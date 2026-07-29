@@ -66,10 +66,27 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
     [router, state]
   );
 
+  // Wrap startLesson so it uses Next.js routing after setting up lesson state.
+  // The raw startLesson in useNothoState intentionally does NOT call setRoute
+  // (it used to call the raw useState setter which was the navigation bug).
+  // This wrapper handles both state update and router.push on success.
+  const startLesson = React.useCallback(
+    (courseId: string, lessonId: string): boolean => {
+      const ok = state.startLesson(courseId, lessonId);
+      if (ok) {
+        state.setRoute({ name: "lesson", courseId, lessonId });
+        router.push(`/lesson/${courseId}/${lessonId}`);
+      }
+      return ok;
+    },
+    [router, state]
+  );
+
   const value = React.useMemo(() => ({
     ...state,
     setRoute,
-  }), [state, setRoute]);
+    startLesson,
+  }), [state, setRoute, startLesson]);
 
   return (
     <NothoContext.Provider value={value}>

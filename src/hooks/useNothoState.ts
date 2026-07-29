@@ -471,9 +471,9 @@ export function useNothoState() {
   const isLessonCompleted = (courseId: string, lessonId: string) =>
     progress.completedLessons.has(`${courseId}:${lessonId}`);
 
-  const startLesson = (courseId: string, lessonId: string) => {
+  const startLesson = (courseId: string, lessonId: string): boolean => {
     const course = CONTENT_DATA.courses.find((c) => c.id === courseId);
-    if (!course) return;
+    if (!course) return false;
     let found: import("@/data/content").Lesson | undefined;
     for (const unit of course.units) {
       const lesson = unit.lessons.find((l) => l.id === lessonId);
@@ -482,7 +482,7 @@ export function useNothoState() {
         break;
       }
     }
-    if (!found) return;
+    if (!found) return false;
     // Resolve the lesson bank: bank-backed lessons pick one variant per slot
     // (fresh per attempt); legacy lessons return their static steps. Never let a
     // resolution error or empty result silently swallow the tap — fall back to
@@ -495,7 +495,7 @@ export function useNothoState() {
     } catch {
       /* keep the static-steps fallback */
     }
-    if (resolved.length === 0) return;
+    if (resolved.length === 0) return false;
     setCurrentLessonState({
       courseId,
       lessonId,
@@ -514,7 +514,11 @@ export function useNothoState() {
       masteredQids: [],
       mistakenQids: [],
     });
-    setRoute({ name: "lesson", courseId, lessonId });
+    // NOTE: We intentionally do NOT call setRoute here. Navigation is handled
+    // by the NothoContext wrapper which has access to router.push. Calling the
+    // raw setRoute here was the original bug — it updated React state but never
+    // triggered Next.js navigation.
+    return true;
   };
 
   // ── Mid-lesson save (survives refresh / app kill / crash) ────────────────
