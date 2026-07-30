@@ -1,3 +1,5 @@
+import { reportClientError } from "@/lib/errorReporting";
+
 export type ServiceWorkerUpdateHandler = (
   registration: ServiceWorkerRegistration
 ) => void;
@@ -67,17 +69,18 @@ export async function registerServiceWorker(options: {
     // Re-check when the tab becomes visible (browser SW update check is throttled).
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
-        void registration.update();
+        registration.update().catch(() => {/* transient — next visibility change retries */});
       }
     });
 
     // Periodic check while the app is open.
     window.setInterval(() => {
-      void registration.update();
+      registration.update().catch(() => {/* transient — next interval retries */});
     }, 60 * 60 * 1000);
 
     return registration;
-  } catch {
+  } catch (err) {
+    void reportClientError("sw-registration", err);
     return null;
   }
 }
