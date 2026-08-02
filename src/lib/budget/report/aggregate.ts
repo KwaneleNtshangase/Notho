@@ -320,11 +320,15 @@ export function buildReport(
     g.categoryCounts.set(entry.category, (g.categoryCounts.get(entry.category) ?? 0) + 1);
   }
   const topMerchants: MerchantInsight[] = [...merchantMap.values()]
-    .map((m) => ({
-      description: cleanMerchantName(m.sample),
-      totalCents: m.totalCents,
-      count: m.count,
-    }))
+    .map((m) => {
+      const topCategory = [...m.categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+      return {
+        description: cleanMerchantName(m.sample),
+        totalCents: m.totalCents,
+        count: m.count,
+        categoryName: topCategory ? metaOf(topCategory).name : "",
+      };
+    })
     .sort((a, b) => b.totalCents - a.totalCents)
     .slice(0, 5);
 

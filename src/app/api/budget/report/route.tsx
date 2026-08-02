@@ -9,6 +9,7 @@ import {
   sumDbEntriesCents,
 } from "@/lib/budget/report/aggregate";
 import { BudgetReportDocument } from "@/lib/budget/report/pdf";
+import { countRedacted, redactReportModel } from "@/lib/budget/report/redact";
 import { precedingPeriod, previousCalendarMonthPeriod } from "@/lib/budget/report/period";
 import { snapshotFingerprint, snapshotMetricsOf } from "@/lib/budget/report/snapshot";
 import { sastToday } from "@/lib/dates";
@@ -29,7 +30,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { periodStart?: string; periodEnd?: string; savingsCategoryIds?: string[]; format?: "pdf" | "json" };
+  let body: {
+    periodStart?: string;
+    periodEnd?: string;
+    savingsCategoryIds?: string[];
+    format?: "pdf" | "json";
+    /** Mask private counterparties in the PDF. Omitted means true. */
+    redactNames?: boolean;
+  };
   try {
     body = await req.json();
   } catch {
@@ -283,9 +291,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, model, entries: lightEntries, prevSnapshot });
   }
 
+  // Counterparty masking. Defaults ON: the PDF is a shareable file, and the
+  // names in it belong to third parties who never agreed to be in it. Only an
+  // explicit `redactNames: false` from the client turns it off, so a caller
+  // that forgets the field gets the safe behaviour rather than the leaky one.
+  // The JSON branch above returns the UNREDACTED model on purpose - that feeds
+  // the on-screen report, which is the user's own data on their own device.
+  const redactNames = body.redactNames !== false;
+  const redactedCount = redactNames ? countRedacted(model) : 0;
+  const pdfModel = redactNames ? redactReportModel(model) : model;
+
   // Server-side @react-pdf render: element is constructed here, outside the
   // try, because renderToBuffer rejects on failure - no error boundary exists.
-  const reportDoc = <BudgetReportDocument model={model} logoDataUri={logoDataUri} />;
+  const reportDoc = (
+    <BudgetReportDocument model={pdfModel} logoDataUri={logoDataUri} redactedCount={redactedCount} />
+  );
   try {
     const buffer = await renderToBuffer(reportDoc);
     const filename = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;

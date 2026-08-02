@@ -261,16 +261,19 @@ exports[`buildReport > fixed fixture snapshot 1`] = `
   "setAsidePlannedCents": 300000,
   "topMerchants": [
     {
+      "categoryName": "Food & Groceries",
       "count": 1,
       "description": "Groceries",
       "totalCents": 320000,
     },
     {
+      "categoryName": "Savings",
       "count": 1,
       "description": "Transfer",
       "totalCents": 250000,
     },
     {
+      "categoryName": "Transport",
       "count": 1,
       "description": "Uber",
       "totalCents": 180000,

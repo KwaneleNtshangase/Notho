@@ -992,7 +992,7 @@ export function BudgetView() {
   };
 
   // Download the PDF for a specific period (used by the interactive report).
-  const downloadReportPdf = async (periodStart: string, periodEnd: string) => {
+  const downloadReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
     setExportLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -1001,7 +1001,7 @@ export function BudgetView() {
       const res = await fetch(`${window.location.origin}/api/budget/report`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ periodStart, periodEnd }),
+        body: JSON.stringify({ periodStart, periodEnd, redactNames }),
       });
       if (!res.ok) return;
       const blob = await res.blob();
@@ -1142,7 +1142,7 @@ export function BudgetView() {
         onClose={() => setShowInteractiveReport(false)}
         initialStart={reportPeriod.start}
         initialEnd={reportPeriod.end}
-        onDownloadPdf={(s, e) => downloadReportPdf(s, e)}
+        onDownloadPdf={(s, e, redact) => downloadReportPdf(s, e, redact)}
         downloadingPdf={exportLoading}
       />
 

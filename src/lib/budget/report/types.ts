@@ -64,6 +64,10 @@ export type MerchantInsight = {
   totalCents: number;
   /** Number of transactions grouped under this merchant. */
   count: number;
+  /** Display name of the category this merchant most often falls under. A
+   *  merchant can span categories, so this is the modal one, not the only one.
+   *  Used by PDF redaction to label a hidden counterparty by what it was for. */
+  categoryName: string;
 };
 
 /** A detected recurring payment: same counterparty, similar amount, 3+ months. */

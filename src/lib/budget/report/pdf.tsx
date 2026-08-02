@@ -636,7 +636,19 @@ function MonthTable({ months }: { months: MonthlySpend[] }) {
   );
 }
 
-export function BudgetReportDocument({ model, logoDataUri }: { model: ReportModel; logoDataUri?: string }) {
+export function BudgetReportDocument({
+  model,
+  logoDataUri,
+  redactedCount = 0,
+}: {
+  model: ReportModel;
+  logoDataUri?: string;
+  /** How many counterparties the caller masked before passing the model in.
+   *  Drives the footnote under the merchant tables - a reader who sees
+   *  "Housing · person A" should be told that is a deliberate mask, not a
+   *  parsing failure. Zero means nothing was hidden and no note is shown. */
+  redactedCount?: number;
+}) {
   const periodLabel = formatPeriodLabel(model.periodStart, model.periodEnd);
   const generated = new Date(model.generatedAt).toLocaleString("en-ZA", {
     timeZone: "Africa/Johannesburg",
@@ -1177,6 +1189,14 @@ export function BudgetReportDocument({ model, logoDataUri }: { model: ReportMode
             </View>
           </View>
         </View>
+
+        {redactedCount > 0 && (
+          <Text style={{ fontSize: 7.5, color: C.textMuted, marginTop: -2, marginBottom: 6 }}>
+            {redactedCount} {redactedCount === 1 ? "counterparty is" : "counterparties are"} shown by category
+            instead of by name, so this report can be shared without naming people you pay. Amounts and totals
+            are unchanged. Names are always visible to you in the app.
+          </Text>
+        )}
 
         <View style={{ flexDirection: "row", gap: 12, marginBottom: 4 }}>
           <View style={{ flex: 1 }}>

@@ -77,7 +77,7 @@ export function InteractiveReportModal({
   onClose: () => void;
   initialStart: string;
   initialEnd: string;
-  onDownloadPdf: (periodStart: string, periodEnd: string) => void;
+  onDownloadPdf: (periodStart: string, periodEnd: string, redactNames: boolean) => void;
   downloadingPdf?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
@@ -90,6 +90,11 @@ export function InteractiveReportModal({
   const [preset, setPreset] = useState<PeriodPreset>("this_month");
   const [customStart, setCustomStart] = useState(initialStart);
   const [customEnd, setCustomEnd] = useState(initialEnd);
+  // Defaults to true, and deliberately resets to true every time the modal
+  // opens rather than being remembered. Turning masking off is a decision about
+  // one specific file going to one specific person; it should not silently
+  // persist into the next export weeks later.
+  const [redactNames, setRedactNames] = useState(true);
 
   // Resolve the active window from the picker; "custom" uses the date inputs.
   const { periodStart, periodEnd } = useMemo(() => {
@@ -219,7 +224,7 @@ export function InteractiveReportModal({
             <div style={{ fontWeight: 900, fontSize: 16 }}>Budget report</div>
             <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>{periodLabel}</div>
           </div>
-          <button type="button" onClick={() => onDownloadPdf(periodStart, periodEnd)} disabled={downloadingPdf}
+          <button type="button" onClick={() => onDownloadPdf(periodStart, periodEnd, redactNames)} disabled={downloadingPdf}
             style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: 10, border: "1px solid var(--color-border)", background: "var(--color-bg)", color: "var(--color-text-primary)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
             <FileText size={15} /> {downloadingPdf ? "..." : "PDF"}
           </button>
@@ -249,6 +254,20 @@ export function InteractiveReportModal({
                 style={{ flex: 1, padding: "7px 10px", borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 13, background: "var(--color-surface)", color: "var(--color-text-primary)" }} />
             </div>
           )}
+          {/* Export privacy. Lives next to the period controls because it is a
+              property of the file you are about to download, not of the report
+              you are reading on screen - what is shown below always uses real
+              names. */}
+          <label style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", marginTop: 8, cursor: "pointer" }}>
+            <input type="checkbox" checked={redactNames} onChange={(e) => setRedactNames(e.target.checked)}
+              style={{ width: 16, height: 16, accentColor: "var(--color-primary)", cursor: "pointer", flexShrink: 0 }} />
+            <span style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.4 }}>
+              Hide names of people I pay in the PDF
+              <span style={{ display: "block", fontSize: 11, color: "var(--color-text-secondary)", opacity: 0.75 }}>
+                Shops and companies stay visible. Amounts never change.
+              </span>
+            </span>
+          </label>
         </div>
 
         <div style={{ padding: "16px 18px 40px" }}>
