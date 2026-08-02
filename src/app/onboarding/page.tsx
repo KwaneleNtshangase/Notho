@@ -29,6 +29,35 @@ function OnboardingContent() {
       if (payload.goalDescription) row.goal_description = payload.goalDescription;
       if (payload.ageRange) row.age_range = payload.ageRange;
       row.username = username;
+
+      // Copy the name from signup metadata into the profile.
+      //
+      // Signup writes the name to auth.users metadata only (email signup via
+      // options.data, OAuth via the provider). Nothing ever copied it into
+      // `profiles`, so profiles.full_name stayed empty unless the person later
+      // opened Profile or Settings and pressed save - which almost nobody does.
+      //
+      // Everything that greets someone by name reads profiles.full_name: the
+      // welcome and milestone emails, the budget report, the leaderboard's
+      // first-name fallback, stokvel member names. They were all falling back
+      // to a username or "there" for users whose name we knew perfectly well.
+      //
+      // Only fill a blank - never clobber a name the user typed themselves.
+      const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+      const metaName = ["full_name", "name", "display_name"]
+        .map((k) => (typeof meta[k] === "string" ? (meta[k] as string).trim() : ""))
+        .find((v) => v.length > 0);
+      if (metaName) {
+        const { data: existing } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (!(existing as { full_name?: string } | null)?.full_name?.trim()) {
+          row.full_name = metaName;
+        }
+      }
+
       if (row.goal ?? row.age_range ?? row.goal_description ?? row.username) {
         await supabase.from("profiles").upsert(row, { onConflict: "user_id" });
       }

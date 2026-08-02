@@ -101,6 +101,53 @@ WHERE table_name = 'budget_entries'
 
 Two rows back means done.
 
+## Fix 1b — backfill the missing names (run this too)
+
+Separate bug, same session. Signup writes the user's name to
+`auth.users.raw_user_meta_data` only — email signup via `options.data`, OAuth
+via the provider. **Nothing ever copied it into `profiles`**, so
+`profiles.full_name` stayed empty unless the person later opened Profile or
+Settings and pressed save.
+
+Everything that greets someone by name reads `profiles.full_name`: the welcome
+and milestone emails, the budget report, the leaderboard first-name fallback,
+stokvel member names. All of them have been falling back to a username or
+"there" for users whose name we knew perfectly well. Erin Barrett is in the
+Supabase dashboard as "Erin Barrett" and her welcome email did not use it.
+
+Onboarding now copies the name across for new signups. This backfills everyone
+who already signed up:
+
+```sql
+UPDATE public.profiles p
+SET full_name = COALESCE(
+      NULLIF(TRIM(u.raw_user_meta_data->>'full_name'), ''),
+      NULLIF(TRIM(u.raw_user_meta_data->>'name'), ''),
+      NULLIF(TRIM(u.raw_user_meta_data->>'display_name'), '')
+    )
+FROM auth.users u
+WHERE p.user_id = u.id
+  AND (p.full_name IS NULL OR TRIM(p.full_name) = '')
+  AND COALESCE(
+      NULLIF(TRIM(u.raw_user_meta_data->>'full_name'), ''),
+      NULLIF(TRIM(u.raw_user_meta_data->>'name'), ''),
+      NULLIF(TRIM(u.raw_user_meta_data->>'display_name'), '')
+    ) IS NOT NULL;
+```
+
+Only fills blanks — a name someone typed themselves is never overwritten.
+
+Check who is still nameless afterwards:
+
+```sql
+SELECT COUNT(*) FILTER (WHERE TRIM(COALESCE(full_name, '')) = '') AS still_blank,
+       COUNT(*) AS total
+FROM public.profiles;
+```
+
+Anyone still blank signed up without giving a name at all — there is nothing to
+backfill for them, and the greeting falls back to their username as designed.
+
 ## Fix 2 — already in the code
 
 `/api/budget/import/commit` now detects a missing optional column, strips

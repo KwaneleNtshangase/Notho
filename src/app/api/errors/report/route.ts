@@ -101,15 +101,37 @@ export async function POST(req: NextRequest) {
 
   // The alert email needs a real person, not a hash. A bug report you cannot
   // reply to is half a bug report: the whole point is to message the user back
-  // once it is fixed. Name comes from their profile; both are already ours.
+  // once it is fixed.
+  //
+  // The name can live in two places and they drift apart:
+  //   1. `profiles.full_name` - written only when someone saves their profile
+  //      or settings. A user who signed up and went straight to the app has an
+  //      empty one.
+  //   2. `auth.users.raw_user_meta_data` - set at signup, including by OAuth.
+  //      This is what the Supabase dashboard shows as "Display name".
+  //
+  // Erin Barrett had a name in (2) and nothing in (1), so the first alert read
+  // "(no name set)" for a user whose name we plainly knew. Check the profile
+  // first because the user edited it deliberately, then fall back to signup
+  // metadata. OAuth providers vary on the key, so try all three.
+  //
+  // NB: profiles is keyed on `user_id`, NOT `id`. Querying `.eq("id", ...)`
+  // matches nothing and fails silently as an empty name.
   let userName = "";
   if (user?.id) {
     const { data: prof } = await admin
       .from("profiles")
       .select("full_name, username")
-      .eq("id", user.id)
+      .eq("user_id", user.id)
       .maybeSingle();
     userName = (prof?.full_name || prof?.username || "").trim();
+  }
+  if (!userName && user) {
+    const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+    const fromMeta = ["full_name", "name", "display_name"]
+      .map((k) => (typeof meta[k] === "string" ? (meta[k] as string) : ""))
+      .find((v) => v.trim().length > 0);
+    userName = (fromMeta ?? "").trim();
   }
   const userLabel = user?.email
     ? `${userName || "(no name set)"} <${user.email}>`
