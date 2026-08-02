@@ -81,7 +81,15 @@ export type ParsePdfError =
   | { kind: "needsPassword" }
   | { kind: "scanned" }
   | { kind: "noText" }
-  | { kind: "error"; message: string };
+  | {
+      kind: "error";
+      message: string;
+      /** Masked layout signature, attached when we found no transaction table.
+       *  Lets an unsupported layout be fixed from the bug report alone, without
+       *  ever asking the user for their statement. See pdfFingerprint.ts. */
+      diagnostics?: string;
+      bankHint?: string;
+    };
 
 export type ParsePdfResult =
   | ({ ok: true } & ParseStatementResult)

@@ -1,3 +1,4 @@
+import { MAIL_FROM } from "@/lib/emails/sender";
 import { NextResponse } from "next/server";
 
 /** Disabled in production - diagnostic email test only for local development. */
@@ -26,7 +27,7 @@ export async function GET() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Notho <hello@fundiapp.co.za>",
+        from: MAIL_FROM,
         to: [to],
         subject: `[Notho Test] Delivery check → ${to}`,
         html: `<p>Test email to ${to}</p>`,

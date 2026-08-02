@@ -1,3 +1,4 @@
+import { MAIL_FROM } from "@/lib/emails/sender";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getUserFromRequest } from "@/lib/apiAuth";
@@ -21,7 +22,7 @@ export const maxDuration = 60;
  */
 
 const DEFAULT_SCHEDULED_AT = "2026-07-22T06:00:00.000Z"; // 22 Jul 2026, 08:00 SAST (UTC+2)
-const FROM = "Notho <hello@fundiapp.co.za>";
+const FROM = MAIL_FROM;
 const SUBJECT = "Fundi Finance is now Notho";
 const MAX_RECIPIENTS = 20000;
 // Stable key for the current announcement's dedupe ledger. Start a genuinely new

@@ -321,12 +321,19 @@ export function buildReport(
   }
   const topMerchants: MerchantInsight[] = [...merchantMap.values()]
     .map((m) => {
-      const topCategory = [...m.categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+      // Only claim a category when EVERY transaction for this merchant carries
+      // it. A merchant that spans categories gets an empty string, and the PDF
+      // redactor falls back to "Uncategorised" rather than picking the modal
+      // one. Picking the most common would let a counterparty the user split
+      // between Housing and Groceries be labelled "Groceries" - relabelling
+      // their own categorisation, which we must never do.
+      const cats = [...m.categoryCounts.keys()];
+      const unanimous = cats.length === 1 ? cats[0] : null;
       return {
         description: cleanMerchantName(m.sample),
         totalCents: m.totalCents,
         count: m.count,
-        categoryName: topCategory ? metaOf(topCategory).name : "",
+        categoryName: unanimous ? metaOf(unanimous).name : "",
       };
     })
     .sort((a, b) => b.totalCents - a.totalCents)

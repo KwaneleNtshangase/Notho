@@ -14,6 +14,8 @@ import {
   extractDiscoveryBalances,
   mergeTemplateRows,
 } from "./pdfTemplates";
+import { parseLastResortRows } from "./pdfLastResort";
+import { fingerprintLayout, formatFingerprint } from "./pdfFingerprint";
 
 const SCANNED_MESSAGE =
   "This looks like a scanned image - please upload the downloadable/text PDF or a CSV/OFX export from your bank.";
@@ -46,6 +48,37 @@ export async function parsePdfStatement(
     rows = mergeTemplateRows(generic.rows, templateRows, bankId);
   }
 
+  // Tier 3. Both tiers above need to RECOGNISE something - a known bank, or a
+  // column header we have seen before. A certified statement, a redesigned
+  // template or a bank we have never held an account at satisfies neither, and
+  // used to fall straight through as zero rows with no explanation.
+  //
+  // The last-resort parser assumes only that a transaction row has a date and
+  // an amount, which is what a statement is. It marks every row needsReview, so
+  // nothing it infers reaches the budget without the user confirming it.
+  let usedLastResort = false;
+  if (rows.length === 0) {
+    const fallback = parseLastResortRows(lines, contextYear);
+    if (fallback.rows.length > 0) {
+      rows = fallback.rows;
+      usedLastResort = true;
+    }
+  }
+
+  // Still nothing. Fail loudly, and attach the layout fingerprint so this is
+  // fixable from the bug report alone - see pdfFingerprint.ts for why we can
+  // send this without ever handling the statement itself.
+  if (rows.length === 0) {
+    return {
+      ok: false,
+      kind: "error",
+      message:
+        "We couldn't find a transaction table in this PDF. It may be a certified or summary statement rather than a standard one.",
+      diagnostics: formatFingerprint(fingerprintLayout(lines)),
+      bankHint: bankId ?? undefined,
+    };
+  }
+
   // Discovery has no per-row running balance - pull opening/closing from the
   // account summary so the signed-sum reconciliation can still run.
   if (bankId === "discovery") {
@@ -76,7 +109,9 @@ export async function parsePdfStatement(
 
   const hasBalanceMeta =
     generic.balances.openingBalance !== undefined && closingBalance !== undefined;
-  const lowConfidence = !hasBalanceMeta;
+  // A last-resort parse is low confidence by definition: we recognised neither
+  // the bank nor the column layout, so the user must eyeball every row.
+  const lowConfidence = !hasBalanceMeta || usedLastResort;
 
   let reconciliation =
     (bankId === "capitec" || bankId === "fnb" || bankId === "standard-bank") &&
@@ -105,7 +140,11 @@ export async function parsePdfStatement(
     });
   }
 
-  if (lowConfidence && reconciliation.ok) {
+  if (usedLastResort) {
+    reconciliation.warnings.push(
+      "We don't have a template for this statement layout yet, so these rows were read generically. Please check the dates and amounts before importing - we've logged it and will add proper support."
+    );
+  } else if (lowConfidence && reconciliation.ok) {
     reconciliation.warnings.push(
       "No opening/closing balance found - review each transaction carefully."
     );

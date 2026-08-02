@@ -173,8 +173,17 @@ export async function POST(req: NextRequest) {
         if (pdfResult.kind === "scanned") {
           return NextResponse.json({ error: SCANNED_MESSAGE }, { status: 400 });
         }
+        // Pass the masked layout fingerprint back to the client so it rides
+        // along with the automatic bug report. It contains no statement data -
+        // bank column headings verbatim, transaction rows masked to x/9. This
+        // is what lets an unsupported layout be fixed without ever asking the
+        // user to send us their statement.
         return NextResponse.json(
-          { error: pdfResult.kind === "error" ? pdfResult.message : SCANNED_MESSAGE },
+          {
+            error: pdfResult.kind === "error" ? pdfResult.message : SCANNED_MESSAGE,
+            diagnostics: pdfResult.kind === "error" ? pdfResult.diagnostics : undefined,
+            bankHint: pdfResult.kind === "error" ? pdfResult.bankHint : undefined,
+          },
           { status: 400 }
         );
       }

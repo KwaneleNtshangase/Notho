@@ -9,13 +9,15 @@
  * username. We never fall back to a generic label like "Mfundi".
  */
 
-// DELIBERATELY STILL THE OLD SENDER. The domain moved to notho.co.za, but the
-// From address cannot move until notho.co.za is verified in Resend (SPF/DKIM
-// records live at the registrar). Sending from an unverified domain does not
-// degrade gracefully — Resend rejects the call and every lifecycle email
-// silently stops. Flip this to hello@notho.co.za only after the Resend domain
-// shows "Verified", and send one test first.
-const FROM = "Notho <hello@fundiapp.co.za>";
+import { MAIL_FROM } from "./sender";
+
+// The sender lives in one shared module and is overridable via the
+// MAIL_FROM_ADDRESS env var, so the notho.co.za cutover is a Vercel setting
+// rather than a code change in six files. It still points at the old domain by
+// default, because that is the one Resend has verified - sending from an
+// unverified domain does not degrade, Resend rejects it and every email
+// silently stops. See docs/EMAIL-MIGRATION-NOTHO.md.
+const FROM = MAIL_FROM;
 // www, not the apex: the apex 308-redirects to www, and email clients do not
 // follow redirects for images — the logo shows broken. The white mark reads on
 // the teal (#007A85) header band; the colour icon's teal blends.

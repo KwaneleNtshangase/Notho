@@ -7,6 +7,7 @@ import { formatRand } from "@/lib/viewHelpers";
 import type { PreviewTxn } from "@/lib/budget/types";
 import { normaliseDescription } from "@/lib/budget/dedupe";
 import { detectTransferPairs, type TransferPair } from "@/lib/budget/transfers";
+import { reportClientError } from "@/lib/errorReporting";
 
 type PreviewRow = PreviewTxn & {
   categoryEdited?: boolean;
@@ -37,6 +38,8 @@ type ParseResponse = {
   accountLabel?: string;
   fileType?: string;
   needsPassword?: boolean;
+  /** Masked layout signature returned when no transaction table was found. */
+  diagnostics?: string;
   customCategories?: CustomBudgetCategory[];
   reconciliation?: {
     ok: boolean;
@@ -259,6 +262,42 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
     setNewCategoryName("");
   };
 
+  /**
+   * Every import failure must reach the bug inbox, with enough detail to fix it
+   * WITHOUT going back to the user - they have already told us it is broken and
+   * asking them to re-explain is how a report dies.
+   *
+   * So we send the bank hint, the file type and the size. We deliberately do
+   * NOT send the file, the file name, or any transaction: statements are
+   * processed in memory only and that promise is on the panel above. The bank
+   * and the layout are enough to reproduce it from a fixture.
+   */
+  const reportImportFailure = async (
+    area: string,
+    reason: string,
+    file: File,
+    json?: Partial<ParseResponse>
+  ): Promise<string> => {
+    // Short, sayable reference the user can quote and we can grep for. Not a
+    // UUID: someone reading it off a phone screen to a WhatsApp message needs
+    // it to be six characters, not thirty-six.
+    const ref = Math.random().toString(36).slice(2, 8).toUpperCase();
+    await reportClientError(area, new Error(reason), {
+      ref,
+      bankHint: json?.bankHint ?? "unknown",
+      fileType: json?.fileType ?? file.name.split(".").pop()?.toLowerCase() ?? "unknown",
+      fileSizeKb: Math.round(file.size / 1024),
+      // Distinguishes "we could not read the file at all" from "we read it and
+      // it was empty" - completely different fixes.
+      parsedOk: json?.ok ?? false,
+      lowConfidence: json?.lowConfidence ?? null,
+      // The masked layout signature. No statement content - see
+      // src/lib/budget/parsers/pdfFingerprint.ts.
+      diagnostics: json?.diagnostics ?? null,
+    });
+    return ref;
+  };
+
   const parseOneFile = async (
     file: File,
     token: string,
@@ -279,7 +318,12 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
       return { ok: false, needsPassword: true };
     }
     if (!res.ok) {
-      return { ok: false, error: json.error ?? "Parse failed" };
+      return {
+        ok: false,
+        error: json.error ?? "Parse failed",
+        diagnostics: json.diagnostics,
+        bankHint: json.bankHint,
+      };
     }
     return json;
   };
@@ -314,12 +358,29 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
           setLoading(false);
           return;
         }
-        if (!json.ok || !json.transactions) {
-          // Surface this file's failure but keep parsing the rest, and keep any
-          // already-parsed files in the preview (never silently reset).
+        // `!json.transactions` is NOT enough: an empty array is truthy. The
+        // parse route returns `{ ok: true, transactions: [] }` when it
+        // recognises the bank but reads no rows out of the table - which is
+        // exactly what a Discovery "CertifiedStatements.pdf" did. That fell
+        // through every guard below, produced no rows and no error, and the
+        // button simply returned to its idle label. To the user, pressing
+        // Preview did nothing at all. Check the LENGTH.
+        if (!json.ok || !json.transactions?.length) {
+          const reason = json.error
+            ?? "We recognised this statement but couldn't read any transactions from it.";
+          // Report first so the user's message can carry the reference code.
+          const ref = await reportImportFailure(
+            json.ok ? "import-parse-empty" : "import-parse-failed",
+            reason,
+            file,
+            json
+          );
+          // Tell them what happened, that it is already logged, and that they
+          // do not need to do anything. Nobody should have to guess whether a
+          // failure was noticed.
           failed.push({
             name: file.name,
-            error: json.error ?? "Couldn't read this statement - unsupported layout or no transaction table found.",
+            error: `${reason} We've automatically logged this and we're on it - your statement was not sent to us, only the layout. Reference ${ref}.`,
           });
           continue;
         }
@@ -355,6 +416,19 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
       setRows(allRows);
       if (failed.length > 0) {
         setError(failed.map((f) => `${f.name}: ${f.error}`).join("  ·  "));
+      } else if (allRows.length === 0 && files.length > 0) {
+        // Belt and braces. Every known route to zero rows is handled above, so
+        // reaching here means a path we have not thought of - which is the most
+        // important kind to hear about. Never leave the user with a button that
+        // silently returns to idle.
+        const ref = await reportImportFailure(
+          "import-parse-no-rows",
+          "Parse returned no rows across all files",
+          files[0]
+        );
+        setError(
+          `We couldn't find any transactions in these files. This has been logged automatically and we're looking into it - you don't need to do anything. Reference ${ref}.`
+        );
       }
       if (latestCustomCategories?.length) {
         setCustomCategories(latestCustomCategories);
@@ -362,7 +436,13 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
         await loadCustomCategories();
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Parse failed");
+      const msg = e instanceof Error ? e.message : "Parse failed";
+      if (files[0]) {
+        const ref = await reportImportFailure("import-parse-threw", msg, files[0]);
+        setError(`${msg} - this has been logged automatically and we're on it. Reference ${ref}.`);
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -449,7 +529,14 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
         const json = await res.json();
         if (!res.ok) {
           // Keep importing the other files; report failures at the end.
-          failed.push(`${meta.fileName}: ${json.error ?? "Import failed"}`);
+          const reason = json.error ?? "Import failed";
+          failed.push(`${meta.fileName}: ${reason}`);
+          void reportClientError("import-commit-failed", new Error(reason), {
+            bankHint: meta.bankHint ?? "unknown",
+            fileType: meta.fileType,
+            status: res.status,
+            rowCount: commitRows.length,
+          });
           continue;
         }
         committedAny = true;
@@ -469,7 +556,12 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
       reset();
       onImported();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Import failed");
+      const msg = e instanceof Error ? e.message : "Import failed";
+      setError(msg);
+      void reportClientError("import-commit-threw", new Error(msg), {
+        fileCount: fileMetas.length,
+        bankHints: fileMetas.map((m) => m.bankHint ?? "unknown").join(","),
+      });
     } finally {
       setCommitting(false);
     }

@@ -1,3 +1,4 @@
+import { MAIL_FROM } from "@/lib/emails/sender";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getUserFromRequest } from "@/lib/apiAuth";
@@ -142,7 +143,7 @@ export async function POST(req: NextRequest) {
         method: "POST",
         headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: "Notho <hello@fundiapp.co.za>",
+          from: MAIL_FROM,
           to: [email],
           subject: "Good news - we've fixed that for you",
           html: `

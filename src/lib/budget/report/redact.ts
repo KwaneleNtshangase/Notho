@@ -88,6 +88,14 @@ function letterFor(index: number): string {
   return out;
 }
 
+/**
+ * The category shown next to a masked counterparty is ALWAYS one the user
+ * assigned to that counterparty - never inferred, never guessed, never the
+ * most-common-of-several. Aggregate passes an empty string when a merchant's
+ * transactions span more than one category, and we say "Uncategorised" rather
+ * than picking a winner. Relabelling someone's rent as groceries in a document
+ * they are about to share would be worse than saying nothing.
+ */
 function labelFor(categoryName: string | undefined, letter: string): string {
   const cat = (categoryName ?? "").trim();
   const clean = !cat || /^other$/i.test(cat) ? "Uncategorised" : cat;

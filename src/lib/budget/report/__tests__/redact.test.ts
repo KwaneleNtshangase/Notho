@@ -125,6 +125,24 @@ describe("redactReportModel", () => {
     expect(out.topMerchants[0].description).toBe("Uncategorised · person A");
   });
 
+  it("never invents a category when aggregate could not agree on one", () => {
+    // Aggregate sends "" for a merchant whose transactions span categories.
+    // Saying "Uncategorised" is correct; naming any single category would be
+    // relabelling the user's own categorisation inside a shared document.
+    const out = redactReportModel(
+      modelOf({ merchants: [{ description: "Samke", categoryName: "" }] })
+    );
+    expect(out.topMerchants[0].description).toBe("Uncategorised · person A");
+  });
+
+  it("uses the exact category the user assigned, verbatim", () => {
+    const out = redactReportModel(
+      modelOf({ merchants: [{ description: "Samke", categoryName: "Housing/Rent" }] })
+    );
+    expect(out.topMerchants[0].description).toContain("Housing/Rent");
+    expect(out.topMerchants[0].description).not.toContain("Food");
+  });
+
   it("never alters any amount, count or date", () => {
     const model = modelOf({
       merchants: [{ description: "Samke", totalCents: 220000, count: 4 }],

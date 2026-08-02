@@ -1,3 +1,4 @@
+import { MAIL_FROM } from "@/lib/emails/sender";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getUserFromRequest } from "@/lib/apiAuth";
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Notho <hello@fundiapp.co.za>",
+        from: MAIL_FROM,
         to: [process.env.ALERT_EMAIL || "kwanelebc031@gmail.com"],
         subject: `[${typeDisplay}] ${subject}`,
         html: `
