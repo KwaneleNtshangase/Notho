@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
               <p style="margin:4px 0;font-size:12px;color:#9ca3af">User token: ${eUserId}</p>
               <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0" />
               <p style="font-size:13px;color:#6b7280">Triage and notify the user from the admin console:</p>
-              <p><a href="https://fundiapp.co.za/admin/bugs" style="color:#007A85;font-weight:700">Open bug console →</a></p>
+              <p><a href="https://notho.co.za/admin/bugs" style="color:#007A85;font-weight:700">Open bug console →</a></p>
             </div>`,
         }),
       }).catch(() => { });

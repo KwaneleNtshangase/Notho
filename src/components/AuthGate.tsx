@@ -515,7 +515,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               </div>
               <button
                 onClick={() => {
-                  const url = typeof window !== "undefined" ? window.location.href : "https://fundiapp.co.za";
+                  const url = typeof window !== "undefined" ? window.location.href : "https://notho.co.za";
                   const doCopy = () => {
                     setLinkCopied(true);
                     setTimeout(() => setLinkCopied(false), 3000);

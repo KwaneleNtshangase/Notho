@@ -9,11 +9,17 @@
  * username. We never fall back to a generic label like "Mfundi".
  */
 
+// DELIBERATELY STILL THE OLD SENDER. The domain moved to notho.co.za, but the
+// From address cannot move until notho.co.za is verified in Resend (SPF/DKIM
+// records live at the registrar). Sending from an unverified domain does not
+// degrade gracefully — Resend rejects the call and every lifecycle email
+// silently stops. Flip this to hello@notho.co.za only after the Resend domain
+// shows "Verified", and send one test first.
 const FROM = "Notho <hello@fundiapp.co.za>";
-const APP_URL = "https://fundiapp.co.za";
-// www, not the apex: notho.co.za/fundiapp.co.za 308-redirect to www, and email
-// clients don't follow redirects for images — the logo shows broken. The white
-// mark reads on the teal (#007A85) header band; the colour icon's teal blends.
+// www, not the apex: the apex 308-redirects to www, and email clients do not
+// follow redirects for images — the logo shows broken. The white mark reads on
+// the teal (#007A85) header band; the colour icon's teal blends.
+const APP_URL = "https://www.notho.co.za";
 const LOGO = "https://www.notho.co.za/notho-icon-white.png";
 
 export type EmailProfile = {
@@ -174,9 +180,10 @@ export function buildMilestone(kind: MilestoneKind, p: EmailProfile, streak: num
  *      does not read as a phishing attempt.
  *   3. Explain the name, briefly.
  *
- * The sending address stays hello@fundiapp.co.za until the domain migrates,
- * which is deliberate: changing the From address in the same week as the name
- * is what actually trips spam filters and confuses people.
+ * The sending address stays on the old domain until Resend verifies the new
+ * one, which is also the safer sequencing: changing the From address in the
+ * same week as the name is what actually trips spam filters. Links in the body
+ * already point at notho.co.za.
  */
 export function buildRebrandAnnouncement(p?: EmailProfile | null): BuiltEmail {
   const name = resolveName(p);

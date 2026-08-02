@@ -15,7 +15,7 @@ export const TEST_EMAIL = process.env.TEST_EMAIL ?? "e2e-test@fundiapp.co.za";
 // ever want to change it.
 export const TEST_PASSWORD = process.env.TEST_PASSWORD ?? "FundiE2E_Test#2026";
 export const BASE_URL =
-  process.env.BASE_URL ?? "https://fundiapp.co.za";
+  process.env.BASE_URL ?? "https://notho.co.za";
 
 /** Sign in with email/password, wait for the app shell to appear */
 export async function signIn(page: Page) {

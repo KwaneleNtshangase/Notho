@@ -13,9 +13,8 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      // Scripts: self + PostHog + CDN. Two production domains during the rename:
-      // fundiapp.co.za (legacy) and notho.co.za (new) both serve this app until
-      // the fundiapp cutover completes, so both are allowlisted below.
+      // Scripts: self + PostHog + CDN. notho.co.za is the canonical domain;
+      // fundiapp.co.za 301-redirects to it via vercel.json.
       "script-src 'self' 'unsafe-inline' https://us-assets.i.posthog.com https://us.i.posthog.com https://app.posthog.com https://cdn.jsdelivr.net",
       // Styles: self + inline (JSX style={{}}) + Google Fonts
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
@@ -23,13 +22,13 @@ const securityHeaders = [
       // Images: self + data URIs (emojis, canvas exports) + OAuth avatars
       "img-src 'self' data: blob: https://*.supabase.co https://*.googleusercontent.com https://*.fbcdn.net https://platform-lookaside.fbsbx.com",
       // XHR / fetch / websocket
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com https://app.posthog.com https://fundiapp.co.za https://notho.co.za https://www.notho.co.za https://wealthwithkwanele.co.za",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com https://app.posthog.com https://notho.co.za https://www.notho.co.za https://wealthwithkwanele.co.za",
       // Service worker scope
       "worker-src 'self' blob:",
       // Frames: deny embedding us; allow YouTube for lessons if needed
       "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
       "frame-ancestors 'none'",
-      "form-action 'self' https://formspree.io https://fundiapp.co.za https://notho.co.za https://www.notho.co.za https://wealthwithkwanele.co.za",
+      "form-action 'self' https://formspree.io https://notho.co.za https://www.notho.co.za https://wealthwithkwanele.co.za",
       "base-uri 'self'",
       "object-src 'none'",
       "upgrade-insecure-requests",

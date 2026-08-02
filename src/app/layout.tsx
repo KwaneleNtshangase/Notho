@@ -29,7 +29,11 @@ export const metadata: Metadata = {
   title: "Notho - Master Your Money",
   description: "Interactive personal finance learning app built for South Africa.",
   manifest: "/manifest.json",
-  metadataBase: new URL("https://fundiapp.co.za"),
+  // www, not the apex. The apex 308-redirects to www, and social scrapers
+  // (WhatsApp, Twitter, LinkedIn) do not all follow redirects when fetching
+  // og:image — the share preview comes back blank. Point straight at the host
+  // that actually serves the file.
+  metadataBase: new URL("https://www.notho.co.za"),
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

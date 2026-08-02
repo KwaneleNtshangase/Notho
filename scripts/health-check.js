@@ -8,12 +8,12 @@
  *  4. Response time < 8 seconds
  *
  * Usage: node scripts/health-check.js
- * Env:   BASE_URL   (default: https://fundiapp.co.za)
+ * Env:   BASE_URL   (default: https://notho.co.za)
  */
 
 const { chromium } = require("@playwright/test");
 
-const BASE_URL = process.env.BASE_URL ?? "https://fundiapp.co.za";
+const BASE_URL = process.env.BASE_URL ?? "https://notho.co.za";
 const TIMEOUT = 30_000;
 
 const checks = [];

@@ -109,8 +109,8 @@ export default function PrivacyPage() {
           <p>
             Notho (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;) is a
             South African personal-finance learning app available at{" "}
-            <a href="https://fundiapp.co.za" style={{ color: "#007A85" }}>
-              fundiapp.co.za
+            <a href="https://notho.co.za" style={{ color: "#007A85" }}>
+              notho.co.za
             </a>
             . We are committed to protecting your personal information in
             accordance with the Protection of Personal Information Act, 2013
@@ -351,8 +351,8 @@ export default function PrivacyPage() {
               support@fundiapp.co.za
             </a>
             <br />
-            <a href="https://fundiapp.co.za" style={{ color: "#007A85" }}>
-              fundiapp.co.za
+            <a href="https://notho.co.za" style={{ color: "#007A85" }}>
+              notho.co.za
             </a>
           </address>
           <p style={{ marginTop: "16px" }}>

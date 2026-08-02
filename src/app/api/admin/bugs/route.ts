@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
               <p>You're all set - just carry on where you left off. Small things like this matter to us, and keeping Notho smooth and reliable for you is exactly what we're here for.</p>
               <p style="margin-top:20px">Thanks for being part of Notho 💚</p>
               <p style="color:#6b7280">- The Notho team</p>
-              <p style="margin-top:24px"><a href="https://fundiapp.co.za" style="background:#007A85;color:#fff;text-decoration:none;padding:10px 18px;border-radius:10px;font-weight:700;display:inline-block">Open Notho</a></p>
+              <p style="margin-top:24px"><a href="https://notho.co.za" style="background:#007A85;color:#fff;text-decoration:none;padding:10px 18px;border-radius:10px;font-weight:700;display:inline-block">Open Notho</a></p>
             </div>`,
         }),
       });

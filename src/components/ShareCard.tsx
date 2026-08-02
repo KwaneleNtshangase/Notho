@@ -151,11 +151,11 @@ export function generateShareCard(data: ShareCardData): Promise<string> {
       ctx.beginPath(); ctx.roundRect(120, H - 220, W - 240, 80, 40); ctx.fill();
       ctx.fillStyle = "#000000";
       ctx.font = `bold 34px -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx.fillText("Try it FREE → fundiapp.co.za", W / 2, H - 170);
+      ctx.fillText("Try it FREE → notho.co.za", W / 2, H - 170);
 
       ctx.fillStyle = "rgba(255,255,255,0.25)";
       ctx.font = `500 28px -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx.fillText("Real money skills. Start free at fundiapp.co.za", W / 2, H - 110);
+      ctx.fillText("Real money skills. Start free at notho.co.za", W / 2, H - 110);
 
       resolve(canvas.toDataURL("image/png"));
     } catch (err) { reject(err); }
@@ -177,8 +177,8 @@ export function ShareResultButton({ data, label = "Share" }: { data: ShareCardDa
       const file = new File([blob], "notho-result.png", { type: "image/png" });
 
       const text = data.type === "calculator"
-        ? `${data.headline} - calculated on Notho 📊 Try it free at fundiapp.co.za`
-        : `I just completed "${data.lessonTitle}" (+${data.xpEarned} XP) on Notho 🎓 fundiapp.co.za`;
+        ? `${data.headline} - calculated on Notho 📊 Try it free at notho.co.za`
+        : `I just completed "${data.lessonTitle}" (+${data.xpEarned} XP) on Notho 🎓 notho.co.za`;
 
       let shared = false;
       // Try native share with file
@@ -192,7 +192,7 @@ export function ShareResultButton({ data, label = "Share" }: { data: ShareCardDa
       // Try native share without file
       if (!shared && navigator.share) {
         try {
-          await navigator.share({ title: "Notho", text, url: "https://fundiapp.co.za" });
+          await navigator.share({ title: "Notho", text, url: "https://notho.co.za" });
           shared = true;
         } catch { /* cancelled */ }
       }

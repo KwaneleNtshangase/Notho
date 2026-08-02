@@ -182,15 +182,15 @@ export function generateShareText(
   if (type === "lesson") {
     const t = data.lessonTitle ?? "a lesson";
     const xpPart = data.xp ? ` (+${data.xp} XP)` : "";
-    return `I just completed "${t}"${xpPart} on Notho 🎓\n\nShort, South Africa–focused money lessons that actually make sense. Join me 👇\nfundiapp.co.za`;
+    return `I just completed "${t}"${xpPart} on Notho 🎓\n\nShort, South Africa–focused money lessons that actually make sense. Join me 👇\nnotho.co.za`;
   }
   if (type === "badge") {
     const n = data.badgeName ?? "a";
-    return `I just earned the "${n}" badge on Notho 🏅\n\nBuilding real financial knowledge, one lesson at a time.\nfundiapp.co.za`;
+    return `I just earned the "${n}" badge on Notho 🏅\n\nBuilding real financial knowledge, one lesson at a time.\nnotho.co.za`;
   }
   if (type === "streak") {
     const d = data.streakDays ?? 0;
-    return `${d}-day learning streak on Notho 🔥\n\nShowing up for my money goals every single day.\nfundiapp.co.za`;
+    return `${d}-day learning streak on Notho 🔥\n\nShowing up for my money goals every single day.\nnotho.co.za`;
   }
   return "";
 }
@@ -602,11 +602,11 @@ export function generateShareCard(data: ShareCardData): Promise<string> {
       canvasRoundRect(ctx, 120, H - 220, W - 240, 80, 40); ctx.fill();
       ctx.fillStyle = "#000000";
       ctx.font = `bold 34px -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx.fillText("Try it FREE → fundiapp.co.za", W / 2, H - 170);
+      ctx.fillText("Try it FREE → notho.co.za", W / 2, H - 170);
 
       ctx.fillStyle = "rgba(255,255,255,0.25)";
       ctx.font = `500 28px -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx.fillText("Real money skills. Start free at fundiapp.co.za", W / 2, H - 110);
+      ctx.fillText("Real money skills. Start free at notho.co.za", W / 2, H - 110);
 
       resolve(canvas.toDataURL("image/png"));
     } catch (err) {
@@ -626,8 +626,8 @@ export function ShareResultButton({ data, label = "Share" }: { data: ShareCardDa
       const dataUrl = await generateShareCard(data);
 
       const text = data.type === "calculator"
-        ? `${data.headline} - calculated on Notho 📊 Try it free at fundiapp.co.za`
-        : `I just completed "${(data as any).lessonTitle}" (+${(data as any).xpEarned} XP) on Notho 🎓 fundiapp.co.za`;
+        ? `${data.headline} - calculated on Notho 📊 Try it free at notho.co.za`
+        : `I just completed "${(data as any).lessonTitle}" (+${(data as any).xpEarned} XP) on Notho 🎓 notho.co.za`;
 
       // Try native share with image file
       try {
