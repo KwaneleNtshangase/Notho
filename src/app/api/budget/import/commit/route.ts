@@ -184,7 +184,47 @@ export async function POST(req: NextRequest) {
     };
   });
 
-  const { error: insertError } = await admin.from("budget_entries").insert(inserts);
+  /**
+   * Schema-drift tolerance. This is not defensive programming for its own sake:
+   * migration 20260706122040_account_attribution.sql sat unapplied on
+   * production for four weeks, and because this insert named account_id and
+   * entry_method unconditionally, PostgREST rejected the ENTIRE batch. Every
+   * statement import in production failed at the final step, after parsing
+   * hundreds of rows correctly. The reads in BudgetPlanner already degraded
+   * gracefully for exactly this reason; the write did not, so the write is
+   * what broke.
+   *
+   * Account attribution is a nice-to-have. The transactions are the point. If
+   * the columns are missing we drop them and save the money, rather than
+   * throwing away a correct parse over metadata.
+   */
+  const OPTIONAL_COLUMNS = ["account_id", "entry_method"] as const;
+
+  const isUnknownColumn = (e: { code?: string; message: string }): string | null => {
+    // PGRST204 on write, 42703 from Postgres directly. Both name the column.
+    const m = e.message.match(/'([a-z_]+)' column|column [a-z_]+\.([a-z_]+) does not exist/i);
+    const named = m?.[1] ?? m?.[2] ?? null;
+    if (!named) return null;
+    return (OPTIONAL_COLUMNS as readonly string[]).includes(named) ? named : null;
+  };
+
+  let insertError = (await admin.from("budget_entries").insert(inserts)).error;
+
+  if (insertError && isUnknownColumn(insertError)) {
+    const missing = isUnknownColumn(insertError);
+    console.error(
+      `[schema-drift] budget_entries is missing '${missing}'. ` +
+        `Apply supabase/migrations/20260706122040_account_attribution.sql. ` +
+        `Saving ${inserts.length} entries without account attribution.`
+    );
+    const stripped = inserts.map((row) => {
+      const copy: Record<string, unknown> = { ...row };
+      for (const col of OPTIONAL_COLUMNS) delete copy[col];
+      return copy;
+    });
+    insertError = (await admin.from("budget_entries").insert(stripped)).error;
+  }
+
   if (insertError) {
     const isDuplicate =
       insertError.code === "23505" ||
