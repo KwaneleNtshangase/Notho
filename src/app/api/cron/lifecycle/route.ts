@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceSupabase } from "@/lib/supabaseServer";
-import { buildD1, buildMilestone, sendEmail, type EmailProfile } from "@/lib/emails/lifecycle";
+import {
+  buildD1,
+  buildMilestone,
+  buildWelcome,
+  nameFromAuthMetadata,
+  sendEmail,
+  type EmailProfile,
+} from "@/lib/emails/lifecycle";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -42,7 +49,7 @@ export async function GET(req: NextRequest) {
 
   const admin = createServiceSupabase();
   const now = Date.now();
-  const summary = { d1: 0, d7: 0, d14: 0, d30: 0, failed: 0 };
+  const summary = { welcome: 0, d1: 0, d7: 0, d14: 0, d30: 0, failed: 0 };
 
   // ── D+1 re-engagement: last lesson 20-48h ago, not yet nudged ──────────────
   try {
@@ -79,9 +86,63 @@ export async function GET(req: NextRequest) {
     /* d1 batch is best-effort; milestones still run */
   }
 
-  // ── D+7 / D+14 / D+30 milestones by signup age ─────────────────────────────
   const { data: list } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const users = list?.users ?? [];
+
+  // ── Welcome backstop ───────────────────────────────────────────────────────
+  //
+  // The welcome email used to fire from exactly one place: the last step of
+  // onboarding. Anyone who signed up, confirmed their email and then closed the
+  // tab - or went straight to the budget importer, as our most engaged tester
+  // did - got nothing at all. No welcome, and no profiles row either, since
+  // onboarding is also the only thing that creates one.
+  //
+  // Client-side triggers keep finding new ways to be skipped, so the safety net
+  // lives here instead: anyone confirmed for over an hour who has never had a
+  // welcome gets one. Idempotent through retention_fired, and self-healing for
+  // everyone already stuck in that state.
+  //
+  // The hour of grace lets the normal onboarding path send it first, so a
+  // brand-new user does not get a duplicate from the cron.
+  try {
+    for (const u of users) {
+      if (!u.email || !u.email_confirmed_at) continue;
+      if (new Date(u.email_confirmed_at).getTime() > now - 60 * 60 * 1000) continue;
+
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("retention_fired, username, full_name, goal")
+        .eq("user_id", u.id)
+        .maybeSingle();
+      const fired = firedList((profile as ProfileRow | null)?.retention_fired);
+      if (fired.includes("welcome")) continue;
+
+      const p = (profile ?? {}) as EmailProfile;
+      const metaName = nameFromAuthMetadata(u.user_metadata);
+      const built = buildWelcome({ ...p, full_name: p.full_name || metaName });
+      const res = await sendEmail(resendKey, u.email, built);
+      if (res.ok) {
+        // Upsert: these are precisely the users with no profiles row, and an
+        // UPDATE would change nothing while reporting success - which would
+        // re-send the welcome email every single morning.
+        await admin.from("profiles").upsert(
+          {
+            user_id: u.id,
+            retention_fired: [...fired, "welcome"].join(","),
+            ...(p.full_name || !metaName ? {} : { full_name: metaName }),
+          },
+          { onConflict: "user_id" }
+        );
+        summary.welcome++;
+      } else {
+        summary.failed++;
+      }
+    }
+  } catch {
+    /* backstop is best-effort; milestones still run */
+  }
+
+  // ── D+7 / D+14 / D+30 milestones by signup age ─────────────────────────────
 
   for (const m of MILESTONES) {
     const minDate = now - m.daysMax * DAY;

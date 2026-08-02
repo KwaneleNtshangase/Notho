@@ -1,4 +1,5 @@
 import { MAIL_FROM, ALERT_TO } from "@/lib/emails/sender";
+import { nameFromAuthMetadata } from "@/lib/emails/lifecycle";
 import { createHash } from 'crypto';
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -126,13 +127,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
     userName = (prof?.full_name || prof?.username || "").trim();
   }
-  if (!userName && user) {
-    const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
-    const fromMeta = ["full_name", "name", "display_name"]
-      .map((k) => (typeof meta[k] === "string" ? (meta[k] as string) : ""))
-      .find((v) => v.trim().length > 0);
-    userName = (fromMeta ?? "").trim();
-  }
+  if (!userName && user) userName = nameFromAuthMetadata(user.user_metadata);
   const userLabel = user?.email
     ? `${userName || "(no name set)"} <${user.email}>`
     : "Not signed in";

@@ -43,6 +43,26 @@ export function resolveName(p?: EmailProfile | null): string {
   return firstNameOf(p?.full_name) || (p?.username?.trim() || "") || "there";
 }
 
+/**
+ * The name a user gave at signup, read from auth metadata.
+ *
+ * Signup stores it here and nowhere else - email signup writes it via
+ * `options.data`, OAuth providers write their own key. `profiles.full_name`
+ * only ever gets populated later, if the person opens Profile or Settings and
+ * saves, which most never do. So auth metadata is the ONLY name we have for
+ * most users, and anything that greets someone must fall back to it.
+ *
+ * Providers disagree on the key, hence all three.
+ */
+export function nameFromAuthMetadata(meta: unknown): string {
+  const m = (meta ?? {}) as Record<string, unknown>;
+  for (const key of ["full_name", "name", "display_name"]) {
+    const v = m[key];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return "";
+}
+
 const GOAL_LINES: Record<string, { label: string; line: string }> = {
   "debt-free": { label: "Get debt-free", line: "Every lesson is another step out of debt." },
   emergency: { label: "Build an emergency fund", line: "Peace of mind is a money decision too." },

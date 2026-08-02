@@ -148,6 +148,98 @@ FROM public.profiles;
 Anyone still blank signed up without giving a name at all — there is nothing to
 backfill for them, and the greeting falls back to their username as designed.
 
+### If that UPDATE reported no changes
+
+It only touches rows that already exist. Users who never finished onboarding
+have **no `profiles` row at all**, so there is nothing for it to update. Run
+this instead — it creates the missing rows:
+
+```sql
+INSERT INTO public.profiles (user_id, full_name)
+SELECT u.id,
+       COALESCE(
+         NULLIF(TRIM(u.raw_user_meta_data->>'full_name'), ''),
+         NULLIF(TRIM(u.raw_user_meta_data->>'name'), ''),
+         NULLIF(TRIM(u.raw_user_meta_data->>'display_name'), '')
+       )
+FROM auth.users u
+LEFT JOIN public.profiles p ON p.user_id = u.id
+WHERE p.user_id IS NULL
+  AND COALESCE(
+        NULLIF(TRIM(u.raw_user_meta_data->>'full_name'), ''),
+        NULLIF(TRIM(u.raw_user_meta_data->>'name'), ''),
+        NULLIF(TRIM(u.raw_user_meta_data->>'display_name'), '')
+      ) IS NOT NULL;
+```
+
+Diagnose the gap first if you want to see the scale of it:
+
+```sql
+SELECT
+  (SELECT COUNT(*) FROM auth.users)                                   AS auth_users,
+  (SELECT COUNT(*) FROM public.profiles)                              AS profile_rows,
+  (SELECT COUNT(*) FROM auth.users u
+     LEFT JOIN public.profiles p ON p.user_id = u.id
+   WHERE p.user_id IS NULL)                                           AS missing_profiles;
+```
+
+## Fix 1c — nobody was getting a welcome email
+
+The welcome email fired from exactly one place: the **last step of onboarding**.
+Sign up, confirm your email, close the tab — or go straight to the budget
+importer, as Erin did — and you got nothing. No welcome, and no `profiles` row
+either, since onboarding is also the only thing that created one. That is the
+same root cause as the missing names.
+
+Now fixed in code three ways:
+
+- the daily lifecycle cron sends a welcome to anyone confirmed for over an hour
+  who has never had one. Self-healing for every user already stuck, including
+  the whole current list
+- the welcome route falls back to the auth-metadata name, so it greets people
+  properly instead of "there"
+- both write `retention_fired` with an **upsert**. It was an `UPDATE`, which
+  silently changes nothing when the row does not exist — meaning the flag never
+  stuck and the email could re-send indefinitely
+
+**No SQL needed.** It takes effect on the next 07:30 SAST cron run after deploy.
+Expect a burst of welcome emails that morning — that is the backlog clearing,
+and each user still only ever gets one.
+
+## Fix 1d — the confirmation email still says "Fundi Finance"
+
+Not in this repo, and not fixable from code. Supabase Auth sends the
+confirmation email using **its own templates**, configured in the dashboard.
+Erin's confirmation arrived from:
+
+```
+"Fundi Finance" <noreply@fundiapp.co.za>
+Subject: Confirm Your Signup
+Body:    "Follow this link to confirm your user:"
+```
+
+Old brand, old domain, and default Supabase copy — on the **first email anyone
+ever receives** from you.
+
+Fix in **Authentication → Emails** in the Supabase dashboard:
+
+1. **Sender name** → `Notho`
+2. **Sender email** → keep `noreply@fundiapp.co.za` until Resend verifies
+   notho.co.za (see `EMAIL-MIGRATION-NOTHO.md`), then move it with the rest
+3. **Confirm signup** template → rewrite in the app's voice. Something like:
+
+   > **Confirm your email**
+   >
+   > Tap below to finish setting up your Notho account. One short lesson a day
+   > is all it takes to get a real grip on your money.
+   >
+   > [Confirm my email]
+   >
+   > If you did not sign up, you can ignore this.
+
+Worth doing before the EDHE regional round — a judge who signs up gets that
+email first, and it currently shows a brand you no longer use.
+
 ## Fix 2 — already in the code
 
 `/api/budget/import/commit` now detects a missing optional column, strips
