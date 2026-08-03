@@ -26,6 +26,8 @@ import {
 import type { MasteryRecord } from "@/lib/spaced-repetition";
 import { useProgress } from "@/hooks/useProgress";
 import { useUserSettings } from "@/hooks/useUserSettings";
+import { usePinnedCourses } from "@/hooks/usePinnedCourses";
+import { groupCourses } from "@/lib/pinnedCourses";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { NothoLearn, NothoCalculate, NothoBudget, NothoGoals, NothoProgress, NothoProfile, NothoLeaderboard } from "@/components/icons/NothoIcons";
 import {
@@ -78,12 +80,15 @@ import {
   Lock,
   LogOut,
   Mail,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Moon,
   MoreHorizontal,
   PenLine,
   PiggyBank,
+  Pin,
+  PinOff,
   Play,
   Plus,
   RefreshCcw,
@@ -691,6 +696,10 @@ export function LearnView({
   const [pickerGoalDescription, setPickerGoalDescription] = useState<string>("");
   const [showReview, setShowReview] = useState(false);
   const [dueCount, setDueCount] = useState(0);
+  const { pinned, isPinned, togglePin } = usePinnedCourses();
+  // Finished courses live in a collapsed section at the bottom — they're the
+  // least likely thing you came here to tap.
+  const [showCompleted, setShowCompleted] = useState(false);
 
   // Debounce search input for performance (150ms)
   useEffect(() => {
@@ -742,6 +751,28 @@ export function LearnView({
         .map(r => courses.find(c => c.id === r.courseId)!)
         .filter(Boolean)
     : courses;
+
+  // Lesson counts drive both the card's progress bar and the completed/active
+  // split, so they're computed in one place.
+  const courseCompletion = React.useCallback(
+    (course: Course) => {
+      const total = course.units.reduce((sum, unit) => sum + unit.lessons.length, 0);
+      const completed = course.units.reduce(
+        (sum, unit) =>
+          sum + unit.lessons.filter((l) => isLessonCompleted(course.id, l.id)).length,
+        0
+      );
+      return {
+        total,
+        completed,
+        percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
+        // A course with unwritten ("coming soon") lessons can never reach 100%,
+        // so it correctly stays in the active list.
+        isComplete: total > 0 && completed >= total,
+      };
+    },
+    [isLessonCompleted]
+  );
 
   return (
     <main id="mainContent">
@@ -922,29 +953,43 @@ export function LearnView({
 
       <div className={`courses-grid ${!contentLoaded ? "hidden" : ""}`}>
         {(() => {
-          // Group the long list: core courses first, XP-gated advanced courses
-          // under their own header (flat list while searching).
+          // Group the long list: pinned first, then core courses, then XP-gated
+          // advanced courses, then finished ones tucked into a collapsed
+          // section at the bottom. Search results stay a flat relevance-ranked
+          // list — reordering them by pin would fight the ranking.
           const isSearching = Boolean(search.trim());
           const gatedIds = new Set(Object.keys(COURSE_LEVEL_REQUIREMENTS));
-          const coreCourses = isSearching ? filteredCourses : filteredCourses.filter((c) => !gatedIds.has(c.id));
-          const advancedCourses = isSearching ? [] : filteredCourses.filter((c) => gatedIds.has(c.id));
+          const groups = groupCourses(filteredCourses, {
+            getId: (c) => c.id,
+            isCompleted: (c) => courseCompletion(c).isComplete,
+            isAdvanced: (c) => gatedIds.has(c.id),
+            pinned,
+          });
+          const pinnedCourses = isSearching ? [] : groups.pinned;
+          const coreCourses = isSearching ? filteredCourses : groups.core;
+          const advancedCourses = isSearching ? [] : groups.advanced;
+          const completedCourses = isSearching ? [] : groups.completed;
+
+        const sectionHeaderStyle = {
+          fontSize: 13,
+          fontWeight: 800,
+          textTransform: "uppercase" as const,
+          letterSpacing: "0.08em",
+          color: "var(--color-text-secondary)",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        };
 
         const renderCourseCard = (course: Course) => {
           const originalIndex = courses.indexOf(course);
           const courseIndex2 = originalIndex;
           const colour = COURSE_COLOURS[(originalIndex ?? courseIndex2) % COURSE_COLOURS.length];
-          const totalLessons = course.units.reduce(
-            (sum, unit) => sum + unit.lessons.length, 0
-          );
-          const completedLessons = course.units.reduce((sum, unit) => {
-            return sum + unit.lessons.filter((lesson) =>
-              isLessonCompleted(course.id, lesson.id)
-            ).length;
-          }, 0);
-          const percentage = totalLessons > 0
-            ? Math.round((completedLessons / totalLessons) * 100) : 0;
+          const { total: totalLessons, completed: completedLessons, percentage } =
+            courseCompletion(course);
           const levelReq = COURSE_LEVEL_REQUIREMENTS[course.id];
           const isLocked = levelReq ? userLevel < levelReq.level : false;
+          const pinnedNow = isPinned(course.id);
           return (
             <div
               key={course.id}
@@ -997,9 +1042,45 @@ export function LearnView({
                   )}
                 </div>
                 {!isLocked && (
-                  <div className="course-progress">
+                  <div
+                    className="course-progress"
+                    style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}
+                  >
+                    {/* Pin toggle. Lives in the progress column rather than
+                        absolutely positioned so it can't collide with the
+                        percentage. Hidden on locked courses — pinning one you
+                        can't open yet just moves a dead card to the top. */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        // The whole card is clickable, so the pin must not also
+                        // navigate into the course.
+                        e.stopPropagation();
+                        togglePin(course.id);
+                      }}
+                      aria-pressed={pinnedNow}
+                      aria-label={pinnedNow ? `Unpin ${course.title}` : `Pin ${course.title} to the top`}
+                      title={pinnedNow ? "Unpin" : "Pin to top"}
+                      style={{
+                        width: 34,
+                        height: 34,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 999,
+                        border: `1px solid ${pinnedNow ? colour.accent : "var(--color-border)"}`,
+                        background: pinnedNow ? colour.accent : "var(--color-surface)",
+                        color: pinnedNow ? "#fff" : "var(--color-text-secondary)",
+                        cursor: "pointer",
+                        padding: 0,
+                        lineHeight: 0,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {pinnedNow ? <PinOff size={15} aria-hidden /> : <Pin size={15} aria-hidden />}
+                    </button>
                     <div className="course-percentage" style={{ color: colour.accent }}>{percentage}%</div>
-                    <div className="course-percentage-label">Complete</div>
+                    <div className="course-percentage-label" style={{ marginTop: -6 }}>Complete</div>
                   </div>
                 )}
               </div>
@@ -1025,14 +1106,29 @@ export function LearnView({
 
           return (
             <>
+              {pinnedCourses.length > 0 && (
+                <div>
+                  <div style={sectionHeaderStyle}>
+                    <Pin size={13} aria-hidden /> Pinned
+                  </div>
+                </div>
+              )}
+              {pinnedCourses.map(renderCourseCard)}
+
+              {pinnedCourses.length > 0 && coreCourses.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <div style={sectionHeaderStyle}>All courses</div>
+                </div>
+              )}
               {coreCourses.map(renderCourseCard)}
+
               {advancedCourses.length > 0 && (() => {
                 const anyLocked = advancedCourses.some(
                   (c) => userLevel < (COURSE_LEVEL_REQUIREMENTS[c.id]?.level ?? 0)
                 );
                 return (
                   <div style={{ marginTop: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={sectionHeaderStyle}>
                       {anyLocked && <Lock size={13} aria-hidden />} Advanced courses
                     </div>
                     {anyLocked && (
@@ -1044,6 +1140,43 @@ export function LearnView({
                 );
               })()}
               {advancedCourses.map(renderCourseCard)}
+
+              {completedCourses.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowCompleted((v) => !v)}
+                    aria-expanded={showCompleted}
+                    style={{
+                      ...sectionHeaderStyle,
+                      width: "100%",
+                      background: "transparent",
+                      border: "none",
+                      padding: "4px 0",
+                      cursor: "pointer",
+                      textAlign: "left",
+                    }}
+                  >
+                    <CheckCircle2 size={13} aria-hidden style={{ color: "#007A85" }} />
+                    Completed ({completedCourses.length})
+                    <ChevronDown
+                      size={15}
+                      aria-hidden
+                      style={{
+                        marginLeft: "auto",
+                        transition: "transform 0.2s",
+                        transform: showCompleted ? "rotate(180deg)" : "none",
+                      }}
+                    />
+                  </button>
+                  {!showCompleted && (
+                    <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>
+                      Finished courses — tap to show and replay them.
+                    </div>
+                  )}
+                </div>
+              )}
+              {showCompleted && completedCourses.map(renderCourseCard)}
             </>
           );
         })()}
