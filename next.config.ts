@@ -65,6 +65,30 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Version skew protection.
+  //
+  // A deploy lands while someone has the app open. Their tab is still running
+  // the old build; the next client-side navigation asks the new deployment for
+  // a route chunk that build no longer serves, the fetch 404s, and the whole
+  // tree unmounts into the error boundary. That is what happened on
+  // /course/re5-exam-prep on 3 Aug 2026 — a crash in a page whose code never
+  // ran.
+  //
+  // With a deployment id set, Next stamps `?dpl=` onto asset URLs and sends
+  // `x-deployment-id` on navigations. When the id it holds disagrees with the
+  // one the server reports, it falls back to a full page load instead of a
+  // client-side navigation — so the tab quietly picks up the new build rather
+  // than reaching for a chunk that is gone.
+  //
+  // Only VERCEL_DEPLOYMENT_ID is safe here. With Vercel's Skew Protection on,
+  // `?dpl=` is used to route the request to that exact deployment, so any other
+  // value (a git SHA, say) matches no deployment and 404s everything. Undefined
+  // off-Vercel, which leaves behaviour unchanged.
+  //
+  // This is the framework half. The platform half — actually keeping the old
+  // deployment's assets reachable — is Vercel's Skew Protection setting under
+  // Settings → Advanced, and it needs a Pro plan.
+  deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
   // unpdf ships a serverless PDF.js build (no separate worker file) — keep it external so Vercel bundles it correctly for the import parse route.
   serverExternalPackages: ["unpdf"],
   async headers() {

@@ -1,7 +1,7 @@
 // Notho — Service Worker
 // Push notifications + offline caching. Bump SW_VERSION when caching strategy changes.
 
-const SW_VERSION = "5";
+const SW_VERSION = "6";
 const STATIC_CACHE = `notho-static-${SW_VERSION}`;
 const RUNTIME_CACHE = `notho-runtime-${SW_VERSION}`;
 const CACHE_PREFIX = "notho-";
@@ -15,6 +15,12 @@ const LEGACY_CACHE_PREFIXES = ["fundi-"];
 
 // Offline fallbacks only — do NOT pre-cache "/" (stale app shell after deploy).
 const PRECACHE = ["/manifest.json", "/notho-logo.png", "/notho-icon-192.png", "/favicon.ico"];
+
+// Hashed chunks are immutable, so the only reason an entry leaves this cache is
+// to stop it growing forever: every deploy mints new filenames and the old ones
+// are dead weight. Keep a generous ceiling — the whole app is well under this,
+// so in practice we only ever evict previous builds.
+const STATIC_CACHE_MAX_ENTRIES = 240;
 
 function isNavigationRequest(request) {
   return (
@@ -69,6 +75,46 @@ self.addEventListener("message", (event) => {
   }
 });
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/**
+ * Fetch, retrying once after a short pause.
+ *
+ * Only worth doing for immutable assets, where a repeat request is free of
+ * side effects. Covers the common mobile case: the radio drops one request
+ * during a handover and the next one succeeds immediately.
+ */
+async function fetchWithRetry(request, attempts = 2, delayMs = 300) {
+  let lastError;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fetch(request);
+    } catch (err) {
+      lastError = err;
+      if (i < attempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * Evict the oldest entries once the static cache exceeds its ceiling.
+ * cache.keys() resolves in insertion order, so the front of the list is the
+ * least recently added — in practice, the previous deploy's chunks.
+ */
+async function trimStaticCache(cache) {
+  try {
+    const keys = await cache.keys();
+    const excess = keys.length - STATIC_CACHE_MAX_ENTRIES;
+    if (excess <= 0) return;
+    await Promise.all(keys.slice(0, excess).map((key) => cache.delete(key)));
+  } catch {
+    // Eviction is housekeeping — never let it break a response.
+  }
+}
+
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 self.addEventListener("fetch", (event) => {
   const { request } = event;
@@ -80,16 +126,31 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   // Hashed build assets: cache-first (filename changes each deploy).
+  //
+  // These are lazily-loaded route chunks, so a failure here does not degrade
+  // gracefully — it unmounts the React tree into the error boundary. On a phone
+  // a single dropped request is enough. Hence the retry, and hence never
+  // letting respondWith see a rejection: an unhandled rejection surfaces as an
+  // opaque network error, where a real Response lets the boundary recognise a
+  // chunk failure and reload itself.
   if (url.pathname.startsWith("/_next/static/")) {
     event.respondWith(
       caches.open(STATIC_CACHE).then(async (cache) => {
         const cached = await cache.match(request);
         if (cached) return cached;
-        const response = await fetch(request);
-        if (response.ok) {
-          await cache.put(request, response.clone());
+        try {
+          const response = await fetchWithRetry(request);
+          if (response.ok) {
+            await cache.put(request, response.clone());
+            void trimStaticCache(cache);
+          }
+          return response;
+        } catch {
+          return new Response("", {
+            status: 504,
+            statusText: "Asset unavailable",
+          });
         }
-        return response;
       })
     );
     return;
