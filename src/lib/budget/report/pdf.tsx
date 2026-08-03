@@ -86,8 +86,8 @@ const styles = StyleSheet.create({
   },
   // Cover (navy)
   cover: { fontFamily: "Helvetica", color: C.white, backgroundColor: C.navy, padding: 0 },
-  sectionTitle: { fontSize: 13, fontWeight: 700, marginBottom: 10, color: C.navy },
-  sectionSub: { fontSize: 8, color: C.textMuted, marginBottom: 8 },
+  sectionTitle: { fontSize: 13, fontWeight: 700, marginBottom: 8, color: C.navy },
+  sectionSub: { fontSize: 8, color: C.textMuted, marginBottom: 6 },
 
   // Per-page branded header band
   header: {
@@ -434,7 +434,7 @@ function SunburstChart({
  * connectors and hollow points so a mid-month cut-off never reads as a
  * "spending collapsed" trend.
  */
-function LineChart({ data, width = 515, height = 150 }: { data: MonthlySpend[]; width?: number; height?: number }) {
+function LineChart({ data, width = 515, height = 124 }: { data: MonthlySpend[]; width?: number; height?: number }) {
   const leftPad = 42;
   const plotW = width - leftPad - 8;
   const plotH = height;
@@ -712,22 +712,21 @@ function MonthTable({ months }: { months: MonthlySpend[] }) {
 const MONTH_TABLE_KEEP_MAX = 14;
 
 /**
- * The trend chart and the month table it plots, kept as one unit while they
- * fit. Held together they either both sit under the budget summary or both
- * move to the next page - which is what stops the table shedding its last two
- * rows and a footnote onto a page of their own.
+ * The trend chart and the month table it plots.
+ *
+ * They are two independent keep-units, not one. Bound together, a page that
+ * was 30pt short of holding both sent ~475pt to the next page and left this
+ * one 60% empty. Apart, the chart stays where it fits and only the table
+ * moves, so the shortfall costs one block instead of two.
+ *
+ * The table keeps its heading and summary line with it - that trio is what
+ * used to shed two rows and a footnote onto a page of their own.
  */
 function TrendAndMonths({ model }: { model: ReportModel }) {
-  const keepWhole = model.monthlySpend.length <= MONTH_TABLE_KEEP_MAX;
-  const body = (
+  const keepTable = model.monthlySpend.length <= MONTH_TABLE_KEEP_MAX;
+  const table = (
     <>
-      {model.monthlySpend.length >= 2 && (
-        <View style={{ marginBottom: 14 }} wrap={false}>
-          <SectionTitle ahead={0}>Income vs expenses over time</SectionTitle>
-          <LineChart data={model.monthlySpend} />
-        </View>
-      )}
-      <SectionTitle ahead={keepWhole ? 0 : 110}>Month by month</SectionTitle>
+      <SectionTitle ahead={keepTable ? 0 : 110}>Month by month</SectionTitle>
       <MonthTable months={model.monthlySpend} />
       {model.projection.annualisedExpenseCents != null && model.projection.monthsUsed >= 2 && (
         <Text style={{ fontSize: 8, color: C.textMuted, marginTop: 8 }} minPresenceAhead={0}>
@@ -737,7 +736,17 @@ function TrendAndMonths({ model }: { model: ReportModel }) {
       )}
     </>
   );
-  return keepWhole ? <Keep>{body}</Keep> : body;
+  return (
+    <>
+      {model.monthlySpend.length >= 2 && (
+        <View style={{ marginBottom: 10 }} wrap={false}>
+          <SectionTitle ahead={0}>Income vs expenses over time</SectionTitle>
+          <LineChart data={model.monthlySpend} />
+        </View>
+      )}
+      {keepTable ? <Keep>{table}</Keep> : table}
+    </>
+  );
 }
 
 export function BudgetReportDocument({
@@ -1098,7 +1107,7 @@ export function BudgetReportDocument({
           />
         )}
         {model.setAsidePlannedCents > 0 && (
-          <Text style={{ fontSize: 8, color: C.textMuted, marginBottom: 12 }}>
+          <Text style={{ fontSize: 8, color: C.textMuted, marginBottom: 8 }}>
             Set-aside plan: {zar(model.setAsidePlannedCents)} planned into savings vehicles · {zar(model.setAsideCents)} actually set aside
             {model.setAsideCents >= model.setAsidePlannedCents ? " - plan beaten." : "."}
           </Text>
@@ -1107,7 +1116,7 @@ export function BudgetReportDocument({
         {overspendSorted.filter((r) => r.varianceCents > 0).length > 0 && (
           <Keep>
             <Text style={styles.sectionTitle}>Where the overspend came from</Text>
-            <View style={{ marginBottom: 14 }}>
+            <View style={{ marginBottom: 10 }}>
               {overspendSorted
                 .filter((r) => r.varianceCents > 0)
                 .slice(0, 4)

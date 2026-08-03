@@ -153,6 +153,50 @@ the old sender resumes working immediately.
 
 ---
 
+## Step 8 — DMARC reporting (10 minutes, do it once)
+
+`notho.co.za` currently publishes:
+
+```
+v=DMARC1; p=none;
+```
+
+Valid, and nothing is broken. But there is no `rua=` reporting address, which
+means **nobody is telling you anything**. You cannot see who is sending as
+notho.co.za, whether your own mail passes alignment, or whether someone starts
+spoofing you. `p=none` without reporting is the one DMARC setup that gives you
+neither enforcement nor visibility.
+
+Raw DMARC reports are XML and genuinely unreadable, so point them at a service
+that turns them into a weekly email instead of your inbox.
+
+1. Go to **dmarc.postmarkapp.com**, enter `notho.co.za` and your email. Free,
+   unlimited domains, no login, and you do not need to be a Postmark customer.
+2. It gives you a reporting address that looks like
+   `re+something@dmarc.postmarkapp.com`.
+3. At Truehost → Zone Editor, **edit** the existing `_dmarc` TXT record to:
+
+   ```
+   v=DMARC1; p=none; rua=mailto:PASTE_THE_POSTMARK_ADDRESS; fo=1; adkim=r; aspf=r
+   ```
+
+4. Verify with `bash scripts/check-resend-dns.sh` — it now reports DMARC state.
+
+Notes on the record:
+
+- **Keep `p=none` for now.** It means "monitor, change nothing". Moving
+  straight to `quarantine` on a domain you started sending from yesterday is
+  how people silently bin their own mail.
+- **No `ruf=`.** Forensic reports are barely supported, and where they are
+  supported they can contain recipient content. Aggregate reports are enough.
+- `adkim=r` / `aspf=r` are relaxed alignment, which is what you want while
+  Supabase Auth and Resend both send on your behalf.
+
+After three or four weekly digests, if everything shows as passing, tighten to
+`p=quarantine` and later `p=reject`. That is the point at which DMARC actually
+stops someone impersonating Notho to your users, which matters more than usual
+for a money app.
+
 ## Quick reference
 
 ```bash

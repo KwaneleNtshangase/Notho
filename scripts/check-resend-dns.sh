@@ -60,6 +60,18 @@ check() {
     printf '  [ok]      root SPF untouched (%s record)\n' "$root_spf_count"
   fi
 
+  # DMARC. Not required to send, but without a reporting address you get no
+  # visibility into who is sending as you or whether it passes.
+  local dmarc
+  dmarc=$(dig +short TXT "_dmarc.$DOMAIN")
+  if [ -z "$dmarc" ]; then
+    printf '  [WARN]    no DMARC record at all\n'
+  elif printf '%s' "$dmarc" | grep -q 'rua='; then
+    printf '  [ok]      DMARC with reporting  %s\n' "$dmarc"
+  else
+    printf '  [WARN]    DMARC has no rua= reporting address  %s\n' "$dmarc"
+  fi
+
   if [ "$ok" = 1 ]; then
     printf '\n  All records live. Click Verify in Resend, then send a test.\n'
     return 0
