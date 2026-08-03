@@ -14,10 +14,12 @@ export const runtime = "nodejs";
  * Every user-scoped table is cleared EXPLICITLY rather than trusting ON DELETE
  * CASCADE. Two reasons, both learned the hard way:
  *
- *   1. Cascade coverage is incomplete. The stokvel tables reference
+ *   1. Cascade coverage is incomplete. The legacy stokvel tables reference
  *      auth.users(id) with no cascade at all, so deleting a user who had ever
  *      joined a stokvel would fail on a foreign-key violation and the account
- *      would be undeletable.
+ *      would be undeletable. The stokvel feature is gone from the app, but the
+ *      tables survive until the drop migration is applied, so the cleanup below
+ *      stays until then.
  *   2. budget_entries was created outside the migrations folder, so its
  *      constraints are not in version control and cannot be verified by
  *      reading the repo. That table holds imported bank transactions - the
@@ -52,7 +54,10 @@ const USER_TABLES = [
   "push_notification_log",
   "push_subscriptions",
   "user_settings",
-  // Stokvels: membership rows first, the group itself is handled separately.
+  // LEGACY: the stokvel feature was removed from the app, but its tables are
+  // still in the database until 20260803120000_drop_stokvel.sql is applied. Erasing
+  // these rows is still required for a complete deletion, and once the tables
+  // are dropped the loop skips them as "missing" and this block can go.
   "stokvel_contributions",
   "stokvel_members",
   // Identity last.
@@ -76,10 +81,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Stokvels the user created. NOT deleted: a stokvel is a communal savings
-  // group, and removing it would destroy other members' records to satisfy one
-  // person's deletion. Detaching the creator erases their link to it while
-  // leaving the group intact for everyone else.
+  // LEGACY: stokvel groups the user created. The feature is removed, but until
+  // the drop migration runs these rows still carry the user's id, so detach it.
+  // No-ops harmlessly once the table is gone.
   await admin.from("stokvels").update({ created_by: null }).eq("created_by", user.id);
 
   // Bug reports they filed, which carry their address in email_status.

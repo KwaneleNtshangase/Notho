@@ -154,7 +154,6 @@ import {
 } from "@/lib/dailyChallengeFlags";
 import { useNothoState } from "@/hooks/useNothoState";
 import { SettingsView } from "@/components/SettingsView";
-import { StokvelDashboard } from "@/components/StokvelDashboard";
 import { GoalCard } from "@/components/GoalCard";
 
 function getDailyFact(): string {
@@ -252,7 +251,6 @@ export function QuestsView({
         </div>
       )}
       <DailyChallenges streak={streak} onXpClaimed={addXP} />
-      <StokvelDashboard />
       </div>
     </main>
   );

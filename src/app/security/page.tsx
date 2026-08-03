@@ -42,7 +42,7 @@ export default function SecurityPage() {
     const t = await token();
     if (!t) { setMsg("Please sign in first."); return; }
     if (!window.confirm("Delete your Notho account and all your data? This cannot be undone.")) return;
-    if (!window.confirm("Last check: this permanently removes your lessons, progress, budget and stokvel data. Continue?")) return;
+    if (!window.confirm("Last check: this permanently removes your lessons, progress and budget data. Continue?")) return;
     setBusy("delete");
     try {
       const res = await fetch("/api/account/delete", { method: "POST", headers: { Authorization: `Bearer ${t}` } });

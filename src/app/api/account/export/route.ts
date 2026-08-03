@@ -24,11 +24,9 @@ export async function GET(req: NextRequest) {
     }
   };
 
-  const [profiles, progress, stokvelMembers, contributions] = await Promise.all([
+  const [profiles, progress] = await Promise.all([
     safe("profiles"),
     safe("user_progress"),
-    safe("stokvel_members"),
-    safe("stokvel_contributions"),
   ]);
 
   const payload = {
@@ -37,8 +35,6 @@ export async function GET(req: NextRequest) {
     account: { id: user.id, email: user.email ?? null, createdAt: user.created_at ?? null },
     profile: profiles?.[0] ?? null,
     progress: progress?.[0] ?? null,
-    stokvelMemberships: stokvelMembers ?? [],
-    stokvelContributions: contributions ?? [],
   };
 
   return new NextResponse(JSON.stringify(payload, null, 2), {

@@ -39,8 +39,8 @@ function OnboardingContent() {
       //
       // Everything that greets someone by name reads profiles.full_name: the
       // welcome and milestone emails, the budget report, the leaderboard's
-      // first-name fallback, stokvel member names. They were all falling back
-      // to a username or "there" for users whose name we knew perfectly well.
+      // first-name fallback. They were all falling back to a username or
+      // "there" for users whose name we knew perfectly well.
       //
       // Only fill a blank - never clobber a name the user typed themselves.
       const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
