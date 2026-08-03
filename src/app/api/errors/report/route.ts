@@ -91,6 +91,21 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Second line of defence against crawler noise. The client filters bots
+  // before sending, but that check ships in JS a bot can ignore, and this
+  // endpoint is public. Dropping it here keeps the feedback table clean too,
+  // not just the inbox.
+  const reportedUa = String(body.userAgent ?? "");
+  const AUTOMATED =
+    /\b(bot|crawler|spider|crawling|slurp|googlebot|bingbot|yandex|baidu|duckduckbot|facebookexternalhit|ia_archiver|semrush|ahrefs|mj12bot|dotbot|petalbot|headless|phantomjs|puppeteer|playwright|lighthouse|gtmetrix|pingdom|uptimerobot|curl|wget|python-requests|axios|node-fetch)\b/i;
+  // Chrome/N.0.0.0 - real Chrome ships a build number, automation sends zeros.
+  const SPOOFED_CHROME = /Chrome\/\d+\.0\.0\.0\b/;
+  if (AUTOMATED.test(reportedUa) || SPOOFED_CHROME.test(reportedUa)) {
+    // 200, not an error: the caller is misbehaving but there is nothing for it
+    // to retry, and a failure response would just invite one.
+    return NextResponse.json({ ok: true, skipped: "automated-client" });
+  }
+
   // User is optional - errors can happen on unauthenticated screens.
   const user = await getUserFromRequest(req).catch(() => null);
 

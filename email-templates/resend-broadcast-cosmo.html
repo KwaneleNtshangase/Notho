@@ -13,9 +13,20 @@
 
   Paste into Resend -> Broadcasts -> new broadcast -> Code / HTML view.
 -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;margin:0;padding:0">
-  <tr><td align="center" style="padding:24px 12px">
-    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
+<!--
+  Centring, belt and braces.
+
+  The first version relied on align="center" alone. Resend's block editor
+  reparses pasted HTML and dropped it, so the email rendered flush left while
+  every other Notho email sat centred. Three mechanisms now, because different
+  clients and editors respect different ones:
+    1. align="center" on the outer cell   - the classic, widest support
+    2. text-align:center on that cell     - survives attribute stripping
+    3. margin:0 auto on the inner table   - works even with no outer table
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="background:#f4f5f7;margin:0;padding:0;width:100%">
+  <tr><td align="center" style="padding:24px 12px;text-align:center">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center" style="width:600px;max-width:600px;margin:0 auto;text-align:left;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
 
       <tr><td style="background:#007A85;border-radius:16px 16px 0 0;padding:30px 28px">
         <table role="presentation" cellpadding="0" cellspacing="0"><tr>
