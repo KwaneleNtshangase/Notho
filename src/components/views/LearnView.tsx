@@ -202,6 +202,90 @@ export function CourseIcon({ name, size = 48 }: { name: string; size?: number })
 }
 
 
+const SECTION_HEADER_STYLE: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 800,
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+  color: "var(--color-text-secondary)",
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+};
+
+/**
+ * Header row inside the course grid: "Pinned", "All courses", "Advanced
+ * courses", "Completed". Pass `onToggle` to make it a collapse control;
+ * without it the header is static. `note` only shows while collapsed, so an
+ * explanation doesn't take up space once the section is open.
+ */
+function CourseSectionHeader({
+  icon,
+  label,
+  count,
+  note,
+  open,
+  onToggle,
+}: {
+  icon?: ReactNode;
+  label: string;
+  count?: number;
+  note?: string;
+  open?: boolean;
+  onToggle?: () => void;
+}) {
+  const inner = (
+    <>
+      {icon}
+      <span>
+        {label}
+        {typeof count === "number" ? ` (${count})` : ""}
+      </span>
+      {onToggle && (
+        <ChevronDown
+          size={15}
+          aria-hidden
+          style={{
+            marginLeft: "auto",
+            transition: "transform 0.2s",
+            transform: open ? "rotate(180deg)" : "none",
+          }}
+        />
+      )}
+    </>
+  );
+
+  return (
+    <div className="courses-grid-heading">
+      {onToggle ? (
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          style={{
+            ...SECTION_HEADER_STYLE,
+            width: "100%",
+            background: "transparent",
+            border: "none",
+            padding: "4px 0",
+            cursor: "pointer",
+            textAlign: "left",
+          }}
+        >
+          {inner}
+        </button>
+      ) : (
+        <div style={SECTION_HEADER_STYLE}>{inner}</div>
+      )}
+      {note && !open && (
+        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>
+          {note}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const CourseCardSkeleton = () => (
   <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-4 animate-pulse">
     <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-xl mb-3" />
@@ -700,6 +784,9 @@ export function LearnView({
   // Finished courses live in a collapsed section at the bottom — they're the
   // least likely thing you came here to tap.
   const [showCompleted, setShowCompleted] = useState(false);
+  // null = follow the default (collapsed while every advanced course is still
+  // XP-locked, open once you've unlocked one). A tap pins it either way.
+  const [advancedOpen, setAdvancedOpen] = useState<boolean | null>(null);
 
   // Debounce search input for performance (150ms)
   useEffect(() => {
@@ -970,16 +1057,17 @@ export function LearnView({
           const advancedCourses = isSearching ? [] : groups.advanced;
           const completedCourses = isSearching ? [] : groups.completed;
 
-        const sectionHeaderStyle = {
-          fontSize: 13,
-          fontWeight: 800,
-          textTransform: "uppercase" as const,
-          letterSpacing: "0.08em",
-          color: "var(--color-text-secondary)",
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        };
+          const anyAdvancedLocked = advancedCourses.some(
+            (c) => userLevel < (COURSE_LEVEL_REQUIREMENTS[c.id]?.level ?? 0)
+          );
+          const allAdvancedLocked =
+            advancedCourses.length > 0 &&
+            advancedCourses.every(
+              (c) => userLevel < (COURSE_LEVEL_REQUIREMENTS[c.id]?.level ?? 0)
+            );
+          // Collapsed while it's all still locked — no reason to scroll past
+          // courses you can't open. Opens itself once you've earned into one.
+          const advancedShown = advancedOpen ?? !allAdvancedLocked;
 
         const renderCourseCard = (course: Course) => {
           const originalIndex = courses.indexOf(course);
@@ -1004,52 +1092,42 @@ export function LearnView({
                 position: "relative",
               }}
             >
-              {/* Lock overlay badge */}
-              {isLocked && (
-                <div style={{
-                  position: "absolute", top: 10, right: 10,
-                  background: "var(--color-border)", borderRadius: 20,
-                  padding: "3px 10px", fontSize: 11, fontWeight: 700,
-                  color: "var(--color-text-secondary)",
-                  display: "flex", alignItems: "center", gap: 4,
-                }}>
-                  <Lock size={10} /> {levelReq.label}
-                </div>
-              )}
               <div className="course-header">
-                <div>
-                  <div style={{ fontSize: 48, marginBottom: 12, color: isLocked ? "var(--color-text-secondary)" : colour.accent }}>
-                    {isLocked ? <Lock size={48} /> : <CourseIcon name={course.icon} size={48} />}
-                  </div>
-                  <div className="course-title" style={{ color: isLocked ? "var(--color-text-primary)" : colour.accent }}>{course.title}</div>
-                  {!isLocked && recommendedCourseIds.includes(course.id) && (
-                    <div style={{
-                      display: "inline-flex", alignItems: "center", gap: 3,
-                      background: "rgba(0,122,133,0.12)", borderRadius: 20,
-                      padding: "2px 8px", fontSize: 10, fontWeight: 700,
-                      color: "#007A85", marginBottom: 4,
-                    }}>
-                      <Target size={9} aria-hidden /> Recommended for your goal
-                    </div>
-                  )}
-                  {isLocked ? (
-                    <div className="course-description" style={{ color: "var(--color-text-secondary)" }}>
-                      Keep earning XP to unlock this advanced content. Reach {levelReq.label} to continue.
-                      {" "}You&apos;re Level {userLevel} - {Math.max(0, (levelReq.level - 1) * 500 - userXP).toLocaleString("en-ZA")} XP to go.
-                    </div>
-                  ) : (
-                    <div className="course-description">{course.description}</div>
-                  )}
+                <div
+                  className="course-card-icon"
+                  style={{ color: isLocked ? "var(--color-text-secondary)" : colour.accent }}
+                >
+                  {isLocked ? <Lock size={26} /> : <CourseIcon name={course.icon} size={26} />}
                 </div>
-                {!isLocked && (
-                  <div
-                    className="course-progress"
-                    style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}
-                  >
-                    {/* Pin toggle. Lives in the progress column rather than
-                        absolutely positioned so it can't collide with the
-                        percentage. Hidden on locked courses — pinning one you
-                        can't open yet just moves a dead card to the top. */}
+
+                <div className="course-card-body">
+                  <div className="course-title" style={{ color: isLocked ? "var(--color-text-primary)" : colour.accent }}>
+                    {course.title}
+                  </div>
+                  {/* One secondary line at most — the course description lives
+                      on the course page, so it's dropped here. */}
+                  {isLocked ? (
+                    <div className="course-card-note">
+                      {Math.max(0, (levelReq.level - 1) * 500 - userXP).toLocaleString("en-ZA")} XP to go
+                    </div>
+                  ) : recommendedCourseIds.includes(course.id) ? (
+                    <div className="course-card-note" style={{ color: "#007A85" }}>
+                      <Target size={10} aria-hidden /> Recommended for your goal
+                    </div>
+                  ) : null}
+                </div>
+
+                {isLocked ? (
+                  <div className="course-lock-chip">
+                    <Lock size={10} aria-hidden /> {levelReq.label}
+                  </div>
+                ) : (
+                  <>
+                    <div className="course-percentage" style={{ color: colour.accent }}>{percentage}%</div>
+                    {/* Pin toggle. Sits in the title row rather than absolutely
+                        positioned so it can't collide with the percentage.
+                        Hidden on locked courses — pinning one you can't open
+                        yet just moves a dead card to the top. */}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -1062,8 +1140,8 @@ export function LearnView({
                       aria-label={pinnedNow ? `Unpin ${course.title}` : `Pin ${course.title} to the top`}
                       title={pinnedNow ? "Unpin" : "Pin to top"}
                       style={{
-                        width: 34,
-                        height: 34,
+                        width: 30,
+                        height: 30,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -1077,26 +1155,25 @@ export function LearnView({
                         flexShrink: 0,
                       }}
                     >
-                      {pinnedNow ? <PinOff size={15} aria-hidden /> : <Pin size={15} aria-hidden />}
+                      {pinnedNow ? <PinOff size={14} aria-hidden /> : <Pin size={14} aria-hidden />}
                     </button>
-                    <div className="course-percentage" style={{ color: colour.accent }}>{percentage}%</div>
-                    <div className="course-percentage-label" style={{ marginTop: -6 }}>Complete</div>
-                  </div>
+                  </>
                 )}
               </div>
+
               {!isLocked && (
                 <>
-                  {/* Coloured progress bar - neutral track so 0% never reads as complete */}
-                  <div style={{ height: 6, background: "var(--color-border)", borderRadius: 3, margin: "8px 0", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${percentage}%`, background: colour.accent, borderRadius: 3, transition: "width 0.4s" }} />
+                  <div className="course-bar">
+                    <div style={{ width: `${percentage}%`, background: colour.accent }} />
                   </div>
                   <div className="course-stats">
-                    <div className="course-stat">
+                    <span className="course-stat">
                       <strong>{completedLessons}</strong> / {totalLessons} {totalLessons === 1 ? "lesson" : "lessons"}
-                    </div>
-                    <div className="course-stat">
+                    </span>
+                    <span className="course-stat" aria-hidden>·</span>
+                    <span className="course-stat">
                       <strong>{course.units.length}</strong> {course.units.length === 1 ? "unit" : "units"}
-                    </div>
+                    </span>
                   </div>
                 </>
               )}
@@ -1107,74 +1184,40 @@ export function LearnView({
           return (
             <>
               {pinnedCourses.length > 0 && (
-                <div>
-                  <div style={sectionHeaderStyle}>
-                    <Pin size={13} aria-hidden /> Pinned
-                  </div>
-                </div>
+                <CourseSectionHeader icon={<Pin size={12} aria-hidden />} label="Pinned" />
               )}
               {pinnedCourses.map(renderCourseCard)}
 
               {pinnedCourses.length > 0 && coreCourses.length > 0 && (
-                <div style={{ marginTop: 8 }}>
-                  <div style={sectionHeaderStyle}>All courses</div>
-                </div>
+                <CourseSectionHeader label="All courses" />
               )}
               {coreCourses.map(renderCourseCard)}
 
-              {advancedCourses.length > 0 && (() => {
-                const anyLocked = advancedCourses.some(
-                  (c) => userLevel < (COURSE_LEVEL_REQUIREMENTS[c.id]?.level ?? 0)
-                );
-                return (
-                  <div style={{ marginTop: 8 }}>
-                    <div style={sectionHeaderStyle}>
-                      {anyLocked && <Lock size={13} aria-hidden />} Advanced courses
-                    </div>
-                    {anyLocked && (
-                      <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>
-                        Earn XP from any lesson to level up and open these courses.
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-              {advancedCourses.map(renderCourseCard)}
+              {advancedCourses.length > 0 && (
+                <CourseSectionHeader
+                  icon={anyAdvancedLocked ? <Lock size={12} aria-hidden /> : undefined}
+                  label="Advanced courses"
+                  count={advancedCourses.length}
+                  open={advancedShown}
+                  onToggle={() => setAdvancedOpen(!advancedShown)}
+                  note={
+                    anyAdvancedLocked
+                      ? "Earn XP from any lesson to level up and open these."
+                      : undefined
+                  }
+                />
+              )}
+              {advancedShown && advancedCourses.map(renderCourseCard)}
 
               {completedCourses.length > 0 && (
-                <div style={{ marginTop: 8 }}>
-                  <button
-                    type="button"
-                    onClick={() => setShowCompleted((v) => !v)}
-                    aria-expanded={showCompleted}
-                    style={{
-                      ...sectionHeaderStyle,
-                      width: "100%",
-                      background: "transparent",
-                      border: "none",
-                      padding: "4px 0",
-                      cursor: "pointer",
-                      textAlign: "left",
-                    }}
-                  >
-                    <CheckCircle2 size={13} aria-hidden style={{ color: "#007A85" }} />
-                    Completed ({completedCourses.length})
-                    <ChevronDown
-                      size={15}
-                      aria-hidden
-                      style={{
-                        marginLeft: "auto",
-                        transition: "transform 0.2s",
-                        transform: showCompleted ? "rotate(180deg)" : "none",
-                      }}
-                    />
-                  </button>
-                  {!showCompleted && (
-                    <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>
-                      Finished courses — tap to show and replay them.
-                    </div>
-                  )}
-                </div>
+                <CourseSectionHeader
+                  icon={<CheckCircle2 size={12} aria-hidden style={{ color: "#007A85" }} />}
+                  label="Completed"
+                  count={completedCourses.length}
+                  open={showCompleted}
+                  onToggle={() => setShowCompleted((v) => !v)}
+                  note="Finished courses — tap to show and replay them."
+                />
               )}
               {showCompleted && completedCourses.map(renderCourseCard)}
             </>

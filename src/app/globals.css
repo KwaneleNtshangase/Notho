@@ -368,15 +368,34 @@ html.dark .nav-link.active {
   margin-top: 4px;
 }
 
+/* Course cards.
+   Deliberately compact: there are 17 courses in this list, and the tall
+   version (48px icon stacked over the title, full description, big
+   percentage) pushed the last course several screens down. Each card is now
+   three short rows — title row, progress bar, stats — and the description is
+   dropped here since it's on the course page itself. */
+
+/* Columns are driven by the container, not the viewport: the desktop sidebar
+   eats 256px, so a viewport media query would wrongly fire two columns into a
+   448px-wide content area. auto-fit means one column on a phone and as many as
+   fit once there's room. */
 .courses-grid {
   display: grid;
-  gap: 24px;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Section headers (Pinned, Advanced, Completed) span every column so they
+   never get laid out as if they were a card. */
+.courses-grid-heading {
+  grid-column: 1 / -1;
+  margin-top: 4px;
 }
 
 .course-card {
   background: var(--color-surface);
-  border-radius: 18px;
-  padding: 24px;
+  border-radius: 14px;
+  padding: 14px 16px;
   border: none;
   box-shadow: none;
   transition: 0.2s ease;
@@ -390,16 +409,39 @@ html.dark .nav-link.active {
 
 .course-header {
   display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 12px;
+}
+
+.course-card-icon {
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* min-width:0 so a long title wraps instead of shoving the percentage and
+   pin button off the right edge. */
+.course-card-body {
+  flex: 1;
+  min-width: 0;
 }
 
 .course-title {
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 700;
+  line-height: 1.25;
   color: var(--text-dark);
-  margin-bottom: 8px;
+}
+
+/* Secondary line under the title: "Recommended for your goal", or how much XP
+   is left on a locked course. */
+.course-card-note {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
 }
 
 .course-description {
@@ -413,9 +455,11 @@ html.dark .nav-link.active {
 }
 
 .course-percentage {
-  font-size: 28px;
+  font-size: 18px;
   font-weight: 800;
+  line-height: 1;
   color: var(--color-primary);
+  flex-shrink: 0;
 }
 
 .course-percentage-label {
@@ -423,22 +467,51 @@ html.dark .nav-link.active {
   color: var(--text-light);
 }
 
+/* Neutral track so 0% never reads as complete. */
+.course-bar {
+  height: 5px;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.course-bar > div {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s;
+}
+
 .course-stats {
   display: flex;
-  gap: 16px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-light);
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-light);
 }
 
 .course-stat {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-light);
 }
 
 .course-stat strong {
   color: var(--text-dark);
-  font-weight: 600;
+  font-weight: 700;
+}
+
+/* "Level 5" chip on a course you haven't earned enough XP to open. */
+.course-lock-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  border-radius: 20px;
+  padding: 3px 9px;
+  background: var(--color-border);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
 }
 
 .course-map {
