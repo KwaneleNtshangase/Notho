@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { createServiceSupabase } from "@/lib/supabaseServer";
 import { buildWelcome, nameFromAuthMetadata, sendEmail, type EmailProfile } from "@/lib/emails/lifecycle";
+import { sendSignupAlert } from "@/lib/emails/signupAlert";
+import { countConfirmedUsers } from "@/lib/emails/userCount";
 
 export const runtime = "nodejs";
 
@@ -45,6 +47,18 @@ export async function POST(req: NextRequest) {
   const email = buildWelcome({ ...p, full_name: p.full_name || metaName });
   const res = await sendEmail(resendKey, user.email, email);
   if (!res.ok) return NextResponse.json({ error: res.detail }, { status: 500 });
+
+  // Tell the founder, on the same trigger and behind the same ledger check
+  // above, so this can never fire twice for one person. Deliberately not
+  // awaited into the response path beyond the send itself: if the alert fails,
+  // the user's welcome still counts as sent.
+  void sendSignupAlert(resendKey, {
+    email: user.email,
+    name: p.full_name || metaName,
+    goal: p.goal ?? null,
+    provider: user.app_metadata?.provider ?? null,
+    totalUsers: await countConfirmedUsers(admin),
+  });
 
   // Upsert, not update: a user who has not finished onboarding has no profiles
   // row, and an UPDATE against a missing row succeeds while changing nothing -

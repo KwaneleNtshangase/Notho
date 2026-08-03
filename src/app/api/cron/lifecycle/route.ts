@@ -8,6 +8,7 @@ import {
   sendEmail,
   type EmailProfile,
 } from "@/lib/emails/lifecycle";
+import { sendSignupAlert } from "@/lib/emails/signupAlert";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -88,6 +89,11 @@ export async function GET(req: NextRequest) {
 
   const { data: list } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const users = list?.users ?? [];
+  // Counted once for the whole run rather than per user: the backstop can send
+  // a burst, and re-counting for each would be pointless load.
+  const confirmedCount = users.filter(
+    (u) => u.email_confirmed_at || (u as { confirmed_at?: string }).confirmed_at
+  ).length;
 
   // ── Welcome backstop ───────────────────────────────────────────────────────
   //
@@ -122,6 +128,16 @@ export async function GET(req: NextRequest) {
       const built = buildWelcome({ ...p, full_name: p.full_name || metaName });
       const res = await sendEmail(resendKey, u.email, built);
       if (res.ok) {
+        // Founder alert rides the same trigger, so someone who confirms and
+        // never opens the app is still reported rather than vanishing. Same
+        // ledger guard above means it cannot double up with the app path.
+        void sendSignupAlert(resendKey, {
+          email: u.email,
+          name: p.full_name || metaName,
+          goal: p.goal ?? null,
+          provider: u.app_metadata?.provider ?? null,
+          totalUsers: confirmedCount,
+        });
         // Upsert: these are precisely the users with no profiles row, and an
         // UPDATE would change nothing while reporting success - which would
         // re-send the welcome email every single morning.
