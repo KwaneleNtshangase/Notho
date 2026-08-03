@@ -133,10 +133,10 @@ export default function TermsPage() {
           { title: "4. Acceptable Use", body: "You may use the Service only for lawful purposes. You agree not to: share your account credentials; attempt to reverse-engineer or scrape the app; upload harmful or offensive content; impersonate other users or misrepresent your identity on the leaderboard." },
           { title: "5. Intellectual Property", body: "All content in the app - including lessons, graphics, the Notho name and logo, and the former Fundi Finance name and logo - is owned by or licensed to The Solution Org (Pty) Ltd. You may not reproduce, distribute, or create derivative works from any app content without our written permission." },
           { title: "6. User-Generated Content", body: "Any display names, profile information, or content you submit to the Service grants us a licence to display it within the app. You retain ownership of your content but are responsible for ensuring it does not violate these terms." },
-          { title: "7. Account Termination", body: "We reserve the right to suspend or terminate your account for violations of these terms, fraudulent activity, or any other reason at our discretion. You may delete your account at any time by contacting privacy@fundiapp.co.za." },
+          { title: "7. Account Termination", body: "We reserve the right to suspend or terminate your account for violations of these terms, fraudulent activity, or any other reason at our discretion. You may delete your account at any time by contacting privacy@notho.co.za." },
           { title: "8. Limitation of Liability", body: "To the fullest extent permitted by law, The Solution Org (Pty) Ltd and its team shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service. Our total liability for any claim shall not exceed any amount you have paid to us in the preceding 12 months." },
           { title: "9. Governing Law", body: "These Terms are governed by the laws of the Republic of South Africa. Any disputes shall be subject to the jurisdiction of the South African courts." },
-          { title: "10. Contact", body: "For any questions about these Terms, contact us at legal@fundiapp.co.za." },
+          { title: "10. Contact", body: "For any questions about these Terms, contact us at legal@notho.co.za." },
         ].map((s) => (
           <Section key={s.title} title={s.title}>
             <p>{s.body}</p>

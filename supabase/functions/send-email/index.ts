@@ -21,8 +21,27 @@ const RESEND_API_KEY            = Deno.env.get("RESEND_API_KEY")!;
 const SUPABASE_URL              = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const FROM = "Notho <hello@fundiapp.co.za>";
-const APP_URL = "https://fundiapp.co.za";
+/**
+ * Sending identity. Mirrors src/lib/emails/sender.ts — same reasoning, but this
+ * runs on Deno in Supabase rather than on Vercel, so it needs its own env read.
+ *
+ * The fallback is deliberately the OLD domain: fundiapp.co.za is the one
+ * currently verified in Resend. Resend rejects mail from an unverified domain
+ * rather than degrading, so defaulting to notho.co.za before verification would
+ * silently stop every welcome email with no symptom to tell you.
+ *
+ * Cutover: verify notho.co.za in Resend (docs/EMAIL-MIGRATION-NOTHO.md steps
+ * 4-5), then `supabase secrets set MAIL_FROM_ADDRESS="Notho <hello@notho.co.za>"`.
+ * No redeploy, and flipping back is just as fast if verification regresses.
+ */
+const FROM = Deno.env.get("MAIL_FROM_ADDRESS") ?? "Notho <hello@fundiapp.co.za>";
+
+/**
+ * Link target, NOT a sending identity — safe to move ahead of Resend
+ * verification, and it should move: fundiapp.co.za 301s to www.notho.co.za, and
+ * a redirect inside an email body is a deliverability signal working against us.
+ */
+const APP_URL = Deno.env.get("APP_URL") ?? "https://www.notho.co.za";
 
 const WELCOME_TEMPLATE_ID  = "a599bf54-7f17-4ed6-8f27-cdb058e0ae5d";
 const D1_TEMPLATE_ID       = "14f12c73-516c-4649-bf18-048c8891b535";
@@ -107,7 +126,7 @@ function buildMilestoneEmail(v: MilestoneVars): string {
         </td></tr>
         <!-- Footer -->
         <tr><td style="background:#F9FAFB;padding:20px 32px;text-align:center;border-top:1px solid #F3F4F6">
-          <p style="color:#9CA3AF;font-size:13px;margin:0">Notho &middot; <a href="mailto:hello@fundiapp.co.za" style="color:#9CA3AF">hello@fundiapp.co.za</a></p>
+          <p style="color:#9CA3AF;font-size:13px;margin:0">Notho &middot; <a href="mailto:hello@notho.co.za" style="color:#9CA3AF">hello@notho.co.za</a></p>
           <p style="color:#D1D5DB;font-size:12px;margin:6px 0 0">You are receiving this because you signed up for Notho.</p>
         </td></tr>
       </table>

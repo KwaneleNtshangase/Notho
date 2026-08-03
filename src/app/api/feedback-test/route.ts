@@ -12,7 +12,12 @@ export async function GET() {
     return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
   }
 
+  // Both domains on purpose. This route exists to prove delivery, and during
+  // the cutover the question worth answering is whether the NEW addresses
+  // receive AND the old forwarders still fire (migration doc step 3).
   const ADDRESSES = [
+    "support@notho.co.za",
+    "hello@notho.co.za",
     "support@fundiapp.co.za",
     "hello@fundiapp.co.za",
   ];

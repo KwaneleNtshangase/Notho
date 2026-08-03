@@ -116,7 +116,7 @@ function BroadcastPanel() {
     <div style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 16, background: "#F5FBF8", marginBottom: 20 }}>
       <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, color: "#065f46" }}>Budget announcement broadcast</div>
       <p style={{ fontSize: 13, color: "#374151", margin: "0 0 12px" }}>
-        Schedules the &quot;import your bank statement&quot; announcement to every confirmed user, sent from hello@fundiapp.co.za. Delivery is queued in Resend for the set time.
+        Schedules the &quot;import your bank statement&quot; announcement to every confirmed user, sent from hello@notho.co.za. Delivery is queued in Resend for the set time.
       </p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
         <a href="/api/admin/broadcast?preview=1" target="_blank" rel="noopener noreferrer"

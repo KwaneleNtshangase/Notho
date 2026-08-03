@@ -272,10 +272,10 @@ export default function PrivacyPage() {
           <p>
             To exercise any of these rights, contact us at{" "}
             <a
-              href="mailto:support@fundiapp.co.za"
+              href="mailto:support@notho.co.za"
               style={{ color: "#007A85" }}
             >
-              support@fundiapp.co.za
+              support@notho.co.za
             </a>
             . We will respond within 30 days.
           </p>
@@ -293,10 +293,10 @@ export default function PrivacyPage() {
             <li>
               Email{" "}
               <a
-                href="mailto:support@fundiapp.co.za"
+                href="mailto:support@notho.co.za"
                 style={{ color: "#007A85" }}
               >
-                support@fundiapp.co.za
+                support@notho.co.za
               </a>{" "}
               with the subject line <em>&ldquo;Data Deletion Request&rdquo;</em> and the
               email address associated with your account.
@@ -345,10 +345,10 @@ export default function PrivacyPage() {
             South Africa
             <br />
             <a
-              href="mailto:support@fundiapp.co.za"
+              href="mailto:support@notho.co.za"
               style={{ color: "#007A85" }}
             >
-              support@fundiapp.co.za
+              support@notho.co.za
             </a>
             <br />
             <a href="https://notho.co.za" style={{ color: "#007A85" }}>

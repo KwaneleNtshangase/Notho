@@ -97,7 +97,7 @@ const NOTHO_FAQ = [
     section: "Account & Data",
     items: [
       { q: "How do I change my name?", a: "Go to Profile, tap Edit Profile, update your first and last name, then tap Save." },
-      { q: "How do I delete my account?", a: "Email us at privacy@fundiapp.co.za with subject 'Account Deletion Request'. We'll process it within 7 working days and permanently delete all your data." },
+      { q: "How do I delete my account?", a: "Email us at privacy@notho.co.za with subject 'Account Deletion Request'. We'll process it within 7 working days and permanently delete all your data." },
       { q: "What data does Notho collect?", a: "We collect the email address you register with, your learning progress (lessons completed, XP, streaks), and anonymised budget data for benchmarking. See our Privacy Policy for full details." },
       { q: "Is my budget data shared?", a: "Budget data is aggregated and anonymised before being used for the community benchmarking feature. Individual entries are never shared with other users. We require at least 3 users in a category before showing any comparison." },
     ],
@@ -163,7 +163,7 @@ export function FeedbackModal({ open, onClose }: { open: boolean; onClose: () =>
         description,
         issue_type: issueType,
       });
-      // 2. Send email to support@fundiapp.co.za via Resend
+      // 2. Send email to support@notho.co.za via Resend
       const token = session?.access_token;
       await fetch("/api/feedback-email", {
         method: "POST",
@@ -317,11 +317,11 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
             { title: "2. Information We Collect", body: "We collect: (a) your email address and display name when you register; (b) your learning progress including lessons completed, XP earned, and streaks; (c) budget entries you create - these are stored securely and only accessible to you; (d) anonymised, aggregated budget data for the community benchmarking feature; (e) app usage data such as which lessons you viewed and how long you spent." },
             { title: "3. How We Use Your Information", body: "We use your information to provide and improve the service, personalise your learning experience, display your progress on the leaderboard (which you can disable by not setting a public display name), detect and fix bugs, and send you progress-related reminders (which you can opt out of in your device notification settings)." },
             { title: "4. Sharing Your Information", body: "We do not sell your personal information. We may share it with trusted service providers (Supabase for database hosting, PostHog for anonymised analytics) who are contractually bound to protect it. Budget data is only used in aggregate form with a minimum of 3 users before any comparison is shown." },
-            { title: "5. Your Rights", body: "You have the right to: access the personal data we hold about you; correct inaccurate information; request deletion of your account and associated data; object to certain processing; export your data. To exercise any of these rights, email privacy@fundiapp.co.za." },
+            { title: "5. Your Rights", body: "You have the right to: access the personal data we hold about you; correct inaccurate information; request deletion of your account and associated data; object to certain processing; export your data. To exercise any of these rights, email privacy@notho.co.za." },
             { title: "6. Data Retention", body: "We retain your data for as long as your account is active. When you delete your account, we delete your personal data within 30 days, except where retention is required by law." },
             { title: "7. Children", body: "Notho is not directed at children under the age of 13. We do not knowingly collect data from children. If we become aware that a child has provided personal information, we will delete it promptly." },
             { title: "8. Cookies & Analytics", body: "We use analytics tools (PostHog) to understand how users engage with the app. Data collected is anonymised and used only to improve the product. We do not use third-party advertising cookies." },
-            { title: "9. Contact", body: "For all privacy enquiries, contact our team at privacy@fundiapp.co.za." },
+            { title: "9. Contact", body: "For all privacy enquiries, contact our team at privacy@notho.co.za." },
           ].map((s) => (
             <div key={s.title} style={{ marginBottom: 20 }}>
               <div style={{ fontWeight: 800, marginBottom: 6 }}>{s.title}</div>
@@ -341,10 +341,10 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
             { title: "4. Acceptable Use", body: "You may use the Service only for lawful purposes. You agree not to: share your account credentials; attempt to reverse-engineer or scrape the app; upload harmful or offensive content; impersonate other users or misrepresent your identity on the leaderboard." },
             { title: "5. Intellectual Property", body: "All content in the app - including lessons, graphics, and the Notho name and logo - is owned by or licensed to Notho. You may not reproduce, distribute, or create derivative works from any app content without our written permission." },
             { title: "6. User-Generated Content", body: "Any display names, profile information, or content you submit to the Service grants us a licence to display it within the app. You retain ownership of your content but are responsible for ensuring it does not violate these terms." },
-            { title: "7. Account Termination", body: "We reserve the right to suspend or terminate your account for violations of these terms, fraudulent activity, or any other reason at our discretion. You may delete your account at any time by contacting privacy@fundiapp.co.za." },
+            { title: "7. Account Termination", body: "We reserve the right to suspend or terminate your account for violations of these terms, fraudulent activity, or any other reason at our discretion. You may delete your account at any time by contacting privacy@notho.co.za." },
             { title: "8. Limitation of Liability", body: "To the fullest extent permitted by law, Notho and its team shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service. Our total liability for any claim shall not exceed any amount you have paid to us in the preceding 12 months." },
             { title: "9. Governing Law", body: "These Terms are governed by the laws of the Republic of South Africa. Any disputes shall be subject to the jurisdiction of the South African courts." },
-            { title: "10. Contact", body: "For any questions about these Terms, contact us at legal@fundiapp.co.za." },
+            { title: "10. Contact", body: "For any questions about these Terms, contact us at legal@notho.co.za." },
           ].map((s) => (
             <div key={s.title} style={{ marginBottom: 20 }}>
               <div style={{ fontWeight: 800, marginBottom: 6 }}>{s.title}</div>

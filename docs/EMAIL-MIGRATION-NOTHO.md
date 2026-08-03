@@ -1,7 +1,11 @@
 # Email migration: fundiapp.co.za → notho.co.za
 
-**Status:** not started. The app still sends from `hello@fundiapp.co.za` on purpose.
-Work through this doc in order. Do **not** flip the sender until Step 4 passes.
+**Status:** steps 1–3 outstanding (yours, in cPanel). Step 6's code sweep is **done** —
+addresses and links now point at notho.co.za, and the sending identity is staged behind
+`MAIL_FROM_ADDRESS` with the old domain as the fallback.
+
+The app still sends from `hello@fundiapp.co.za` on purpose: it is the only domain
+verified in Resend. Do **not** flip the env var until Step 5 passes.
 
 ---
 
@@ -129,21 +133,67 @@ dashboard to your Gmail. Then check:
 If DKIM fails, the `resend._domainkey` TXT record is wrong or truncated — that is the
 usual culprit, because the key is long and cPanel sometimes clips it.
 
-## Step 6 — Flip the sender in code (1 line, my job)
+## Step 6 — Flip the sender ~~in code~~ **with an env var** (done — 3 Aug 2026)
 
-Only once Step 5 is fully green. In `src/lib/emails/lifecycle.ts`:
+**The code sweep has already happened. There is nothing left to edit here.**
 
-```ts
-const FROM = "Notho <hello@fundiapp.co.za>";   // ← change this
-const FROM = "Notho <hello@notho.co.za>";      // ← to this
+What changed:
+
+| Surface | State |
+|---|---|
+| 18 `@fundiapp.co.za` addresses in privacy, terms, security, ProfileView, admin/bugs | ✅ now `@notho.co.za` |
+| `supabase/functions/send-email/index.ts` `APP_URL` | ✅ now `https://www.notho.co.za` |
+| Drip-template logo `<img src>` and CTA hrefs (`supabase/create_drip_templates.sh`) | ✅ now `https://www.notho.co.za` |
+| Sending identity — Vercel (`src/lib/emails/sender.ts`) | staged: `MAIL_FROM_ADDRESS` |
+| Sending identity — Supabase edge fn (`send-email/index.ts`) | staged: `MAIL_FROM_ADDRESS` |
+| Sending identity — Resend templates (`fix_resend_templates.sh`) | staged: `MAIL_FROM` |
+
+Addresses and links moved because they are inbound or navigational — a wrong one
+is a dead link, which is visible. The **sending identity** did not, because a
+wrong one is invisible: Resend rejects mail from an unverified domain rather
+than degrading, so lifecycle email would simply stop with nothing to notice.
+
+So the flip is now three settings, no deploy, and reversible in seconds:
+
+```bash
+# 1. Vercel  — Settings → Environment Variables
+MAIL_FROM_ADDRESS="Notho <hello@notho.co.za>"
+
+# 2. Supabase edge function
+supabase secrets set MAIL_FROM_ADDRESS="Notho <hello@notho.co.za>"
+
+# 3. Resend stored templates
+MAIL_FROM="Notho <hello@notho.co.za>" bash supabase/fix_resend_templates.sh
 ```
 
-There is a comment above that line explaining exactly this. Also change
-`src/app/api/feedback-email/route.ts` and `src/app/api/admin/broadcast/route.ts`, which
-have their own hardcoded `from:` values, plus the 24 `@fundiapp.co.za` addresses in the
-privacy, terms, security and admin pages.
+Do all three, or you get a split-brain where welcome mail sends from one domain
+and lifecycle mail from the other.
 
-Tell me when Step 5 is green and I will do the whole sweep in one commit.
+**Still only after Step 5 is fully green.** As of 2 Aug the DKIM records were
+missing, so this is not yet safe:
+
+```
+resend._domainkey.notho.co.za   ❌ missing
+send.notho.co.za                ❌ missing
+```
+
+Re-check before flipping anything — it takes ten seconds:
+
+```bash
+bash scripts/check-resend-dns.sh
+```
+
+### Not swept, on purpose
+
+- `e2e-test@fundiapp.co.za` / `FundiE2E_Test#2026` in `e2e/helpers.ts` and
+  `e2e-tests.yml` — a real Supabase auth account. Renaming the literal cannot
+  rename the stored credential; it would just break E2E sign-in. Rotate the
+  account in Supabase first if you want these to change.
+- `src/app/api/feedback-test/route.ts` now probes **both** domains, so one run
+  tells you whether the new addresses receive *and* whether the Step 3
+  forwarders still fire.
+- `vercel.json` redirect hosts and the `LEGACY_CACHE_PREFIXES` in `public/sw.js`
+  — both must keep naming the old value to do their job.
 
 ## Step 7 — Watch the first automated send
 
