@@ -1,0 +1,67 @@
+<!--
+  Cosmo announcement - for pasting into a Resend BROADCAST.
+
+  Differs from the in-app version in src/lib/emails/lifecycle.ts in two ways:
+    1. No {{ name }} personalisation. Broadcasts go to an Audience, and a
+       merge tag that fails renders as literal text in someone's inbox.
+       "Hi there" is safer than a chance of "Hi {{FIRST_NAME}}".
+    2. Carries {{{RESEND_UNSUBSCRIBE_URL}}}, which Resend REQUIRES on every
+       broadcast. Three braces, not two - it injects a raw URL.
+
+  Cosmo is male. The illustrator brief used to say otherwise; it has been
+  corrected. Keep pronouns consistent if you edit this.
+
+  Paste into Resend -> Broadcasts -> new broadcast -> Code / HTML view.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;margin:0;padding:0">
+  <tr><td align="center" style="padding:24px 12px">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
+
+      <tr><td style="background:#007A85;border-radius:16px 16px 0 0;padding:30px 28px">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="vertical-align:middle;padding-right:14px">
+            <img src="https://www.notho.co.za/notho-icon-white.png" width="44" height="44" alt="Notho" style="display:block;border:0;outline:none;text-decoration:none" />
+          </td>
+          <td style="vertical-align:middle">
+            <div style="font-size:19px;font-weight:800;color:#ffffff;line-height:1.25">Notho</div>
+            <div style="font-size:12px;color:#B5E4E8;letter-spacing:0.04em;padding-top:3px">Master Your Money</div>
+          </td>
+        </tr></table>
+      </td></tr>
+
+      <tr><td style="background:#ffffff;border-radius:0 0 16px 16px;padding:30px 28px;color:#111827;line-height:1.6">
+
+        <h1 style="margin:0 0 14px;font-size:22px;font-weight:800">Meet Cosmo</h1>
+
+        <p style="margin:0 0 16px;font-size:15px;color:#374151">Hi there, there's someone new in the app. Cosmo is a money coach built into Notho, and he can answer questions about your own budget in plain language.</p>
+
+        <p style="margin:0 0 16px;font-size:15px;color:#374151">Ask him things like "where did most of my money go last month" or "what does a debit order dispute actually mean". He reads the totals from your budget, so the answers are about your actual numbers, not generic tips off the internet.</p>
+
+        <div style="background:#E6F4F5;border-radius:12px;padding:16px 18px;margin:0 0 22px">
+          <div style="font-size:14px;font-weight:700;color:#00636B">He never sees who you pay</div>
+          <div style="font-size:14px;color:#374151;padding-top:6px;line-height:1.6">
+            Cosmo only receives your category totals. Not merchant names, not transaction descriptions, not who you send money to. That part never leaves your account.
+          </div>
+        </div>
+
+        <p style="margin:0 0 16px;font-size:15px;color:#374151"><b>Where to find him.</b> Open the <b>Budget</b> tab and look for the chat button in the bottom right corner. He'll ask permission before the first question, and you can turn him off any time.</p>
+
+        <p style="margin:0 0 16px;font-size:15px;color:#374151">One thing worth being straight about. Cosmo teaches, he does not advise. He won't tell you which account to open or what to invest in, because that's a decision for you and a registered financial adviser. What he will do is explain how the money side of it works, so you're making that call with your eyes open.</p>
+
+        <div style="margin:6px 0">
+          <a href="https://www.notho.co.za/budget" style="display:inline-block;padding:13px 24px;background:#007A85;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:700;font-size:15px">Say hi to Cosmo</a>
+        </div>
+
+        <p style="margin:22px 0 0;font-size:15px;color:#374151">Let us know what you think.<br/>Team Notho</p>
+
+      </td></tr>
+
+      <tr><td style="padding:16px 28px 0;text-align:center;font-size:11px;color:#9AA0A6;line-height:1.6">
+        You're getting this because you have a Notho account.<br/>
+        Educational content only, not financial advice.<br/>
+        <a href="{{{RESEND_UNSUBSCRIBE_URL}}}" style="color:#9AA0A6;text-decoration:underline">Unsubscribe</a>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>

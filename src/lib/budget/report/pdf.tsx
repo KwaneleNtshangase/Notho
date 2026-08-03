@@ -48,6 +48,19 @@ const GROUP_META: Record<CategoryGroup, { label: string; color: string }> = {
   unclassified: { label: "Unclassified", color: "#9E9E9E" },
 };
 
+/**
+ * Cover contents strip. Page numbers are structural - the document below is a
+ * fixed sequence of five <Page> blocks - so keep this in step if a page is
+ * added or removed.
+ */
+const COVER_CONTENTS: { page: string; title: string; blurb: string }[] = [
+  { page: "2", title: "What Cosmo noticed", blurb: "The story, your wins and risks, next moves" },
+  { page: "3", title: "Monthly performance", blurb: "Budget vs actual and the trend over time" },
+  { page: "4", title: "Where the money went", blurb: "Needs, wants & goals vs the guidelines" },
+  { page: "5", title: "Every category", blurb: "Full spend and set-aside tables" },
+  { page: "6", title: "Income & transactions", blurb: "Sources, commitments, top merchants" },
+];
+
 function toneColor(tone: InsightTone): string {
   switch (tone) {
     case "good":
@@ -197,10 +210,19 @@ function zarShort(cents: number): string {
 }
 
 // ── Branding ───────────────────────────────────────────────────────────────
+/**
+ * Intrinsic height/width of public/notho-icon.png (512 x 494). Every logo in
+ * the report derives its height from its width through this ratio - hard-coding
+ * a square box is what squashed the mark before, and @react-pdf will happily
+ * distort an image rather than letterbox it.
+ */
+const MARK_RATIO = 494 / 512;
+
+/** The Notho icon mark, always at its true aspect ratio. `size` is the width. */
 function Logo({ uri, size }: { uri?: string; size: number }) {
   if (!uri) return null;
   // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
-  return <Image src={uri} style={{ width: size, height: size }} />;
+  return <Image src={uri} style={{ width: size, height: size * MARK_RATIO }} />;
 }
 
 function PageHeader({ uri, title }: { uri?: string; title: string }) {
@@ -230,6 +252,41 @@ function Footer() {
         `Notho · Master Your Money   |   Educational insights based on your own data - not financial advice   |   Page ${pageNumber} of ${totalPages}`
       }
     />
+  );
+}
+
+// ── Pagination helpers ─────────────────────────────────────────────────────
+/**
+ * A section heading that refuses to be the last thing on a page.
+ *
+ * @react-pdf breaks purely on "does this node fit", with no notion of a heading
+ * belonging to what follows it. Left alone it will happily print a title at the
+ * foot of one page and its table on the next - which is how this report ended
+ * up with pages carrying a single stray line. `minPresenceAhead` reserves
+ * `ahead` points below the title: if that much room isn't left, the whole block
+ * moves to the next page together.
+ */
+type ViewStyle = React.ComponentProps<typeof View>["style"];
+
+function SectionTitle({ children, ahead = 110 }: { children: React.ReactNode; ahead?: number }) {
+  return (
+    <Text style={styles.sectionTitle} minPresenceAhead={ahead}>
+      {children}
+    </Text>
+  );
+}
+
+/**
+ * Block that must never be split across a page boundary. Use for anything
+ * small enough to always fit in one page's content area (~708pt) - charts,
+ * short tables, two-column pairs. Never wrap a long table in this: a block
+ * that cannot fit is pushed whole onto a fresh page and leaves a hole behind.
+ */
+function Keep({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {
+  return (
+    <View wrap={false} style={style}>
+      {children}
+    </View>
   );
 }
 
@@ -564,7 +621,9 @@ function ExpenseTable({
   };
   return (
     <View>
-      <View style={styles.tableHeader}>
+      {/* Header reserves room for itself + ~4 rows, so a table never starts
+          with its header stranded at the foot of a page. */}
+      <View style={styles.tableHeader} minPresenceAhead={80}>
         <Text style={{ width: "28%" }}>Category</Text>
         <Text style={{ width: "16%", textAlign: "right" }}>Budgeted</Text>
         <Text style={{ width: "16%", textAlign: "right" }}>Actual</Text>
@@ -573,7 +632,11 @@ function ExpenseTable({
         <Text style={{ width: "12%", textAlign: "right" }}>Share</Text>
       </View>
       {rows.map((r, idx) => (
-        <View key={r.categoryId} style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}>
+        <View
+          key={r.categoryId}
+          wrap={false}
+          style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}
+        >
           <View style={{ width: "28%", flexDirection: "row", alignItems: "center" }}>
             <View style={[styles.dot, { backgroundColor: r.color }]} />
             <Text>{r.categoryName}</Text>
@@ -606,7 +669,7 @@ function MonthTable({ months }: { months: MonthlySpend[] }) {
     : { month: "26%", inc: "24%", day: "24%", set: "0%", net: "26%" };
   return (
     <View>
-      <View style={styles.tableHeader}>
+      <View style={styles.tableHeader} minPresenceAhead={80}>
         <Text style={{ width: w.month }}>Month</Text>
         <Text style={{ width: w.inc, textAlign: "right" }}>Income</Text>
         <Text style={{ width: w.day, textAlign: "right" }}>Day-to-day</Text>
@@ -614,7 +677,11 @@ function MonthTable({ months }: { months: MonthlySpend[] }) {
         <Text style={{ width: w.net, textAlign: "right" }}>Net</Text>
       </View>
       {months.map((m, idx) => (
-        <View key={m.monthYear} style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}>
+        <View
+          key={m.monthYear}
+          wrap={false}
+          style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}
+        >
           <View style={{ width: w.month, flexDirection: "row", alignItems: "center" }}>
             <View style={[styles.dot, { width: 7, height: 7, backgroundColor: m.netCents >= 0 ? C.teal : C.expense }]} />
             <Text>
@@ -634,6 +701,43 @@ function MonthTable({ months }: { months: MonthlySpend[] }) {
       ))}
     </View>
   );
+}
+
+/**
+ * Rows beyond this and the trend chart + month table can no longer be
+ * guaranteed to fit one page together (chart ~180pt + heading 25 + header 22 +
+ * 26pt a row + summary 20 = 631pt at 14 rows, against ~708pt of content area),
+ * so past it the block is allowed to break instead of being kept whole.
+ */
+const MONTH_TABLE_KEEP_MAX = 14;
+
+/**
+ * The trend chart and the month table it plots, kept as one unit while they
+ * fit. Held together they either both sit under the budget summary or both
+ * move to the next page - which is what stops the table shedding its last two
+ * rows and a footnote onto a page of their own.
+ */
+function TrendAndMonths({ model }: { model: ReportModel }) {
+  const keepWhole = model.monthlySpend.length <= MONTH_TABLE_KEEP_MAX;
+  const body = (
+    <>
+      {model.monthlySpend.length >= 2 && (
+        <View style={{ marginBottom: 14 }} wrap={false}>
+          <SectionTitle ahead={0}>Income vs expenses over time</SectionTitle>
+          <LineChart data={model.monthlySpend} />
+        </View>
+      )}
+      <SectionTitle ahead={keepWhole ? 0 : 110}>Month by month</SectionTitle>
+      <MonthTable months={model.monthlySpend} />
+      {model.projection.annualisedExpenseCents != null && model.projection.monthsUsed >= 2 && (
+        <Text style={{ fontSize: 8, color: C.textMuted, marginTop: 8 }} minPresenceAhead={0}>
+          Average over {model.projection.monthsUsed} complete months: {zarWhole(model.projection.avgMonthlyExpenseCents!)}/month
+          - roughly {zarWhole(model.projection.annualisedExpenseCents)} a year at this pace.
+        </Text>
+      )}
+    </>
+  );
+  return keepWhole ? <Keep>{body}</Keep> : body;
 }
 
 export function BudgetReportDocument({
@@ -725,17 +829,29 @@ export function BudgetReportDocument({
       {/* ── Page 1 - Cover: verdict first ─────────────────────────────── */}
       <Page size="A4" style={styles.cover}>
         {logoDataUri && (
+          // Watermark: sized off the page width and anchored so the whole mark
+          // stays on the page. The old version was a squashed 320x320 box hung
+          // off two edges, so it read as a cropped accident rather than a mark.
           // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
           <Image
             src={logoDataUri}
-            style={{ position: "absolute", width: 320, height: 320, bottom: -40, right: -50, opacity: 0.06 }}
+            style={{
+              position: "absolute",
+              width: 300,
+              height: 300 * MARK_RATIO,
+              bottom: 120,
+              right: -60,
+              opacity: 0.07,
+            }}
           />
         )}
         <View style={{ height: 6, backgroundColor: C.gold }} />
-        <View style={{ paddingHorizontal: 48, paddingTop: 40 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 28 }}>
-            <Logo uri={logoDataUri} size={42} />
-            <View style={{ marginLeft: 10 }}>
+        {/* flexGrow so this column owns the full remaining page height - that's
+            what gives the contents strip below something to push against. */}
+        <View style={{ flexGrow: 1, paddingHorizontal: 48, paddingTop: 38, paddingBottom: 30 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 26 }}>
+            <Logo uri={logoDataUri} size={40} />
+            <View style={{ marginLeft: 11 }}>
               <Text style={{ fontSize: 17, fontWeight: 700, color: C.white }}>Notho</Text>
               <Text style={{ fontSize: 9, color: C.teal, fontWeight: 700 }}>Master Your Money</Text>
             </View>
@@ -817,6 +933,34 @@ export function BudgetReportDocument({
               ))}
             </View>
           )}
+
+          {/* Contents strip. `marginTop: auto` pushes it to the foot of the
+              cover, which both closes the empty third the cover used to end on
+              and gives the reader a map of a multi-page document. Auto margin
+              (not absolute positioning) so a taller "At a glance" simply
+              squeezes the gap instead of printing underneath this. */}
+          <View
+            style={{
+              marginTop: "auto",
+              paddingTop: 14,
+              borderTop: `1px solid ${C.card}`,
+            }}
+          >
+            <Text style={{ fontSize: 8, color: C.gold, fontWeight: 700, letterSpacing: 0.8, marginBottom: 8 }}>
+              IN THIS REPORT
+            </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              {COVER_CONTENTS.map((c) => (
+                <View key={c.title} style={{ width: "50%", flexDirection: "row", marginBottom: 6, paddingRight: 12 }}>
+                  <Text style={{ fontSize: 8, color: C.teal, fontWeight: 700, width: 16 }}>{c.page}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 8.5, color: C.white, fontWeight: 700 }}>{c.title}</Text>
+                    <Text style={{ fontSize: 7, color: C.onNavyMuted }}>{c.blurb}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
         </View>
       </Page>
 
@@ -841,7 +985,7 @@ export function BudgetReportDocument({
           </View>
         )}
 
-        <View style={{ flexDirection: "row", gap: 12, marginBottom: 10 }}>
+        <Keep style={{ flexDirection: "row", gap: 12, marginBottom: 10 }}>
           <View style={{ flex: 1 }}>
             <Text style={styles.sectionTitle}>Wins</Text>
             {ins.wins.length === 0 ? (
@@ -858,11 +1002,15 @@ export function BudgetReportDocument({
               ins.risks.map((r, i) => <ToneItem key={i} tone="bad" text={r} />)
             )}
           </View>
-        </View>
+        </Keep>
 
-        <Text style={styles.sectionTitle}>Your next moves</Text>
+        <SectionTitle ahead={70}>Your next moves</SectionTitle>
         {ins.actions.map((a, i) => (
-          <View key={i} style={[styles.actionCard, a.isTopPriority ? { borderLeft: `3px solid ${C.expense}` } : {}]}>
+          <View
+            key={i}
+            wrap={false}
+            style={[styles.actionCard, a.isTopPriority ? { borderLeft: `3px solid ${C.expense}` } : {}]}
+          >
             <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 3 }}>
               <Text style={{ fontSize: 9.5, fontWeight: 700, flex: 1 }}>
                 {i + 1}. {a.title}
@@ -903,7 +1051,7 @@ export function BudgetReportDocument({
       {/* ── Page 3 - Monthly performance ──────────────────────────────── */}
       <Page size="A4" style={styles.page}>
         <PageHeader uri={logoDataUri} title="Monthly performance" />
-        <Text style={styles.sectionTitle}>Budget vs actual (day-to-day, like-for-like)</Text>
+        <SectionTitle ahead={0}>Budget vs actual (day-to-day, like-for-like)</SectionTitle>
         <Text style={styles.sectionSub}>
           Only day-to-day categories with a budget are compared here. Savings-vehicle contributions have their own plan below - putting more than planned into a stokvel is not overspending.
         </Text>
@@ -957,7 +1105,7 @@ export function BudgetReportDocument({
         )}
 
         {overspendSorted.filter((r) => r.varianceCents > 0).length > 0 && (
-          <>
+          <Keep>
             <Text style={styles.sectionTitle}>Where the overspend came from</Text>
             <View style={{ marginBottom: 14 }}>
               {overspendSorted
@@ -971,41 +1119,27 @@ export function BudgetReportDocument({
                   />
                 ))}
             </View>
-          </>
+          </Keep>
         )}
 
-        {model.monthlySpend.length >= 2 && (
-          <>
-            <Text style={styles.sectionTitle}>Income vs expenses over time</Text>
-            <View style={{ marginBottom: 16 }}>
-              <LineChart data={model.monthlySpend} />
-            </View>
-          </>
-        )}
-
-        <Text style={styles.sectionTitle}>Month by month</Text>
-        <MonthTable months={model.monthlySpend} />
-        {model.projection.annualisedExpenseCents != null && model.projection.monthsUsed >= 2 && (
-          <Text style={{ fontSize: 8, color: C.textMuted, marginTop: 8 }}>
-            Average over {model.projection.monthsUsed} complete months: {zarWhole(model.projection.avgMonthlyExpenseCents!)}/month
-            - roughly {zarWhole(model.projection.annualisedExpenseCents)} a year at this pace.
-          </Text>
-        )}
+        <TrendAndMonths model={model} />
         <Footer />
       </Page>
 
-      {/* ── Page 4 - Where the money went ─────────────────────────────── */}
+      {/* ── Page 4 - Where the money went: the picture ────────────────── */}
       <Page size="A4" style={styles.page}>
         <PageHeader uri={logoDataUri} title="Where the money went" />
-        <Text style={styles.sectionTitle}>Needs, wants & goals</Text>
-        <Text style={styles.sectionSub}>
-          The 50/30/20 guideline: about half on needs, under a third on wants, the rest to savings and debt payoff.
-        </Text>
-        <View style={{ marginBottom: 14 }}>
-          <GroupBar totals={model.groupTotals} totalCents={model.totalExpenseCents} />
-        </View>
+        <Keep>
+          <SectionTitle ahead={0}>Needs, wants &amp; goals</SectionTitle>
+          <Text style={styles.sectionSub}>
+            The 50/30/20 guideline: about half on needs, under a third on wants, the rest to savings and debt payoff.
+          </Text>
+          <View style={{ marginBottom: 14 }}>
+            <GroupBar totals={model.groupTotals} totalCents={model.totalExpenseCents} />
+          </View>
+        </Keep>
 
-        <Text style={styles.sectionTitle}>Where every rand went</Text>
+        <SectionTitle>Where every rand went</SectionTitle>
         <Text style={styles.sectionSub}>
           The inner ring is your money grouped into needs, wants, goals &amp; business. The outer ring breaks each group into its categories (same colour family). The legend below is grouped the same way, so you can see exactly which category sits where.
         </Text>
@@ -1050,16 +1184,62 @@ export function BudgetReportDocument({
           </View>
         )}
 
-        <Text style={styles.sectionTitle}>Expenses by category</Text>
+        {/* Benchmarks live here rather than at the tail of the transactions
+            page: they are ratios about needs/wants/savings, so they read as a
+            scorecard under the 50/30/20 bar above. Moving them also stops a
+            six-row table being pushed onto a page of its own at the end of an
+            already-full page. */}
+        <Keep style={{ marginTop: 6 }}>
+          <Text style={styles.sectionTitle}>How you compare to common guidelines</Text>
+          <View>
+            <View style={styles.tableHeader}>
+              <Text style={{ width: "40%" }}>Measure</Text>
+              <Text style={{ width: "30%", textAlign: "right" }}>You</Text>
+              <Text style={{ width: "30%", textAlign: "right" }}>Guideline</Text>
+            </View>
+            {ins.benchmarks.map((b, idx) => (
+              <View key={b.label} style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}>
+                <View style={{ width: "40%", flexDirection: "row", alignItems: "center" }}>
+                  <View style={[styles.dot, { width: 7, height: 7, backgroundColor: toneColor(b.tone) }]} />
+                  <Text style={{ fontSize: 8.5 }}>{b.label}</Text>
+                </View>
+                <Text style={{ width: "30%", textAlign: "right", fontWeight: 700, color: toneColor(b.tone), fontSize: 8.5 }}>
+                  {b.value}
+                </Text>
+                <Text style={{ width: "30%", textAlign: "right", color: C.textMuted, fontSize: 8.5 }}>{b.target}</Text>
+              </View>
+            ))}
+          </View>
+          {model.dataQuality.unclassifiedExpenseSharePct >= 20 && (
+            <Text style={{ fontSize: 7.5, color: C.textMuted, marginTop: 5 }}>
+              Caveat: with {model.dataQuality.unclassifiedExpenseSharePct}% of spending unclassified, the true Needs and Wants shares are likely higher.
+            </Text>
+          )}
+        </Keep>
+        <Footer />
+      </Page>
+
+      {/* ── Page 5 - Where the money went: the numbers ────────────────────
+          The two category tables get their own page on purpose. Sharing a page
+          with the sunburst meant the first table always ran a few rows past the
+          bottom, pushing the set-aside table onto a page of its own that was
+          otherwise blank. Given their own page they fit together, and long
+          tables now break row-by-row instead of stranding a heading. */}
+      <Page size="A4" style={styles.page}>
+        <PageHeader uri={logoDataUri} title="Where the money went" />
+        <SectionTitle ahead={0}>Expenses by category</SectionTitle>
+        <Text style={styles.sectionSub}>
+          Day-to-day spending only - money consumed, not money moved into savings. Sorted by share of spending.
+        </Text>
         <ExpenseTable rows={consumptionRows} />
         {setAsideRows.length > 0 && (
-          <>
-            <Text style={[styles.sectionTitle, { marginTop: 10 }]}>Money set aside</Text>
+          <View style={{ marginTop: 14 }}>
+            <SectionTitle>Money set aside</SectionTitle>
             <Text style={styles.sectionSub}>
               Savings, stokvel and investment contributions - building assets, not consumption. A positive variance here means you set aside MORE than planned.
             </Text>
             <ExpenseTable rows={setAsideRows} positiveIsGood />
-          </>
+          </View>
         )}
         <Footer />
       </Page>
@@ -1067,18 +1247,22 @@ export function BudgetReportDocument({
       {/* ── Page 5 - Income & transactions ────────────────────────────── */}
       <Page size="A4" style={styles.page}>
         <PageHeader uri={logoDataUri} title="Income & transactions" />
-        <Text style={styles.sectionTitle}>Income by source</Text>
+        <SectionTitle ahead={0}>Income by source</SectionTitle>
         {model.incomeCategories.length === 0 ? (
           <Text style={{ fontSize: 9, color: C.textMuted, marginBottom: 16 }}>No income data for this period.</Text>
         ) : (
           <View style={{ marginBottom: 6 }}>
-            <View style={styles.tableHeader}>
+            <View style={styles.tableHeader} minPresenceAhead={80}>
               <Text style={{ width: "55%" }}>Source</Text>
               <Text style={{ width: "25%", textAlign: "right" }}>Amount</Text>
               <Text style={{ width: "20%", textAlign: "right" }}>Share</Text>
             </View>
             {model.incomeCategories.map((r, idx) => (
-              <View key={r.categoryId} style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}>
+              <View
+                key={r.categoryId}
+                wrap={false}
+                style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}
+              >
                 <Text style={{ width: "55%" }}>{r.categoryName}</Text>
                 <Text style={{ width: "25%", textAlign: "right", color: C.teal }}>{zar(r.actualCents)}</Text>
                 <Text style={{ width: "20%", textAlign: "right" }}>{r.sharePct}%</Text>
@@ -1095,28 +1279,32 @@ export function BudgetReportDocument({
         )}
 
         {model.recurringCommitments.length === 0 && (
-          <>
-            <Text style={styles.sectionTitle}>Recurring commitments</Text>
+          <Keep>
+            <SectionTitle ahead={0}>Recurring commitments</SectionTitle>
             <Text style={{ fontSize: 8.5, color: C.textMuted, marginBottom: 14 }}>
               None detected yet - a payment shows up here once it repeats at a similar amount for three months or more.
             </Text>
-          </>
+          </Keep>
         )}
         {model.recurringCommitments.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>Recurring commitments</Text>
+            <SectionTitle>Recurring commitments</SectionTitle>
             <Text style={styles.sectionSub}>
               Payments that repeat monthly at a similar amount - your fixed base of {zarWhole(totalRecurringMonthly)}/month before any day-to-day choices.
             </Text>
             <View style={{ marginBottom: 10 }}>
-              <View style={styles.tableHeader}>
+              <View style={styles.tableHeader} minPresenceAhead={80}>
                 <Text style={{ width: "40%" }}>Payment</Text>
                 <Text style={{ width: "22%" }}>Category</Text>
                 <Text style={{ width: "19%", textAlign: "right" }}>Typical / month</Text>
                 <Text style={{ width: "19%", textAlign: "right" }}>Total</Text>
               </View>
               {model.recurringCommitments.map((r, idx) => (
-                <View key={r.description} style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}>
+                <View
+                  key={r.description}
+                  wrap={false}
+                  style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}
+                >
                   <Text style={{ width: "40%", fontSize: 8.5 }}>{r.description}</Text>
                   {r.group === "unclassified" ? (
                     <Text style={{ width: "22%", fontSize: 8, color: C.expense, fontWeight: 700 }}>
@@ -1142,7 +1330,7 @@ export function BudgetReportDocument({
           </>
         )}
 
-        <View style={{ flexDirection: "row", gap: 12, marginBottom: 4 }}>
+        <Keep style={{ flexDirection: "row", gap: 12, marginBottom: 4 }}>
           <View style={{ flex: 1 }}>
             <Text style={styles.sectionTitle}>Top merchants</Text>
             <View style={styles.insightCard}>
@@ -1188,7 +1376,7 @@ export function BudgetReportDocument({
               )}
             </View>
           </View>
-        </View>
+        </Keep>
 
         {redactedCount > 0 && (
           <Text style={{ fontSize: 7.5, color: C.textMuted, marginTop: -2, marginBottom: 6 }}>
@@ -1198,7 +1386,7 @@ export function BudgetReportDocument({
           </Text>
         )}
 
-        <View style={{ flexDirection: "row", gap: 12, marginBottom: 4 }}>
+        <Keep style={{ flexDirection: "row", gap: 12, marginBottom: 4 }}>
           <View style={{ flex: 1 }}>
             <Text style={styles.sectionTitle}>Over budget</Text>
             {model.topOverBudget.length === 0 ? (
@@ -1223,33 +1411,8 @@ export function BudgetReportDocument({
               ))
             )}
           </View>
-        </View>
+        </Keep>
 
-        <Text style={styles.sectionTitle}>How you compare to common guidelines</Text>
-        <View>
-          <View style={styles.tableHeader}>
-            <Text style={{ width: "40%" }}>Measure</Text>
-            <Text style={{ width: "30%", textAlign: "right" }}>You</Text>
-            <Text style={{ width: "30%", textAlign: "right" }}>Guideline</Text>
-          </View>
-          {ins.benchmarks.map((b, idx) => (
-            <View key={b.label} style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}>
-              <View style={{ width: "40%", flexDirection: "row", alignItems: "center" }}>
-                <View style={[styles.dot, { width: 7, height: 7, backgroundColor: toneColor(b.tone) }]} />
-                <Text style={{ fontSize: 8.5 }}>{b.label}</Text>
-              </View>
-              <Text style={{ width: "30%", textAlign: "right", fontWeight: 700, color: toneColor(b.tone), fontSize: 8.5 }}>
-                {b.value}
-              </Text>
-              <Text style={{ width: "30%", textAlign: "right", color: C.textMuted, fontSize: 8.5 }}>{b.target}</Text>
-            </View>
-          ))}
-        </View>
-        {model.dataQuality.unclassifiedExpenseSharePct >= 20 && (
-          <Text style={{ fontSize: 7.5, color: C.textMuted, marginTop: 5 }}>
-            Caveat: with {model.dataQuality.unclassifiedExpenseSharePct}% of spending unclassified, the true Needs and Wants shares are likely higher.
-          </Text>
-        )}
         <Footer />
       </Page>
     </Document>

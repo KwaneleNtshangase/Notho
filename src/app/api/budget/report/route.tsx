@@ -172,12 +172,21 @@ export async function POST(req: NextRequest) {
     progress?.display_name?.trim() ||
     "Notho user";
 
-  // Fetch the Notho logo (public asset) and inline it as a data URI so the PDF
-  // is self-contained. Graceful: if it fails, the report renders without it.
+  // Fetch the Notho icon mark (public asset) and inline it as a data URI so the
+  // PDF is self-contained. Graceful: if it fails, the report renders without it.
+  //
+  // Deliberately the ICON MARK, not /Logo.png. Two reasons:
+  //   1. /Logo.png is flattened onto opaque white - on the navy cover and header
+  //      bands it renders as a white rectangle around the mark.
+  //   2. It is the full lockup at 4.04:1, and every place the report draws a
+  //      logo already prints the word "Notho" beside it, so the lockup both
+  //      duplicates the wordmark and has to be squeezed to fit a small slot.
+  // notho-icon.png is transparent and effectively square (512x494), so it sits
+  // cleanly on any background at any size.
   let logoDataUri: string | undefined;
   try {
     const origin = req.nextUrl.origin;
-    const logoRes = await fetch(`${origin}/Logo.png`);
+    const logoRes = await fetch(`${origin}/notho-icon.png`);
     if (logoRes.ok) {
       const buf = Buffer.from(await logoRes.arrayBuffer());
       logoDataUri = `data:image/png;base64,${buf.toString("base64")}`;

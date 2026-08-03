@@ -194,6 +194,79 @@ export function buildMilestone(kind: MilestoneKind, p: EmailProfile, streak: num
   return { subject: m.subject(name, streak), html, text };
 }
 
+/** ── Cosmo announcement (one-off broadcast) ────────────────────────────────
+ *
+ * Introduces the AI coach. Three constraints shape every line of this:
+ *
+ *   1. FAIS. Notho is not a registered FSP and Cosmo gives EDUCATION, never
+ *      advice. So: "explains", "helps you understand", "answers questions".
+ *      Never "recommends", "tells you what to do", or "advises". This is not
+ *      pedantry - the founder is a licensed adviser, and an app that reads as
+ *      giving advice is a real regulatory problem.
+ *
+ *   2. Privacy is the actual differentiator, not a disclaimer. A money app
+ *      offering an AI is asking for a lot of trust, and the honest answer is
+ *      genuinely good: the model only ever receives anonymised totals, never
+ *      merchant names or transaction descriptions. Say it plainly and early.
+ *
+ *   3. Findability is the real problem. The chat is mounted only inside the
+ *      Budget tab and sits behind a consent step, so most people have never
+ *      seen it. The email must say exactly where to tap, or it fails no matter
+ *      how good the copy is.
+ *
+ * House style: no em dashes, no marketing-speak, no emoji.
+ */
+export function buildCosmoAnnouncement(p?: EmailProfile | null): BuiltEmail {
+  const name = resolveName(p);
+  const personal = name !== "there";
+
+  const html = shell(`
+    <h1 style="margin:0 0 14px;font-size:22px;font-weight:800">Meet Cosmo</h1>
+
+    <p style="margin:0 0 16px;font-size:15px;color:#374151">Hi ${name}, there's someone new in the app. Cosmo is a money coach built into Notho, and he can answer questions about your own budget in plain language.</p>
+
+    <p style="margin:0 0 16px;font-size:15px;color:#374151">Ask him things like "where did most of my money go last month" or "what does a debit order dispute actually mean". He reads the totals from your budget, so the answers are about your actual numbers, not generic tips off the internet.</p>
+
+    <div style="background:#E6F4F5;border-radius:12px;padding:16px 18px;margin:0 0 22px">
+      <div style="font-size:14px;font-weight:700;color:#00636B">He never sees who you pay</div>
+      <div style="font-size:14px;color:#374151;padding-top:6px;line-height:1.6">
+        Cosmo only receives your category totals. Not merchant names, not transaction descriptions, not who you send money to. That part never leaves your account.
+      </div>
+    </div>
+
+    <p style="margin:0 0 16px;font-size:15px;color:#374151"><b>Where to find him.</b> Open the <b>Budget</b> tab and look for the chat button in the bottom right corner. He'll ask permission before the first question, and you can turn him off any time.</p>
+
+    <p style="margin:0 0 16px;font-size:15px;color:#374151">One thing worth being straight about. Cosmo teaches, he does not advise. He won't tell you which account to open or what to invest in, because that's a decision for you and a registered financial adviser. What he will do is explain how the money side of it works, so you're making that call with your eyes open.</p>
+
+    ${cta("Say hi to Cosmo")}
+
+    <p style="margin:22px 0 0;font-size:15px;color:#374151">Let us know what you think.<br/>Team Notho</p>
+  `);
+
+  const text = `Meet Cosmo
+
+Hi ${name}, there's someone new in the app. Cosmo is a money coach built into Notho, and he can answer questions about your own budget in plain language.
+
+Ask him things like "where did most of my money go last month" or "what does a debit order dispute actually mean". He reads the totals from your budget, so the answers are about your actual numbers, not generic tips off the internet.
+
+He never sees who you pay. Cosmo only receives your category totals. Not merchant names, not transaction descriptions, not who you send money to. That part never leaves your account.
+
+Where to find him. Open the Budget tab and look for the chat button in the bottom right corner. He'll ask permission before the first question, and you can turn him off any time.
+
+One thing worth being straight about. Cosmo teaches, he does not advise. He won't tell you which account to open or what to invest in, because that's a decision for you and a registered financial adviser. What he will do is explain how the money side of it works, so you're making that call with your eyes open.
+
+Say hi to Cosmo: ${APP_URL}
+
+Let us know what you think.
+Team Notho`;
+
+  return {
+    subject: personal ? `${name}, meet Cosmo` : "Meet Cosmo, your money coach",
+    html,
+    text,
+  };
+}
+
 /** ── Rebrand announcement (one-off broadcast) ──────────────────────────────
  *
  * Sent once to the whole list. Three jobs, in this order of importance:

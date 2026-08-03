@@ -1,5 +1,6 @@
 import { getDocumentProxy, getResolvedPDFJS } from "unpdf";
 import type { PositionedItem, TextLine } from "./pdfLayout";
+import { sanitiseText } from "../sanitise";
 
 export type PdfExtractResult =
   | { ok: true; items: PositionedItem[]; fullText: string; pageCount: number }
@@ -42,7 +43,11 @@ export async function extractPdfText(
       const page = await pdf.getPage(p);
       const content = await page.getTextContent();
       for (const raw of content.items as TextContentItem[]) {
-        const t = raw.str?.trim();
+        // Sanitise at the source. A PDF text layer can carry NUL bytes and
+        // stray control characters, which are valid in a JS string but make
+        // Postgres reject the whole insert later with "unsupported Unicode
+        // escape sequence". Cleaning here keeps the entire pipeline safe.
+        const t = sanitiseText(raw.str);
         if (!t) continue;
         const x = raw.transform?.[4] ?? 0;
         const y = raw.transform?.[5] ?? 0;

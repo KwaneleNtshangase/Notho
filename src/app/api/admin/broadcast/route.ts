@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { isAdminEmail, isAdminUser } from "@/lib/admin";
-import { buildRebrandAnnouncement } from "@/lib/emails/lifecycle";
+import {
+  buildCosmoAnnouncement,
+  buildRebrandAnnouncement,
+  type BuiltEmail,
+} from "@/lib/emails/lifecycle";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -21,13 +25,45 @@ export const maxDuration = 60;
  * Uses Resend's scheduled_at so delivery is handled by Resend at the set time.
  */
 
-const DEFAULT_SCHEDULED_AT = "2026-07-22T06:00:00.000Z"; // 22 Jul 2026, 08:00 SAST (UTC+2)
 const FROM = MAIL_FROM;
-const SUBJECT = "Fundi Finance is now Notho";
 const MAX_RECIPIENTS = 20000;
-// Stable key for the current announcement's dedupe ledger. Start a genuinely new
-// broadcast by bumping this together with SUBJECT so its ledger is separate.
-const CAMPAIGN = "rebrand-notho";
+
+/**
+ * Campaign registry.
+ *
+ * The subject, builder and ledger key used to be three module constants that
+ * had to be edited together for every broadcast. That is a bad shape for
+ * something that sends to the entire user base: a half-finished edit sends the
+ * wrong email, and reusing a ledger key silently suppresses the send to
+ * everyone who received the previous one.
+ *
+ * Keyed campaigns make each broadcast a self-contained entry with its own
+ * dedupe ledger, and adding the next one cannot disturb the last.
+ */
+const CAMPAIGNS = {
+  "cosmo-intro": {
+    subject: "Meet Cosmo, your money coach",
+    build: buildCosmoAnnouncement,
+    scheduledAt: "2026-08-03T06:00:00.000Z", // 3 Aug 2026, 08:00 SAST (UTC+2)
+  },
+  "rebrand-notho": {
+    subject: "Fundi Finance is now Notho",
+    build: buildRebrandAnnouncement,
+    scheduledAt: "2026-07-22T06:00:00.000Z", // 22 Jul 2026, 08:00 SAST
+  },
+} as const;
+
+type CampaignId = keyof typeof CAMPAIGNS;
+const DEFAULT_CAMPAIGN: CampaignId = "cosmo-intro";
+
+function resolveCampaign(id?: string): { id: CampaignId; subject: string; scheduledAt: string; built: BuiltEmail } | null {
+  const key = (id ?? DEFAULT_CAMPAIGN) as CampaignId;
+  const c = CAMPAIGNS[key];
+  if (!c) return null;
+  // Bulk sends have no per-recipient profile, so the greeting renders as the
+  // generic "Hi there" variant.
+  return { id: key, subject: c.subject, scheduledAt: c.scheduledAt, built: c.build() };
+}
 
 function adminClient(): SupabaseClient | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -95,15 +131,20 @@ async function recordSent(admin: SupabaseClient, campaign: string, emails: strin
 
 // Built once at module load. The bulk send has no per-recipient profile, so
 // the greeting is the generic "Hi there" variant.
-const REBRAND = buildRebrandAnnouncement();
-
-async function scheduleOne(resendKey: string, to: string, scheduledAt?: string) {
+async function scheduleOne(
+  resendKey: string,
+  to: string,
+  email: BuiltEmail,
+  subject: string,
+  scheduledAt?: string
+) {
   const payload: Record<string, unknown> = {
     from: FROM,
     to: [to],
-    subject: scheduledAt ? SUBJECT : `[TEST] ${SUBJECT}`,
-    html: REBRAND.html,
-    text: REBRAND.text,
+    // No scheduledAt means this is the admin's own test copy, so mark it.
+    subject: scheduledAt ? subject : `[TEST] ${subject}`,
+    html: email.html,
+    text: email.text,
   };
   if (scheduledAt) payload.scheduled_at = scheduledAt;
   const resp = await fetch("https://api.resend.com/emails", {
@@ -123,9 +164,17 @@ async function scheduleOne(resendKey: string, to: string, scheduledAt?: string) 
 
 /** GET ?preview=1 returns the rendered email HTML (marketing copy, not sensitive). */
 export async function GET(req: NextRequest) {
-  const preview = new URL(req.url).searchParams.get("preview");
+  const url = new URL(req.url);
+  const preview = url.searchParams.get("preview");
   if (!preview) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return new NextResponse(REBRAND.html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  const c = resolveCampaign(url.searchParams.get("campaign") ?? undefined);
+  if (!c) {
+    return NextResponse.json(
+      { error: `Unknown campaign. Known: ${Object.keys(CAMPAIGNS).join(", ")}` },
+      { status: 400 }
+    );
+  }
+  return new NextResponse(c.built.html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
 }
 
 export async function POST(req: NextRequest) {
@@ -144,7 +193,17 @@ export async function POST(req: NextRequest) {
     listAll?: boolean;
     /** Restrict the send to these addresses (e.g. retrying failures). */
     onlyTo?: string[];
+    /** Which campaign to send. Defaults to DEFAULT_CAMPAIGN. */
+    campaign?: string;
   };
+
+  const campaign = resolveCampaign(body.campaign);
+  if (!campaign) {
+    return NextResponse.json(
+      { error: `Unknown campaign "${body.campaign}". Known: ${Object.keys(CAMPAIGNS).join(", ")}` },
+      { status: 400 }
+    );
+  }
 
   // Test send: deliver a single copy immediately to the admin (or a given address).
   if (body.test) {
@@ -152,13 +211,15 @@ export async function POST(req: NextRequest) {
     if (!resendKey) return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
     const to = (body.testEmail || user.email || "").trim();
     if (!to) return NextResponse.json({ error: "No test address available" }, { status: 400 });
-    const r = await scheduleOne(resendKey, to); // no scheduledAt = send now
+    // No scheduledAt = send now. Test copies are never written to the dedupe
+    // ledger, so testing does not silently exclude you from the real send.
+    const r = await scheduleOne(resendKey, to, campaign.built, campaign.subject);
     if (!r.ok) return NextResponse.json({ error: `Test send failed: ${r.detail}` }, { status: 500 });
-    return NextResponse.json({ test: true, sentTo: to });
+    return NextResponse.json({ test: true, sentTo: to, campaign: campaign.id });
   }
 
   const dryRun = body.dryRun !== false; // default true; must explicitly pass false
-  const scheduledAt = body.scheduledAt || DEFAULT_SCHEDULED_AT;
+  const scheduledAt = body.scheduledAt || campaign.scheduledAt;
 
   let emails: string[];
   try {
@@ -177,7 +238,7 @@ export async function POST(req: NextRequest) {
   // full send AND the targeted retry. If the ledger is unavailable (migration
   // not applied yet) we proceed without dedupe rather than block sending.
   let alreadySent = 0;
-  const sentSet = await loadSentSet(admin, CAMPAIGN);
+  const sentSet = await loadSentSet(admin, campaign.id);
   const ledgerAvailable = sentSet !== null;
   if (sentSet) {
     const before = emails.length;
@@ -195,6 +256,8 @@ export async function POST(req: NextRequest) {
   if (dryRun) {
     return NextResponse.json({
       dryRun: true,
+      campaign: campaign.id,
+      subject: campaign.subject,
       recipients: emails.length,
       alreadySent,
       ledgerAvailable,
@@ -226,7 +289,9 @@ export async function POST(req: NextRequest) {
   const CHUNK = 4;
   for (let i = 0; i < emails.length; i += CHUNK) {
     const chunk = emails.slice(i, i + CHUNK);
-    const results = await Promise.all(chunk.map((to) => scheduleOne(resendKey, to, effectiveScheduledAt)));
+    const results = await Promise.all(
+      chunk.map((to) => scheduleOne(resendKey, to, campaign.built, campaign.subject, effectiveScheduledAt))
+    );
     results.forEach((r, idx) => {
       if (r.ok) { scheduled++; sentOk.push(chunk[idx]); }
       else errors.push({ to: chunk[idx], detail: r.detail });
@@ -237,7 +302,7 @@ export async function POST(req: NextRequest) {
   // Log everyone we successfully queued so they can never be sent this campaign
   // again. Best-effort: a ledger write failure must not fail the send response.
   try {
-    await recordSent(admin, CAMPAIGN, sentOk);
+    await recordSent(admin, campaign.id, sentOk);
   } catch {
     /* ledger unavailable (e.g. migration not applied) - send already succeeded */
   }

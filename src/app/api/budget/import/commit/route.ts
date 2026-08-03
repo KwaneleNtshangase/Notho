@@ -3,6 +3,7 @@ import { getUserFromRequest } from "@/lib/apiAuth";
 import { createServiceSupabase } from "@/lib/supabaseServer";
 import { reconcileAfterImportSkips } from "@/lib/budget/reconciliation";
 import { txnToBudgetEntryFields } from "@/lib/budget/types";
+import { sanitiseText } from "@/lib/budget/sanitise";
 import type { NormalizedTxn, ReconciliationResult } from "@/lib/budget/types";
 
 type CommitRow = {
@@ -167,17 +168,23 @@ export async function POST(req: NextRequest) {
       safeCategory = type === "income" ? "other-income" : "other";
     }
 
+    // Belt and braces on every free-text field. PDF extraction is already
+    // sanitised at the source, but CSV and OFX exports arrive straight from the
+    // bank and can carry the same NUL bytes. One bad glyph anywhere in the
+    // batch makes Postgres reject ALL of it with "unsupported Unicode escape
+    // sequence", so a single stray character costs the user every row.
+    const label = sanitiseText(row.accountLabel ?? body.accountLabel ?? "");
     return {
       user_id: user.id,
       type: row.type ?? type,
       category: safeCategory,
       amount,
-      description: row.description,
+      description: sanitiseText(row.description),
       entry_date: row.date,
       source: "import",
       import_batch_id: batch.id,
       dedupe_hash: row.dedupeHash,
-      account_label: row.accountLabel ?? body.accountLabel ?? null,
+      account_label: label || null,
       is_transfer: row.isTransfer ?? false,
       account_id: accountId,
       entry_method: "imported",

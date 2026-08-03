@@ -1,0 +1,62 @@
+<!--
+  Supabase Auth -> Confirm signup template.
+
+  NOT sent by this repo. Paste into the Supabase dashboard:
+  Authentication -> Emails -> Templates -> Confirm signup.
+  Kept in git so the copy is reviewable and does not drift silently.
+
+  Deliberately matches the shell in src/lib/emails/lifecycle.ts - same teal
+  band, same logo, same white content box - so the confirmation and the welcome
+  email that follows it read as one product rather than two systems.
+
+  {{ .ConfirmationURL }} is Supabase's variable. Leave it exactly as written.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;margin:0;padding:0">
+  <tr><td align="center" style="padding:24px 12px">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
+
+      <tr><td style="background:#007A85;border-radius:16px 16px 0 0;padding:30px 28px">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="vertical-align:middle;padding-right:14px">
+            <img src="https://www.notho.co.za/notho-icon-white.png" width="44" height="44" alt="Notho" style="display:block;border:0;outline:none;text-decoration:none" />
+          </td>
+          <td style="vertical-align:middle">
+            <div style="font-size:19px;font-weight:800;color:#ffffff;line-height:1.25">Notho</div>
+            <div style="font-size:12px;color:#B5E4E8;letter-spacing:0.04em;padding-top:3px">Master Your Money</div>
+          </td>
+        </tr></table>
+      </td></tr>
+
+      <tr><td style="background:#ffffff;border-radius:0 0 16px 16px;padding:30px 28px;color:#111827;line-height:1.6">
+        <h1 style="margin:0 0 14px;font-size:22px;font-weight:800">Confirm your email</h1>
+
+        <p style="margin:0 0 16px;font-size:15px;color:#374151">
+          Tap the button below to finish setting up your Notho account. One short lesson a day is all it takes to get a real grip on your money.
+        </p>
+
+        <div style="margin:22px 0">
+          <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:13px 24px;background:#007A85;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:700;font-size:15px">Confirm my email</a>
+        </div>
+
+        <p style="margin:0 0 16px;font-size:13px;color:#6b7280">
+          If the button does not work, copy this link into your browser:<br/>
+          <a href="{{ .ConfirmationURL }}" style="color:#007A85;word-break:break-all">{{ .ConfirmationURL }}</a>
+        </p>
+
+        <p style="margin:22px 0 0;font-size:15px;color:#374151">
+          See you inside.<br/>Team Notho
+        </p>
+
+        <p style="margin:20px 0 0;padding-top:16px;border-top:1px solid #e5e7eb;font-size:13px;color:#6b7280">
+          Didn't sign up? You can ignore this email - no account will be created.
+        </p>
+      </td></tr>
+
+      <tr><td style="padding:16px 28px 0;text-align:center;font-size:11px;color:#9AA0A6;line-height:1.6">
+        Educational content only, not financial advice.<br/>
+        notho.co.za
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
