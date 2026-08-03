@@ -34,6 +34,22 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      # The repo has ~30 unit test files covering money maths, statement
+      # parsing, budget aggregation and the localStorage migration that keeps
+      # existing users' progress alive across the rebrand. Until now none of
+      # them ran in CI — they only ran when someone remembered to run them
+      # locally, which meant they could not stop a regression reaching main.
+      #
+      # Blocking on purpose. A failing test in a personal finance app is not a
+      # warning; the aggregate and parser suites are the difference between a
+      # correct budget and a confidently wrong one.
+      #
+      # Note: pass no extra arguments. Vitest treats positional args as
+      # filename filters, so a stray word silently runs a subset and still
+      # reports green.
+      - name: Unit tests
+        run: npm run test:unit
+
       # Surfaces high-severity advisories (like the Next.js CVEs in audit H1)
       # without letting them fail the build. A new advisory can land against a
       # dependency with no change on our side, and a blocking gate here turns

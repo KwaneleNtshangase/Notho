@@ -114,6 +114,10 @@ async function run() {
   }
 
   // ── 2. No crash overlay / blank screen ────────────────────────────────────
+  // The 20-char threshold this used to apply was below the length of the splash
+  // screen's own copy ("Your financial journey starts here" is 34), so a stuck
+  // splash counted as a rendered page. Kept only as a crude "not literally
+  // blank" signal now — check 3 is what actually decides whether the app works.
   const bodyText = await page.evaluate(() => document.body?.innerText ?? "");
   if (bodyText.trim().length < 20) {
     fail("Page renders content (not blank)", `Body text: "${bodyText.slice(0, 60)}"`);
@@ -128,49 +132,81 @@ async function run() {
     pass("No Next.js crash overlay");
   }
 
-  // ── 3. Auth screen or app shell visible ───────────────────────────────────
-  // Splash animation can take up to 8s; React hydration adds more in CI.
-  // Poll for up to 25s for either sign-in form OR app shell to appear.
-  let authOrShellFound = false;
-  const authDeadline = Date.now() + 25_000;
-  while (Date.now() < authDeadline) {
-    const emailCount = await page.locator('input[type="email"]').count();
-    const passCount  = await page.locator('input[type="password"]').count();
-    if (emailCount > 0 && passCount > 0) { authOrShellFound = true; break; }
+  // ── 3. The app actually booted ────────────────────────────────────────────
+  //
+  // This is the check the whole script exists for, so it is worth being blunt
+  // about what it used to do. It polled for the sign-in form, and if that never
+  // appeared it fell through to a "branding" test that passed whenever
+  // document.title contained "notho". That title is server-rendered. It is
+  // present on a completely dead app — Supabase down, bundle failing to boot,
+  // React never mounting — so the check could not fail for the one condition it
+  // was meant to detect. Every green run since was evidence of nothing.
+  //
+  // What follows requires proof that React mounted and rendered interactive
+  // controls. Nothing here is satisfied by static HTML.
+  const BOOT_DEADLINE_MS = 40_000; // generous: cold lambda + splash + hydration
+  let bootedAs = null;
+  const bootDeadline = Date.now() + BOOT_DEADLINE_MS;
 
-    // Accept: app shell already showing (prior session cookie)
-    const learnVisible  = await page.locator("text=Learn").first().isVisible().catch(() => false);
-    const budgetVisible = await page.locator("text=Budget").first().isVisible().catch(() => false);
-    if (learnVisible || budgetVisible) { authOrShellFound = true; break; }
+  while (Date.now() < bootDeadline && !bootedAs) {
+    // (a) Landing screen — the real entry point for a signed-out visitor.
+    //     Matches the button e2e/01-auth.spec.ts drives.
+    const landingBtn = page
+      .locator("button", { hasText: /I Already Have an Account|Get Started/i })
+      .first();
+    if (await landingBtn.isVisible().catch(() => false)) {
+      bootedAs = "landing screen (sign-in / get-started controls interactive)";
+      break;
+    }
 
-    await page.waitForTimeout(600);
+    // (b) Auth form — if a previous step already opened it.
+    if (
+      (await page.locator('input[type="email"]').count()) > 0 &&
+      (await page.locator('input[type="password"]').count()) > 0 &&
+      (await page.locator('[data-testid="auth-submit"]').count()) > 0
+    ) {
+      bootedAs = "auth form (email + password + submit present)";
+      break;
+    }
+
+    // (c) App shell — a live session. .app-container is rendered by
+    //     src/app/(app)/layout.tsx, i.e. only once the client tree mounts.
+    if (
+      await page.locator(".app-container").first().isVisible().catch(() => false)
+    ) {
+      bootedAs = "app shell (authenticated session)";
+      break;
+    }
+
+    await page.waitForTimeout(500);
   }
 
+  const authOrShellFound = Boolean(bootedAs);
+
   if (authOrShellFound) {
-    const emailCount = await page.locator('input[type="email"]').count();
-    if (emailCount > 0) {
-      pass("Sign-in form visible (email + password)");
-    } else {
-      pass("App shell visible (authenticated session)");
-    }
+    pass(`App booted — ${bootedAs}`);
   } else {
-    // Last resort: if branding rendered with no JS errors, the app is up.
-    // Treat "splash still showing" as a soft pass — the health check's job
-    // is to confirm the site is reachable and not crashing, not to time
-    // how fast the auth form renders in headless CI environments.
-    const brandingOk = await page.evaluate(() => {
-      const hit = (v) => typeof v === "string" && v.toLowerCase().includes("notho");
-      return (
-        hit(document.title) ||
-        hit(document.body?.innerText ?? "") ||
-        Array.from(document.querySelectorAll("img")).some((el) => hit(el.getAttribute("alt")))
-      );
-    });
-    if (brandingOk) {
-      pass("App is running (Notho branding confirmed; auth form may be slow to render in headless CI)");
-    } else {
-      fail("Sign-in form visible", "Could not find email/password inputs, app shell, or Notho branding");
-    }
+    // No soft pass. If React never rendered an interactive control within 40s,
+    // a real user is staring at a splash screen that never resolves, and this
+    // check must go red so the alert fires.
+    const diagnostic = await page.evaluate(() => ({
+      url: window.location.href,
+      title: document.title,
+      bodyChars: document.body?.innerText?.length ?? 0,
+      buttons: document.querySelectorAll("button").length,
+      inputs: document.querySelectorAll("input").length,
+      // A Next.js app that hydrated always has this. Absent means the client
+      // bundle never ran, which points at a chunk 404 or a boot-time throw.
+      nextData: Boolean(document.querySelector("#__next, [data-nextjs-router]")),
+      firstText: (document.body?.innerText ?? "").trim().slice(0, 120),
+    }));
+    fail(
+      "App booted",
+      `No interactive control after ${BOOT_DEADLINE_MS / 1000}s. ` +
+        `url=${diagnostic.url} buttons=${diagnostic.buttons} inputs=${diagnostic.inputs} ` +
+        `hydrated=${diagnostic.nextData} bodyChars=${diagnostic.bodyChars} ` +
+        `text="${diagnostic.firstText}"`
+    );
   }
 
   // ── 4. Branding present ────────────────────────────────────────────────────
@@ -205,31 +241,85 @@ async function run() {
   }
 
   // ── 5. JS console errors ───────────────────────────────────────────────────
-  // Filter out known non-critical noise
-  const realErrors = consoleErrors.filter(
-    (e) =>
-      !e.includes("favicon") &&
-      !e.includes("404") &&
-      !e.includes("net::ERR_BLOCKED") &&
-      !e.includes("net::ERR_ABORTED") &&
-      !e.includes("posthog") &&
-      !e.includes("PostHog") &&
-      !e.includes("WebSocket") &&
-      !e.includes("supabase.co/realtime") &&
-      !e.includes("Failed to load resource") &&
-      !e.includes("Content Security Policy") &&
-      !e.includes("sw.js") &&
-      !e.includes("service-worker") &&
-      !e.includes("push") &&
-      !e.includes("Notification")
-  );
+  //
+  // The old filter list was wide enough to swallow the failures that matter.
+  // "Failed to load resource" and "404" are exactly what a missing JS chunk
+  // looks like; "Content Security Policy" is what a broken CSP looks like, and
+  // that one takes the whole app down. Suppressing them meant this check could
+  // only ever catch errors nobody cared about.
+  //
+  // Now: only genuinely optional, non-blocking subsystems are ignored, and each
+  // entry says why. Anything not on this list fails the run.
+  const IGNORED = [
+    // Analytics. Blocked by ad blockers and privacy DNS constantly; the app is
+    // fully functional without it.
+    { match: /posthog/i, why: "analytics, non-blocking" },
+    // Cosmetic.
+    { match: /favicon/i, why: "icon only" },
+    // Realtime is used for live leaderboard updates and reconnects on its own.
+    // A dropped socket is not an outage.
+    { match: /supabase\.co\/realtime|WebSocket/i, why: "realtime reconnects itself" },
+    // Push requires an OS-level permission that headless CI never grants.
+    { match: /Notification|PushManager|permission denied/i, why: "no push in headless CI" },
+  ];
+
+  const classified = consoleErrors.map((text) => ({
+    text,
+    ignored: IGNORED.find((r) => r.match.test(text)),
+  }));
+  const realErrors = classified.filter((c) => !c.ignored).map((c) => c.text);
+  const suppressed = classified.filter((c) => c.ignored);
+
+  if (suppressed.length > 0) {
+    console.log(`      (${suppressed.length} known-benign console message(s) ignored)`);
+  }
+
   if (realErrors.length === 0) {
     pass("No JavaScript console errors");
   } else {
-    fail("No JS console errors", realErrors.slice(0, 3).join(" | "));
+    // Deduplicate: one broken chunk can log the same line dozens of times, and
+    // a failure message that is 40 copies of one error is hard to read.
+    const unique = [...new Set(realErrors)];
+    fail(
+      `No JS console errors (${realErrors.length} total, ${unique.length} unique)`,
+      unique.slice(0, 5).join(" | ")
+    );
   }
 
-  // ── 6. Screenshot ─────────────────────────────────────────────────────────
+  // ── 6. Backend dependencies via /api/health ───────────────────────────────
+  // Everything above tests the browser's view. This tests the server's, and
+  // catches the case where the page renders perfectly but Supabase is
+  // unreachable — the app looks fine and no user can sign in.
+  try {
+    const apiRes = await page.request.get(`${BASE_URL.replace(/\/$/, "")}/api/health`, {
+      timeout: 15_000,
+      failOnStatusCode: false,
+    });
+    const body = await apiRes.json().catch(() => null);
+
+    if (apiRes.status() === 200 && body?.status === "ok") {
+      const slow = Object.entries(body.checks ?? {})
+        .filter(([, c]) => c?.ms > 2000)
+        .map(([k, c]) => `${k} ${c.ms}ms`);
+      pass(`Backend dependencies OK (${body.totalMs}ms)`);
+      if (slow.length) warn("Backend dependency slow", slow.join(", "));
+    } else if (apiRes.status() === 404) {
+      // Deployed build predates the endpoint. Not a fault in the running app.
+      warn("/api/health not deployed yet", "Endpoint returns 404 — deploy to enable this check");
+    } else {
+      const broken = Object.entries(body?.checks ?? {})
+        .filter(([, c]) => !c?.ok)
+        .map(([k, c]) => `${k}${c?.detail ? ` (${c.detail})` : ""}`);
+      fail(
+        "Backend dependencies OK",
+        `HTTP ${apiRes.status()}${broken.length ? ` — failing: ${broken.join(", ")}` : ""}`
+      );
+    }
+  } catch (e) {
+    fail("Backend dependencies OK", `/api/health unreachable: ${e.message}`);
+  }
+
+  // ── 7. Screenshot ─────────────────────────────────────────────────────────
   await page.screenshot({ path: "health-check-screenshot.png", fullPage: false });
   pass("Screenshot captured (health-check-screenshot.png)");
 

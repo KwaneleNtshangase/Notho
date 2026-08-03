@@ -11,7 +11,10 @@ jobs:
   e2e:
     name: Playwright E2E (${{ matrix.project }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Was 30, and run #369 hit it at 30m 21s — a job killed by its own cap
+    # reports as a failure indistinguishable from a real one. 41 tests x 1
+    # worker x up to 2 retries needs headroom, particularly on Mobile Safari.
+    timeout-minutes: 45
 
     strategy:
       fail-fast: false

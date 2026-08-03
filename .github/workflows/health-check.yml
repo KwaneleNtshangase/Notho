@@ -4,7 +4,12 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 */6 * * *"
+    # Every 30 minutes. Was every 6 hours, which meant an outage starting just
+    # after a run went unnoticed for most of a working day. Free on public
+    # repos. GitHub deprioritises scheduled runs under load, so treat this as
+    # "about every 30 minutes", not a guarantee — the external uptime monitor
+    # in docs/MONITORING.md is what gives you a hard floor on detection time.
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -62,28 +67,95 @@ jobs:
           path: health-check-screenshot.png
           retention-days: 7
 
-      - name: Notify on failure (GitHub issue)
+      # ── Alerting ──────────────────────────────────────────────────────────
+      #
+      # One rolling incident issue, not one per day. At the old 6-hourly cadence
+      # a per-day issue was tolerable; at 48 runs a day it would bury you, and
+      # an alert channel you have learned to ignore is worse than none. So:
+      # first failure opens an issue, subsequent failures comment on it, and
+      # recovery closes it. The issue being open is a live status indicator.
+      - name: Open or update the incident issue
         if: failure()
         continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
-            const title = `Health Check Failed — ${new Date().toISOString().slice(0,10)}`;
-            const body = `The automated health check detected a problem with the Notho app.\n\nSee the [failed workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details and screenshots.`;
-            const issues = await github.rest.issues.listForRepo({
+            const LABEL = 'health-check-failure';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const when = new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+
+            const { data: open } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: 'health-check-failure'
+              labels: LABEL,
             });
-            const today = new Date().toISOString().slice(0,10);
-            const existing = issues.data.find(i => i.title.includes(today));
-            if (!existing) {
-              await github.rest.issues.create({
+
+            if (open.length > 0) {
+              // Already in a known incident. Add a datapoint, don't add noise.
+              const issue = open[0];
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title,
-                body,
-                labels: ['health-check-failure', 'bug']
+                issue_number: issue.number,
+                body: `Still failing as of ${when}. [Run #${context.runNumber}](${runUrl})`,
+              });
+              core.setFailed(`Health check still failing — see issue #${issue.number}`);
+              return;
+            }
+
+            const { data: created } = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔴 Notho health check failing (since ${when})`,
+              body: [
+                'The automated health check could not confirm the app is working.',
+                '',
+                `**First failing run:** [#${context.runNumber}](${runUrl})`,
+                `**Commit:** ${context.sha.slice(0, 7)}`,
+                '',
+                'The run log lists which checks failed. The `App booted` check is',
+                'the important one: if it failed, React never rendered an',
+                'interactive control and users are looking at a stuck splash',
+                'screen. The uploaded screenshot artifact shows what the browser',
+                'actually saw.',
+                '',
+                'This issue updates itself on each subsequent failure and closes',
+                'automatically once a run passes. Please do not close it by hand',
+                'while the check is still red.',
+              ].join('\n'),
+              labels: [LABEL, 'bug'],
+            });
+            core.setFailed(`Health check failing — opened issue #${created.number}`);
+
+      # Recovery. Without this the incident issue stays open forever and the
+      # signal decays back into the 36-open-issues problem.
+      - name: Close the incident issue on recovery
+        if: success()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const LABEL = 'health-check-failure';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: LABEL,
+            });
+            for (const issue of open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ Recovered. [Run #${context.runNumber}](${runUrl}) passed. Closing.`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'completed',
               });
             }
