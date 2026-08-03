@@ -14,8 +14,10 @@ export const TEST_EMAIL = process.env.TEST_EMAIL ?? "e2e-test@fundiapp.co.za";
 // wherever secrets.TEST_PASSWORD is unset. Rotate it in Supabase first if you
 // ever want to change it.
 export const TEST_PASSWORD = process.env.TEST_PASSWORD ?? "FundiE2E_Test#2026";
+// Canonical host, with www. Bare notho.co.za 301s to www, and every redirect
+// hop is charged against the splash-screen timeouts the specs below rely on.
 export const BASE_URL =
-  process.env.BASE_URL ?? "https://notho.co.za";
+  process.env.BASE_URL ?? "https://www.notho.co.za";
 
 /** Sign in with email/password, wait for the app shell to appear */
 export async function signIn(page: Page) {

@@ -48,7 +48,11 @@ jobs:
       - name: Run health-check script
         run: node scripts/health-check.js
         env:
-          BASE_URL: ${{ secrets.BASE_URL || 'https://fundiapp.co.za' }}
+          # Must be the CANONICAL host. fundiapp.co.za 301s to www.notho.co.za
+          # (see vercel.json), and pointing the check at the old domain makes
+          # every run pay a redirect chain before the app even starts loading.
+          # Bare notho.co.za also redirects to www — use www directly.
+          BASE_URL: ${{ secrets.BASE_URL || 'https://www.notho.co.za' }}
 
       - name: Upload screenshot
         if: always()

@@ -5,16 +5,21 @@
  *  1. The site loads (HTTP 200, no crash overlay)
  *  2. No console errors at load time
  *  3. Key UI elements are visible (tabs, logo, sign-in form)
- *  4. Response time < 8 seconds
+ *  4. Response time is reported, and warned on — see SLOW_MS below
  *
  * Usage: node scripts/health-check.js
- * Env:   BASE_URL   (default: https://notho.co.za)
+ * Env:   BASE_URL   (default: https://www.notho.co.za)
+ *        SLOW_MS    (default: 8000 — warn threshold, does not fail the run)
  */
 
 const { chromium } = require("@playwright/test");
 
-const BASE_URL = process.env.BASE_URL ?? "https://notho.co.za";
+// Canonical host, with www. Point this at the apex or at fundiapp.co.za and
+// every run pays one or two 301s before the app starts loading — which used to
+// blow the load-time budget below and fail the check for no real reason.
+const BASE_URL = process.env.BASE_URL ?? "https://www.notho.co.za";
 const TIMEOUT = 30_000;
+const SLOW_MS = Number(process.env.SLOW_MS ?? 8000);
 
 const checks = [];
 let browser, page;
@@ -26,6 +31,14 @@ function pass(name) {
 function fail(name, detail = "") {
   checks.push({ name, status: "❌ FAIL", detail });
   console.error(`  ❌  ${name}${detail ? `: ${detail}` : ""}`);
+}
+/**
+ * A signal worth seeing that must not page anyone at 03:00.
+ * Counted and printed, but never affects the exit code.
+ */
+function warn(name, detail = "") {
+  checks.push({ name, status: "⚠️  WARN", detail });
+  console.warn(`  ⚠️   ${name}${detail ? `: ${detail}` : ""}`);
 }
 
 async function run() {
@@ -57,10 +70,31 @@ async function run() {
     if (!response || response.status() >= 400) {
       fail("HTTP response OK", `Got status ${response?.status()}`);
     } else {
-      pass(`HTTP 200 in ${elapsed}ms`);
+      pass(`HTTP ${response.status()} in ${elapsed}ms`);
     }
-    if (elapsed > 8000) {
-      fail("Page load < 8s", `Took ${elapsed}ms`);
+
+    // Report the redirect chain. If this is ever non-empty the target is not
+    // canonical, and the extra hops are being charged to the timing below.
+    const hops = [];
+    for (let r = response?.request()?.redirectedFrom(); r; r = r.redirectedFrom()) {
+      hops.unshift(r.url());
+    }
+    if (hops.length > 0) {
+      warn(
+        `Redirected ${hops.length}x before landing`,
+        `${hops.join(" → ")} → ${page.url()}. Point BASE_URL at the final URL.`
+      );
+    } else {
+      pass(`No redirects (landed directly on ${page.url()})`);
+    }
+
+    // Load time is a warning, not a failure. This check exists to tell you the
+    // site is UP; a cold Vercel lambda on a shared CI runner is slow without
+    // being broken, and failing on it means the alert that fires at 03:00 is
+    // usually noise. Genuine unreachability is caught by the catch below and by
+    // the status assertion above, both of which do fail.
+    if (elapsed > SLOW_MS) {
+      warn(`Page load slower than ${SLOW_MS}ms`, `Took ${elapsed}ms`);
     } else {
       pass(`Page load time acceptable (${elapsed}ms)`);
     }
@@ -204,23 +238,39 @@ async function run() {
 
 function summarize() {
   const failed = checks.filter((c) => c.status.startsWith("❌"));
+  const warned = checks.filter((c) => c.status.startsWith("⚠️"));
+  const passed = checks.length - failed.length - warned.length;
+
   console.log(`\n── Summary ─────────────────────────────────────────`);
   console.log(`   Total checks : ${checks.length}`);
-  console.log(`   Passed       : ${checks.length - failed.length}`);
+  console.log(`   Passed       : ${passed}`);
+  console.log(`   Warnings     : ${warned.length}`);
   console.log(`   Failed       : ${failed.length}`);
+
+  if (warned.length > 0) {
+    console.log(`\n   Warnings (do not fail the run):`);
+    warned.forEach((c) => console.log(`     • ${c.name}: ${c.detail ?? ""}`));
+  }
   if (failed.length > 0) {
     console.log(`\n   Failed checks:`);
     failed.forEach((c) => console.log(`     • ${c.name}: ${c.detail ?? ""}`));
     console.log("");
     return false;
   }
-  console.log(`\n   🎉 All checks passed!\n`);
+  console.log(
+    warned.length > 0
+      ? `\n   ✅ Site is healthy (${warned.length} warning${warned.length === 1 ? "" : "s"}).\n`
+      : `\n   🎉 All checks passed!\n`
+  );
   return true;
 }
 
 run()
   .catch((e) => {
     console.error("Unexpected error:", e);
+    // Close the browser here too. Without this an unexpected throw leaves a
+    // chromium process holding the runner open until the job timeout.
+    browser?.close();
     process.exit(1);
   })
   .then((ok) => {

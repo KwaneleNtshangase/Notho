@@ -53,7 +53,13 @@ jobs:
       - name: Run Playwright tests (${{ matrix.project }})
         run: npx playwright test --project="${{ matrix.project }}"
         env:
-          BASE_URL: ${{ secrets.BASE_URL || 'https://fundiapp.co.za' }}
+          # Canonical host only — the old domain 301s to www.notho.co.za and
+          # lands on /learn, which is not the landing route these specs expect.
+          BASE_URL: ${{ secrets.BASE_URL || 'https://www.notho.co.za' }}
+          # NOT brand strings. These are the credentials of a real Supabase auth
+          # account; renaming the literal cannot rename the stored credential, it
+          # would just break sign-in wherever the secret is unset. Rotate the
+          # account in Supabase first if you want to change them.
           TEST_EMAIL: ${{ secrets.TEST_EMAIL || 'e2e-test@fundiapp.co.za' }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD || 'FundiE2E_Test#2026' }}
 

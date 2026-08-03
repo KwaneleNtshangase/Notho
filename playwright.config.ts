@@ -11,7 +11,9 @@ export default defineConfig({
   // These globals cover every expect() / waitFor() / action without touching each test.
   expect: { timeout: 30_000 },
   use: {
-    baseURL: process.env.BASE_URL ?? "https://fundiapp.co.za",
+    // Canonical host. fundiapp.co.za 301s here via vercel.json, and bare
+    // notho.co.za redirects to www — starting at www avoids both hops.
+    baseURL: process.env.BASE_URL ?? "https://www.notho.co.za",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
     trace: "retain-on-failure",

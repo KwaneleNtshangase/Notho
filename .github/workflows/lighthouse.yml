@@ -22,7 +22,7 @@ jobs:
         uses: treosh/lighthouse-ci-action@v11
         with:
           urls: |
-            ${{ secrets.BASE_URL || 'https://fundiapp.co.za' }}
+            ${{ secrets.BASE_URL || 'https://www.notho.co.za' }}
           # Fail if any score drops below these thresholds
           budgetPath: ./lighthouse-budget.json
           uploadArtifacts: true

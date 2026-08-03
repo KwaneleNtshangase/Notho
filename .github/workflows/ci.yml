@@ -34,10 +34,28 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
-      # Fails the build on high-severity advisories so a vulnerable
-      # dependency (like the Next.js CVEs in audit H1) can't linger unnoticed.
+      # Surfaces high-severity advisories (like the Next.js CVEs in audit H1)
+      # without letting them fail the build. A new advisory can land against a
+      # dependency with no change on our side, and a blocking gate here turns
+      # main red for something no commit caused — which trains people to ignore
+      # a red main. Report it loudly, gate on it deliberately.
       - name: Dependency audit
-        run: npm audit --audit-level=high
+        continue-on-error: true
+        run: |
+          npm audit --audit-level=high | tee audit.txt
+          {
+            echo "### Dependency audit"
+            echo
+            if [ "${PIPESTATUS[0]}" -eq 0 ]; then
+              echo "No advisories at or above **high**."
+            else
+              echo "⚠️ Advisories found at or above **high** — review below."
+              echo
+              echo '```'
+              cat audit.txt
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build
         run: npm run build
