@@ -57,8 +57,10 @@ export async function parsePdfStatement(
   // an amount, which is what a statement is. It marks every row needsReview, so
   // nothing it infers reaches the budget without the user confirming it.
   let usedLastResort = false;
+  let refusedReason: string | undefined;
   if (rows.length === 0) {
     const fallback = parseLastResortRows(lines, contextYear);
+    refusedReason = fallback.refusedReason;
     if (fallback.rows.length > 0) {
       rows = fallback.rows;
       usedLastResort = true;
@@ -69,11 +71,13 @@ export async function parsePdfStatement(
   // fixable from the bug report alone - see pdfFingerprint.ts for why we can
   // send this without ever handling the statement itself.
   if (rows.length === 0) {
+    const refused = refusedReason === "unreadable-signs";
     return {
       ok: false,
       kind: "error",
-      message:
-        "We couldn't find a transaction table in this PDF. It may be a certified or summary statement rather than a standard one.",
+      message: refused
+        ? "We found transactions in this statement but couldn't tell reliably which were money in and which were money out, so we've stopped rather than import it wrong. We've logged the layout and we're adding support for it."
+        : "We couldn't find a transaction table in this PDF. It may be a certified or summary statement rather than a standard one.",
       diagnostics: formatFingerprint(fingerprintLayout(lines)),
       bankHint: bankId ?? undefined,
     };
@@ -158,6 +162,12 @@ export async function parsePdfStatement(
     transactions,
     reconciliation,
     lowConfidence,
+    // Ship the layout fingerprint on a LOW-CONFIDENCE success too, not only on
+    // failure. This was the gap: a statement that parsed generically looked
+    // fine to the pipeline, so no diagnostics were sent, and the only way to
+    // support the layout properly was to ask the user for their statement.
+    // A parse we do not trust is exactly when we most need to see the shape.
+    diagnostics: usedLastResort ? formatFingerprint(fingerprintLayout(lines)) : undefined,
   };
 }
 

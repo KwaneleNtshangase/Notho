@@ -580,30 +580,59 @@ export function useNothoState() {
     }
   }, [route.name]);
 
-  // ── Restore profile settings from Supabase when user logs in ─────────────
-  // Prevents returning users from seeing onboarding again if localStorage was
-  // cleared (new device, cleared cache, etc.)
+  // ── Reconcile onboarding state with the ACCOUNT, not the device ──────────
+  //
+  // `notho-onboarded` lives in localStorage, which belongs to the browser, not
+  // to the person signed in. That gets it wrong in both directions:
+  //
+  //   flag missing, profile exists  -> a returning user on a new device or
+  //                                    after clearing cache is made to redo
+  //                                    onboarding they already finished
+  //   flag present, no profile      -> a NEW user signing up on a device where
+  //                                    somebody else already onboarded skips
+  //                                    it entirely: no name, no age, no goal,
+  //                                    no username, and therefore no profiles
+  //                                    row at all
+  //
+  // The second case is not hypothetical and not rare. Shared phones are normal,
+  // and it is how a real signup produced an account with no profile, no welcome
+  // email and no signup notification. It also silently breaks anything that
+  // reads profiles.full_name, which is most of the emails we send.
+  //
+  // The database is the source of truth. localStorage is a cache of it.
   useEffect(() => {
     if (!progress.userId) return;
-    if (route.name !== "onboarding") return;
     (async () => {
       const { data: profile } = await supabase
         .from("profiles")
         .select("goal, goal_description, age_range, username, full_name")
         .eq("user_id", progress.userId!)
         .maybeSingle();
+
       const hasIdentityName =
         Boolean(profile?.username && String(profile.username).trim()) ||
         Boolean(profile?.full_name && String(profile.full_name).trim());
-      if (profile?.goal || hasIdentityName) {
+      const hasOnboarded = Boolean(profile?.goal) || hasIdentityName;
+
+      if (hasOnboarded) {
         localStorage.setItem("notho-onboarded", "true");
         if (profile?.goal) localStorage.setItem("notho-user-goal", profile.goal);
         if (profile?.goal_description) localStorage.setItem("notho-goal-description", profile.goal_description);
         if (profile?.age_range) localStorage.setItem("notho-age-range", profile.age_range);
         // Sync username so the duplicate-username-prompt check skips the DB round-trip
         if (profile?.username) localStorage.setItem("notho-username", profile.username);
-        setRoute({ name: "learn" });
+        if (route.name === "onboarding") setRoute({ name: "learn" });
+        return;
       }
+
+      // No profile for this account. Whatever the device remembers, this person
+      // has not onboarded. Clear the stale flag and send them through it.
+      localStorage.removeItem("notho-onboarded");
+      localStorage.removeItem("notho-user-goal");
+      localStorage.removeItem("notho-goal-description");
+      localStorage.removeItem("notho-age-range");
+      localStorage.removeItem("notho-username");
+      if (route.name !== "onboarding") setRoute({ name: "onboarding" });
     })().catch(() => {});
   }, [progress.userId]); // eslint-disable-line react-hooks/exhaustive-deps
 

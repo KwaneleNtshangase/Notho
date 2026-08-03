@@ -92,7 +92,7 @@ export type ParsePdfError =
     };
 
 export type ParsePdfResult =
-  | ({ ok: true } & ParseStatementResult)
+  | ({ ok: true; diagnostics?: string } & ParseStatementResult)
   | ({ ok: false } & ParsePdfError);
 
 export type UserMerchantRule = {

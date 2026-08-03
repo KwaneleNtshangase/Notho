@@ -83,18 +83,43 @@ describe("parseLastResortRows", () => {
     expect(parseLastResortRows(prose, 2026).rows).toHaveLength(0);
   });
 
-  it("flags rows as uncertain when there is no balance column to trust", () => {
+  it("refuses a statement whose signs are mostly guesswork", () => {
+    // No balance column and no debit/credit wording, so every sign would be a
+    // guess. Importing this produced a real user's budget in which her salary
+    // was counted as spending and her expenses were inflated by exactly the
+    // size of her pay cheque - with no error, because each guess looked fine
+    // on its own. Refusing sends the layout fingerprint instead.
     const noBalance = lines([
       [[40, "02/07/2026"], [130, "Checkers Sixty60"], [400, "320.00"]],
       [[40, "04/07/2026"], [130, "Uber trip"], [400, "85.50"]],
       [[40, "06/07/2026"], [130, "Netflix"], [400, "199.00"]],
       [[40, "08/07/2026"], [130, "Engen garage"], [400, "600.00"]],
     ]);
-    const { rows, usedBalanceChain } = parseLastResortRows(noBalance, 2026);
-    expect(usedBalanceChain).toBe(false);
-    expect(rows.length).toBeGreaterThanOrEqual(3);
-    // Without a balance to check against, an inferred sign must say so.
-    expect(rows.some((r) => r.uncertainAmount)).toBe(true);
+    const res = parseLastResortRows(noBalance, 2026);
+    expect(res.rows).toHaveLength(0);
+    expect(res.refusedReason).toBe("unreadable-signs");
+  });
+
+  it("still imports when only a minority of signs are guessed", () => {
+    // Explicit debit/credit wording on most rows. A few ambiguous ones among
+    // many clear ones is normal and the user fixes them in review.
+    const mostlyMarked = lines([
+      [[40, "02/07/2026"], [130, "Debit order Vodacom"], [400, "199.00"]],
+      [[40, "03/07/2026"], [130, "Card purchase Checkers"], [400, "320.00"]],
+      [[40, "04/07/2026"], [130, "Salary deposit ACME"], [400, "12000.00"]],
+      [[40, "05/07/2026"], [130, "Payment to landlord"], [400, "4500.00"]],
+      [[40, "06/07/2026"], [130, "Bank charge monthly fee"], [400, "60.00"]],
+      [[40, "07/07/2026"], [130, "Netflix"], [400, "199.00"]],
+    ]);
+    const res = parseLastResortRows(mostlyMarked, 2026);
+    expect(res.rows.length).toBeGreaterThanOrEqual(5);
+    expect(res.refusedReason).toBeUndefined();
+
+    // And the marked ones got the right direction without a balance chain.
+    const salary = res.rows.find((r) => /salary/i.test(r.description));
+    const rent = res.rows.find((r) => /landlord/i.test(r.description));
+    expect(salary?.amountZAR).toBeGreaterThan(0);
+    expect(rent?.amountZAR).toBeLessThan(0);
   });
 });
 

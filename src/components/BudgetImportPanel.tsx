@@ -388,6 +388,19 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
         setNeedsPasswordFile(null);
         setPdfPassword("");
 
+        // Parsed, but generically. The rows are usable so the user carries on,
+        // and we quietly report the layout so it can be supported properly.
+        // Without this, an unsupported bank looks healthy right up until
+        // someone notices their salary counted as spending.
+        if (json.lowConfidence && json.diagnostics) {
+          void reportImportFailure(
+            "import-parse-low-confidence",
+            "Parsed with the generic fallback - layout not supported yet",
+            file,
+            json
+          );
+        }
+
         const accountLabel = json.accountLabel ?? file.name.replace(/\.[^.]+$/, "");
         metas.push({
           fileName: file.name,

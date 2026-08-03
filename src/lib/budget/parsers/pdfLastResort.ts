@@ -166,21 +166,43 @@ function balanceChainSigns(
   return signed;
 }
 
-/** Sign from explicit markers only. Used when there is no balance chain. */
+/**
+ * Sign from explicit markers only. Used when there is no balance chain.
+ *
+ * The fallback used to assume an outflow, on the reasoning that statements are
+ * mostly spending. That reasoning is fine for one row and catastrophic for a
+ * whole statement: on a layout where nothing is recognisable, EVERY row takes
+ * the fallback, so the user's salary is imported as spending. A real user
+ * ended up with 700 rows, no income at all, and expenses inflated by exactly
+ * the size of her pay cheque - and no error, because each individual guess
+ * looked reasonable.
+ *
+ * The guess is still made, but `certain` is now load-bearing: the caller
+ * refuses the parse outright when too much of the statement depends on it.
+ */
 function signFromMarkers(c: Candidate, value: number): { amount: number; certain: boolean } {
   if (c.explicitNegative[0]) return { amount: -Math.abs(value), certain: true };
   const t = c.description;
   if (CREDIT_MARK.test(t) && !DEBIT_MARK.test(t)) return { amount: Math.abs(value), certain: true };
   if (DEBIT_MARK.test(t) && !CREDIT_MARK.test(t)) return { amount: -Math.abs(value), certain: true };
-  // Unknown. Statements are mostly spending, so default to an outflow - but say
-  // so loudly by marking the row uncertain, which forces user review.
   return { amount: -Math.abs(value), certain: false };
 }
+
+/**
+ * How much of a statement may rest on a guessed sign before we refuse it.
+ *
+ * A handful of ambiguous rows among a hundred clear ones is normal and the
+ * user can fix them in review. A statement where most rows are guesses is not
+ * a parse, it is a coin toss applied to someone's money.
+ */
+const MAX_GUESSED_SIGN_SHARE = 0.3;
 
 export type LastResortResult = {
   rows: ParsedRow[];
   /** True when signs came from the document's own balance chain. */
   usedBalanceChain: boolean;
+  /** Set when rows were found but deliberately rejected as untrustworthy. */
+  refusedReason?: "unreadable-signs";
 };
 
 /**
@@ -236,6 +258,16 @@ export function parseLastResortRows(
   // missing row is invisible while a wrong row is obvious. It is already
   // flagged uncertain by signFromMarkers above.
   if (rows.length < 3) return { rows: [], usedBalanceChain: false };
+
+  // Refuse a statement whose signs are mostly guesswork. Importing it would
+  // produce a confident-looking budget built on coin tosses - income shown as
+  // spending, totals inflated by the size of someone's salary, and no error to
+  // explain any of it. Failing here sends the layout fingerprint instead, so
+  // the layout gets supported properly rather than approximated forever.
+  const guessed = rows.filter((r) => r.uncertainAmount).length;
+  if (guessed / rows.length > MAX_GUESSED_SIGN_SHARE) {
+    return { rows: [], usedBalanceChain: false, refusedReason: "unreadable-signs" };
+  }
 
   return { rows, usedBalanceChain: !!chain };
 }

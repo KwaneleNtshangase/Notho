@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { reportClientError } from "@/lib/errorReporting";
 
 export function useProfileHandlers() {
   const handleProfileSignOut = async () => {
@@ -50,29 +51,54 @@ export function useProfileHandlers() {
     URL.revokeObjectURL(url);
   };
 
+  /**
+   * Delete the signed-in user's account and all their data.
+   *
+   * Three things were wrong here, and together they made the red button do
+   * nothing at all on iOS:
+   *
+   *   1. It POSTed to /api/admin/deleteUser, which does not exist. The route
+   *      is /api/account/delete. Even a confirmed deletion 404'd.
+   *   2. It sent no Authorization header. The real route identifies the user
+   *      from their session token - deliberately, so nobody can delete someone
+   *      else's account - so it would have returned 401 regardless.
+   *   3. It called window.confirm() AFTER the app's own confirmation modal.
+   *      Safari on iOS suppresses native dialogs in a lot of situations, and a
+   *      suppressed confirm returns false, which took the silent early-return
+   *      path. Pressing "Yes, Delete Everything" appeared to do nothing.
+   *
+   * The modal is the confirmation. One deliberate, well-worded confirmation
+   * beats two, and the second one was the one that broke.
+   */
   const handleDeleteAccount = async () => {
-    if (typeof window === "undefined") return;
-    const confirmDelete = window.confirm(
-      "Are you absolutely sure you want to delete your account? This will permanently erase all your progress, streaks, badges, and personal data. This action cannot be undone."
-    );
-    if (!confirmDelete) return;
-
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No authenticated user");
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error("No active session - please sign in again");
 
-      // We call the edge function directly since Supabase client doesn't allow self-deletion by default
-      const res = await fetch("/api/admin/deleteUser", {
+      const res = await fetch("/api/account/delete", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id }),
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed to delete account");
-      
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(
+          (body as { error?: string }).error ??
+            `Account deletion failed (${res.status})`
+        );
+      }
+
       await handleProfileSignOut();
     } catch (e) {
-      console.error("Account deletion error:", e);
-      alert("There was an error deleting your account. Please try again or contact support.");
+      const msg = e instanceof Error ? e.message : "Account deletion failed";
+      // Report it. A failed deletion is a POPIA obligation we did not meet, so
+      // it must never be something we only find out about by being told.
+      void reportClientError("account-delete-failed", new Error(msg));
+      alert(
+        `${msg}\n\nWe've logged this and we're on it. If it keeps happening, ` +
+          `email support@notho.co.za and we'll delete your data manually.`
+      );
     }
   };
 

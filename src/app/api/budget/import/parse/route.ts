@@ -198,7 +198,11 @@ export async function POST(req: NextRequest) {
         customCategories
       );
 
-      return NextResponse.json({ ok: true, ...result });
+      // A low-confidence parse succeeded, but generically. Pass the layout
+      // fingerprint through so the client reports it: the rows are usable, yet
+      // the layout is unsupported, and this is the only chance to learn its
+      // shape without asking the user for their statement.
+      return NextResponse.json({ ok: true, ...result, diagnostics: pdfResult.diagnostics });
     }
 
     const text = await file.text();
