@@ -38,7 +38,7 @@ const lesson1Slots: QuestionSlot[] = [
           prompt: "The TFSA annual contribution limit for 2026/27 is R____ (in rands).",
           correct: 46000,
           feedback: {
-            correct: "Correct — R46 000 a year, up from R36 000. Lifetime limit remains R500 000.",
+            correct: "Correct, R46 000 a year, up from R36 000. Lifetime limit remains R500 000.",
             incorrect: "It's R46 000 for the 2026/27 tax year.",
           },
         },
@@ -74,7 +74,7 @@ const lesson1Slots: QuestionSlot[] = [
           statement: "If you don't use your full TFSA annual limit this year, the unused portion rolls over to next year.",
           correct: false,
           feedback: {
-            correct: "Correct. TFSA annual limits don't carry over — use this year's R46 000 or lose that year's allowance for good.",
+            correct: "Correct. TFSA annual limits don't carry over. Use this year's R46 000 or lose that year's allowance for good.",
             incorrect: "It doesn't roll over. Each tax year is use-it-or-lose-it, so it pays to contribute as early and consistently as you can.",
           },
         },
@@ -85,7 +85,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "You contribute only R20 000 of your R46 000 TFSA limit this year. What happens to the unused R26 000?",
           options: [
-            "It's forfeited — it doesn't get added to next year's limit",
+            "It's forfeited. It doesn't get added to next year's limit",
             "It carries over, giving you R72 000 next year",
             "SARS refunds it to you",
             "It's added to your lifetime limit",
@@ -93,7 +93,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Unused annual room is simply lost. Next year you get a fresh R46 000, not R46 000 plus the leftover.",
-            incorrect: "The unused R26 000 is forfeited. Annual limits never carry forward — next year is a fresh R46 000.",
+            incorrect: "The unused R26 000 is forfeited. Annual limits never carry forward. Next year is a fresh R46 000.",
           },
         },
       },
@@ -105,7 +105,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Every year skipped is tax-free growth gone forever. Even small monthly amounts beat waiting for a lump sum you never get to.",
-            incorrect: "It's true — the use-it-or-lose-it rule rewards starting early. Missed years can't be reclaimed.",
+            incorrect: "It's true: the use-it-or-lose-it rule rewards starting early. Missed years can't be reclaimed.",
           },
         },
       },
@@ -123,7 +123,7 @@ const lesson1Slots: QuestionSlot[] = [
           options: ["R500 000", "R46 000", "R1 million", "There's no lifetime limit"],
           correct: 0,
           feedback: {
-            correct: "Right. R500 000 is the total you can ever contribute across your lifetime — separate from the R46 000 annual cap.",
+            correct: "Right. R500 000 is the total you can ever contribute across your lifetime, separate from the R46 000 annual cap.",
             incorrect: "The lifetime limit is R500 000. The R46 000 is the annual limit; R500 000 is the total-ever cap.",
           },
         },
@@ -153,7 +153,7 @@ const lesson1Slots: QuestionSlot[] = [
           statement: "If you withdraw money from your TFSA, it restores room in your lifetime limit to re-contribute.",
           correct: false,
           feedback: {
-            correct: "Correct. Withdrawals do NOT restore your limit — money taken out still counts against your R500 000 lifetime cap. Only dip in for real emergencies.",
+            correct: "Correct. Withdrawals do NOT restore your limit. Money taken out still counts against your R500 000 lifetime cap. Only dip in for real emergencies.",
             incorrect: "Withdrawals don't give the room back. What you've contributed counts toward the R500 000 lifetime cap even after you take it out.",
           },
         },
@@ -190,7 +190,7 @@ const lesson1Slots: QuestionSlot[] = [
           prompt: "You contribute R47 000 in a year (R1 000 over the R46 000 limit). The 40% penalty on the excess is R____.",
           correct: 400,
           feedback: {
-            correct: "Correct: 40% × R1 000 = R400. Small excess, real penalty — stay inside R46 000.",
+            correct: "Correct: 40% × R1 000 = R400. Small excess, real penalty, stay inside R46 000.",
             incorrect: "40% of the R1 000 excess = R400.",
           },
         },
@@ -202,13 +202,13 @@ const lesson1Slots: QuestionSlot[] = [
           question: "Sipho has TFSAs at two providers and isn't tracking the totals. What's the risk?",
           options: [
             "Combined deposits could exceed R46 000 and trigger the 40% penalty",
-            "Nothing — each provider has its own R46 000 limit",
+            "Nothing. Each provider has its own R46 000 limit",
             "He earns double the tax-free growth",
             "SARS ignores multiple accounts",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The R46 000 limit is per person, not per account. Deposits across all providers add up — track them so you don't over-contribute.",
+            correct: "Right. The R46 000 limit is per person, not per account. Deposits across all providers add up: track them so you don't over-contribute.",
             incorrect: "The limit is per person, not per provider. His combined deposits count together, so untracked accounts risk the 40% penalty.",
           },
         },
@@ -222,7 +222,7 @@ const lesson1Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Best Legal Tax Break You're Probably Not Using",
     content:
-      "<p>Every year you don't use your TFSA allowance is R46 000 of tax-free growth you lose permanently — it doesn't roll over. Over decades, the difference between using your TFSA and not can be over R1 million in tax saved.</p><p>A Tax-Free Savings Account lets you invest R46 000 per year (R500 000 lifetime limit) and pay zero tax on interest, dividends or capital gains — ever. Go over the limit and SARS charges 40% of the excess. Available at Sygnia, Satrix, EasyEquities, Capitec and most major platforms.</p>",
+      "<p>Every year you don't use your TFSA allowance is R46 000 of tax-free growth you lose permanently, it doesn't roll over. Over decades, the difference between using your TFSA and not can be over R1 million in tax saved.</p><p>A Tax-Free Savings Account lets you invest R46 000 per year (R500 000 lifetime limit) and pay zero tax on interest, dividends or capital gains, ever. Go over the limit and SARS charges 40% of the excess. Available at Sygnia, Satrix, EasyEquities, Capitec and most major platforms.</p>",
   },
   { slot: "sa-investing/lesson-1/annual-limit" },
   { slot: "sa-investing/lesson-1/no-rollover" },
@@ -245,15 +245,15 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What is the main long-term advantage of a compliant TFSA over the same assets in a normal taxable account?",
           options: [
-            "No tax on qualifying growth (interest, dividends, capital gains)",
+            "No tax on qualifying growth",
             "Guaranteed higher returns every year",
             "SARS pays you cash back monthly",
             "You never have to read statements",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The wrapper changes the tax treatment, not the returns — qualifying growth inside a TFSA is 100% tax-free.",
-            incorrect: "It's the tax shelter: growth inside a TFSA isn't taxed. It doesn't promise higher returns — it lets you keep more of them.",
+            correct: "Right. The wrapper changes the tax treatment, not the returns. Qualifying growth inside a TFSA is 100% tax-free.",
+            incorrect: "It's the tax shelter: growth inside a TFSA isn't taxed. It doesn't promise higher returns. It lets you keep more of them.",
           },
         },
       },
@@ -264,8 +264,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "Inside a TFSA, you pay no tax on interest, dividends or capital gains.",
           correct: true,
           feedback: {
-            correct: "True. That's the whole point of the wrapper — every rand of qualifying growth stays yours, which compounds powerfully over decades.",
-            incorrect: "It's true — a TFSA shelters interest, dividends and capital gains from tax entirely, unlike a normal investment account.",
+            correct: "True. That's the whole point of the wrapper. Every rand of qualifying growth stays yours, which compounds powerfully over decades.",
+            incorrect: "It's true: a TFSA shelters interest, dividends and capital gains from tax entirely, unlike a normal investment account.",
           },
         },
       },
@@ -273,16 +273,16 @@ const lesson2Slots: QuestionSlot[] = [
         variantId: "ma-twin-scenario",
         step: {
           type: "scenario",
-          question: "Two people hold the same funds — one inside a TFSA, one in a normal taxable account. Over 20 years, who keeps more?",
+          question: "Two people hold the same funds, one inside a TFSA, one in a normal taxable account. Over 20 years, who keeps more?",
           options: [
-            "The TFSA holder, because qualifying growth isn't taxed",
+            "The TFSA holder",
             "The taxable-account holder",
             "They keep exactly the same",
             "It depends on the colour of the app",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Same funds, same returns — but the TFSA holder isn't handing a slice of the growth to SARS each year, so more compounds.",
+            correct: "Right. Same funds, same returns, but the TFSA holder isn't handing a slice of the growth to SARS each year, so more compounds.",
             incorrect: "The TFSA holder wins. Sheltering the growth from tax means more stays invested and compounds over 20 years.",
           },
         },
@@ -300,8 +300,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "You should track your TFSA contributions yourself so you don't exceed the annual or lifetime limits.",
           correct: true,
           feedback: {
-            correct: "True. Your platform helps, but you're responsible — a breach is a 40% penalty. Keep your own tally, especially across providers.",
-            incorrect: "It's true — the limits are real and the penalty is steep. Keep your own running total across every account.",
+            correct: "True. Your platform helps, but you're responsible. A breach is a 40% penalty. Keep your own tally, especially across providers.",
+            incorrect: "It's true. The limits are real and the penalty is steep. Keep your own running total across every account.",
           },
         },
       },
@@ -318,7 +318,7 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. It's a per-person limit. Opening more TFSAs doesn't create more room — all your deposits add up against the one R46 000.",
+            correct: "Right. It's a per-person limit. Opening more TFSAs doesn't create more room. All your deposits add up against the one R46 000.",
             incorrect: "It's per person, not per account. Multiple TFSAs share the single R46 000 annual limit.",
           },
         },
@@ -330,8 +330,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "Contributing to a TFSA in your child's name uses their limit, not yours.",
           correct: true,
           feedback: {
-            correct: "True. Each person (including a child) has their own R46 000 annual and R500 000 lifetime limits — but be aware you're using up the child's lifetime room early.",
-            incorrect: "It's true — a child has their own limits. Just remember it consumes their lifetime allowance, which is a real trade-off.",
+            correct: "True. Each person (including a child) has their own R46 000 annual and R500 000 lifetime limits, but be aware you're using up the child's lifetime room early.",
+            incorrect: "It's true. A child has their own limits. Just remember it consumes their lifetime allowance, which is a real trade-off.",
           },
         },
       },
@@ -354,8 +354,8 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Respect the annual limit — over-contributing triggers a 40% penalty. Hold the extra elsewhere and feed it into next year's TFSA room.",
-            incorrect: "Don't top up a maxed TFSA — that's a 40% penalty. Park the bonus elsewhere and use it in the new tax year.",
+            correct: "Right. Respect the annual limit. Over-contributing triggers a 40% penalty. Hold the extra elsewhere and feed it into next year's TFSA room.",
+            incorrect: "Don't top up a maxed TFSA. That's a 40% penalty. Park the bonus elsewhere and use it in the new tax year.",
           },
         },
       },
@@ -367,7 +367,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. On 1 March a new R46 000 of annual room opens (until your R500 000 lifetime cap is reached). Timing a maxed year's overflow into the new year avoids penalties.",
-            incorrect: "It's true — the annual limit refreshes on 1 March each tax year, up to the R500 000 lifetime cap.",
+            incorrect: "It's true, the annual limit refreshes on 1 March each tax year, up to the R500 000 lifetime cap.",
           },
         },
       },
@@ -408,7 +408,7 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The tax break rewards time — the longer growth compounds untaxed, the bigger the benefit. It's a long-game wrapper, not a spending account.",
+            correct: "Right. The tax break rewards time: the longer growth compounds untaxed, the bigger the benefit. It's a long-game wrapper, not a spending account.",
             incorrect: "It shines for long-term money. Because the tax saving compounds over years, short-term cash doesn't get the real benefit.",
           },
         },
@@ -421,7 +421,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Dip into a TFSA for emergencies and you permanently burn lifetime room you can't get back. Keep your emergency fund in a separate accessible account.",
-            incorrect: "It's true — raiding a TFSA wastes irreplaceable lifetime room. Emergency money belongs in a separate, accessible account.",
+            incorrect: "It's true, raiding a TFSA wastes irreplaceable lifetime room. Emergency money belongs in a separate, accessible account.",
           },
         },
       },
@@ -438,7 +438,7 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Those early years compound tax-free the whole way to retirement — starting a decade sooner can roughly double the outcome.",
+            correct: "Right. Those early years compound tax-free the whole way to retirement. Starting a decade sooner can roughly double the outcome.",
             incorrect: "The head start is huge: ten more years of untaxed compounding can nearly double the final value. Timing matters as much as the amount.",
           },
         },
@@ -477,7 +477,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Anti-money-laundering rules mean legitimate providers verify who you are. Expect to submit ID and a recent proof of address.",
-            incorrect: "It's true — FICA verification is standard. Be wary of anyone who offers to skip identity checks.",
+            incorrect: "It's true. FICA verification is standard. Be wary of anyone who offers to skip identity checks.",
           },
         },
       },
@@ -487,15 +487,15 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "A 'provider' offers to open your TFSA with no ID or verification at all. What should you think?",
           options: [
-            "Red flag — legitimate, regulated providers always do FICA",
+            "Red flag. Legitimate, regulated providers always do FICA",
             "Fine if they seem professional and have a slick website",
             "A sign they're a newer, lower-cost platform",
-            "Normal — TFSAs are exempt from FICA",
+            "Normal. TFSAs are exempt from FICA",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Skipping identity checks is a warning sign of a scam. Real providers are legally required to verify you.",
-            incorrect: "No verification is a scam signal, not convenience. Regulated providers must do FICA — use one that does.",
+            incorrect: "No verification is a scam signal, not convenience. Regulated providers must do FICA. Use one that does.",
           },
         },
       },
@@ -507,7 +507,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. With your ID and proof of address on hand, most platforms let you open and fund a TFSA the same day.",
-            incorrect: "It's true — it's usually quick. Having your FICA documents ready is what makes online onboarding fast.",
+            incorrect: "It's true. It's usually quick. Having your FICA documents ready is what makes online onboarding fast.",
           },
         },
       },
@@ -523,7 +523,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Before funding, which pair should you compare between two TFSA platforms?",
           options: [
-            "Total yearly costs, and which funds or ETFs you may hold",
+            "Total yearly costs",
             "The colour of the app icon",
             "How many influencers mention them",
             "Whether they only trade crypto",
@@ -531,7 +531,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Fees and investment choice drive your long-term outcome far more than marketing does.",
-            incorrect: "Compare cost and fund choice — that's what compounds over decades. Influencer buzz is noise.",
+            incorrect: "Compare cost and fund choice. That's what compounds over decades. Influencer buzz is noise.",
           },
         },
       },
@@ -542,8 +542,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "Low recurring fees and steady contributions matter more than a flashy advert.",
           correct: true,
           feedback: {
-            correct: "True. Opening the account isn't the finish line — it's the low costs and consistent deposits over years that build the wealth.",
-            incorrect: "It's true — fees and consistency beat marketing. A cheaper platform you actually fund regularly wins over time.",
+            correct: "True. Opening the account isn't the finish line. It's the low costs and consistent deposits over years that build the wealth.",
+            incorrect: "It's true. Fees and consistency beat marketing. A cheaper platform you actually fund regularly wins over time.",
           },
         },
       },
@@ -591,8 +591,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "Setting a monthly debit order into your TFSA helps you contribute consistently.",
           correct: true,
           feedback: {
-            correct: "True. Automation removes willpower from the equation — the money moves before you can spend it. Any amount you can sustain works.",
-            incorrect: "It's true — a debit order builds consistency. Even a small automated amount beats sporadic manual deposits.",
+            correct: "True. Automation removes willpower from the equation. The money moves before you can spend it. Any amount you can sustain works.",
+            incorrect: "It's true. A debit order builds consistency. Even a small automated amount beats sporadic manual deposits.",
           },
         },
       },
@@ -646,7 +646,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Regulation is your protection. If a 'TFSA' offer isn't from a licensed institution, walk away.",
-            incorrect: "It's true — real TFSAs come from licensed, regulated providers. That oversight is exactly what keeps your money safe.",
+            incorrect: "It's true. Real TFSAs come from licensed, regulated providers. That oversight is exactly what keeps your money safe.",
           },
         },
       },
@@ -659,12 +659,12 @@ const lesson3Slots: QuestionSlot[] = [
             "Pick a well-known licensed platform and check its fees and fund choices",
             "Go with whoever a stranger DM'd her",
             "Choose the one with the most dramatic returns advert",
-            "Avoid TFSAs entirely — they're too risky",
+            "Avoid TFSAs entirely. They're too risky",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Start with a reputable licensed provider, then compare costs and investment options. Boring and regulated beats exciting and shady.",
-            incorrect: "Safest is a known, licensed provider — then compare fees and funds. DMs and hype adverts are red flags, not shortlists.",
+            incorrect: "Safest is a known, licensed provider, then compare fees and funds. DMs and hype adverts are red flags, not shortlists.",
           },
         },
       },
@@ -677,7 +677,7 @@ const lesson3Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Start With Licensed Players",
     content:
-      "<p>Most major banks, LISPs and platforms offer TFSA wrappers. You'll complete FICA with ID and proof of address, sign risk disclosures, and choose underlying funds or ETFs that fit your timeline. Online onboarding often takes under an hour if your documents are ready.</p><p>Check platform fees, whether you want ad-hoc or debit-order contributions, and how you'll track deposits across apps. Opening the account isn't the finish line — low recurring fees and steady contributions matter far more than a flashy advert.</p>",
+      "<p>Most major banks, LISPs and platforms offer TFSA wrappers. You'll complete FICA with ID and proof of address, sign risk disclosures, and choose underlying funds or ETFs that fit your timeline. Online onboarding often takes under an hour if your documents are ready.</p><p>Check platform fees, whether you want ad-hoc or debit-order contributions, and how you'll track deposits across apps. Opening the account isn't the finish line. Low recurring fees and steady contributions matter far more than a flashy advert.</p>",
   },
   { slot: "sa-investing/lesson-3/fica" },
   { slot: "sa-investing/lesson-3/compare" },
@@ -700,7 +700,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What is a Retirement Annuity (RA)?",
           options: [
-            "A long-term investment for retirement, with tax-deductible contributions",
+            "A long-term investment for retirement",
             "A short-term savings account you can dip into anytime",
             "A type of car insurance",
             "A government grant",
@@ -708,7 +708,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. An RA is a private retirement investment. Contributions reduce your taxable income now, and the money grows for retirement.",
-            incorrect: "An RA is a long-term retirement investment with a tax deduction on contributions — not a flexible savings account.",
+            incorrect: "An RA is a long-term retirement investment with a tax deduction on contributions, not a flexible savings account.",
           },
         },
       },
@@ -719,8 +719,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "A Retirement Annuity is something you open yourself, independent of any employer.",
           correct: true,
           feedback: {
-            correct: "True. Unlike a workplace pension, an RA is private — ideal for the self-employed or anyone wanting to save beyond their employer fund.",
-            incorrect: "It's true — an RA is a private product you control yourself, separate from any employer pension.",
+            correct: "True. Unlike a workplace pension, an RA is private: ideal for the self-employed or anyone wanting to save beyond their employer fund.",
+            incorrect: "It's true. An RA is a private product you control yourself, separate from any employer pension.",
           },
         },
       },
@@ -731,13 +731,13 @@ const lesson4Slots: QuestionSlot[] = [
           question: "Thabo is self-employed with no workplace pension. How can he still save for retirement with a tax break?",
           options: [
             "Open a Retirement Annuity and contribute himself",
-            "He can't — retirement tax breaks are only for employees",
+            "He can't. Retirement tax breaks are only for employees",
             "Only through UIF",
             "Only by buying property",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. An RA gives the self-employed the same deduction employees get through a pension — he sets it up and funds it himself.",
+            correct: "Right. An RA gives the self-employed the same deduction employees get through a pension, he sets it up and funds it himself.",
             incorrect: "An RA is exactly for him: a private retirement fund with a tax deduction, no employer needed.",
           },
         },
@@ -756,7 +756,7 @@ const lesson4Slots: QuestionSlot[] = [
           options: ["27.5%", "10%", "15%", "50%"],
           correct: 0,
           feedback: {
-            correct: "Right. You can deduct up to 27.5% of your taxable income, subject to an annual rand cap (R430 000 for 2027) — one of SA's best legal tax breaks.",
+            correct: "Right. You can deduct up to 27.5% of your taxable income, subject to an annual rand cap (R430 000 for 2027), one of SA's best legal tax breaks.",
             incorrect: "It's 27.5% of taxable income, up to an annual cap (R430 000 for 2027).",
           },
         },
@@ -766,7 +766,7 @@ const lesson4Slots: QuestionSlot[] = [
         step: {
           type: "fill-blank",
           title: "Your deductible ceiling",
-          prompt: "You earn R400 000 taxable income a year. 27.5% of that — your deduction ceiling — is R____.",
+          prompt: "You earn R400 000 taxable income a year. 27.5% of that, your deduction ceiling, is R____.",
           correct: 110000,
           feedback: {
             correct: "Correct: 27.5% × R400 000 = R110 000, well within the annual rand cap. Contribute up to that and it's deductible.",
@@ -782,7 +782,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. It's the lower of 27.5% of income or the annual rand cap (R430 000 for 2027). High earners hit the rand cap first.",
-            incorrect: "It's true — the deduction is 27.5% of income up to an annual rand cap. Whichever is lower applies.",
+            incorrect: "It's true. The deduction is 27.5% of income up to an annual rand cap. Whichever is lower applies.",
           },
         },
       },
@@ -799,8 +799,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "RA money is generally locked until at least age 55, unlike a normal savings account.",
           correct: true,
           feedback: {
-            correct: "True. The trade-off for the tax break is a long lock-in — you generally can't access an RA before 55. Don't put money you'll need soon into one.",
-            incorrect: "It's true — RAs are designed to stay locked until retirement (generally 55+). That discipline is the price of the tax deduction.",
+            correct: "True. The trade-off for the tax break is a long lock-in: you generally can't access an RA before 55. Don't put money you'll need soon into one.",
+            incorrect: "It's true. RAs are designed to stay locked until retirement (generally 55+). That discipline is the price of the tax deduction.",
           },
         },
       },
@@ -810,7 +810,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the main trade-off of an RA's tax benefit?",
           options: [
-            "Your money is locked in until retirement (generally 55+)",
+            "Your money is locked in until retirement",
             "You pay higher tax overall",
             "It has no investment growth",
             "You can withdraw it any time with no rules",
@@ -855,12 +855,12 @@ const lesson4Slots: QuestionSlot[] = [
             "The self-employed, and anyone wanting to save beyond their employer fund",
             "Only people over 60",
             "Only people who earn under R5 000",
-            "Nobody — RAs have no purpose",
+            "Nobody. RAs have no purpose",
           ],
           correct: 0,
           feedback: {
             correct: "Right. No employer fund, or want to save more than it allows? An RA lets you claim the deduction and build retirement savings on your own terms.",
-            incorrect: "RAs suit the self-employed and anyone topping up beyond an employer fund — that's who gains the most.",
+            incorrect: "RAs suit the self-employed and anyone topping up beyond an employer fund. That's who gains the most.",
           },
         },
       },
@@ -871,8 +871,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "An RA stays yours through job changes, because it isn't tied to an employer.",
           correct: true,
           feedback: {
-            correct: "True. That portability is a key advantage — an RA follows you across jobs and career breaks, unlike an employer pension.",
-            incorrect: "It's true — an RA is portable and independent of any job, so it keeps going through every career change.",
+            correct: "True. That portability is a key advantage, an RA follows you across jobs and career breaks, unlike an employer pension.",
+            incorrect: "It's true. An RA is portable and independent of any job, so it keeps going through every career change.",
           },
         },
       },
@@ -883,7 +883,7 @@ const lesson4Slots: QuestionSlot[] = [
           question: "Sipho has an employer pension but wants to save more for retirement with a tax break. What can he do?",
           options: [
             "Open an RA to top up, sharing the same 27.5% deduction limit",
-            "Nothing — he's capped at the pension",
+            "Nothing. He's capped at the pension",
             "Only use a normal savings account",
             "Cancel his pension first",
           ],
@@ -903,7 +903,7 @@ const lesson4Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Save for Retirement AND Pay Less Tax",
     content:
-      "<p>A Retirement Annuity (RA) is a long-term investment specifically for retirement. Contributions are <strong>tax-deductible</strong> up to 27.5% of your income, subject to an annual rand cap (R430 000 for 2027).</p><p>Example: earn R50 000/month and contribute R5 000/month to an RA, and you reduce your taxable income by R60 000 a year — potentially saving thousands in tax. The trade-off is a long lock-in: RA money is generally inaccessible until at least age 55.</p>",
+      "<p>A Retirement Annuity (RA) is a long-term investment specifically for retirement. Contributions are <strong>tax-deductible</strong> up to 27.5% of your income, subject to an annual rand cap (R430 000 for 2027).</p><p>Example: earn R50 000/month and contribute R5 000/month to an RA, and you reduce your taxable income by R60 000 a year, potentially saving thousands in tax. The trade-off is a long lock-in: RA money is generally inaccessible until at least age 55.</p>",
   },
   { slot: "sa-investing/lesson-4/what-is" },
   { slot: "sa-investing/lesson-4/deduction-pct" },
@@ -945,8 +945,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Contributing to an RA lowers your taxable income, which reduces the income tax you pay.",
           correct: true,
           feedback: {
-            correct: "True. The contribution comes off before tax is calculated, so SARS taxes a smaller income — a real, immediate saving.",
-            incorrect: "It's true — RA contributions cut taxable income, so your income tax drops. That's the core benefit.",
+            correct: "True. The contribution comes off before tax is calculated, so SARS taxes a smaller income: a real, immediate saving.",
+            incorrect: "It's true. RA contributions cut taxable income, so your income tax drops. That's the core benefit.",
           },
         },
       },
@@ -956,14 +956,14 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Priya earns R42 000 taxable a month and contributes R4 000 to an RA. What broadly happens at tax time?",
           options: [
-            "Her taxable income drops by the deductible contribution, lowering her tax — exact saving depends on her bracket",
+            "Her taxable income drops by the deductible contribution, lowering her tax. Exact saving depends on her bracket",
             "She pays more tax as a penalty",
             "Nothing changes",
             "She's exempt from all tax forever",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The deductible contribution shrinks her taxable income, so she pays less tax now — how much depends on her marginal rate.",
+            correct: "Right. The deductible contribution shrinks her taxable income, so she pays less tax now. How much depends on her marginal rate.",
             incorrect: "Her tax falls: the RA contribution reduces taxable income. The exact saving depends on her bracket, but it's a real reduction.",
           },
         },
@@ -982,7 +982,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Your deduction depends on your income, the caps and current law. Use official SARS guidance or a registered practitioner for your case.",
-            incorrect: "It's true — tax is personal. Check your own numbers against current SARS rules, not a friend's anecdote.",
+            incorrect: "It's true. Tax is personal. Check your own numbers against current SARS rules, not a friend's anecdote.",
           },
         },
       },
@@ -1000,7 +1000,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Rules and caps change and depend on your income. Trust SARS or a registered practitioner, not second-hand tips.",
-            incorrect: "Use SARS or a registered practitioner. Tax rules shift yearly and are personal — anecdotes and 'hacks' get people penalised.",
+            incorrect: "Use SARS or a registered practitioner. Tax rules shift yearly and are personal. Anecdotes and 'hacks' get people penalised.",
           },
         },
       },
@@ -1012,7 +1012,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Budgets adjust the caps and thresholds. Check the current figures each tax year before increasing your contributions.",
-            incorrect: "It's true — the caps and rules are updated in the annual budget, so verify the current year's numbers.",
+            incorrect: "It's true. The caps and rules are updated in the annual budget, so verify the current year's numbers.",
           },
         },
       },
@@ -1028,7 +1028,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How should you treat the RA tax deduction?",
           options: [
-            "As a nudge to save — plan cash flow so living costs stay covered after the debit order",
+            "As a nudge to save. Plan cash flow so living costs stay covered after the debit order",
             "As free money to spend elsewhere",
             "As a reason to borrow to contribute more",
             "As a way to access cash any time",
@@ -1036,7 +1036,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The deduction rewards saving you'd want to do anyway. Make sure the contribution still leaves your monthly essentials covered.",
-            incorrect: "It's a nudge to save, not free money. Contribute what fits your cash flow — never borrow or starve essentials to chase the deduction.",
+            incorrect: "It's a nudge to save, not free money. Contribute what fits your cash flow. Never borrow or starve essentials to chase the deduction.",
           },
         },
       },
@@ -1047,7 +1047,7 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "It's a good idea to borrow on a credit card to increase your RA contribution for the tax deduction.",
           correct: false,
           feedback: {
-            correct: "Correct. Never do that. Credit-card interest (often 20%+) dwarfs the tax saving — you'd lose money chasing the deduction.",
+            correct: "Correct. Never do that. Credit-card interest (often 20%+) dwarfs the tax saving. You'd lose money chasing the deduction.",
             incorrect: "It's a bad idea. High credit-card interest wipes out the tax benefit. Only contribute money you actually have.",
           },
         },
@@ -1066,7 +1066,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The tax break isn't worth risking her rent. A smaller, sustainable contribution she can always afford is the right size.",
-            incorrect: "Scale the contribution to what her budget allows. A deduction that jeopardises rent is too big — sustainable beats maximal.",
+            incorrect: "Scale the contribution to what her budget allows. A deduction that jeopardises rent is too big. Sustainable beats maximal.",
           },
         },
       },
@@ -1083,8 +1083,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Cashing out an RA early, outside allowed events, generally triggers penalties.",
           correct: true,
           feedback: {
-            correct: "True. RAs are built to stay locked. Early access outside the rules carries penalties and tax — another reason to only commit long-term money.",
-            incorrect: "It's true — early withdrawal outside the permitted events is penalised. The lock-in is central to how RAs work.",
+            correct: "True. RAs are built to stay locked. Early access outside the rules carries penalties and tax, another reason to only commit long-term money.",
+            incorrect: "It's true. Early withdrawal outside the permitted events is penalised. The lock-in is central to how RAs work.",
           },
         },
       },
@@ -1133,7 +1133,7 @@ const lesson5Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Deductions Now, Discipline Later",
     content:
-      "<p>Priya contributes R4 000 monthly to an RA while earning R42 000 taxable income. SARS lets her deduct those contributions up to the legal percentage and cap, lowering her income tax today while locking money for retirement. Exact savings depend on your bracket and current law.</p><p>You still follow product rules: penalties for cashing out early outside allowed events, and contributions must go to approved funds. Treat the deduction as a nudge to save — not 'free money' — and plan your cash flow so living costs stay covered after the debit order.</p>",
+      "<p>Priya contributes R4 000 monthly to an RA while earning R42 000 taxable income. SARS lets her deduct those contributions up to the legal percentage and cap, lowering her income tax today while locking money for retirement. Exact savings depend on your bracket and current law.</p><p>You still follow product rules: penalties for cashing out early outside allowed events, and contributions must go to approved funds. Treat the deduction as a nudge to save, not 'free money', and plan your cash flow so living costs stay covered after the debit order.</p>",
   },
   { slot: "sa-investing/lesson-5/deduction-benefit" },
   { slot: "sa-investing/lesson-5/confirm-own" },
@@ -1164,7 +1164,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. A unit trust pools money from many people into a managed basket of assets, so even a small investor gets instant diversification.",
-            incorrect: "A unit trust pools many investors' money into a managed basket — not a single share or a bank account.",
+            incorrect: "A unit trust pools many investors' money into a managed basket, not a single share or a bank account.",
           },
         },
       },
@@ -1175,8 +1175,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "Pooled investments like unit trusts and ETFs let a small investor hold many assets at once.",
           correct: true,
           feedback: {
-            correct: "True. Instead of buying dozens of shares yourself, one pooled fund spreads your money across many holdings — cheap, instant diversification.",
-            incorrect: "It's true — pooling is how a small amount buys a slice of many assets, giving diversification you couldn't easily build alone.",
+            correct: "True. Instead of buying dozens of shares yourself, one pooled fund spreads your money across many holdings, cheap, instant diversification.",
+            incorrect: "It's true. Pooling is how a small amount buys a slice of many assets, giving diversification you couldn't easily build alone.",
           },
         },
       },
@@ -1186,15 +1186,15 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho wants his long-term fund to grow tax-free. Can he hold unit trusts or ETFs inside a TFSA?",
           options: [
-            "Yes — both can sit inside a TFSA wrapper when the rules allow",
-            "No — TFSAs can only hold cash",
+            "Yes. Both can sit inside a TFSA wrapper when the rules allow",
+            "No. TFSAs can only hold cash",
             "Only individual shares are allowed",
             "Only bonds are allowed",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Many unit trusts and ETFs can live inside a TFSA, combining diversification with tax-free growth — a powerful long-term combo.",
-            incorrect: "They can — eligible unit trusts and ETFs can be held in a TFSA, so you get diversification and tax-free growth together.",
+            correct: "Right. Many unit trusts and ETFs can live inside a TFSA, combining diversification with tax-free growth: a powerful long-term combo.",
+            incorrect: "They can. Eligible unit trusts and ETFs can be held in a TFSA, so you get diversification and tax-free growth together.",
           },
         },
       },
@@ -1217,7 +1217,7 @@ const lesson6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. It's a passive-vs-active, low-fee-vs-higher-fee trade-off — neither structure is guaranteed to win every year.",
+            correct: "Right. It's a passive-vs-active, low-fee-vs-higher-fee trade-off. Neither structure is guaranteed to win every year.",
             incorrect: "ETFs usually track an index cheaply; active unit trusts try to beat a benchmark at higher cost. Neither is a guaranteed winner.",
           },
         },
@@ -1230,7 +1230,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Most ETFs passively follow an index (like the JSE Top 40 or a global index) and can be bought and sold like a share.",
-            incorrect: "It's true — an ETF usually tracks an index and trades like a share, which is part of why it's often low-cost.",
+            incorrect: "It's true, an ETF usually tracks an index and trades like a share, which is part of why it's often low-cost.",
           },
         },
       },
@@ -1240,7 +1240,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "An active unit trust charges much higher fees than a similar index ETF, promising to 'beat the market'. What should a beginner remember?",
           options: [
-            "Higher fees are guaranteed; beating the market isn't — many active funds don't, after fees",
+            "Higher fees are guaranteed; beating the market isn't, many active funds don't",
             "Higher fees guarantee higher returns",
             "Active funds never charge fees",
             "The market can't be tracked",
@@ -1266,7 +1266,7 @@ const lesson6Slots: QuestionSlot[] = [
           prompt: "One fund lists total yearly costs near 1.5% and a similar index fund near 0.35%. Enter the higher one as a number (not R): ____.",
           correct: 1.5,
           feedback: {
-            correct: "Correct — 1.5%. When funds are similar, the lower-cost one usually leaves you more growth. Small fee gaps compound over decades.",
+            correct: "Correct. 1.5%. When funds are similar, the lower-cost one usually leaves you more growth. Small fee gaps compound over decades.",
             incorrect: "The higher figure is 1.5(%). Comparing TERs like this is how you spot expensive duplicates.",
           },
         },
@@ -1277,15 +1277,15 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does the Total Expense Ratio (TER) tell you?",
           options: [
-            "Roughly the yearly cost of holding the fund, as a percentage",
+            "Roughly the yearly cost of holding the fund",
             "The guaranteed return",
             "The fund manager's salary",
             "The share price",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The TER is the annual cost of the fund. Lower is better when funds are otherwise similar — it's money that stays invested.",
-            incorrect: "The TER is the fund's yearly cost as a percentage. It's the number to compare when funds are similar — lower keeps more growth yours.",
+            correct: "Right. The TER is the annual cost of the fund. Lower is better when funds are otherwise similar. It's money that stays invested.",
+            incorrect: "The TER is the fund's yearly cost as a percentage. It's the number to compare when funds are similar. Lower keeps more growth yours.",
           },
         },
       },
@@ -1297,7 +1297,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. A 1% fee gap doesn't sound like much, but compounded over 20–30 years it can cost you a large slice of your final value.",
-            incorrect: "It's true — fees compound against you. Even a 1% difference is significant over a long investing lifetime.",
+            incorrect: "It's true: fees compound against you. Even a 1% difference is significant over a long investing lifetime.",
           },
         },
       },
@@ -1314,8 +1314,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "Reading the minimum disclosure document (fund fact sheet) is part of responsible investing.",
           correct: true,
           feedback: {
-            correct: "True. The fact sheet shows what the fund holds, its fees, its benchmark and its risks — the basics you should know before you invest.",
-            incorrect: "It's true — the fact sheet (minimum disclosure document) is essential reading: holdings, fees, benchmark and risk in one place.",
+            correct: "True. The fact sheet shows what the fund holds, its fees, its benchmark and its risks. The basics you should know before you invest.",
+            incorrect: "It's true. The fact sheet (minimum disclosure document) is essential reading: holdings, fees, benchmark and risk in one place.",
           },
         },
       },
@@ -1325,7 +1325,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Before investing in a fund, what should you check on its fact sheet?",
           options: [
-            "Its benchmark, its costs (TER), and its suggested minimum investment period",
+            "Its benchmark, its costs (TER)",
             "Only its name",
             "How many people follow it online",
             "The manager's photo",
@@ -1333,7 +1333,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Benchmark, cost and time horizon tell you what you're buying, what it costs, and whether it fits your timeline.",
-            incorrect: "Check the benchmark, the TER and the suggested holding period — that's what tells you if the fund fits you.",
+            incorrect: "Check the benchmark, the TER and the suggested holding period. That's what tells you if the fund fits you.",
           },
         },
       },
@@ -1343,7 +1343,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Ayesha reads a fund fact sheet but doesn't understand what she'd be holding. What's the responsible move?",
           options: [
-            "Pause and learn more (or get advice) before investing",
+            "Pause and learn more before investing",
             "Invest anyway and hope",
             "Put in her whole savings to be safe",
             "Follow a stranger's tip instead",
@@ -1351,7 +1351,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Never invest in something you don't understand. Pausing to learn or asking a licensed adviser beats guessing with real money.",
-            incorrect: "If it's unclear, don't invest yet. Understanding what you hold — or getting proper advice — comes before committing money.",
+            incorrect: "If it's unclear, don't invest yet. Understanding what you hold, or getting proper advice, comes before committing money.",
           },
         },
       },
@@ -1364,7 +1364,7 @@ const lesson6Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Pooled Investing",
     content:
-      "<p>A unit trust pools money from many investors into a basket chosen by a manager within set mandates. An ETF typically tracks an index and trades like a share. Both can sit inside a TFSA or other wrapper when the rules allow, but their fees and trading differ.</p><p>Read the Total Expense Ratio (TER), transaction costs, and how often you may switch. Flashy past-performance charts ignore the tax you'd pay outside a shelter and your own timing — focus on fit, fees, and whether you understand what you hold.</p>",
+      "<p>A unit trust pools money from many investors into a basket chosen by a manager within set mandates. An ETF typically tracks an index and trades like a share. Both can sit inside a TFSA or other wrapper when the rules allow, but their fees and trading differ.</p><p>Read the Total Expense Ratio (TER), transaction costs, and how often you may switch. Flashy past-performance charts ignore the tax you'd pay outside a shelter and your own timing, focus on fit, fees, and whether you understand what you hold.</p>",
   },
   { slot: "sa-investing/lesson-6/pooled" },
   { slot: "sa-investing/lesson-6/etf-vs-active" },

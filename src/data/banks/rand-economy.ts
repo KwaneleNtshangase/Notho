@@ -26,10 +26,10 @@ const whyWeakensSlots: QuestionSlot[] = [
           type: "mcq",
           question: "The US Federal Reserve raises interest rates sharply. What typically happens to the rand?",
           options: [
-            "It weakens — capital flows to the US dollar for better yields",
-            "It strengthens — US growth is good for SA trade",
-            "No effect — exchange rates are independent of rates",
-            "It strengthens — investors seek diversification",
+            "It weakens: capital flows to the US dollar for better yields",
+            "It strengthens. US growth is good for SA trade",
+            "No effect. Exchange rates are independent of rates",
+            "It strengthens, investors seek diversification",
           ],
           correct: 0,
           feedback: {
@@ -45,7 +45,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           statement: "When global investors turn nervous ('risk-off'), they tend to sell emerging-market currencies like the rand.",
           correct: true,
           feedback: {
-            correct: "Right. In risk-off moments investors flee to 'safe' assets like the dollar — the rand often weakens even if nothing changed in SA.",
+            correct: "Right. In risk-off moments investors flee to 'safe' assets like the dollar, the rand often weakens even if nothing changed in SA.",
             incorrect: "They do. Risk-off means selling 'risky' currencies like the rand and buying the dollar, which weakens the rand.",
           },
         },
@@ -63,7 +63,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. When load shedding is severe it cuts growth and scares off investors — capital leaves and the rand weakens.",
+            correct: "Right. When load shedding is severe it cuts growth and scares off investors. Capital leaves and the rand weakens.",
             incorrect: "Growth shocks like severe load shedding weaken the rand. The other three would tend to support it, not weaken it.",
           },
         },
@@ -82,7 +82,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           options: ["They get more expensive", "They get cheaper", "They stay the same", "Only luxury goods change"],
           correct: 0,
           feedback: {
-            correct: "Right. You need more rands to buy the same dollar amount, so imports cost more — which pushes inflation up.",
+            correct: "Right. You need more rands to buy the same dollar amount, so imports cost more, which pushes inflation up.",
             incorrect: "A weaker rand means imports cost more rands. Petrol (priced in dollars), electronics and imported food all get pricier.",
           },
         },
@@ -94,7 +94,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           statement: "A weaker rand is always bad for every South African.",
           correct: false,
           feedback: {
-            correct: "Correct. It hurts importers and consumers, but helps exporters — miners earn dollars and pay costs in rand, so a weak rand lifts their rand income.",
+            correct: "Correct. It hurts importers and consumers, but helps exporters. Miners earn dollars and pay costs in rand, so a weak rand lifts their rand income.",
             incorrect: "Not always. Exporters (mining, agriculture, tourism) earn foreign currency, so a weaker rand actually boosts their rand earnings.",
           },
         },
@@ -113,7 +113,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Earning in dollars and spending in rand means a weaker rand increases their rand revenue.",
-            incorrect: "Exporters benefit — they earn dollars and pay costs in rand. Importers, consumers and overseas travellers all pay more.",
+            incorrect: "Exporters benefit. They earn dollars and pay costs in rand. Importers, consumers and overseas travellers all pay more.",
           },
         },
       },
@@ -131,7 +131,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           options: ["R111 000", "R100 000", "R90 000", "R80 000"],
           correct: 0,
           feedback: {
-            correct: "Right: R100 000 ÷ R18 = $5 556; at R20/$ that's about R111 000 — roughly an 11% gain from the currency move alone.",
+            correct: "Right: R100 000 ÷ R18 = $5 556; at R20/$ that's about R111 000: roughly an 11% gain from the currency move alone.",
             incorrect: "R100 000 ÷ R18 = $5 556. At R20/$, $5 556 × R20 ≈ R111 000. The weaker rand lifted the rand value ~11%.",
           },
         },
@@ -143,7 +143,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           statement: "Offshore assets tend to rise in RAND terms when the rand weakens, even if their foreign price is unchanged.",
           correct: true,
           feedback: {
-            correct: "Right. They're priced in foreign currency, which now buys more rands — so the rand value goes up on the currency move alone.",
+            correct: "Right. They're priced in foreign currency, which now buys more rands, so the rand value goes up on the currency move alone.",
             incorrect: "They do. Priced in dollars, an offshore asset is worth more rands when the rand weakens, even with a flat foreign price.",
           },
         },
@@ -154,14 +154,14 @@ const whyWeakensSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Why does a global ETF gain in rand terms when the rand weakens?",
           options: [
-            "It's priced in foreign currency, which now buys more rands",
+            "It's priced in foreign currency",
             "It automatically pays a bigger dividend",
             "SA shares always rise at the same time",
             "Its returns are guaranteed by the ETF provider",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The foreign price can stay flat, but each unit of foreign currency converts to more rands — so the rand value rises.",
+            correct: "Right. The foreign price can stay flat, but each unit of foreign currency converts to more rands, so the rand value rises.",
             incorrect: "It's the currency effect: the asset is in foreign currency, which converts to more rands when the rand weakens.",
           },
         },
@@ -185,8 +185,8 @@ const whyWeakensSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A global ETF holds foreign-currency assets, so it gains in rand when the rand falls — the most accessible hedge.",
-            incorrect: "A global ETF gives currency exposure. Fixed deposits, RSA bonds and SA property are all rand-denominated — no currency protection.",
+            correct: "Right. A global ETF holds foreign-currency assets, so it gains in rand when the rand falls, the most accessible hedge.",
+            incorrect: "A global ETF gives currency exposure. Fixed deposits, RSA bonds and SA property are all rand-denominated, no currency protection.",
           },
         },
       },
@@ -197,7 +197,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           statement: "An SA bank fixed deposit protects you from the rand losing value against the dollar.",
           correct: false,
           feedback: {
-            correct: "Correct. A fixed deposit is fully rand-denominated — it earns interest but gives no protection if the rand weakens.",
+            correct: "Correct. A fixed deposit is fully rand-denominated. It earns interest but gives no protection if the rand weakens.",
             incorrect: "It doesn't. A rand fixed deposit has no currency exposure, so it can't hedge the rand weakening against the dollar.",
           },
         },
@@ -215,7 +215,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Some offshore exposure means part of her wealth gains in rand when the rand falls — a practical long-term hedge.",
+            correct: "Right. Some offshore exposure means part of her wealth gains in rand when the rand falls: a practical long-term hedge.",
             incorrect: "A global ETF is the accessible hedge. Rand savings, SA bonds and cash are all rand-denominated and offer no protection.",
           },
         },
@@ -229,15 +229,15 @@ const whyWeakensLayout: LessonLayoutItem[] = [
     type: "info",
     title: "A Volatile Emerging-Market Currency",
     content:
-      "<p>The rand is one of the most traded — and most volatile — emerging-market currencies. When global investors get nervous, they sell 'risky' assets (including rand) and buy 'safe' ones like the US dollar. This can happen even when nothing has changed inside South Africa.</p><p>Durable drivers of rand weakness include US–SA interest-rate differentials (capital flight to the dollar), load shedding and other growth shocks, a current-account (trade) deficit, and global risk-off sentiment.</p>",
+      "<p>The rand is one of the most traded, and most volatile, emerging-market currencies. When global investors get nervous, they sell 'risky' assets (including rand) and buy 'safe' ones like the US dollar. This can happen even when nothing has changed inside South Africa.</p><p>Durable drivers of rand weakness include US–SA interest-rate differentials (capital flight to the dollar), load shedding and other growth shocks, a current-account (trade) deficit, and global risk-off sentiment.</p>",
   },
   { slot: "rand-economy/why-rand-weakens/drivers" },
   { slot: "rand-economy/why-rand-weakens/budget-impact" },
   {
     type: "info",
-    title: "How Rand Weakness Hits Your Budget — and How to Hedge",
+    title: "How Rand Weakness Hits Your Budget, and How to Hedge",
     content:
-      "<p>Every R1 the rand weakens against the dollar adds roughly R0.20–R0.30 per litre of petrol (crude oil is dollar-priced). Electronics, imported food, flights and medicine all get pricier. A weaker rand helps exporters (mining, agriculture, tourism) but hurts consumers and importers.</p><p>The most accessible hedge for an ordinary investor is a <strong>global (offshore) equity ETF</strong>: because it's priced in foreign currency, it gains in rand terms when the rand weakens — even if the underlying shares don't move.</p>",
+      "<p>Every R1 the rand weakens against the dollar adds roughly R0.20–R0.30 per litre of petrol (crude oil is dollar-priced). Electronics, imported food, flights and medicine all get pricier. A weaker rand helps exporters (mining, agriculture, tourism) but hurts consumers and importers.</p><p>The most accessible hedge for an ordinary investor is a <strong>global (offshore) equity ETF</strong>: because it's priced in foreign currency, it gains in rand terms when the rand weakens, even if the underlying shares don't move.</p>",
   },
   { slot: "rand-economy/why-rand-weakens/hedge-math" },
   { slot: "rand-economy/why-rand-weakens/best-hedge" },

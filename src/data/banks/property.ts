@@ -41,7 +41,7 @@ const lesson1Slots: QuestionSlot[] = [
           prompt: "You earn R35 000 gross a month. Using the 30% rule, your maximum total housing cost is R____.",
           correct: 10500,
           feedback: {
-            correct: "Correct: R35 000 × 30% = R10 500 — covering bond, rates, levy and insurance combined.",
+            correct: "Correct: R35 000 × 30% = R10 500, covering bond, rates, levy and insurance combined.",
             incorrect: "30% of R35 000 = R10 500, for all housing costs together.",
           },
         },
@@ -78,7 +78,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: false,
           feedback: {
             correct: "Correct. Banks approve based on their risk appetite, not your lifestyle. Plenty of people are approved for more than they can comfortably repay.",
-            incorrect: "Not necessarily. The bank lends to its own criteria — you still have to check it fits YOUR budget and survives a rate rise.",
+            incorrect: "Not necessarily. The bank lends to its own criteria. You still have to check it fits YOUR budget and survives a rate rise.",
           },
         },
       },
@@ -95,7 +95,7 @@ const lesson1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Rates rise and incomes change. A repayment that only works on a perfect month is a trap — make sure it survives a shock.",
+            correct: "Right. Rates rise and incomes change. A repayment that only works on a perfect month is a trap. Make sure it survives a shock.",
             incorrect: "Stress-test against higher rates and a lean month. If it only works on your best month, it's too much house.",
           },
         },
@@ -107,7 +107,7 @@ const lesson1Slots: QuestionSlot[] = [
           question: "The bank approves Thabo for a R14 000/month bond, but that leaves almost nothing after his other costs. What's wise?",
           options: [
             "Buy something cheaper that leaves a comfortable buffer",
-            "Take the full R14 000 bond — the bank knows best",
+            "Take the full R14 000 bond, the bank knows best",
             "Skip insurance to afford it",
             "Stop saving entirely to cover it",
           ],
@@ -137,7 +137,7 @@ const lesson1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Rates, levies and insurance are real, recurring housing costs — budget them alongside the bond, not as afterthoughts.",
+            correct: "Right. Rates, levies and insurance are real, recurring housing costs. Budget them alongside the bond, not as afterthoughts.",
             incorrect: "Housing cost includes rates, levies and insurance on top of the bond. The others are separate budget lines.",
           },
         },
@@ -150,7 +150,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The bond is the headline, but rates, levies, insurance and maintenance can add thousands a month. Count them all before you buy.",
-            incorrect: "It's true — focusing only on the bond hides rates, levies, insurance and upkeep. The true monthly cost is much higher.",
+            incorrect: "It's true: focusing only on the bond hides rates, levies, insurance and upkeep. The true monthly cost is much higher.",
           },
         },
       },
@@ -160,8 +160,8 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa budgets only her R11 000 bond, forgetting R2 000 in rates and levies. What happens?",
           options: [
-            "Her real housing cost is R13 000 — she's over her 30% budget",
-            "Nothing — rates and levies are optional",
+            "Her real housing cost is R13 000. She's over her 30% budget",
+            "Nothing. Rates and levies are optional",
             "The bank pays her rates",
             "Her bond automatically shrinks",
           ],
@@ -186,7 +186,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Buying at your absolute limit leaves no room for a rate hike or a lean month. A gap is what keeps a setback from becoming a default.",
-            incorrect: "It's true — a buffer below your max absorbs shocks. Buying to the limit is how small surprises turn into missed payments.",
+            incorrect: "It's true, a buffer below your max absorbs shocks. Buying to the limit is how small surprises turn into missed payments.",
           },
         },
       },
@@ -203,7 +203,7 @@ const lesson1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Emotion pushes people to over-buy. The disciplined move is to let the budget — not the feelings — set the price.",
+            correct: "Right. Emotion pushes people to over-buy. The disciplined move is to let the budget, not the feelings, set the price.",
             incorrect: "The trap is over-stretching for a dream home. Let affordability, not emotion, cap what you spend.",
           },
         },
@@ -214,7 +214,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato can afford a R12 000 bond but is shown a beautiful R16 000 one she 'loves'. Best move?",
           options: [
-            "Stay within her R12 000 budget — love fades faster than a 20-year bond",
+            "Stay within her R12 000 budget, love fades faster than a 20-year bond",
             "Take the R16 000 bond and cut essentials",
             "Borrow more to cover the gap each month",
             "Skip the deposit to afford it",
@@ -235,7 +235,7 @@ const lesson1Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The 30% Rule",
     content:
-      "<p>A common rule: your total housing costs (bond repayment + rates + levy + insurance) shouldn't exceed <strong>30% of your gross income</strong>.</p><p>Gross salary R40 000/month → maximum housing costs about R12 000/month. Banks often lend up to roughly this level — but just because the bank approves it doesn't mean it's comfortable for YOU. Buy below your max and stress-test the repayment against a rate rise.</p>",
+      "<p>A common rule: your total housing costs (bond repayment + rates + levy + insurance) shouldn't exceed <strong>30% of your gross income</strong>.</p><p>Gross salary R40 000/month → maximum housing costs about R12 000/month. Banks often lend up to roughly this level, but just because the bank approves it doesn't mean it's comfortable for YOU. Buy below your max and stress-test the repayment against a rate rise.</p>",
   },
   { slot: "property/lesson-1/thirty-pct" },
   { slot: "property/lesson-1/bank-approval" },
@@ -290,8 +290,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "A home loan (a 'bond' in SA) is secured by the property, so the bank can repossess it if you stop paying.",
           correct: true,
           feedback: {
-            correct: "True. The property is the collateral. That security is why bonds have far lower rates than unsecured loans — but also why default risks your home.",
-            incorrect: "It's true — a bond is secured by the home. Miss enough payments and the bank can repossess and sell it to recover the debt.",
+            correct: "True. The property is the collateral. That security is why bonds have far lower rates than unsecured loans, but also why default risks your home.",
+            incorrect: "It's true. A bond is secured by the home. Miss enough payments and the bank can repossess and sell it to recover the debt.",
           },
         },
       },
@@ -307,14 +307,14 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How does a bigger deposit usually affect your home-loan interest rate?",
           options: [
-            "It tends to earn a better rate (lower LTV = less bank risk)",
+            "It tends to earn a better rate",
             "It makes the rate worse",
             "It has no effect on the rate",
             "It removes interest entirely",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A bigger deposit means a lower LTV, so the bank takes less risk — and often rewards you with a lower rate.",
+            correct: "Right. A bigger deposit means a lower LTV, so the bank takes less risk, and often rewards you with a lower rate.",
             incorrect: "A bigger deposit lowers your LTV and risk to the bank, which typically earns a better rate.",
           },
         },
@@ -327,7 +327,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Lend R700k on a R1m home and the bank is well-covered if it must repossess; lend R980k and it isn't. Lower LTV = lower risk = often a better rate.",
-            incorrect: "It's true — more of your own money in means less of the bank's at risk. That lower risk often translates to a better rate.",
+            incorrect: "It's true. More of your own money in means less of the bank's at risk. That lower risk often translates to a better rate.",
           },
         },
       },
@@ -337,14 +337,14 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho can put down 20% instead of 5%. Beyond a smaller loan, what's a likely benefit?",
           options: [
-            "A better interest rate, because his LTV is much lower",
+            "A better interest rate",
             "The bank charges him more for the privilege",
             "No difference at all",
             "He loses his deposit",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. 20% down means an 80% LTV — much safer for the bank than 95%, so he's more likely to get a competitive rate.",
+            correct: "Right. 20% down means an 80% LTV: much safer for the bank than 95%, so he's more likely to get a competitive rate.",
             incorrect: "A 20% deposit (80% LTV) is far less risky for the bank than 5% down, so it usually earns a better rate.",
           },
         },
@@ -361,7 +361,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The 'prime rate' your bond is priced off is set by:",
           options: [
-            "The South African Reserve Bank (via the repo rate)",
+            "The South African Reserve Bank",
             "Each estate agent",
             "SARS",
             "The seller of the house",
@@ -381,7 +381,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The 'spread' is personal: a good profile might get prime minus 0.5%, a riskier one prime plus 1%. Your credit record directly affects the rate.",
-            incorrect: "It's true — the spread depends on your risk. Good credit can mean below prime; poor credit means above it, costing more over 20 years.",
+            incorrect: "It's true. The spread depends on your risk. Good credit can mean below prime; poor credit means above it, costing more over 20 years.",
           },
         },
       },
@@ -392,8 +392,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "Because most SA bonds track prime, your repayment can rise or fall when the Reserve Bank changes rates.",
           correct: true,
           feedback: {
-            correct: "True. A variable bond moves with prime — great when rates fall, painful when they rise. That's why you stress-test the repayment before buying.",
-            incorrect: "It's true — a prime-linked bond changes with SARB rate moves. Budget for the repayment going up, not just today's rate.",
+            correct: "True. A variable bond moves with prime. Great when rates fall, painful when they rise. That's why you stress-test the repayment before buying.",
+            incorrect: "It's true, a prime-linked bond changes with SARB rate moves. Budget for the repayment going up, not just today's rate.",
           },
         },
       },
@@ -417,7 +417,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. It's income-tested: first-time buyers earning R3 501–R22 000/month can get a sliding-scale subsidy that reduces their bond.",
-            incorrect: "It's for first-time buyers earning R3 501–R22 000/month — means-tested, and not if you've owned property before.",
+            incorrect: "It's for first-time buyers earning R3 501–R22 000/month. Means-tested, and not if you've owned property before.",
           },
         },
       },
@@ -428,7 +428,7 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "First Home Finance (formerly FLISP) is available to all home buyers regardless of income.",
           correct: false,
           feedback: {
-            correct: "Correct. It's means-tested — only first-time buyers earning R3 501–R22 000/month qualify, and not if you've owned property before.",
+            correct: "Correct. It's means-tested, only first-time buyers earning R3 501–R22 000/month qualify, and not if you've owned property before.",
             incorrect: "It's income-tested, not universal. Only first-time buyers in the R3 501–R22 000/month band qualify.",
           },
         },
@@ -446,7 +446,7 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The subsidy (roughly R39k–R169k, more for lower incomes) is applied to shrink her bond — real help for a qualifying first-time buyer.",
+            correct: "Right. The subsidy (roughly R39k–R169k, more for lower incomes) is applied to shrink her bond. Real help for a qualifying first-time buyer.",
             incorrect: "It's a once-off, income-linked subsidy that reduces her bond. Lower earners get more; it's a leg-up, not a free house.",
           },
         },
@@ -460,7 +460,7 @@ const lesson2Layout: LessonLayoutItem[] = [
     type: "info",
     title: "How a Bond Really Works",
     content:
-      "<p>A home loan (a <strong>bond</strong> in SA) is a secured loan — the property is collateral, so if you stop paying, the bank can repossess it.</p><p><strong>Key terms:</strong> <strong>LTV</strong> (loan ÷ value — lower is safer for the bank, often a better rate); <strong>Prime rate</strong> (set by the SARB's repo rate; your bond is prime ± a spread for your credit risk); <strong>First Home Finance</strong> (formerly FLISP — a government subsidy for first-time buyers earning R3 501–R22 000/month that reduces your bond). Your actual rate depends on prime and your profile, so always stress-test against rate rises.</p>",
+      "<p>A home loan (a <strong>bond</strong> in SA) is a secured loan. The property is collateral, so if you stop paying, the bank can repossess it.</p><p><strong>Key terms:</strong> <strong>LTV</strong> (loan ÷ value. Lower is safer for the bank, often a better rate); <strong>Prime rate</strong> (set by the SARB's repo rate; your bond is prime ± a spread for your credit risk); <strong>First Home Finance</strong> (formerly FLISP: a government subsidy for first-time buyers earning R3 501–R22 000/month that reduces your bond). Your actual rate depends on prime and your profile, so always stress-test against rate rises.</p>",
   },
   { slot: "property/lesson-2/ltv-what" },
   { slot: "property/lesson-2/ltv-deposit" },
@@ -503,7 +503,7 @@ const lesson3Slots: QuestionSlot[] = [
           prompt: "A property is listed at R1 200 000. A 10% deposit is R____.",
           correct: 120000,
           feedback: {
-            correct: "Correct: 10% of R1 200 000 = R120 000 — and remember you still need transfer and bond-registration costs on top.",
+            correct: "Correct: 10% of R1 200 000 = R120 000, and remember you still need transfer and bond-registration costs on top.",
             incorrect: "10% of R1 200 000 = R120 000 (plus separate cash for transfer and registration costs).",
           },
         },
@@ -515,7 +515,7 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "Your deposit is the only upfront cash you need to buy a home.",
           correct: false,
           feedback: {
-            correct: "Correct. On top of the deposit you need transfer duty (above R1 210 000), bond registration and transfer attorney fees — often R80k–R150k more.",
+            correct: "Correct. On top of the deposit you need transfer duty (above R1 210 000), bond registration and transfer attorney fees, often R80k–R150k more.",
             incorrect: "There's more than the deposit: transfer duty, bond registration and transfer fees can add tens of thousands upfront.",
           },
         },
@@ -540,7 +540,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. More deposit = less borrowed = lower repayment, plus a lower LTV that often earns a better rate. It also gives you instant equity.",
-            incorrect: "A bigger deposit shrinks the loan and repayment and usually improves the rate — and builds immediate equity.",
+            incorrect: "A bigger deposit shrinks the loan and repayment and usually improves the rate, and builds immediate equity.",
           },
         },
       },
@@ -550,7 +550,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Where should Lerato save a house deposit she'll use in about two years?",
           options: [
-            "A separate accessible account (money market or notice), automated on payday",
+            "A separate accessible account , automated on payday",
             "In volatile single shares",
             "Under her mattress",
             "Spent slowly 'to enjoy it'",
@@ -558,7 +558,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. A two-year deposit needs stability and access, not market risk. Automate a debit order into a separate savings account so it grows untouched.",
-            incorrect: "Keep a short-horizon deposit stable and separate — a money-market or notice account, automated. Shares could dip right when she needs it.",
+            incorrect: "Keep a short-horizon deposit stable and separate, a money-market or notice account, automated. Shares could dip right when she needs it.",
           },
         },
       },
@@ -566,11 +566,11 @@ const lesson3Slots: QuestionSlot[] = [
         variantId: "db-equity-tf",
         step: {
           type: "true-false",
-          statement: "A deposit gives you immediate equity — a stake in the property you own from day one.",
+          statement: "A deposit gives you immediate equity. A stake in the property you own from day one.",
           correct: true,
           feedback: {
             correct: "True. Put down R200 000 and you own that much of the home outright immediately, rather than owing the full price to the bank.",
-            incorrect: "It's true — your deposit is instant equity. It's the portion of the home that's yours, not the bank's, from the start.",
+            incorrect: "It's true. Your deposit is instant equity. It's the portion of the home that's yours, not the bank's, from the start.",
           },
         },
       },
@@ -617,8 +617,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "A guarantor who stands surety on your bond becomes liable if you default.",
           correct: true,
           feedback: {
-            correct: "True. A guarantor can help a thin credit profile, but they take on real risk — if you can't pay, the bank can pursue them. Only ask someone who understands that.",
-            incorrect: "It's true — a guarantor is on the hook if you default. It's a serious favour to ask, not a formality.",
+            correct: "True. A guarantor can help a thin credit profile, but they take on real risk, if you can't pay, the bank can pursue them. Only ask someone who understands that.",
+            incorrect: "It's true. A guarantor is on the hook if you default. It's a serious favour to ask, not a formality.",
           },
         },
       },
@@ -635,8 +635,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "A 100% bond (no deposit) usually comes with a higher interest rate than a bond with a deposit.",
           correct: true,
           feedback: {
-            correct: "True. No deposit means a 100% LTV — maximum risk for the bank, so it prices the rate higher. A deposit almost always saves you money over time.",
-            incorrect: "It's true — a 100% bond is the bank's riskiest, so it usually carries a higher rate. A deposit lowers both the loan and the rate.",
+            correct: "True. No deposit means a 100% LTV: maximum risk for the bank, so it prices the rate higher. A deposit almost always saves you money over time.",
+            incorrect: "It's true. A 100% bond is the bank's riskiest, so it usually carries a higher rate. A deposit lowers both the loan and the rate.",
           },
         },
       },
@@ -646,10 +646,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo qualifies for a 100% bond but could save 10% first. Purely on cost, which is usually cheaper long-term?",
           options: [
-            "Saving a deposit first — smaller loan and a likely better rate",
+            "Saving a deposit first, smaller loan and a likely better rate",
             "The 100% bond, always",
             "They cost exactly the same",
-            "Neither — renting forever is the only option",
+            "Neither. Renting forever is the only option",
           ],
           correct: 0,
           feedback: {
@@ -665,13 +665,13 @@ const lesson3Slots: QuestionSlot[] = [
           question: "When might a 100% bond still make sense despite the higher rate?",
           options: [
             "When waiting to save a deposit would cost more in rent and rising prices than the rate premium",
-            "Always — deposits are pointless",
+            "Always. Deposits are pointless",
             "Never, under any circumstances",
             "Only for luxury homes",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. It's a trade-off. If saving a deposit would take years of rising prices and rent, a 100% bond can be reasonable — just go in with eyes open.",
+            correct: "Right. It's a trade-off. If saving a deposit would take years of rising prices and rent, a 100% bond can be reasonable. Just go in with eyes open.",
             incorrect: "It can make sense when the cost of waiting (rent + price rises) outweighs the rate premium. It's a judgement call, not never/always.",
           },
         },
@@ -685,7 +685,7 @@ const lesson3Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Why Your Deposit Changes Everything",
     content:
-      "<p>Most SA banks want a deposit of <strong>10–20%</strong> of the purchase price, though 100% bonds exist for strong credit profiles. A bigger deposit means a lower monthly repayment, often a better rate (lower LTV), and immediate equity.</p><p>Save it in a separate accessible account (money-market or 32-day notice), automated on payday. Get an <strong>Approval in Principle</strong> from a bank or originator (ooba, BetterBond) before you make an offer — it tells you your budget and makes your offer credible. Remember: on top of the deposit you'll need transfer and bond-registration costs.</p>",
+      "<p>Most SA banks want a deposit of <strong>10–20%</strong> of the purchase price, though 100% bonds exist for strong credit profiles. A bigger deposit means a lower monthly repayment, often a better rate (lower LTV), and immediate equity.</p><p>Save it in a separate accessible account (money-market or 32-day notice), automated on payday. Get an <strong>Approval in Principle</strong> from a bank or originator (ooba, BetterBond) before you make an offer. It tells you your budget and makes your offer credible. Remember: on top of the deposit you'll need transfer and bond-registration costs.</p>",
   },
   { slot: "property/lesson-3/deposit-range" },
   { slot: "property/lesson-3/deposit-benefits" },
@@ -741,7 +741,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The buyer pays transfer duty, calculated on the purchase price (or market value if higher). Budget for it as upfront cash.",
-            incorrect: "The buyer pays it — on the purchase price or market value, whichever is higher. Plan for it as an upfront cost.",
+            incorrect: "The buyer pays it, on the purchase price or market value, whichever is higher. Plan for it as an upfront cost.",
           },
         },
       },
@@ -770,7 +770,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho buys a home for R1 100 000. How much transfer duty does he pay?",
           options: [
-            "R0 — it's below the R1 210 000 exemption threshold",
+            "R0.",
             "R33 000",
             "3% of the full price",
             "R8 700",
@@ -790,7 +790,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. It's a sliding scale: the first R1 210 000 is free, and only the amount above it is taxed (starting at 3%). That keeps the duty modest near the threshold.",
-            incorrect: "It's true — like income tax, it's marginal. Only the slice above R1 210 000 is taxed, not the entire purchase price.",
+            incorrect: "It's true. Like income tax, it's marginal. Only the slice above R1 210 000 is taxed, not the entire purchase price.",
           },
         },
       },
@@ -825,8 +825,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "Bond registration and transfer attorney fees are once-off costs paid when you buy.",
           correct: true,
           feedback: {
-            correct: "True. These attorney fees (often tens of thousands, scaling with the price) are paid upfront at purchase — separate from, and on top of, your deposit.",
-            incorrect: "It's true — bond registration and transfer fees are once-off purchase costs, paid to attorneys on top of your deposit.",
+            correct: "True. These attorney fees (often tens of thousands, scaling with the price) are paid upfront at purchase: separate from, and on top of, your deposit.",
+            incorrect: "It's true. Bond registration and transfer fees are once-off purchase costs, paid to attorneys on top of your deposit.",
           },
         },
       },
@@ -836,15 +836,15 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa saved exactly a 10% deposit and nothing more. What has she likely forgotten?",
           options: [
-            "The once-off transfer and bond-registration costs (often R80k–R150k)",
-            "Nothing — the deposit covers everything",
+            "The once-off transfer and bond-registration costs",
+            "Nothing. The deposit covers everything",
             "That she needs to pay the seller's rates",
             "That deposits are refundable",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Buyers routinely forget the once-off costs. On top of the deposit, transfer and registration can add R80k–R150k — cash she needs ready.",
-            incorrect: "She's forgotten the upfront transfer and registration costs — often R80k–R150k more than the deposit alone.",
+            correct: "Right. Buyers routinely forget the once-off costs. On top of the deposit, transfer and registration can add R80k–R150k. Cash she needs ready.",
+            incorrect: "She's forgotten the upfront transfer and registration costs, often R80k–R150k more than the deposit alone.",
           },
         },
       },
@@ -871,11 +871,11 @@ const lesson4Slots: QuestionSlot[] = [
         variantId: "mn-owner-tf",
         step: {
           type: "true-false",
-          statement: "As a homeowner, repairs and maintenance are your cost — there's no landlord to call.",
+          statement: "As a homeowner, repairs and maintenance are your cost. There's no landlord to call.",
           correct: true,
           feedback: {
-            correct: "True. A burst geyser, a leaking roof, a failing gate motor — all yours to fund. Budgeting ~1% of value a year stops these becoming debt.",
-            incorrect: "It's true — owners carry all maintenance. Setting aside ~1% of the home's value yearly keeps surprise repairs off a credit card.",
+            correct: "True. A burst geyser, a leaking roof, a failing gate motor, all yours to fund. Budgeting ~1% of value a year stops these becoming debt.",
+            incorrect: "It's true: owners carry all maintenance. Setting aside ~1% of the home's value yearly keeps surprise repairs off a credit card.",
           },
         },
       },
@@ -885,8 +885,8 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo budgets his bond, rates and insurance but nothing for maintenance. What's the risk?",
           options: [
-            "A big repair (like a R25 000 geyser or roof job) lands on credit at high interest",
-            "Nothing — homes never need repairs",
+            "A big repair lands on credit at high interest",
+            "Nothing. Homes never need repairs",
             "The bank pays for repairs",
             "Maintenance is always free",
           ],
@@ -906,7 +906,7 @@ const lesson4Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Costs Nobody Tells You About",
     content:
-      "<p>The purchase price is just the start. <strong>Once-off:</strong> transfer duty (only above R1 210 000 — e.g. on R1.5m it's 3% of the R290 000 above the threshold = R8 700), bond registration and transfer attorney fees (often tens of thousands), plus moving costs. <strong>Ongoing:</strong> municipal rates, levies (sectional title), home insurance, and a maintenance reserve of about 1% of the property's value per year (R15 000/year on a R1.5m home).</p><p>Together, upfront extras can add R80 000–R150 000, and ongoing costs R2 000–R6 000/month, on top of the bond.</p>",
+      "<p>The purchase price is just the start. <strong>Once-off:</strong> transfer duty (only above R1 210 000. E.g. on R1.5m it's 3% of the R290 000 above the threshold = R8 700), bond registration and transfer attorney fees (often tens of thousands), plus moving costs. <strong>Ongoing:</strong> municipal rates, levies (sectional title), home insurance, and a maintenance reserve of about 1% of the property's value per year (R15 000/year on a R1.5m home).</p><p>Together, upfront extras can add R80 000–R150 000, and ongoing costs R2 000–R6 000/month, on top of the bond.</p>",
   },
   { slot: "property/lesson-4/transfer-duty-threshold" },
   { slot: "property/lesson-4/transfer-duty-calc" },
@@ -930,8 +930,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Paying rent every month means you have nothing to show for it financially.",
           correct: false,
           feedback: {
-            correct: "Correct. Rent buys housing, flexibility, no maintenance costs, and the freedom to invest your deposit capital elsewhere — potentially out-earning property.",
-            incorrect: "'Rent is dead money' is a myth. It buys housing and flexibility, and frees your capital to invest — sometimes for a better return than property.",
+            correct: "Correct. Rent buys housing, flexibility, no maintenance costs, and the freedom to invest your deposit capital elsewhere, potentially out-earning property.",
+            incorrect: "'Rent is dead money' is a myth. It buys housing and flexibility, and frees your capital to invest, sometimes for a better return than property.",
           },
         },
       },
@@ -948,7 +948,7 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Renting isn't 'throwing money away' — it's paying for housing and flexibility while your would-be deposit works elsewhere.",
+            correct: "Right. Renting isn't 'throwing money away'. It's paying for housing and flexibility while your would-be deposit works elsewhere.",
             incorrect: "Renting buys housing, flexibility and freedom from maintenance, and lets your capital invest elsewhere. That's real value.",
           },
         },
@@ -961,7 +961,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Your timeframe, city, the price-to-rent ratio and your discipline to invest all matter. 'Always buy' is a myth, not a law.",
-            incorrect: "It's true — the right answer depends on your situation. Neither renting nor buying is universally smarter.",
+            incorrect: "It's true. The right answer depends on your situation. Neither renting nor buying is universally smarter.",
           },
         },
       },
@@ -977,14 +977,14 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the main financial risk of buying a home you plan to sell within about two years?",
           options: [
-            "Transaction costs (transfer duty, fees, agent commission) may exceed any price growth",
+            "Transaction costs may exceed any price growth",
             "Property values always fall over two years",
             "You can never rent it out",
             "Bond rates are fixed so you overpay",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Buying and selling costs — transfer duty, registration, and 5–6% agent commission — can total R100k–R200k. The price must jump a lot just to break even.",
+            correct: "Right. Buying and selling costs (transfer duty, registration, and 5–6% agent commission) can total R100k–R200k. The price must jump a lot just to break even.",
             incorrect: "It's the transaction costs. Duty, fees and agent commission can swallow a short-term gain and more, so a quick sale often loses money.",
           },
         },
@@ -997,7 +997,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The upfront and exit costs are large, so it typically takes years of price growth to recover them. Short stays favour renting.",
-            incorrect: "It's true — high transaction costs mean buying often takes several years to beat renting. A short horizon tilts toward renting.",
+            incorrect: "It's true. High transaction costs mean buying often takes several years to beat renting. A short horizon tilts toward renting.",
           },
         },
       },
@@ -1007,15 +1007,15 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Ayesha expects to move cities for work within two years. Rent or buy?",
           options: [
-            "Rent — she'd likely lose money on transaction costs if she buys and sells quickly",
-            "Buy — always buy",
+            "Rent. She'd likely lose money on transaction costs if she buys and sells quickly",
+            "Buy. Always buy",
             "Buy two properties",
             "Buy and leave it empty",
           ],
           correct: 0,
           feedback: {
             correct: "Right. With a two-year horizon, the costs of buying then selling would probably wipe out any gain. Renting keeps her flexible and better off.",
-            incorrect: "For a two-year stay, renting wins — buying-and-selling costs would likely exceed any price growth. Flexibility is worth more here.",
+            incorrect: "For a two-year stay, renting wins. Buying-and-selling costs would likely exceed any price growth. Flexibility is worth more here.",
           },
         },
       },
@@ -1034,7 +1034,7 @@ const lesson5Slots: QuestionSlot[] = [
             "The return that money could have earned if invested elsewhere",
             "The estate agent's fee",
             "The cost of moving boxes",
-            "Nothing — a deposit has no opportunity cost",
+            "Nothing. A deposit has no opportunity cost",
           ],
           correct: 0,
           feedback: {
@@ -1056,8 +1056,8 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Property gives leverage and a home; investing may give higher returns. The answer depends on your city, expected returns and timeline — compare them.",
-            incorrect: "There's no automatic answer — compare the likely wealth from each path for your situation. Both a deposit and investing have merit.",
+            correct: "Right. Property gives leverage and a home; investing may give higher returns. The answer depends on your city, expected returns and timeline. Compare them.",
+            incorrect: "There's no automatic answer. Compare the likely wealth from each path for your situation. Both a deposit and investing have merit.",
           },
         },
       },
@@ -1068,8 +1068,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Residential rental yields in SA are often below 6%, sometimes less than a money-market account pays.",
           correct: true,
           feedback: {
-            correct: "True. R7 000/month rent on a R1.5m property is a 5.6% gross yield — and that's before costs. It's why buy-to-let isn't automatically a great investment.",
-            incorrect: "It's true — residential yields are frequently under 6%. Property's appeal is leverage and lifestyle, not always raw income return.",
+            correct: "True. R7 000/month rent on a R1.5m property is a 5.6% gross yield, and that's before costs. It's why buy-to-let isn't automatically a great investment.",
+            incorrect: "It's true. Residential yields are frequently under 6%. Property's appeal is leverage and lifestyle, not always raw income return.",
           },
         },
       },
@@ -1092,7 +1092,7 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Renting lets you move on short notice without the cost and delay of selling — valuable when your life or career might change.",
+            correct: "Right. Renting lets you move on short notice without the cost and delay of selling. Valuable when your life or career might change.",
             incorrect: "Flexibility is renting's edge. Owning builds equity but ties you down; selling to move is slow and costly.",
           },
         },
@@ -1105,7 +1105,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Structural and major repairs are typically the landlord's problem, not the tenant's. That's one less financial risk renters carry.",
-            incorrect: "It's true — big maintenance is usually the landlord's cost. Renters swap equity for freedom from those repair bills.",
+            incorrect: "It's true. Big maintenance is usually the landlord's cost. Renters swap equity for freedom from those repair bills.",
           },
         },
       },
@@ -1136,7 +1136,7 @@ const lesson5Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Renting Is Not Wasted Money",
     content:
-      "<p>The idea that renting is 'throwing money away' is one of the most damaging money myths. Renting is often the smarter choice — when you might move within a few years (transaction costs take years to recover), when your deposit could earn more invested elsewhere, in a high price-to-rent city, when you value flexibility, or when buying would stretch you dangerously thin.</p><p>Think about opportunity cost: R200 000 as a deposit lowers your loan, but the same R200 000 invested at ~10%/year could grow to about R520 000 in 10 years. And residential rental yields are often under 6% — sometimes less than a money-market account. The right answer depends on your circumstances.</p>",
+      "<p>The idea that renting is 'throwing money away' is one of the most damaging money myths. Renting is often the smarter choice. When you might move within a few years (transaction costs take years to recover), when your deposit could earn more invested elsewhere, in a high price-to-rent city, when you value flexibility, or when buying would stretch you dangerously thin.</p><p>Think about opportunity cost: R200 000 as a deposit lowers your loan, but the same R200 000 invested at ~10%/year could grow to about R520 000 in 10 years. And residential rental yields are often under 6%: sometimes less than a money-market account. The right answer depends on your circumstances.</p>",
   },
   { slot: "property/lesson-5/not-wasted" },
   { slot: "property/lesson-5/short-stay" },
@@ -1178,8 +1178,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "The 'rent and invest the difference' strategy only works if you actually invest the difference.",
           correct: true,
           feedback: {
-            correct: "True. On paper the renter-investor can come out ahead — but only with the discipline to invest the monthly saving every month, not spend it.",
-            incorrect: "It's true — discipline is the whole game. Rent-and-invest beats buying only if the savings are genuinely invested, consistently.",
+            correct: "True. On paper the renter-investor can come out ahead, but only with the discipline to invest the monthly saving every month, not spend it.",
+            incorrect: "It's true. Discipline is the whole game. Rent-and-invest beats buying only if the savings are genuinely invested, consistently.",
           },
         },
       },
@@ -1189,14 +1189,14 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato rents for R9 500 instead of a R18 000 all-in bond, but spends the R8 500 difference each month. How does she end up?",
           options: [
-            "Worse off — she got renting's flexibility but built no wealth from the saving",
+            "Worse off, she got renting's flexibility but built no wealth from the saving",
             "Automatically richer than a buyer",
             "Exactly the same as a buyer",
             "She owns the flat after a year",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Renting only beats buying if she invests the difference. Spending it means she gets flexibility but no offsetting wealth — the worst of both.",
+            correct: "Right. Renting only beats buying if she invests the difference. Spending it means she gets flexibility but no offsetting wealth, the worst of both.",
             incorrect: "Spending the difference defeats the strategy. Renting-and-investing only works if the R8 500 is invested, not spent.",
           },
         },
@@ -1225,14 +1225,14 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "If shares have historically returned more than property, why do people still buy homes?",
           options: [
-            "Leverage, lifestyle, security and a place to live — not just raw return",
+            "Leverage, lifestyle, security and a place to live, not just raw return",
             "Because property always beats shares",
             "Because shares are illegal",
             "There's no reason to buy a home",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A home isn't only an investment — it's where you live, plus you buy it with leverage (a bond) and it forces a kind of saving. Return isn't the whole story.",
+            correct: "Right. A home isn't only an investment. It's where you live, plus you buy it with leverage (a bond) and it forces a kind of saving. Return isn't the whole story.",
             incorrect: "It's about more than return: a home gives you somewhere to live, uses leverage, and enforces saving. Those are real, non-financial reasons.",
           },
         },
@@ -1241,11 +1241,11 @@ const lesson6Slots: QuestionSlot[] = [
         variantId: "jvp-leverage-tf",
         step: {
           type: "true-false",
-          statement: "One reason property can build wealth despite lower returns is leverage — you control a large asset with a smaller deposit.",
+          statement: "One reason property can build wealth despite lower returns is leverage: you control a large asset with a smaller deposit.",
           correct: true,
           feedback: {
-            correct: "True. Put down R150k on a R1.5m home and you gain (or lose) on the full R1.5m. Leverage amplifies returns — and risk — which is part of property's appeal.",
-            incorrect: "It's true — leverage is key. A small deposit controls a big asset, so even modest price growth works on the full value. It cuts both ways, though.",
+            correct: "True. Put down R150k on a R1.5m home and you gain (or lose) on the full R1.5m. Leverage amplifies returns, and risk, which is part of property's appeal.",
+            incorrect: "It's true. Leverage is key. A small deposit controls a big asset, so even modest price growth works on the full value. It cuts both ways, though.",
           },
         },
       },
@@ -1261,7 +1261,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the honest conclusion of a rent-vs-buy comparison?",
           options: [
-            "Neither is universally right — it depends on your city, returns, timeline and discipline",
+            "Neither is universally right. It depends on your city, returns, timeline and discipline",
             "Buying always wins",
             "Renting always wins",
             "It's impossible to compare",
@@ -1269,7 +1269,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The maths swings on your assumptions. A disciplined investor in a pricey city may rent; a long-term settler in an affordable one may buy. Run YOUR numbers.",
-            incorrect: "There's no universal winner. It depends on your circumstances — city, expected returns, how long you'll stay, and your discipline to invest.",
+            incorrect: "There's no universal winner. It depends on your circumstances. City, expected returns, how long you'll stay, and your discipline to invest.",
           },
         },
       },
@@ -1279,7 +1279,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo plans to settle in one town for 20+ years and isn't a disciplined investor. What likely suits him?",
           options: [
-            "Buying — a long stay recovers transaction costs, and the bond forces saving",
+            "Buying. A long stay recovers transaction costs, and the bond forces saving",
             "Renting forever, definitely",
             "Moving every year",
             "Never having a home",
@@ -1287,7 +1287,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Over 20+ years the transaction costs are recovered, and a bond enforces saving he might not do otherwise. For him, buying fits.",
-            incorrect: "For a long-term settler who won't invest diligently, buying often wins — time recovers the costs and the bond forces saving.",
+            incorrect: "For a long-term settler who won't invest diligently, buying often wins. Time recovers the costs and the bond forces saving.",
           },
         },
       },
@@ -1298,8 +1298,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "The best way to settle rent-vs-buy for yourself is to run the actual numbers for your situation.",
           correct: true,
           feedback: {
-            correct: "True. General rules argue both ways. Plug in your rent, bond, costs, expected returns and how long you'll stay — the honest answer falls out of your own maths.",
-            incorrect: "It's true — don't rely on slogans. Run your own numbers (rent, costs, returns, timeline) to see which wins for you.",
+            correct: "True. General rules argue both ways. Plug in your rent, bond, costs, expected returns and how long you'll stay. The honest answer falls out of your own maths.",
+            incorrect: "It's true. Don't rely on slogans. Run your own numbers (rent, costs, returns, timeline) to see which wins for you.",
           },
         },
       },
@@ -1317,7 +1317,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Leverage cuts both ways: a small deposit on a big asset boosts your return if prices climb, but a price drop can wipe out your equity fast.",
-            incorrect: "It's true — leverage amplifies both directions. The same force that boosts gains in a rising market deepens losses in a falling one.",
+            incorrect: "It's true, leverage amplifies both directions. The same force that boosts gains in a rising market deepens losses in a falling one.",
           },
         },
       },
@@ -1334,8 +1334,8 @@ const lesson6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. If prices drop below your outstanding loan, you're in negative equity — selling wouldn't clear the bond. A deposit and not over-paying reduce this risk.",
-            incorrect: "It's owing more than the home is worth. A price fall below your loan puts you there — a real risk of buying with little deposit at a stretched price.",
+            correct: "Right. If prices drop below your outstanding loan, you're in negative equity. Selling wouldn't clear the bond. A deposit and not over-paying reduce this risk.",
+            incorrect: "It's owing more than the home is worth. A price fall below your loan puts you there, a real risk of buying with little deposit at a stretched price.",
           },
         },
       },
@@ -1366,7 +1366,7 @@ const lesson6Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Numbers Tell the Real Story",
     content:
-      "<p>Compare renting vs buying the same R1 500 000 home over 20 years. <strong>Buying</strong> (R150k deposit, a bond plus rates, insurance and maintenance, ~R120k upfront costs) leaves you with a paid-off asset — but you've paid far more out of pocket along the way. <strong>Renting and investing</strong> the monthly difference (and the upfront costs) at ~10%/year can build a comparable or larger portfolio.</p><p>In many SA markets, a disciplined renter-investor ends up with equal or greater wealth — but only if they actually invest the savings. Property's edge is leverage, lifestyle and forced saving. Neither answer is universally right; it depends on your city, returns, timeline and discipline.</p>",
+      "<p>Compare renting vs buying the same R1 500 000 home over 20 years. <strong>Buying</strong> (R150k deposit, a bond plus rates, insurance and maintenance, ~R120k upfront costs) leaves you with a paid-off asset, but you've paid far more out of pocket along the way. <strong>Renting and investing</strong> the monthly difference (and the upfront costs) at ~10%/year can build a comparable or larger portfolio.</p><p>In many SA markets, a disciplined renter-investor ends up with equal or greater wealth, but only if they actually invest the savings. Property's edge is leverage, lifestyle and forced saving. Neither answer is universally right; it depends on your city, returns, timeline and discipline.</p>",
   },
   { slot: "property/lesson-6/key-assumption" },
   { slot: "property/lesson-6/jse-vs-property" },

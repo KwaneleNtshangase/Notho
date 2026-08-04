@@ -30,7 +30,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: false,
           feedback: {
             correct: "Correct. This is the great tax myth. The higher rate only applies to the income ABOVE the bracket line, so a raise always increases your take-home.",
-            incorrect: "It can't. Only the portion above the threshold is taxed higher — you always keep more of a raise, never less.",
+            incorrect: "It can't. Only the portion above the threshold is taxed higher. You always keep more of a raise, never less.",
           },
         },
       },
@@ -43,7 +43,7 @@ const lesson1Slots: QuestionSlot[] = [
             "Only the income above that bracket's threshold",
             "Your entire salary",
             "All income from the previous year too",
-            "Nothing — brackets don't exist",
+            "Nothing. Brackets don't exist",
           ],
           correct: 0,
           feedback: {
@@ -58,15 +58,15 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho turns down a raise, fearing it'll push him into a higher bracket and cut his take-home. Good idea?",
           options: [
-            "No — a raise always increases take-home; only the extra rands are taxed higher",
-            "Yes — higher brackets reduce your whole salary",
-            "Yes — raises are usually a trap",
+            "No. A raise always increases take-home; only the extra rands are taxed higher",
+            "Yes. Higher brackets reduce your whole salary",
+            "Yes. Raises are usually a trap",
             "Only if he earns over R1 million",
           ],
           correct: 0,
           feedback: {
             correct: "Right. He's falling for the myth. The higher rate only touches the new income, so he'd keep more overall. Never refuse a raise over brackets.",
-            incorrect: "He should take the raise. Marginal tax means only the extra income is taxed higher — his take-home still goes up.",
+            incorrect: "He should take the raise. Marginal tax means only the extra income is taxed higher. His take-home still goes up.",
           },
         },
       },
@@ -82,15 +82,15 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "If you earn R90 000 a year, how much income tax do you pay (2026/27, under 65)?",
           options: [
-            "Zero — you're below the tax threshold",
+            "Zero. You're below the tax threshold",
             "About R16 000",
             "Exactly 18% of R90 000",
             "About R8 000",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The 2026/27 tax threshold for under-65s is R99 000. Earn below that and the primary rebate wipes out your tax — you owe nothing.",
-            incorrect: "Below the R99 000 threshold (2026/27) you pay no income tax — the rebate cancels it out.",
+            correct: "Right. The 2026/27 tax threshold for under-65s is R99 000. Earn below that and the primary rebate wipes out your tax, you owe nothing.",
+            incorrect: "Below the R99 000 threshold (2026/27) you pay no income tax: the rebate cancels it out.",
           },
         },
       },
@@ -102,7 +102,7 @@ const lesson1Slots: QuestionSlot[] = [
           prompt: "In 2026/27, someone under 65 pays no income tax until their annual income passes about R____ (in rands).",
           correct: 99000,
           feedback: {
-            correct: "Correct — R99 000 for 2026/27. Below it, the primary rebate (R17 820) cancels the tax.",
+            correct: "Correct, R99 000 for 2026/27. Below it, the primary rebate (R17 820) cancels the tax.",
             incorrect: "The under-65 threshold is R99 000 for 2026/27.",
           },
         },
@@ -115,7 +115,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The primary rebate (R17 820 in 2026/27) is subtracted from your tax, so income up to R99 000 ends up taxed at effectively zero.",
-            incorrect: "It's true — the rebate offsets your tax, creating the tax-free threshold (R99 000 for under-65s in 2026/27).",
+            incorrect: "It's true, the rebate offsets your tax, creating the tax-free threshold (R99 000 for under-65s in 2026/27).",
           },
         },
       },
@@ -133,7 +133,7 @@ const lesson1Slots: QuestionSlot[] = [
           options: ["45%", "27.5%", "40%", "60%"],
           correct: 0,
           feedback: {
-            correct: "Right. The top marginal rate is 45%, applied only to income in the highest bracket — not to a high earner's whole salary.",
+            correct: "Right. The top marginal rate is 45%, applied only to income in the highest bracket, not to a high earner's whole salary.",
             incorrect: "It's 45%, and only on the top slice of a high earner's income, thanks to the marginal system.",
           },
         },
@@ -145,8 +145,8 @@ const lesson1Slots: QuestionSlot[] = [
           statement: "Even a top earner on the 45% rate doesn't pay 45% on their entire income.",
           correct: true,
           feedback: {
-            correct: "True. Their income is taxed in slices — 18%, then 26%, and so on — with 45% only on the portion in the top bracket. Their average rate is lower.",
-            incorrect: "It's true — 45% applies only to the top slice. Lower slices are taxed at lower rates, so the average rate is well below 45%.",
+            correct: "True. Their income is taxed in slices (18%, then 26%, and so on) with 45% only on the portion in the top bracket. Their average rate is lower.",
+            incorrect: "It's true. 45% applies only to the top slice. Lower slices are taxed at lower rates, so the average rate is well below 45%.",
           },
         },
       },
@@ -188,7 +188,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. SARS takes what you owe but won't chase you to claim deductions. Knowing about RAs, medical credits and more can save you thousands a year.",
-            incorrect: "It's usually unclaimed deductions — RAs, medical credits, home office. The rules exist; you have to use them.",
+            incorrect: "It's usually unclaimed deductions: RAs, medical credits, home office. The rules exist; you have to use them.",
           },
         },
       },
@@ -213,11 +213,11 @@ const lesson1Slots: QuestionSlot[] = [
             "She overpays tax by not claiming the deduction she's entitled to",
             "SARS adds it for her automatically",
             "Her RA is cancelled",
-            "Nothing — RAs give no tax benefit",
+            "Nothing. RAs give no tax benefit",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. If the RA deduction isn't claimed on her return, she misses the tax saving — possibly thousands of rands she could have had back.",
+            correct: "Right. If the RA deduction isn't claimed on her return, she misses the tax saving. Possibly thousands of rands she could have had back.",
             incorrect: "She loses the tax saving. The RA deduction generally has to be claimed at filing to reduce her tax.",
           },
         },
@@ -231,7 +231,7 @@ const lesson1Layout: LessonLayoutItem[] = [
     type: "info",
     title: "How SARS Taxes Your Income",
     content:
-      "<p>SARS takes exactly what you owe — but won't tell you about the legal ways to pay less. Employees who don't know about RA deductions, medical credits and home-office deductions overpay by thousands every year.</p><p>SA uses marginal tax brackets: you only pay the higher rate on income above each threshold, never on your whole salary. For 2026/27, under-65s pay no tax below R99 000 (the primary rebate of R17 820 cancels it), and the top marginal rate is 45%. The myth that a raise can cut your take-home is impossible — you always keep more by earning more.</p>",
+      "<p>SARS takes exactly what you owe, but won't tell you about the legal ways to pay less. Employees who don't know about RA deductions, medical credits and home-office deductions overpay by thousands every year.</p><p>SA uses marginal tax brackets: you only pay the higher rate on income above each threshold, never on your whole salary. For 2026/27, under-65s pay no tax below R99 000 (the primary rebate of R17 820 cancels it), and the top marginal rate is 45%. The myth that a raise can cut your take-home is impossible. You always keep more by earning more.</p>",
   },
   { slot: "taxes/lesson-1/marginal-myth" },
   { slot: "taxes/lesson-1/threshold" },
@@ -262,7 +262,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Self-employment, multiple income sources, or wanting to claim deductions all trigger filing. A simple single-salary case often doesn't.",
-            incorrect: "Filing is triggered by self-employment, extra income sources, or claiming deductions — not by simply having a salary or an account.",
+            incorrect: "Filing is triggered by self-employment, extra income sources, or claiming deductions, not by simply having a salary or an account.",
           },
         },
       },
@@ -272,7 +272,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo earns R450 000 from one employer, has no other income and claims no deductions. Must he file?",
           options: [
-            "Often not — SARS may auto-assess him; he files if SARS asks or his situation changes",
+            "Often not. SARS may auto-assess him; he files if SARS asks or his situation changes",
             "Yes, every South African must file every year",
             "Only if he earns over R1 million",
             "Yes, but only every second year",
@@ -291,8 +291,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "If you want to claim deductions (like RA contributions or a home office), you generally need to file a return.",
           correct: true,
           feedback: {
-            correct: "True. Deductions aren't applied automatically — filing (or correcting your auto-assessment) is how you claim them and get money back.",
-            incorrect: "It's true — to claim deductions you file. That's how the RA, medical and home-office savings actually reach you.",
+            correct: "True. Deductions aren't applied automatically. Filing (or correcting your auto-assessment) is how you claim them and get money back.",
+            incorrect: "It's true, to claim deductions you file. That's how the RA, medical and home-office savings actually reach you.",
           },
         },
       },
@@ -310,7 +310,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Above R30 000 of non-salary income, you register for provisional tax and submit estimates twice a year (August and February).",
-            incorrect: "It's true — over R30 000 of non-salary income triggers provisional tax, with two estimates a year.",
+            incorrect: "It's true, over R30 000 of non-salary income triggers provisional tax, with two estimates a year.",
           },
         },
       },
@@ -320,10 +320,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Provisional taxpayers submit their estimates:",
           options: [
-            "Twice a year (around August and February)",
+            "Twice a year",
             "Every month",
             "Only once, at retirement",
-            "Never — SARS handles it",
+            "Never: SARS handles it",
           ],
           correct: 0,
           feedback: {
@@ -340,12 +340,12 @@ const lesson2Slots: QuestionSlot[] = [
           options: [
             "She should register for provisional tax on the freelance income",
             "It's tax-free because she already pays PAYE",
-            "Nothing — side income isn't taxed",
+            "Nothing, side income isn't taxed",
             "She must stop freelancing",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. R60 000 of non-salary income is over the R30 000 line, so she registers as a provisional taxpayer and declares it — set aside tax as she earns.",
+            correct: "Right. R60 000 of non-salary income is over the R30 000 line, so she registers as a provisional taxpayer and declares it. Set aside tax as she earns.",
             incorrect: "The freelance income is taxable and over R30 000, so she registers for provisional tax. PAYE only covers her salary.",
           },
         },
@@ -363,8 +363,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "Filing your tax return late can lead to monthly administrative penalties from SARS.",
           correct: true,
           feedback: {
-            correct: "True. Late submission carries a monthly admin penalty (scaling with income). Filing correctly and on time — even a nil return — is always cheaper than ignoring it.",
-            incorrect: "It's true — SARS charges monthly penalties for late returns. On-time filing avoids them entirely.",
+            correct: "True. Late submission carries a monthly admin penalty (scaling with income). Filing correctly and on time, even a nil return, is always cheaper than ignoring it.",
+            incorrect: "It's true. SARS charges monthly penalties for late returns. On-time filing avoids them entirely.",
           },
         },
       },
@@ -374,15 +374,15 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho is scared of his tax return so he ignores it for months. What's the risk?",
           options: [
-            "Monthly penalties and interest pile up — ignoring it is the most expensive option",
-            "Nothing — SARS forgets about it",
+            "Monthly penalties and interest pile up. Ignoring it is the most expensive option",
+            "Nothing, SARS forgets about it",
             "He gets a discount for waiting",
             "His tax disappears",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Avoidance is the costly choice: penalties and interest accumulate. Filing (or asking for help) early is always cheaper than hiding.",
-            incorrect: "Ignoring it triggers escalating penalties and interest. Facing it — even late — beats letting it grow.",
+            incorrect: "Ignoring it triggers escalating penalties and interest. Facing it, even late, beats letting it grow.",
           },
         },
       },
@@ -432,11 +432,11 @@ const lesson2Slots: QuestionSlot[] = [
         variantId: "ef-check-tf",
         step: {
           type: "true-false",
-          statement: "Even if SARS auto-assesses you, it's worth checking it before accepting — in case a deduction is missing.",
+          statement: "Even if SARS auto-assesses you, it's worth checking it before accepting. In case a deduction is missing.",
           correct: true,
           feedback: {
             correct: "True. Auto-assessments use the data SARS has. If your RA or medical details are missing, accepting blindly could cost you a refund. Check first.",
-            incorrect: "It's true — always review an auto-assessment. Missing deductions mean you'd overpay unless you correct it.",
+            incorrect: "It's true. Always review an auto-assessment. Missing deductions mean you'd overpay unless you correct it.",
           },
         },
       },
@@ -453,8 +453,8 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. For a complex situation, a registered practitioner usually saves more than they cost — and keeps her out of penalty trouble.",
-            incorrect: "With multiple income types, a registered tax practitioner is worth it — accuracy avoids penalties and captures deductions.",
+            correct: "Right. For a complex situation, a registered practitioner usually saves more than they cost, and keeps her out of penalty trouble.",
+            incorrect: "With multiple income types, a registered tax practitioner is worth it: accuracy avoids penalties and captures deductions.",
           },
         },
       },
@@ -467,7 +467,7 @@ const lesson2Layout: LessonLayoutItem[] = [
     type: "info",
     title: "SARS eFiling: Who Has to Submit",
     content:
-      "<p>Many salaried employees don't need to file — PAYE handles it and SARS may auto-assess. But you generally <strong>must</strong> file if you're self-employed, have more than one income source, have taxable benefits not fully taxed via PAYE, earn investment or rental income, want to claim deductions (RA, medical, home office), or SARS asks you to.</p><p><strong>Provisional tax:</strong> earn more than R30 000/year from non-salary sources and you register as a provisional taxpayer, submitting estimates twice a year (August and February). Late filing carries monthly penalties — filing correctly and on time is always cheaper than ignoring it.</p>",
+      "<p>Many salaried employees don't need to file. PAYE handles it and SARS may auto-assess. But you generally <strong>must</strong> file if you're self-employed, have more than one income source, have taxable benefits not fully taxed via PAYE, earn investment or rental income, want to claim deductions (RA, medical, home office), or SARS asks you to.</p><p><strong>Provisional tax:</strong> earn more than R30 000/year from non-salary sources and you register as a provisional taxpayer, submitting estimates twice a year (August and February). Late filing carries monthly penalties. Filing correctly and on time is always cheaper than ignoring it.</p>",
   },
   { slot: "taxes/lesson-2/who-files" },
   { slot: "taxes/lesson-2/provisional" },
@@ -490,15 +490,15 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the single biggest legal tax deduction available to most South Africans?",
           options: [
-            "Retirement fund contributions (up to 27.5% of income)",
+            "Retirement fund contributions",
             "Buying a new car",
             "Eating out",
             "A gym membership",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Contributions to retirement funds (pension, provident, RA) are deductible up to 27.5% of income (with an annual cap) — the most powerful legal tax saver for most people.",
-            incorrect: "It's retirement contributions — up to 27.5% of income (capped). Nothing else comes close for the average taxpayer.",
+            correct: "Right. Contributions to retirement funds (pension, provident, RA) are deductible up to 27.5% of income (with an annual cap), the most powerful legal tax saver for most people.",
+            incorrect: "It's retirement contributions, up to 27.5% of income (capped). Nothing else comes close for the average taxpayer.",
           },
         },
       },
@@ -510,7 +510,7 @@ const lesson3Slots: QuestionSlot[] = [
           prompt: "You put R3 000/month into an RA and your marginal rate is 31%. Your monthly tax saving is R____.",
           correct: 930,
           feedback: {
-            correct: "Correct: R3 000 × 31% = R930/month saved — about R11 160 a year that compounds in your RA instead of going to SARS.",
+            correct: "Correct: R3 000 × 31% = R930/month saved: about R11 160 a year that compounds in your RA instead of going to SARS.",
             incorrect: "Tax saving = contribution × marginal rate: R3 000 × 31% = R930/month.",
           },
         },
@@ -523,7 +523,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. It's the lower of 27.5% of income or the annual rand cap set by SARS. Most people are limited by the 27.5%; high earners hit the rand cap.",
-            incorrect: "It's true — 27.5% of income up to an annual cap. Whichever is lower applies.",
+            incorrect: "It's true, 27.5% of income up to an annual cap. Whichever is lower applies.",
           },
         },
       },
@@ -540,7 +540,7 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "Medical scheme (medical aid) credits reduce your taxable income by the credit amount.",
           correct: false,
           feedback: {
-            correct: "Correct. They're a credit, not a deduction — subtracted directly from your tax owed, rand for rand. That makes them more valuable than a deduction.",
+            correct: "Correct. They're a credit, not a deduction, subtracted directly from your tax owed, rand for rand. That makes them more valuable than a deduction.",
             incorrect: "They're a tax credit, not a deduction. They come off your tax bill directly (rand for rand), which is actually better than reducing taxable income.",
           },
         },
@@ -553,8 +553,8 @@ const lesson3Slots: QuestionSlot[] = [
           options: ["About R376", "About R1 500", "R0", "About R50"],
           correct: 0,
           feedback: {
-            correct: "Right. It's R376/month for the main member and the first dependant, then R254 for each additional dependant — a direct reduction of your tax.",
-            incorrect: "It's about R376/month for the main member (and first dependant), R254 for each additional — a credit off your tax.",
+            correct: "Right. It's R376/month for the main member and the first dependant, then R254 for each additional dependant: a direct reduction of your tax.",
+            incorrect: "It's about R376/month for the main member (and first dependant), R254 for each additional, a credit off your tax.",
           },
         },
       },
@@ -585,7 +585,7 @@ const lesson3Slots: QuestionSlot[] = [
           options: ["10%", "100%", "1%", "50%"],
           correct: 0,
           feedback: {
-            correct: "Right. Donations to approved PBOs are deductible up to 10% of taxable income — but you need a Section 18A certificate from the charity as proof.",
+            correct: "Right. Donations to approved PBOs are deductible up to 10% of taxable income, but you need a Section 18A certificate from the charity as proof.",
             incorrect: "It's up to 10% of taxable income, and only with a Section 18A certificate from the approved charity.",
           },
         },
@@ -597,8 +597,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "To claim a donation deduction, you need a Section 18A certificate from the charity.",
           correct: true,
           feedback: {
-            correct: "True. Not every charity can issue one — only SARS-approved PBOs. No 18A certificate, no deduction, however generous the gift.",
-            incorrect: "It's true — the Section 18A certificate is the proof SARS requires. Without it, the donation isn't deductible.",
+            correct: "True. Not every charity can issue one, only SARS-approved PBOs. No 18A certificate, no deduction, however generous the gift.",
+            incorrect: "It's true. The Section 18A certificate is the proof SARS requires. Without it, the donation isn't deductible.",
           },
         },
       },
@@ -630,11 +630,11 @@ const lesson3Slots: QuestionSlot[] = [
         variantId: "le-tf",
         step: {
           type: "true-false",
-          statement: "Claiming legal deductions (like RA contributions) to lower your tax is tax avoidance, which is legal — unlike tax evasion.",
+          statement: "Claiming legal deductions (like RA contributions) to lower your tax is tax avoidance, which is legal: unlike tax evasion.",
           correct: true,
           feedback: {
-            correct: "True. Using the rules to pay less (deductions, credits) is legal tax planning. Hiding income or faking expenses is evasion — illegal and heavily penalised.",
-            incorrect: "It's true — claiming real deductions is legal. Evasion (hiding income, fake claims) is the illegal version. Know the line.",
+            correct: "True. Using the rules to pay less (deductions, credits) is legal tax planning. Hiding income or faking expenses is evasion, illegal and heavily penalised.",
+            incorrect: "It's true. Claiming real deductions is legal. Evasion (hiding income, fake claims) is the illegal version. Know the line.",
           },
         },
       },
@@ -651,7 +651,7 @@ const lesson3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Hiding income is evasion — a criminal offence. The others are legitimate ways the law lets you reduce tax.",
+            correct: "Right. Hiding income is evasion. A criminal offence. The others are legitimate ways the law lets you reduce tax.",
             incorrect: "Hiding income is evasion (illegal). RAs, medical credits and 18A donations are all legal, encouraged ways to pay less.",
           },
         },
@@ -663,8 +663,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "Keeping proof (certificates, receipts) for the deductions you claim protects you if SARS asks.",
           correct: true,
           feedback: {
-            correct: "True. SARS can request supporting documents. Keep your RA certificate, 18A receipts and medical statements — no proof can mean a disallowed claim.",
-            incorrect: "It's true — keep your documents. If SARS reviews your return, unproven claims can be reversed with penalties.",
+            correct: "True. SARS can request supporting documents. Keep your RA certificate, 18A receipts and medical statements. No proof can mean a disallowed claim.",
+            incorrect: "It's true. Keep your documents. If SARS reviews your return, unproven claims can be reversed with penalties.",
           },
         },
       },
@@ -677,7 +677,7 @@ const lesson3Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Legal Ways to Pay Less Tax",
     content:
-      "<p>South Africans who know the rules can cut their tax bill legally. Key ones: <strong>Retirement contributions</strong> (up to 27.5% of income, capped) — the biggest for most people. <strong>Medical scheme credits</strong> — a rand-for-rand credit off your tax, not a deduction: R376/month for the main member and first dependant, R254 for each additional. <strong>Home-office</strong> costs, if you have a dedicated space used exclusively and regularly for work. <strong>Donations</strong> to SARS-approved PBOs, deductible up to 10% of taxable income with a Section 18A certificate.</p><p>Claiming real deductions is legal tax planning; hiding income is illegal evasion. Keep your certificates and receipts.</p>",
+      "<p>South Africans who know the rules can cut their tax bill legally. Key ones: <strong>Retirement contributions</strong> (up to 27.5% of income, capped), the biggest for most people. <strong>Medical scheme credits</strong>, a rand-for-rand credit off your tax, not a deduction: R376/month for the main member and first dependant, R254 for each additional. <strong>Home-office</strong> costs, if you have a dedicated space used exclusively and regularly for work. <strong>Donations</strong> to SARS-approved PBOs, deductible up to 10% of taxable income with a Section 18A certificate.</p><p>Claiming real deductions is legal tax planning; hiding income is illegal evasion. Keep your certificates and receipts.</p>",
   },
   { slot: "taxes/lesson-3/ra-deduction" },
   { slot: "taxes/lesson-3/medical-credit" },
@@ -707,7 +707,7 @@ const lesson4Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The IRP5 is your employment-income certificate — salary, deductions and PAYE — issued at tax year-end (end of February).",
+            correct: "Right. The IRP5 is your employment-income certificate (salary, deductions and PAYE) issued at tax year-end (end of February).",
             incorrect: "The IRP5 shows your employment income and the PAYE deducted. Interest and capital gains come on different certificates.",
           },
         },
@@ -719,8 +719,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "Your employer is legally required to give you an IRP5 certificate each tax year.",
           correct: true,
           feedback: {
-            correct: "True. It's a legal obligation. If you don't receive yours by around April, follow up with HR — and escalate to SARS if needed.",
-            incorrect: "It's true — issuing your IRP5 is a legal duty. Chase HR if it's missing; you need it to file correctly.",
+            correct: "True. It's a legal obligation. If you don't receive yours by around April, follow up with HR, and escalate to SARS if needed.",
+            incorrect: "It's true. Issuing your IRP5 is a legal duty. Chase HR if it's missing; you need it to file correctly.",
           },
         },
       },
@@ -737,7 +737,7 @@ const lesson4Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Chase HR first — it's their legal duty. SARS can also show what was submitted for her. Never guess the figures.",
+            correct: "Right. Chase HR first. It's their legal duty. SARS can also show what was submitted for her. Never guess the figures.",
             incorrect: "She should follow up with HR (it's their obligation) and can check with SARS. Guessing risks an inaccurate return.",
           },
         },
@@ -757,7 +757,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The IT3(b) reports interest income, issued by your bank or investment account. IT3(c) is for capital gains; IRP5/IT3(a) is employment.",
-            incorrect: "It's the IT3(b) — interest income from banks and investments. (IT3(c) = capital gains; IRP5 = salary.)",
+            incorrect: "It's the IT3(b), interest income from banks and investments. (IT3(c) = capital gains; IRP5 = salary.)",
           },
         },
       },
@@ -769,7 +769,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Interest up to R23 800/year (under 65) is tax-free; only the amount above that is taxable. Over 65 the exemption is higher (R34 500).",
-            incorrect: "It's true — R23 800 of local interest a year is exempt for under-65s. Only interest above that is taxed.",
+            incorrect: "It's true: R23 800 of local interest a year is exempt for under-65s. Only interest above that is taxed.",
           },
         },
       },
@@ -779,14 +779,14 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Who issues your IT3(b) interest certificate?",
           options: [
-            "Your bank or investment provider (and they send a copy to SARS)",
+            "Your bank or investment provider",
             "Your employer",
             "You write it yourself",
             "The municipality",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Your bank or broker issues it — and sends the same data to SARS, so it usually pre-populates your return. Check it matches.",
+            correct: "Right. Your bank or broker issues it, and sends the same data to SARS, so it usually pre-populates your return. Check it matches.",
             incorrect: "Your bank or investment provider issues it, and SARS gets a copy too. That's why it often auto-fills on eFiling.",
           },
         },
@@ -806,7 +806,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The IT3(c), from your investment platform, reports capital gains. IT3(b) is interest; IRP5/IT3(a) is employment income.",
-            incorrect: "It's the IT3(c) — capital gains from investments. (IT3(b) = interest; IRP5 = salary.)",
+            incorrect: "It's the IT3(c), capital gains from investments. (IT3(b) = interest; IRP5 = salary.)",
           },
         },
       },
@@ -818,7 +818,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Your broker or fund manager provides it. It feeds your capital-gains calculation at tax time, so keep it with your other certificates.",
-            incorrect: "It's true — your investment provider issues the IT3(c). You'll need it to work out any capital gains tax.",
+            incorrect: "It's true. Your investment provider issues the IT3(c). You'll need it to work out any capital gains tax.",
           },
         },
       },
@@ -853,8 +853,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "It's worth keeping your tax certificates and supporting documents in one place each year.",
           correct: true,
           feedback: {
-            correct: "True. SARS can ask for supporting documents after you file. A tidy folder of IRP5s, IT3s, RA and medical certificates makes filing — and any review — painless.",
-            incorrect: "It's true — keep them together. SARS can request them, and organised records make filing and any audit far easier.",
+            correct: "True. SARS can ask for supporting documents after you file. A tidy folder of IRP5s, IT3s, RA and medical certificates makes filing, and any review, painless.",
+            incorrect: "It's true. Keep them together. SARS can request them, and organised records make filing and any audit far easier.",
           },
         },
       },
@@ -871,7 +871,7 @@ const lesson4Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Keep supporting documents for at least five years — SARS can review a past return, and you'll want the proof of what you claimed.",
+            correct: "Right. Keep supporting documents for at least five years. SARS can review a past return, and you'll want the proof of what you claimed.",
             incorrect: "Keep them at least five years. SARS can look back, so binning them after filing is risky.",
           },
         },
@@ -903,7 +903,7 @@ const lesson4Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Documents That Prove Your Tax Story",
     content:
-      "<p>SARS wants your certificates imported into your eFiling return. <strong>IRP5 / IT3(a):</strong> your employer's certificate of salary, deductions and PAYE, issued at year-end. <strong>IT3(b):</strong> interest income from your bank or investments (under 65, the first R23 800 of interest a year is exempt). <strong>IT3(c):</strong> capital gains from shares, ETFs and unit trusts, from your investment platform.</p><p>On eFiling, 'Import Certificate' auto-populates your return from what employers and institutions submitted — but always check the imported figures match what you actually received, and keep your documents for at least five years.</p>",
+      "<p>SARS wants your certificates imported into your eFiling return. <strong>IRP5 / IT3(a):</strong> your employer's certificate of salary, deductions and PAYE, issued at year-end. <strong>IT3(b):</strong> interest income from your bank or investments (under 65, the first R23 800 of interest a year is exempt). <strong>IT3(c):</strong> capital gains from shares, ETFs and unit trusts, from your investment platform.</p><p>On eFiling, 'Import Certificate' auto-populates your return from what employers and institutions submitted, but always check the imported figures match what you actually received, and keep your documents for at least five years.</p>",
   },
   { slot: "taxes/lesson-4/irp5" },
   { slot: "taxes/lesson-4/it3b" },
@@ -950,11 +950,11 @@ const lesson5Slots: QuestionSlot[] = [
         variantId: "rt-consumption-tf",
         step: {
           type: "true-false",
-          statement: "VAT is a consumption tax — it's built into the price of most things you buy.",
+          statement: "VAT is a consumption tax. It's built into the price of most things you buy.",
           correct: true,
           feedback: {
             correct: "True. You pay it on nearly every purchase, usually shown on your till slip. It's why the price you pay is more than the shelf 'ex-VAT' figure in trade.",
-            incorrect: "It's true — VAT is a tax on spending, embedded in most prices. You pay it every time you buy standard-rated goods.",
+            incorrect: "It's true. VAT is a tax on spending, embedded in most prices. You pay it every time you buy standard-rated goods.",
           },
         },
       },
@@ -984,8 +984,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Certain basic foods are zero-rated for VAT to keep essentials affordable for poorer households.",
           correct: true,
           feedback: {
-            correct: "True. Maize meal, brown bread, rice, dried beans, milk, eggs, fruit and veg and more are zero-rated — a deliberate way to ease the cost of basics.",
-            incorrect: "It's true — staples are zero-rated on purpose, to keep essential food affordable for low-income households.",
+            correct: "True. Maize meal, brown bread, rice, dried beans, milk, eggs, fruit and veg and more are zero-rated. A deliberate way to ease the cost of basics.",
+            incorrect: "It's true. Staples are zero-rated on purpose, to keep essential food affordable for low-income households.",
           },
         },
       },
@@ -995,14 +995,14 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa buys maize meal, milk and eggs. How much VAT is on those staples?",
           options: [
-            "R0 — they're zero-rated basic foods",
+            "R0. They're zero-rated basic foods",
             "15% on all of them",
             "15% on the milk only",
             "A special 5% rate",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Maize meal, milk and eggs are on the zero-rated list, so there's no VAT — one of the ways the system protects essential food.",
+            correct: "Right. Maize meal, milk and eggs are on the zero-rated list, so there's no VAT, one of the ways the system protects essential food.",
             incorrect: "Those are zero-rated staples, so no VAT. The zero-rating is designed to keep basic food affordable.",
           },
         },
@@ -1020,8 +1020,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "A small business must register for VAT once its annual taxable turnover exceeds R1 000 000.",
           correct: true,
           feedback: {
-            correct: "True. Above R1 000 000 turnover, VAT registration is compulsory — you charge 15% and pay SARS the difference between VAT collected and VAT paid. Below that it's voluntary.",
-            incorrect: "It's true — R1 000 000 turnover is the compulsory VAT-registration line. Under it, registering is optional.",
+            correct: "True. Above R1 000 000 turnover, VAT registration is compulsory. You charge 15% and pay SARS the difference between VAT collected and VAT paid. Below that it's voluntary.",
+            incorrect: "It's true. R1 000 000 turnover is the compulsory VAT-registration line. Under it, registering is optional.",
           },
         },
       },
@@ -1029,12 +1029,12 @@ const lesson5Slots: QuestionSlot[] = [
         variantId: "rg-below-mcq",
         step: {
           type: "mcq",
-          question: "A business turning over R800 000 a year — must it register for VAT?",
+          question: "A business turning over R800 000 a year: must it register for VAT?",
           options: [
-            "No — it's below the R1 000 000 compulsory threshold (registration is voluntary)",
-            "Yes — all businesses must register",
-            "Yes — over R500 000 you must register",
-            "No — businesses never register for VAT",
+            "No. It's below the R1 000 000 compulsory threshold",
+            "Yes. All businesses must register",
+            "Yes. Over R500 000 you must register",
+            "No. Businesses never register for VAT",
           ],
           correct: 0,
           feedback: {
@@ -1050,13 +1050,13 @@ const lesson5Slots: QuestionSlot[] = [
           question: "Sipho's bakery turns over R1 200 000/year. What must he do about VAT?",
           options: [
             "Register, charge 15% on his products, and submit VAT returns to SARS",
-            "Ignore VAT — bakeries are exempt",
+            "Ignore VAT. Bakeries are exempt",
             "Charge 15% but keep it",
             "Only register if he wants to",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Over R1 000 000, registration is compulsory. He charges 15%, claims back VAT on his inputs, and pays SARS the net — on schedule.",
+            correct: "Right. Over R1 000 000, registration is compulsory. He charges 15%, claims back VAT on his inputs, and pays SARS the net, on schedule.",
             incorrect: "He must register (turnover over R1m), charge 15%, and remit the net to SARS. It's a legal obligation, not optional.",
           },
         },
@@ -1093,7 +1093,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Residential rental is VAT-exempt, so there's no 15% added to your monthly rent. (Commercial property rental is different.)",
-            incorrect: "It's true — residential rent is exempt from VAT, so no 15% is charged on it.",
+            incorrect: "It's true. Residential rent is exempt from VAT, so no 15% is charged on it.",
           },
         },
       },
@@ -1111,7 +1111,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Knowing staples are zero-rated (and rent is exempt) helps you read your spending and see how the system protects essentials.",
-            incorrect: "It helps you understand your costs — why staples are cheaper and what the VAT line on your slip means.",
+            incorrect: "It helps you understand your costs. Why staples are cheaper and what the VAT line on your slip means.",
           },
         },
       },
@@ -1124,7 +1124,7 @@ const lesson5Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Tax Embedded in Almost Everything",
     content:
-      "<p>VAT is a consumption tax added to most goods and services. The standard rate is <strong>15%</strong>. On a R100 VAT-inclusive item, about R13.04 is VAT (R100 − R100÷1.15).</p><p><strong>Zero-rated (0%):</strong> basic foods — brown and white bread, maize meal, rice, dried beans, lentils, tinned pilchards, edible oils, milk, eggs, fruit and vegetables — kept affordable on purpose. <strong>Exempt:</strong> residential rental, some financial services, public transport. <strong>Businesses:</strong> turnover over R1 000 000/year means compulsory VAT registration — you charge 15% and remit the net to SARS.</p>",
+      "<p>VAT is a consumption tax added to most goods and services. The standard rate is <strong>15%</strong>. On a R100 VAT-inclusive item, about R13.04 is VAT (R100 − R100÷1.15).</p><p><strong>Zero-rated (0%):</strong> basic foods, brown and white bread, maize meal, rice, dried beans, lentils, tinned pilchards, edible oils, milk, eggs, fruit and vegetables: kept affordable on purpose. <strong>Exempt:</strong> residential rental, some financial services, public transport. <strong>Businesses:</strong> turnover over R1 000 000/year means compulsory VAT registration. You charge 15% and remit the net to SARS.</p>",
   },
   { slot: "taxes/lesson-5/rate" },
   { slot: "taxes/lesson-5/zero-rated" },
@@ -1150,7 +1150,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Individuals include 40% of the net gain (after the annual exclusion) in taxable income, which is then taxed at their marginal rate.",
-            incorrect: "For individuals it's 40% of the net gain that's included, then taxed at your marginal rate — not the full gain.",
+            incorrect: "For individuals it's 40% of the net gain that's included, then taxed at your marginal rate, not the full gain.",
           },
         },
       },
@@ -1162,7 +1162,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. 45% (top rate) × 40% (inclusion) = 18% effective. So even the highest earners pay a maximum of 18% on their capital gains.",
-            incorrect: "It's true — 45% × 40% = 18% effective. The inclusion rate is why CGT is much gentler than income tax.",
+            incorrect: "It's true, 45% × 40% = 18% effective. The inclusion rate is why CGT is much gentler than income tax.",
           },
         },
       },
@@ -1174,7 +1174,7 @@ const lesson6Slots: QuestionSlot[] = [
           options: [
             "R8 000 (40% of R20 000)",
             "R20 000 (the full gain)",
-            "R0 — gains aren't taxed",
+            "R0, gains aren't taxed",
             "R3 600",
           ],
           correct: 0,
@@ -1198,7 +1198,7 @@ const lesson6Slots: QuestionSlot[] = [
           options: ["R50 000", "R5 000", "R500 000", "Nothing"],
           correct: 0,
           feedback: {
-            correct: "Right. The annual exclusion is R50 000 — you only include gains above that. Small gains often fall away entirely.",
+            correct: "Right. The annual exclusion is R50 000. You only include gains above that. Small gains often fall away entirely.",
             incorrect: "It's R50 000 a year. Only gains above the exclusion get taxed, so modest gains may be tax-free.",
           },
         },
@@ -1223,8 +1223,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "If your total capital gain for the year is under R50 000, you generally owe no CGT.",
           correct: true,
           feedback: {
-            correct: "True. The R50 000 annual exclusion means small gains fall away — handy for modest investors selling a little at a time.",
-            incorrect: "It's true — a gain under the R50 000 exclusion generally isn't taxed. The exclusion shelters small gains.",
+            correct: "True. The R50 000 annual exclusion means small gains fall away: handy for modest investors selling a little at a time.",
+            incorrect: "It's true, a gain under the R50 000 exclusion generally isn't taxed. The exclusion shelters small gains.",
           },
         },
       },
@@ -1241,8 +1241,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "You must pay CGT on your primary residence only if the gain exceeds R3 000 000.",
           correct: true,
           feedback: {
-            correct: "True. The primary-residence exclusion is R3 000 000 (2026/27). Only gain above that attracts CGT — which is why most people pay no CGT selling their home.",
-            incorrect: "It's true — the first R3 000 000 of gain on your main home is excluded. Only the excess is taxed (and only 40% of it is included).",
+            correct: "True. The primary-residence exclusion is R3 000 000 (2026/27). Only gain above that attracts CGT, which is why most people pay no CGT selling their home.",
+            incorrect: "It's true, the first R3 000 000 of gain on your main home is excluded. Only the excess is taxed (and only 40% of it is included).",
           },
         },
       },
@@ -1251,7 +1251,7 @@ const lesson6Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "How much of the capital gain on your primary residence is excluded from CGT (2026/27)?",
-          options: ["R3 000 000", "R50 000", "R500 000", "Nothing — homes are fully taxed"],
+          options: ["R3 000 000", "R50 000", "R500 000", "Nothing. Homes are fully taxed"],
           correct: 0,
           feedback: {
             correct: "Right. The primary-residence exclusion is R3 000 000 (raised from R2 million). Most homeowners' gains fall under this, so they pay no CGT on their home.",
@@ -1265,7 +1265,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo sells the home he lived in for a R900 000 gain. Does he pay CGT?",
           options: [
-            "No — R900 000 is well under the R3 000 000 primary-residence exclusion",
+            "No. R900 000 is well under the R3 000 000 primary-residence exclusion",
             "Yes, on the full R900 000",
             "Yes, at 45%",
             "Only if he's under 65",
@@ -1273,7 +1273,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. His R900 000 gain is under the R3 000 000 exclusion, so no CGT. This is why most homeowners pay nothing when selling their main home.",
-            incorrect: "No CGT — his gain is under the R3 000 000 primary-residence exclusion. Only gains above R3m would be taxed.",
+            incorrect: "No CGT. His gain is under the R3 000 000 primary-residence exclusion. Only gains above R3m would be taxed.",
           },
         },
       },
@@ -1289,14 +1289,14 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "CGT is triggered when you:",
           options: [
-            "Sell an asset (shares, property, unit trusts) for more than you paid",
+            "Sell an asset for more than you paid",
             "Simply hold an investment that has risen in value",
             "Earn your monthly salary",
             "Open a savings account",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. CGT applies on disposal — when you actually sell for a gain. Paper gains on assets you still hold aren't taxed until you sell.",
+            correct: "Right. CGT applies on disposal. When you actually sell for a gain. Paper gains on assets you still hold aren't taxed until you sell.",
             incorrect: "It's the sale that triggers CGT. An unrealised (paper) gain on something you still own isn't taxed yet.",
           },
         },
@@ -1308,7 +1308,7 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "A rise in the value of shares you still hold is taxed every year, even if you don't sell.",
           correct: false,
           feedback: {
-            correct: "Correct. Gains are only taxed when you sell (dispose). While you hold, an increase is an unrealised 'paper' gain — no CGT until you cash it in.",
+            correct: "Correct. Gains are only taxed when you sell (dispose). While you hold, an increase is an unrealised 'paper' gain: no CGT until you cash it in.",
             incorrect: "It isn't taxed until you sell. Holding an asset that's risen creates a paper gain; CGT only applies on disposal.",
           },
         },
@@ -1319,15 +1319,15 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato holds her shares inside a TFSA and sells at a gain. Does she pay CGT?",
           options: [
-            "No — growth inside a TFSA, including capital gains, is tax-free",
+            "No. Growth inside a TFSA, including capital gains, is tax-free",
             "Yes, 40% inclusion applies",
             "Yes, at her full marginal rate",
             "Only above R50 000",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. That's a big TFSA advantage — no CGT (or tax on interest/dividends) on qualifying growth inside the wrapper. Outside a TFSA, CGT would apply.",
-            incorrect: "Inside a TFSA there's no CGT — qualifying growth is tax-free. CGT would only apply to the same shares held outside a TFSA.",
+            correct: "Right. That's a big TFSA advantage, no CGT (or tax on interest/dividends) on qualifying growth inside the wrapper. Outside a TFSA, CGT would apply.",
+            incorrect: "Inside a TFSA there's no CGT. Qualifying growth is tax-free. CGT would only apply to the same shares held outside a TFSA.",
           },
         },
       },
@@ -1340,7 +1340,7 @@ const lesson6Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Profit on Investments Is Not Tax-Free",
     content:
-      "<p>Sell an asset (shares, property, unit trusts, crypto) for more than you paid and the profit is a <strong>capital gain</strong>, taxed via CGT. For individuals: a <strong>R50 000 annual exclusion</strong> (you only count gains above it), then a <strong>40% inclusion rate</strong> (40% of the net gain is added to your taxable income). At the top 45% marginal rate that's an <strong>18% effective</strong> maximum.</p><p>Your <strong>primary residence</strong> gets a R3 000 000 exclusion (2026/27) — which is why most people pay no CGT selling their home. Example: buy shares for R50 000, sell for R120 000 → R70 000 gain, less R50 000 exclusion = R20 000, of which 40% (R8 000) is added to income. And inside a TFSA, capital gains are tax-free entirely.</p>",
+      "<p>Sell an asset (shares, property, unit trusts, crypto) for more than you paid and the profit is a <strong>capital gain</strong>, taxed via CGT. For individuals: a <strong>R50 000 annual exclusion</strong> (you only count gains above it), then a <strong>40% inclusion rate</strong> (40% of the net gain is added to your taxable income). At the top 45% marginal rate that's an <strong>18% effective</strong> maximum.</p><p>Your <strong>primary residence</strong> gets a R3 000 000 exclusion (2026/27), which is why most people pay no CGT selling their home. Example: buy shares for R50 000, sell for R120 000 → R70 000 gain, less R50 000 exclusion = R20 000, of which 40% (R8 000) is added to income. And inside a TFSA, capital gains are tax-free entirely.</p>",
   },
   { slot: "taxes/lesson-6/inclusion" },
   { slot: "taxes/lesson-6/annual-exclusion" },

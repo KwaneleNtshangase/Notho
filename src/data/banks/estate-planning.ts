@@ -28,15 +28,15 @@ const intestateSlots: QuestionSlot[] = [
           type: "mcq",
           question: "If you die without a valid will, who decides where your assets go?",
           options: [
-            "The Intestate Succession Act — a fixed legal formula, not your wishes",
+            "The Intestate Succession Act, a fixed legal formula, not your wishes",
             "Your bank",
             "Your employer",
             "Whoever asks the Master first",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Dying intestate hands your estate to a set formula in the Act — your actual wishes carry no weight.",
-            incorrect: "It's the Intestate Succession Act's formula that decides — not you, your bank, or your employer.",
+            correct: "Right. Dying intestate hands your estate to a set formula in the Act: your actual wishes carry no weight.",
+            incorrect: "It's the Intestate Succession Act's formula that decides, not you, your bank, or your employer.",
           },
         },
       },
@@ -47,7 +47,7 @@ const intestateSlots: QuestionSlot[] = [
           statement: "A long-term cohabiting partner (unmarried) automatically inherits under intestate succession.",
           correct: false,
           feedback: {
-            correct: "Correct. Cohabitants aren't automatically recognised — a court challenge is uncertain. Only a valid will guarantees they inherit.",
+            correct: "Correct. Cohabitants aren't automatically recognised. A court challenge is uncertain. Only a valid will guarantees they inherit.",
             incorrect: "They don't inherit automatically. The Act doesn't recognise cohabiting partners; a will is the only certain protection.",
           },
         },
@@ -58,14 +58,14 @@ const intestateSlots: QuestionSlot[] = [
           type: "scenario",
           question: "An unmarried couple together 15 years own a home jointly, with no wills. One dies. What does the survivor automatically inherit under intestate law?",
           options: [
-            "Nothing automatically — cohabitants aren't recognised; only a will protects them",
+            "Nothing automatically. Cohabitants aren't recognised; only a will protects them",
             "The whole estate",
             "Exactly half of everything",
             "Just the house",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Without a will, the survivor has no automatic intestate claim — a devastating, common outcome. A will fixes it.",
+            correct: "Right. Without a will, the survivor has no automatic intestate claim. A devastating, common outcome. A will fixes it.",
             incorrect: "The survivor inherits nothing automatically. The Act ignores cohabitation, so only a valid will secures their inheritance.",
           },
         },
@@ -82,14 +82,14 @@ const intestateSlots: QuestionSlot[] = [
           type: "mcq",
           question: "A hidden cost of dying without a will is that:",
           options: [
-            "The Master appoints an executor (often a bank at up to 3.5% + VAT) and winding up drags 12-24+ months",
+            "The Master appoints an executor and winding up drags 12-24+ months",
             "Assets are distributed instantly and for free",
             "Your estate pays less tax",
             "There are no consequences at all",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. No nominated executor means the Master appoints one — usually a costly bank trust — and long delays follow.",
+            correct: "Right. No nominated executor means the Master appoints one, usually a costly bank trust, and long delays follow.",
             incorrect: "Without a will the Master appoints an executor (often a bank at up to 3.5% + VAT), and the estate is delayed for a year or more.",
           },
         },
@@ -101,8 +101,8 @@ const intestateSlots: QuestionSlot[] = [
           statement: "If minor children inherit and there's no will, their money can be paid into the state Guardian's Fund until they turn 18.",
           correct: true,
           feedback: {
-            correct: "Right. The Guardian's Fund holds minors' inheritances at below-market interest — one more reason to have a will (and ideally a testamentary trust).",
-            incorrect: "It can. Minors' inheritances often go to the state Guardian's Fund until age 18 — avoidable with a will and a trust.",
+            correct: "Right. The Guardian's Fund holds minors' inheritances at below-market interest, one more reason to have a will (and ideally a testamentary trust).",
+            incorrect: "It can. Minors' inheritances often go to the state Guardian's Fund until age 18. Avoidable with a will and a trust.",
           },
         },
       },
@@ -119,8 +119,8 @@ const intestateSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A one-size formula can't reflect your intentions or your family's real situation — friction is common.",
-            incorrect: "The formula is rigid and impersonal — it ignores relationships and promises, which is exactly what breeds conflict.",
+            correct: "Right. A one-size formula can't reflect your intentions or your family's real situation. Friction is common.",
+            incorrect: "The formula is rigid and impersonal, it ignores relationships and promises, which is exactly what breeds conflict.",
           },
         },
       },
@@ -143,7 +143,7 @@ const intestateSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Two competent witnesses, present together, must witness and sign — you don't need a lawyer, but you do need this.",
+            correct: "Right. Two competent witnesses, present together, must witness and sign. You don't need a lawyer, but you do need this.",
             incorrect: "You need two competent witnesses present at the same time. One witness, or none, doesn't make a valid will.",
           },
         },
@@ -156,7 +156,7 @@ const intestateSlots: QuestionSlot[] = [
           correct: false,
           feedback: {
             correct: "Correct. A beneficiary who witnesses the will forfeits their bequest (the rest of the will stands). Never use beneficiaries as witnesses.",
-            incorrect: "They can't. A witness who is also a beneficiary loses that bequest — so keep witnesses and beneficiaries separate.",
+            incorrect: "They can't. A witness who is also a beneficiary loses that bequest, so keep witnesses and beneficiaries separate.",
           },
         },
       },
@@ -164,9 +164,9 @@ const intestateSlots: QuestionSlot[] = [
         variantId: "est-int-wl-sc",
         step: {
           type: "scenario",
-          question: "Thabo and Nomalanga both witness Siphamandla's will — and are also named to inherit from it. What's the legal result?",
+          question: "Thabo and Nomalanga both witness Siphamandla's will, and are also named to inherit from it. What's the legal result?",
           options: [
-            "The will stays valid, but their bequests are void — they receive nothing",
+            "The will stays valid, but their bequests are void",
             "The entire will is void",
             "Everything is fine and enforceable",
             "Only the blood relative loses out",
@@ -192,7 +192,7 @@ const intestateSlots: QuestionSlot[] = [
           options: ["3.5% + VAT of the gross estate", "10% of the estate", "A flat 1%", "R50 000 fixed"],
           correct: 0,
           feedback: {
-            correct: "Right. 3.5% + VAT is the cap — but it's negotiable, especially on larger, simpler estates, if you appoint your own executor.",
+            correct: "Right. 3.5% + VAT is the cap, but it's negotiable, especially on larger, simpler estates, if you appoint your own executor.",
             incorrect: "The maximum is 3.5% + VAT of the gross estate. It's negotiable if you name your own executor in your will.",
           },
         },
@@ -217,7 +217,7 @@ const intestateSlots: QuestionSlot[] = [
           options: ["About R145 000", "Nothing", "About R5 000", "About R500"],
           correct: 0,
           feedback: {
-            correct: "Right. 3.5% + VAT on R5m is ~R201 000; 1% + VAT is ~R57 500 — a saving of about R145 000 for your family.",
+            correct: "Right. 3.5% + VAT on R5m is ~R201 000; 1% + VAT is ~R57 500, a saving of about R145 000 for your family.",
             incorrect: "It's roughly R145 000: ~R201 000 at 3.5% versus ~R57 500 at 1% (both incl. VAT) on a R5m estate.",
           },
         },
@@ -231,7 +231,7 @@ const intestateLayout: LessonLayoutItem[] = [
     type: "info",
     title: "What Happens When You Die Without a Will",
     content:
-      "<p>Dying without a valid will is dying <strong>intestate</strong>: the Intestate Succession Act distributes your estate by a fixed formula — not your wishes. Cohabiting (unmarried) partners receive <strong>nothing</strong> automatically, minor children's inheritances can go to the state Guardian's Fund, and the Master appoints an executor (often a bank charging up to 3.5% + VAT).</p><p>A valid will needs only to be signed before <strong>two competent witnesses</strong> present together — but a witness who is also a beneficiary forfeits that bequest, so keep them separate. Name your own executor and negotiate the fee in advance.</p>",
+      "<p>Dying without a valid will is dying <strong>intestate</strong>: the Intestate Succession Act distributes your estate by a fixed formula, not your wishes. Cohabiting (unmarried) partners receive <strong>nothing</strong> automatically, minor children's inheritances can go to the state Guardian's Fund, and the Master appoints an executor (often a bank charging up to 3.5% + VAT).</p><p>A valid will needs only to be signed before <strong>two competent witnesses</strong> present together, but a witness who is also a beneficiary forfeits that bequest, so keep them separate. Name your own executor and negotiate the fee in advance.</p>",
   },
   { slot: "estate-planning/dying-intestate-disaster/what-it-means" },
   { slot: "estate-planning/dying-intestate-disaster/cost" },
@@ -262,7 +262,7 @@ const dutySlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. 20% on the dutiable estate up to R30m, 25% on the portion above R30m.",
-            incorrect: "It's 20% up to R30m and 25% above R30m — not a single flat rate.",
+            incorrect: "It's 20% up to R30m and 25% above R30m, not a single flat rate.",
           },
         },
       },
@@ -286,7 +286,7 @@ const dutySlots: QuestionSlot[] = [
           statement: "Assets left to your surviving spouse are exempt from estate duty (it's deferred until the second death).",
           correct: true,
           feedback: {
-            correct: "Right. The spousal exemption defers all duty to the second death — and the first spouse's unused abatement can roll over.",
+            correct: "Right. The spousal exemption defers all duty to the second death, and the first spouse's unused abatement can roll over.",
             incorrect: "They are exempt. Bequests to a spouse defer estate duty to the second death; unused abatement can also carry over.",
           },
         },
@@ -315,7 +315,7 @@ const dutySlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Net estate R8m, R2m left to the spouse, R3.5m abatement. How much estate duty is owed?",
-          options: ["R500 000 (R2.5m × 20%)", "R1.6 million", "R0", "R700 000"],
+          options: ["R500 000", "R1.6 million", "R0", "R700 000"],
           correct: 0,
           feedback: {
             correct: "Right: dutiable amount R2.5m × 20% = R500 000.",
@@ -330,7 +330,7 @@ const dutySlots: QuestionSlot[] = [
           statement: "Estate duty is charged on your whole estate, with no tax-free portion.",
           correct: false,
           feedback: {
-            correct: "Correct. The R3.5m abatement (plus any spousal exemption) comes off first — only the balance is dutiable.",
+            correct: "Correct. The R3.5m abatement (plus any spousal exemption) comes off first. Only the balance is dutiable.",
             incorrect: "There is a tax-free portion: the R3.5m abatement, on top of spousal exemptions, before any duty applies.",
           },
         },
@@ -366,7 +366,7 @@ const dutySlots: QuestionSlot[] = [
           statement: "A R4 million pension paid directly to a nominated beneficiary generally attracts no estate duty.",
           correct: true,
           feedback: {
-            correct: "Right. With a nominated beneficiary, the fund pays the nominee directly — it doesn't form part of the dutiable estate.",
+            correct: "Right. With a nominated beneficiary, the fund pays the nominee directly, it doesn't form part of the dutiable estate.",
             incorrect: "It generally attracts none. A nominated retirement-fund benefit is paid outside the estate, so no estate duty applies to it.",
           },
         },
@@ -377,14 +377,14 @@ const dutySlots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo nominates his wife as beneficiary on his R4 million pension. What estate duty is owed on that R4 million?",
           options: [
-            "R0 — it bypasses the estate via the nomination",
+            "R0",
             "R800 000 (20%)",
             "R100 000",
             "R1 million",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The nominated pension is paid straight to his wife by the fund — it never enters the dutiable estate.",
+            correct: "Right. The nominated pension is paid straight to his wife by the fund, it never enters the dutiable estate.",
             incorrect: "R0. A nominated retirement fund is paid directly to the nominee and falls outside the estate entirely.",
           },
         },
@@ -401,15 +401,15 @@ const dutySlots: QuestionSlot[] = [
           type: "mcq",
           question: "Why do estates often face a 'liquidity problem'?",
           options: [
-            "Duty, fees and debts fall due in cash (~12 months) but most wealth is illiquid (property, funds)",
+            "Duty, fees and debts fall due in cash but most wealth is illiquid",
             "SARS refuses to accept any payment",
             "Banks freeze all accounts permanently",
             "There is no such problem",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Cash is needed fast, but the value is locked in property and investments — forcing rushed, below-value sales.",
-            incorrect: "The issue is timing: cash is due within about a year, yet most wealth is illiquid — hence forced sales.",
+            correct: "Right. Cash is needed fast, but the value is locked in property and investments, forcing rushed, below-value sales.",
+            incorrect: "The issue is timing: cash is due within about a year, yet most wealth is illiquid: hence forced sales.",
           },
         },
       },
@@ -421,7 +421,7 @@ const dutySlots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. Gifting up to R100 000 a year moves value out of your estate over time, free of donations tax.",
-            incorrect: "They are. The annual donations-tax exemption is R100 000 — a slow, legal way to shrink a future estate.",
+            incorrect: "They are. The annual donations-tax exemption is R100 000. A slow, legal way to shrink a future estate.",
           },
         },
       },
@@ -439,7 +439,7 @@ const dutySlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The policy pays out cash to cover duty and fees, so the family doesn't have to dump assets under pressure.",
-            incorrect: "It supplies liquidity — cash to settle duty and costs — so property needn't be sold in a hurry. It doesn't remove the tax.",
+            incorrect: "It supplies liquidity, cash to settle duty and costs, so property needn't be sold in a hurry. It doesn't remove the tax.",
           },
         },
       },
@@ -452,7 +452,7 @@ const dutyLayout: LessonLayoutItem[] = [
     type: "info",
     title: "Estate Duty: The Tax on Dying Rich",
     content:
-      "<p>Estate duty is charged at <strong>20%</strong> on the dutiable estate up to R30 million and <strong>25%</strong> above R30 million — after a <strong>R3.5 million abatement</strong> (unused abatement rolls over to a surviving spouse, up to R7m). Bequests to a spouse are exempt, deferring duty to the second death.</p><p>Retirement funds and life policies paid to <strong>nominated beneficiaries</strong> bypass the estate entirely. The classic trap is <strong>liquidity</strong>: duty, fees and debts fall due in cash within about 12 months, while most wealth is illiquid — which is what an estate-pegged (s3(3)(a)) life policy is designed to solve.</p>",
+      "<p>Estate duty is charged at <strong>20%</strong> on the dutiable estate up to R30 million and <strong>25%</strong> above R30 million, after a <strong>R3.5 million abatement</strong> (unused abatement rolls over to a surviving spouse, up to R7m). Bequests to a spouse are exempt, deferring duty to the second death.</p><p>Retirement funds and life policies paid to <strong>nominated beneficiaries</strong> bypass the estate entirely. The classic trap is <strong>liquidity</strong>: duty, fees and debts fall due in cash within about 12 months, while most wealth is illiquid, which is what an estate-pegged (s3(3)(a)) life policy is designed to solve.</p>",
   },
   { slot: "estate-planning/estate-duty-deep/rates" },
   { slot: "estate-planning/estate-duty-deep/calculation" },
@@ -475,14 +475,14 @@ const beneSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Your pension nomination says 'ex-spouse' but your will says 'my children'. Who is in line for the pension?",
           options: [
-            "It's decided outside your will — the nomination/fund process controls it, not the will",
+            "It's decided outside your will, the nomination/fund process controls it",
             "Your children, because the will always wins",
             "It's split equally by law",
             "The state takes it",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Retirement-fund benefits pass outside your will — your will can't override the fund's process.",
+            correct: "Right. Retirement-fund benefits pass outside your will. Your will can't override the fund's process.",
             incorrect: "The will doesn't control it. Retirement funds pass outside the will, via the nomination and the fund's own rules.",
           },
         },
@@ -494,7 +494,7 @@ const beneSlots: QuestionSlot[] = [
           statement: "Your will overrides the beneficiary nomination on your retirement fund.",
           correct: false,
           feedback: {
-            correct: "Correct. It doesn't. Retirement funds and life policies pass outside the will — the nomination (and s37C) governs them.",
+            correct: "Correct. It doesn't. Retirement funds and life policies pass outside the will: the nomination (and s37C) governs them.",
             incorrect: "It doesn't override it. Retirement funds and nominated life policies bypass the will entirely.",
           },
         },
@@ -505,14 +505,14 @@ const beneSlots: QuestionSlot[] = [
           type: "scenario",
           question: "After her divorce, Nomsa updates her will but forgets her pension nomination still names her ex-husband. If she dies, what's the risk?",
           options: [
-            "Her pension could be steered toward the ex — the stale nomination, not the will, drives it",
-            "Nothing — the divorce cancels the nomination automatically",
+            "Her pension could be steered toward the ex. The stale nomination",
+            "Nothing, the divorce cancels the nomination automatically",
             "Her will fixes it regardless",
             "The pension is frozen forever",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Divorce doesn't automatically fix a nomination. Update the fund form — the will alone won't redirect the pension.",
+            correct: "Right. Divorce doesn't automatically fix a nomination. Update the fund form. The will alone won't redirect the pension.",
             incorrect: "The stale nomination is the risk. Divorce doesn't auto-cancel it, and the will can't override the fund nomination.",
           },
         },
@@ -529,14 +529,14 @@ const beneSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Who ultimately decides how a retirement-fund death benefit is split?",
           options: [
-            "The fund trustees, who must consider all financial dependants (s37C)",
+            "The fund trustees, who must consider all financial dependants",
             "Only the person you nominated",
             "Your executor",
             "SARS",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Under s37C the trustees have discretion, and must look after all financial dependants — the nomination is guidance.",
+            correct: "Right. Under s37C the trustees have discretion, and must look after all financial dependants. The nomination is guidance.",
             incorrect: "It's the fund trustees under s37C. They must consider all financial dependants; your nomination guides but doesn't bind them.",
           },
         },
@@ -548,7 +548,7 @@ const beneSlots: QuestionSlot[] = [
           statement: "Under s37C, fund trustees can allocate a death benefit to a financial dependant even if that person wasn't nominated.",
           correct: true,
           feedback: {
-            correct: "Right. Their duty is to dependants, not just nominees — an un-nominated dependant child, say, can still receive a share.",
+            correct: "Right. Their duty is to dependants, not just nominees. An un-nominated dependant child, say, can still receive a share.",
             incorrect: "They can. s37C obliges trustees to provide for financial dependants, nominated or not.",
           },
         },
@@ -560,13 +560,13 @@ const beneSlots: QuestionSlot[] = [
           question: "Sipho nominated his mother 10 years ago; he has since married and has two young children. He dies. Who most likely receives the pension?",
           options: [
             "The trustees decide, likely favouring his wife and minor children as dependants",
-            "His mother — the nomination is a binding contract",
+            "His mother. The nomination is a binding contract",
             "His estate, split by his will",
             "It lapses because the form is old",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. s37C points the trustees to current financial dependants — the wife and young children — over the old nomination.",
+            correct: "Right. s37C points the trustees to current financial dependants, the wife and young children, over the old nomination.",
             incorrect: "The trustees decide under s37C, prioritising his wife and minor children as dependants over a 10-year-old nomination.",
           },
         },
@@ -583,14 +583,14 @@ const beneSlots: QuestionSlot[] = [
           type: "mcq",
           question: "A common, costly mistake with a life policy is:",
           options: [
-            "Naming 'my estate' as beneficiary instead of a person — exposing the payout to creditors and delays",
+            "Naming 'my estate' as beneficiary instead of a person, exposing the payout to creditors and delays",
             "Naming a specific person as beneficiary",
             "Paying the premiums on time",
             "Reviewing the nomination each year",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. 'To my estate' drags the payout through the estate — creditors first, family after 12-24 months. Name a person.",
+            correct: "Right. 'To my estate' drags the payout through the estate: creditors first, family after 12-24 months. Name a person.",
             incorrect: "The mistake is naming your estate. That routes the money through the estate (creditors, delays). Name a person instead.",
           },
         },
@@ -602,7 +602,7 @@ const beneSlots: QuestionSlot[] = [
           statement: "Naming a person (not 'my estate') as your life-policy beneficiary lets the insurer pay them directly, bypassing estate delays.",
           correct: true,
           feedback: {
-            correct: "Right. A named person is paid straight by the insurer — fast, and outside the reach of estate creditors.",
+            correct: "Right. A named person is paid straight by the insurer, fast, and outside the reach of estate creditors.",
             incorrect: "It's true. A named beneficiary is paid directly by the insurer, avoiding the estate's creditors and delays.",
           },
         },
@@ -613,7 +613,7 @@ const beneSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Lindiwe wants her children to receive her life-policy payout quickly and safely. What should she do?",
           options: [
-            "Name her chosen beneficiaries on the policy directly, rather than leaving it to 'my estate'",
+            "Name her chosen beneficiaries on the policy directly",
             "Name 'my estate' so the will controls it",
             "Leave the beneficiary blank",
             "Cancel the policy",
@@ -635,10 +635,10 @@ const beneSlots: QuestionSlot[] = [
         variantId: "est-bn-rv-tf",
         step: {
           type: "true-false",
-          statement: "You should review your beneficiary nominations after any major life change — marriage, divorce, a birth, or a nominee's death.",
+          statement: "You should review your beneficiary nominations after any major life change. Marriage, divorce, a birth, or a nominee's death.",
           correct: true,
           feedback: {
-            correct: "Right. Stale nominations are a top estate-planning failure — treat a review as annual financial hygiene.",
+            correct: "Right. Stale nominations are a top estate-planning failure. Treat a review as annual financial hygiene.",
             incorrect: "You should. Life changes can make a nomination dangerously wrong; review it at each one (and roughly yearly).",
           },
         },
@@ -657,7 +657,7 @@ const beneSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. A forgotten form can send money to an ex, or to a deceased nominee (dragging it into intestacy). Keep them current.",
-            incorrect: "They send money to the wrong people — an ex-spouse, or a nominee who has died. That's the whole risk of not reviewing.",
+            incorrect: "They send money to the wrong people. An ex-spouse, or a nominee who has died. That's the whole risk of not reviewing.",
           },
         },
       },
@@ -667,14 +667,14 @@ const beneSlots: QuestionSlot[] = [
           type: "scenario",
           question: "What's a simple habit that prevents most beneficiary-nomination disasters?",
           options: [
-            "Review and update every nomination after each major life event (and roughly once a year)",
+            "Review and update every nomination after each major life event",
             "Never fill in a nomination form",
             "Assume your will covers everything",
             "Only update after age 60",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A quick annual check — plus updates at each life event — keeps nominations pointing where you actually intend.",
+            correct: "Right. A quick annual check, plus updates at each life event, keeps nominations pointing where you actually intend.",
             incorrect: "The habit is regular review, especially after life events. Your will doesn't cover nominated funds and policies.",
           },
         },
@@ -688,7 +688,7 @@ const beneLayout: LessonLayoutItem[] = [
     type: "info",
     title: "Your Most Powerful Estate-Planning Tool",
     content:
-      "<p>Several major assets bypass your will entirely if you've named beneficiaries — retirement funds, group life cover, and individual life policies. If your will says 'everything to my children' but your pension names an ex-spouse, the <strong>will does not control the pension</strong>.</p><p>Retirement funds follow <strong>s37C</strong>: the trustees must provide for all financial dependants, so a nomination is guidance, not a binding contract. Life-policy nominees are paid directly by the insurer — so name a <strong>person</strong>, never 'my estate'. Review every nomination after each major life event.</p>",
+      "<p>Several major assets bypass your will entirely if you've named beneficiaries. Retirement funds, group life cover, and individual life policies. If your will says 'everything to my children' but your pension names an ex-spouse, the <strong>will does not control the pension</strong>.</p><p>Retirement funds follow <strong>s37C</strong>: the trustees must provide for all financial dependants, so a nomination is guidance, not a binding contract. Life-policy nominees are paid directly by the insurer, so name a <strong>person</strong>, never 'my estate'. Review every nomination after each major life event.</p>",
   },
   { slot: "estate-planning/beneficiary-strategy/override-will" },
   { slot: "estate-planning/beneficiary-strategy/section-37c" },

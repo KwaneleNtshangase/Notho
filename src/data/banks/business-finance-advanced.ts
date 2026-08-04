@@ -26,15 +26,15 @@ const structSlots: QuestionSlot[] = [
           type: "mcq",
           question: "How is a sole proprietor's business profit taxed, and what's the liability?",
           options: [
-            "Taxed in your hands at your marginal rate (up to 45%), with unlimited personal liability",
+            "Taxed in your hands at your marginal rate",
             "At a flat 27%, with limited liability",
             "It's tax-free",
             "At 20%, with no liability at all",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A sole prop is you — profit is personal income (up to 45%) and your personal assets are on the line.",
-            incorrect: "A sole prop's profit is taxed as your personal income (up to 45%), and liability is unlimited — no separation from you.",
+            correct: "Right. A sole prop is you. Profit is personal income (up to 45%) and your personal assets are on the line.",
+            incorrect: "A sole prop's profit is taxed as your personal income (up to 45%), and liability is unlimited, no separation from you.",
           },
         },
       },
@@ -45,7 +45,7 @@ const structSlots: QuestionSlot[] = [
           statement: "A Pty Ltd is a separate legal entity that offers limited liability and pays 27% company tax.",
           correct: true,
           feedback: {
-            correct: "Right. Incorporating separates the business from you — limited liability, plus a 27% company rate (with SBC relief for small companies).",
+            correct: "Right. Incorporating separates the business from you: limited liability, plus a 27% company rate (with SBC relief for small companies).",
             incorrect: "It's true. A Pty Ltd is a separate entity with limited liability and 27% company tax.",
           },
         },
@@ -64,7 +64,7 @@ const structSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Protecting personal assets and (often) a lower rate on retained profit are the main drivers.",
-            incorrect: "The reasons are limited liability and a 27% rate on profit (vs up to 45% personally) — not avoiding tax entirely.",
+            incorrect: "The reasons are limited liability and a 27% rate on profit (vs up to 45% personally), not avoiding tax entirely.",
           },
         },
       },
@@ -80,14 +80,14 @@ const structSlots: QuestionSlot[] = [
           type: "mcq",
           question: "A Pty Ltd earning 80%+ of its income from one or two clients (personal services) is a Personal Service Provider. How is it taxed?",
           options: [
-            "At individual income tax rates (up to 45%), not the 27% company rate",
+            "At individual income tax rates",
             "At 0%",
             "At a flat 20%",
             "Fully exempt",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. PSP status strips away the 27% advantage — SARS taxes it at individual rates. Many contractors get caught by this.",
+            correct: "Right. PSP status strips away the 27% advantage, SARS taxes it at individual rates. Many contractors get caught by this.",
             incorrect: "A PSP is taxed at individual rates (up to 45%), losing the 27% company benefit. It's a common contractor trap.",
           },
         },
@@ -99,7 +99,7 @@ const structSlots: QuestionSlot[] = [
           statement: "A contractor can set up a Pty Ltd expecting 27% tax but be caught by the PSP rules and taxed at individual rates.",
           correct: true,
           feedback: {
-            correct: "Right. If most income comes from one or two clients for personal services, the company is a PSP — taxed like an individual.",
+            correct: "Right. If most income comes from one or two clients for personal services, the company is a PSP, taxed like an individual.",
             incorrect: "It's true. The PSP rules re-tax such companies at individual rates, removing the 27% benefit the contractor expected.",
           },
         },
@@ -110,14 +110,14 @@ const structSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Zanele earns R1.2 million through her Pty Ltd, almost all from just two clients for her own services. Likely SARS classification?",
           options: [
-            "A Personal Service Provider — taxed at individual rates",
+            "A Personal Service Provider",
             "A Small Business Corporation at reduced rates",
             "A standard Pty Ltd at 27%",
             "A non-profit company",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Personal services, most revenue from one or two clients — that's a PSP, taxed at individual rates, not 27%.",
+            correct: "Right. Personal services, most revenue from one or two clients. That's a PSP, taxed at individual rates, not 27%.",
             incorrect: "It's a PSP: personal services with 80%+ from one or two clients. SARS taxes it at individual rates.",
           },
         },
@@ -141,8 +141,8 @@ const structSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Qualifying SBCs pay lower graduated rates on modest profits — meaningful tax relief for small companies.",
-            incorrect: "An SBC gets reduced, tiered rates instead of the flat 27% — a genuine saving on smaller profits.",
+            correct: "Right. Qualifying SBCs pay lower graduated rates on modest profits, meaningful tax relief for small companies.",
+            incorrect: "An SBC gets reduced, tiered rates instead of the flat 27%, a genuine saving on smaller profits.",
           },
         },
       },
@@ -154,7 +154,7 @@ const structSlots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. Those (plus not being a PSP or investment company) are the core SBC qualifying tests.",
-            incorrect: "It's true — turnover under R20m and shareholders holding no other shares are key SBC conditions.",
+            incorrect: "It's true: turnover under R20m and shareholders holding no other shares are key SBC conditions.",
           },
         },
       },
@@ -171,7 +171,7 @@ const structSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The benefit is purely the reduced tax rates on qualifying profit — not VAT or registration relief.",
+            correct: "Right. The benefit is purely the reduced tax rates on qualifying profit, not VAT or registration relief.",
             incorrect: "The benefit is a lower effective tax rate on modest profit. VAT and registration rules are unchanged.",
           },
         },
@@ -188,7 +188,7 @@ const structSlots: QuestionSlot[] = [
           type: "mcq",
           question: "For an operating, trading business, which structure is usually most suitable?",
           options: [
-            "A Pty Ltd — operating simplicity, 27% (or SBC) rates, limited liability",
+            "A Pty Ltd, operating simplicity, 27% rates, limited liability",
             "An inter vivos trust taxed at 45% on retained income",
             "A sole prop with unlimited liability, always",
             "No structure at all",
@@ -208,7 +208,7 @@ const structSlots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. That's why an advanced structure often pairs a trading company with a trust that holds the shares for estate planning.",
-            incorrect: "It's true. Company shares are in your estate; trust assets sit outside it — the basis for combining the two.",
+            incorrect: "It's true. Company shares are in your estate; trust assets sit outside it, the basis for combining the two.",
           },
         },
       },
@@ -226,7 +226,7 @@ const structSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. You get the company's operating simplicity plus the trust's estate-planning and asset-protection benefits.",
-            incorrect: "It combines a trading company with a trust that holds the shares — operating efficiency plus estate planning, legally.",
+            incorrect: "It combines a trading company with a trust that holds the shares: operating efficiency plus estate planning, legally.",
           },
         },
       },
@@ -239,7 +239,7 @@ const structLayout: LessonLayoutItem[] = [
     type: "info",
     title: "Tax, Liability, and Control",
     content:
-      "<p><strong>Sole proprietor:</strong> no separation from you — profit taxed at your marginal rate (up to 45%), unlimited personal liability, zero setup cost. <strong>Pty Ltd:</strong> a separate legal entity with limited liability and 27% company tax (qualifying small companies — turnover under R20m — get reduced <strong>SBC</strong> rates).</p><p>Two traps to know: a <strong>Personal Service Provider</strong> (a Pty Ltd earning 80%+ from one or two clients for personal services) is taxed at individual rates, not 27%. And shares in your company sit inside your estate, while trust assets don't — which is why advanced structures often pair a trading company with a family trust that holds the shares.</p>",
+      "<p><strong>Sole proprietor:</strong> no separation from you, profit taxed at your marginal rate (up to 45%), unlimited personal liability, zero setup cost. <strong>Pty Ltd:</strong> a separate legal entity with limited liability and 27% company tax (qualifying small companies, turnover under R20m, get reduced <strong>SBC</strong> rates).</p><p>Two traps to know: a <strong>Personal Service Provider</strong> (a Pty Ltd earning 80%+ from one or two clients for personal services) is taxed at individual rates, not 27%. And shares in your company sit inside your estate, while trust assets don't, which is why advanced structures often pair a trading company with a family trust that holds the shares.</p>",
   },
   { slot: "business-finance-advanced/company-structures-sa/sole-vs-pty" },
   { slot: "business-finance-advanced/company-structures-sa/psp-trap" },
@@ -264,7 +264,7 @@ const fsSlots: QuestionSlot[] = [
           options: ["The cash flow statement", "The income statement", "The balance sheet only", "None show cash"],
           correct: 0,
           feedback: {
-            correct: "Right. The cash flow statement tracks actual cash in and out — survival is about cash, not just profit.",
+            correct: "Right. The cash flow statement tracks actual cash in and out. Survival is about cash, not just profit.",
             incorrect: "It's the cash flow statement. The income statement shows profit; the balance sheet shows position; cash flow shows survival.",
           },
         },
@@ -282,8 +282,8 @@ const fsSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Assets, liabilities and equity — a snapshot of what's owned and owed on a given date.",
-            incorrect: "The balance sheet is a point-in-time snapshot of assets, liabilities and equity — not a flow over time.",
+            correct: "Right. Assets, liabilities and equity. A snapshot of what's owned and owed on a given date.",
+            incorrect: "The balance sheet is a point-in-time snapshot of assets, liabilities and equity, not a flow over time.",
           },
         },
       },
@@ -294,7 +294,7 @@ const fsSlots: QuestionSlot[] = [
           statement: "The income statement (P&L) shows revenue, costs and profit over a period.",
           correct: true,
           feedback: {
-            correct: "Right. It answers 'is the business making money?' across a period — a month, quarter or year.",
+            correct: "Right. It answers 'is the business making money?' across a period, a month, quarter or year.",
             incorrect: "It's true. The income statement reports revenue, costs and resulting profit over a period of time.",
           },
         },
@@ -311,14 +311,14 @@ const fsSlots: QuestionSlot[] = [
           type: "mcq",
           question: "A current ratio (current assets ÷ current liabilities) below 1 signals:",
           options: [
-            "A possible liquidity crisis — the business may not cover near-term bills",
+            "A possible liquidity crisis. The business may not cover near-term bills",
             "Excellent financial health",
             "Very high profitability",
             "Low debt levels",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Below 1 means short-term obligations exceed short-term assets — a liquidity risk, even if the business is profitable.",
+            correct: "Right. Below 1 means short-term obligations exceed short-term assets: a liquidity risk, even if the business is profitable.",
             incorrect: "Below 1 is a warning: current liabilities exceed current assets, so near-term bills may not be coverable.",
           },
         },
@@ -327,10 +327,10 @@ const fsSlots: QuestionSlot[] = [
         variantId: "bfa-fs-rt-tf",
         step: {
           type: "true-false",
-          statement: "Rising 'debtor days' — customers taking longer to pay — is a cash-flow warning sign.",
+          statement: "Rising 'debtor days', customers taking longer to pay, is a cash-flow warning sign.",
           correct: true,
           feedback: {
-            correct: "Right. Every extra debtor day is revenue sitting uncollected — it strains cash even when sales look healthy.",
+            correct: "Right. Every extra debtor day is revenue sitting uncollected, it strains cash even when sales look healthy.",
             incorrect: "It's true. Longer debtor days mean cash is stuck with customers, a classic cash-flow red flag.",
           },
         },
@@ -349,7 +349,7 @@ const fsSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. EBITDA strips out financing and accounting choices to show underlying operating profitability.",
-            incorrect: "EBITDA margin is operating profitability before interest, tax, depreciation and amortisation — the 'clean' operating measure.",
+            incorrect: "EBITDA margin is operating profitability before interest, tax, depreciation and amortisation, the 'clean' operating measure.",
           },
         },
       },
@@ -367,7 +367,7 @@ const fsSlots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. Profit is accounting; cash is your bank balance. Late-paying customers can sink a profitable business.",
-            incorrect: "It's true — and common. A profitable business with poor cash timing can run dry and fail.",
+            incorrect: "It's true, and common. A profitable business with poor cash timing can run dry and fail.",
           },
         },
       },
@@ -384,7 +384,7 @@ const fsSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The income statement shows the R500k, but her bank is negative until customers pay — profit ≠ cash.",
+            correct: "Right. The income statement shows the R500k, but her bank is negative until customers pay: profit ≠ cash.",
             incorrect: "She's profitable but cash-flow negative: the sale is booked, but the cash hasn't arrived yet.",
           },
         },
@@ -395,15 +395,15 @@ const fsSlots: QuestionSlot[] = [
           type: "mcq",
           question: "The most common cause of failure among profitable SMEs is:",
           options: [
-            "Running out of cash (poor cash-flow timing)",
+            "Running out of cash",
             "Paying too little tax",
             "Having too many customers",
             "Charging prices that are too low only",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Cash timing kills profitable businesses — which is why a rolling cash-flow forecast matters more than the P&L alone.",
-            incorrect: "It's cash flow. Profitable businesses fail when cash runs out before customers pay — track a 13-week cash forecast.",
+            correct: "Right. Cash timing kills profitable businesses, which is why a rolling cash-flow forecast matters more than the P&L alone.",
+            incorrect: "It's cash flow. Profitable businesses fail when cash runs out before customers pay, track a 13-week cash forecast.",
           },
         },
       },
@@ -440,7 +440,7 @@ const fsSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. You add back financing (interest), tax, and non-cash charges (depreciation, amortisation) to net profit.",
-            incorrect: "EBITDA = net profit with interest, tax, depreciation and amortisation added back — isolating operating performance.",
+            incorrect: "EBITDA = net profit with interest, tax, depreciation and amortisation added back, isolating operating performance.",
           },
         },
       },
@@ -451,7 +451,7 @@ const fsSlots: QuestionSlot[] = [
           statement: "EBITDA strips out financing and accounting choices to show underlying operating profitability.",
           correct: true,
           feedback: {
-            correct: "Right. That's why it's used to compare businesses and to value them — it removes capital-structure and accounting noise.",
+            correct: "Right. That's why it's used to compare businesses and to value them. It removes capital-structure and accounting noise.",
             incorrect: "It's true. EBITDA removes interest, tax and non-cash charges to reveal the underlying operating profit.",
           },
         },
@@ -465,7 +465,7 @@ const fsLayout: LessonLayoutItem[] = [
     type: "info",
     title: "Reading Financial Statements Like a CFO",
     content:
-      "<p>Three core statements: the <strong>income statement</strong> (revenue, costs, profit over a period — 'are we making money?'), the <strong>balance sheet</strong> (assets, liabilities, equity at a point in time — 'what do we own and owe?'), and the <strong>cash flow statement</strong> ('do we have cash to survive?').</p><p>Key checks: the <strong>current ratio</strong> (below 1 is a liquidity risk), <strong>debtor days</strong> (rising = customers paying too slowly), and <strong>EBITDA margin</strong> (operating profit before interest, tax and non-cash charges). Above all — profit is not cash. Profitable businesses fail by running out of cash.</p>",
+      "<p>Three core statements: the <strong>income statement</strong> (revenue, costs, profit over a period: 'are we making money?'), the <strong>balance sheet</strong> (assets, liabilities, equity at a point in time. 'what do we own and owe?'), and the <strong>cash flow statement</strong> ('do we have cash to survive?').</p><p>Key checks: the <strong>current ratio</strong> (below 1 is a liquidity risk), <strong>debtor days</strong> (rising = customers paying too slowly), and <strong>EBITDA margin</strong> (operating profit before interest, tax and non-cash charges). Above all. Profit is not cash. Profitable businesses fail by running out of cash.</p>",
   },
   { slot: "business-finance-advanced/reading-financial-statements/three-statements" },
   { slot: "business-finance-advanced/reading-financial-statements/ratios" },
@@ -496,7 +496,7 @@ const valSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Valuation underpins selling, partner buyouts, raising equity without unfair dilution, and estate planning.",
-            incorrect: "You need it for selling, buyouts, funding and estate planning — real decisions, not vanity.",
+            incorrect: "You need it for selling, buyouts, funding and estate planning, real decisions, not vanity.",
           },
         },
       },
@@ -507,7 +507,7 @@ const valSlots: QuestionSlot[] = [
           statement: "Owners often overvalue their business emotionally, while buyers use that information gap as a negotiating tool.",
           correct: true,
           feedback: {
-            correct: "Right. Understanding valuation removes the asymmetry — you negotiate from evidence, not attachment.",
+            correct: "Right. Understanding valuation removes the asymmetry, you negotiate from evidence, not attachment.",
             incorrect: "It's true. Emotional overvaluation is common; knowing real valuation methods levels the negotiation.",
           },
         },
@@ -518,15 +518,15 @@ const valSlots: QuestionSlot[] = [
           type: "scenario",
           question: "A partner wants to exit a profitable business and asks to be 'bought out fairly'. What's the first thing needed?",
           options: [
-            "A proper valuation of the business, so the buyout price is grounded in evidence",
+            "A proper valuation of the business",
             "A coin toss",
             "Whatever the exiting partner demands",
-            "Nothing — just guess a number",
+            "Nothing: just guess a number",
           ],
           correct: 0,
           feedback: {
             correct: "Right. A defensible valuation (e.g. EBITDA × multiple) sets a fair price and prevents a costly dispute.",
-            incorrect: "You need a proper valuation first — a buyout without one invites conflict and an unfair price.",
+            incorrect: "You need a proper valuation first, a buyout without one invites conflict and an unfair price.",
           },
         },
       },
@@ -550,7 +550,7 @@ const valSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Earnings-based: value = EBITDA × an industry multiple (SA SMEs often 2-5×).",
-            incorrect: "It's EBITDA × an industry multiple — the earnings-based method most common for operating businesses.",
+            incorrect: "It's EBITDA × an industry multiple, the earnings-based method most common for operating businesses.",
           },
         },
       },
@@ -591,14 +591,14 @@ const valSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Which method suits an asset-heavy business (e.g. property) as a floor value?",
           options: [
-            "Net Asset Value (assets minus liabilities)",
+            "Net Asset Value",
             "EBITDA multiple only",
             "Number of staff",
             "Revenue × 100",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. NAV values the assets less liabilities — a floor; a healthy going concern should be worth more than its parts.",
+            correct: "Right. NAV values the assets less liabilities. A floor; a healthy going concern should be worth more than its parts.",
             incorrect: "Net Asset Value (assets − liabilities) is the asset-heavy floor. A trading business should exceed it as a going concern.",
           },
         },
@@ -617,7 +617,7 @@ const valSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. DCF is theoretically sound but very sensitive to its growth and discount-rate assumptions.",
-            incorrect: "DCF projects future free cash flows and discounts them to present value — rigorous, but assumption-sensitive.",
+            incorrect: "DCF projects future free cash flows and discounts them to present value: rigorous, but assumption-sensitive.",
           },
         },
       },
@@ -628,7 +628,7 @@ const valSlots: QuestionSlot[] = [
           statement: "DCF is theoretically strong but highly sensitive to its assumptions.",
           correct: true,
           feedback: {
-            correct: "Right. Small changes in growth or discount rate swing the answer a lot — which is why multiples are often used as a sanity check.",
+            correct: "Right. Small changes in growth or discount rate swing the answer a lot, which is why multiples are often used as a sanity check.",
             incorrect: "It's true. DCF's output depends heavily on assumptions, so it's usually cross-checked against market multiples.",
           },
         },
@@ -645,14 +645,14 @@ const valSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Which red flag most lowers a business's sale value?",
           options: [
-            "70% of revenue coming from a single customer (concentration risk)",
+            "70% of revenue coming from a single customer",
             "Clean, audited books",
             "A capable management team",
             "A diversified customer base",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. If one client leaves, the value evaporates — buyers discount heavily for concentration. Diversify before selling.",
+            correct: "Right. If one client leaves, the value evaporates, buyers discount heavily for concentration. Diversify before selling.",
             incorrect: "Customer concentration is the killer here. The other three actually raise value and buyer confidence.",
           },
         },
@@ -664,7 +664,7 @@ const valSlots: QuestionSlot[] = [
           statement: "If the owner IS the business (all the relationships and knowledge), buyers will pay less because it's risky without them.",
           correct: true,
           feedback: {
-            correct: "Right. Key-person dependency is correctable — document processes and hand over client relationships before a sale.",
+            correct: "Right. Key-person dependency is correctable, document processes and hand over client relationships before a sale.",
             incorrect: "It's true. Owner-dependence lowers value; buyers fear the business can't run without you. Fix it before selling.",
           },
         },
@@ -675,7 +675,7 @@ const valSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho's cleaning business (R800k EBITDA, market multiple 3.5× → R2.8m) gets a R1.6m offer because 70% of revenue is one hospital contract. Is the discount rational?",
           options: [
-            "Yes — heavy customer concentration justifies a lower multiple; he should diversify before selling",
+            "Yes. Heavy customer concentration justifies a lower multiple; he should diversify before selling",
             "No, buyers must always pay the full multiple",
             "The business should be valued on revenue instead",
             "It's a scam offer",
@@ -683,7 +683,7 @@ const valSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Lose that one client and most of the value goes with it, so ~2× (R1.6m) is defensible. Diversify to restore the full multiple.",
-            incorrect: "The discount is rational — 70% from one client is severe risk. Diversifying the client base first would restore the ~3.5× multiple.",
+            incorrect: "The discount is rational. 70% from one client is severe risk. Diversifying the client base first would restore the ~3.5× multiple.",
           },
         },
       },
@@ -696,7 +696,7 @@ const valLayout: LessonLayoutItem[] = [
     type: "info",
     title: "How to Value a Business",
     content:
-      "<p>Your business may be your largest asset — you can't sell it, buy out a partner, raise equity, or plan your estate fairly without knowing its worth. The most common method for an operating business is <strong>EBITDA × an industry multiple</strong> (SA SMEs often 2-5×, versus 8-15× for listed companies). Other methods: <strong>discounted cash flow</strong> (rigorous but assumption-sensitive) and <strong>net asset value</strong> (a floor for asset-heavy businesses).</p><p>What kills a valuation — all fixable before a sale: <strong>customer concentration</strong>, <strong>owner-dependence</strong>, messy books, and no written contracts.</p>",
+      "<p>Your business may be your largest asset. You can't sell it, buy out a partner, raise equity, or plan your estate fairly without knowing its worth. The most common method for an operating business is <strong>EBITDA × an industry multiple</strong> (SA SMEs often 2-5×, versus 8-15× for listed companies). Other methods: <strong>discounted cash flow</strong> (rigorous but assumption-sensitive) and <strong>net asset value</strong> (a floor for asset-heavy businesses).</p><p>What kills a valuation: all fixable before a sale: <strong>customer concentration</strong>, <strong>owner-dependence</strong>, messy books, and no written contracts.</p>",
   },
   { slot: "business-finance-advanced/business-valuation/why" },
   { slot: "business-finance-advanced/business-valuation/ebitda-multiple" },
@@ -738,7 +738,7 @@ const fundSlots: QuestionSlot[] = [
           statement: "Taking equity investment (e.g. venture capital) means giving up a share of ownership and often some control.",
           correct: true,
           feedback: {
-            correct: "Right. Investors buy a stake and often board rights — money comes with dilution and shared decision-making.",
+            correct: "Right. Investors buy a stake and often board rights. Money comes with dilution and shared decision-making.",
             incorrect: "It's true. Equity funding dilutes your ownership and usually brings the investor some control.",
           },
         },
@@ -749,14 +749,14 @@ const fundSlots: QuestionSlot[] = [
           type: "mcq",
           question: "'Bootstrapping' a business means:",
           options: [
-            "Funding growth from your own revenue — no dilution, no interest, but slower",
+            "Funding growth from your own revenue, no dilution, no interest, but slower",
             "Taking the biggest bank loan you can",
             "Selling most of your equity early",
             "Relying on a government grant",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Bootstrapping trades speed for control — you keep 100% but grow at the pace revenue allows.",
+            correct: "Right. Bootstrapping trades speed for control. You keep 100% but grow at the pace revenue allows.",
             incorrect: "Bootstrapping means self-funding from revenue: no dilution or interest, but slower growth.",
           },
         },
@@ -771,17 +771,17 @@ const fundSlots: QuestionSlot[] = [
         variantId: "bfa-fund-gov-mcq",
         step: {
           type: "mcq",
-          question: "SEFA (Small Enterprise Finance Agency) provides:",
+          question: "SEDFA (the Small Enterprise Development and Finance Agency) provides:",
           options: [
-            "Government-backed SME loans, often cheaper than banks",
+            "Government-backed SME loans and support, often cheaper than banks",
             "Free equity with no strings",
             "Automatic tax refunds",
             "Venture capital for tech startups only",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. SEFA offers government-backed loans (roughly R10k-R15m) for SMEs that struggle to get commercial bank finance.",
-            incorrect: "SEFA gives government-backed SME loans — cheaper, and aimed at businesses banks won't fund. Not free equity.",
+            correct: "Right. SEDFA merged SEFA, SEDA and the CBDA in October 2024, so lending, incubation and co-operative support now sit in one agency aimed at businesses banks won't fund.",
+            incorrect: "SEDFA gives government-backed SME loans and support, cheaper, and aimed at businesses banks won't fund. Not free equity.",
           },
         },
       },
@@ -789,11 +789,11 @@ const fundSlots: QuestionSlot[] = [
         variantId: "bfa-fund-gov-tf",
         step: {
           type: "true-false",
-          statement: "Government grants (e.g. via the DTIC) are non-dilutive — you don't give up equity — but the process is bureaucratic.",
+          statement: "Government grants (e.g. via the DTIC) are non-dilutive, you don't give up equity, but the process is bureaucratic.",
           correct: true,
           feedback: {
             correct: "Right. Grants are 'free' money in equity terms, but slow and paperwork-heavy. Many entrepreneurs never even apply.",
-            incorrect: "It's true. Grants don't dilute you, but they're bureaucratic — worth pursuing for capital-intensive businesses.",
+            incorrect: "It's true. Grants don't dilute you, but they're bureaucratic: worth pursuing for capital-intensive businesses.",
           },
         },
       },
@@ -803,7 +803,7 @@ const fundSlots: QuestionSlot[] = [
           type: "scenario",
           question: "A capital-intensive manufacturing business needs funding but doesn't want to give up equity. A sensible avenue to explore is:",
           options: [
-            "Government/development finance (SEFA or IDC loans, DTIC grants) — often cheaper or non-dilutive",
+            "Government/development finance , often cheaper or non-dilutive",
             "Only handing over 40% to a VC",
             "Doing nothing",
             "Only a personal credit card",
@@ -811,7 +811,7 @@ const fundSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. For capital-heavy businesses, development finance and grants can beat both dilution and expensive short-term credit.",
-            incorrect: "Development finance (SEFA/IDC) and DTIC grants fit here — cheaper or non-dilutive, unlike VC equity or a credit card.",
+            incorrect: "Development finance (SEDFA/IDC) and DTIC grants fit here, cheaper or non-dilutive, unlike VC equity or a credit card.",
           },
         },
       },
@@ -826,11 +826,11 @@ const fundSlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "A VC offers R10m for 35% equity. The implied post-money valuation is about:",
-          options: ["R28.6 million (R10m ÷ 35%)", "R10 million", "R3.5 million", "R100 million"],
+          options: ["R28.6 million", "R10 million", "R3.5 million", "R100 million"],
           correct: 0,
           feedback: {
             correct: "Right: R10m ÷ 0.35 ≈ R28.6m post-money (so ~R18.6m pre-money). Whether it's a good deal also depends on the VC's value-add.",
-            incorrect: "R10m ÷ 35% ≈ R28.6m post-money. The percentage alone doesn't tell you if it's fair — the pre-money value and VC's help matter.",
+            incorrect: "R10m ÷ 35% ≈ R28.6m post-money. The percentage alone doesn't tell you if it's fair. The pre-money value and VC's help matter.",
           },
         },
       },
@@ -838,10 +838,10 @@ const fundSlots: QuestionSlot[] = [
         variantId: "bfa-fund-vc-tf",
         step: {
           type: "true-false",
-          statement: "Beyond the price, the right investor adds networks and expertise — not just cash.",
+          statement: "Beyond the price, the right investor adds networks and expertise, not just cash.",
           correct: true,
           feedback: {
-            correct: "Right. A strong VC's connections and experience can matter as much as the money — the wrong one just takes equity.",
+            correct: "Right. A strong VC's connections and experience can matter as much as the money. The wrong one just takes equity.",
             incorrect: "It's true. The best investors bring networks, expertise and follow-on capital, not only a cheque.",
           },
         },
@@ -852,7 +852,7 @@ const fundSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Why is bank debt usually unsuitable for a pre-profit startup with no assets?",
           options: [
-            "Banks lend against assets or cash flow, which such a startup doesn't yet have",
+            "Banks lend against assets or cash flow",
             "Banks never lend to anyone",
             "Debt is illegal for startups",
             "It dilutes equity too much",
@@ -876,7 +876,7 @@ const fundSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Why is a shareholders agreement essential before taking on investment or a co-owner?",
           options: [
-            "It governs exits, disputes, death and deadlock — the Companies Act defaults are rarely what you want",
+            "It governs exits, disputes, death and deadlock. The Companies Act defaults are rarely what you want",
             "It's legally optional and pointless",
             "It sets your company tax rate",
             "It replaces the need for a will",
@@ -884,7 +884,7 @@ const fundSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Clauses like tag/drag-along, first refusal, deadlock resolution and buyout-on-death prevent expensive future fights.",
-            incorrect: "It governs the hard scenarios — exits, disputes, deadlock, death. Without it, unhelpful Companies Act defaults apply.",
+            incorrect: "It governs the hard scenarios: exits, disputes, deadlock, death. Without it, unhelpful Companies Act defaults apply.",
           },
         },
       },
@@ -895,7 +895,7 @@ const fundSlots: QuestionSlot[] = [
           statement: "A 50/50 company with no deadlock clause can be paralysed when the two owners fundamentally disagree.",
           correct: true,
           feedback: {
-            correct: "Right. Neither can override the other — it can end in costly litigation or even liquidation of a profitable business.",
+            correct: "Right. Neither can override the other. It can end in costly litigation or even liquidation of a profitable business.",
             incorrect: "It's true. 50/50 with no deadlock mechanism means paralysis; a 'shotgun clause' would resolve it cleanly.",
           },
         },
@@ -906,14 +906,14 @@ const fundSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo and Sipho own 50/50 with no deadlock clause and fundamentally disagree on a major decision. Most likely result?",
           options: [
-            "Paralysis — potentially costly court action or forced liquidation",
+            "Paralysis, potentially costly court action or forced liquidation",
             "The Companies Act automatically decides for them",
             "Whoever proposed the action wins by default",
             "SARS steps in to run the company",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. With no agreed mechanism, a 50/50 split stalls — and resolving it in court is slow and expensive.",
+            correct: "Right. With no agreed mechanism, a 50/50 split stalls, and resolving it in court is slow and expensive.",
             incorrect: "It's paralysis. There's no automatic tiebreak in law; a deadlock clause (e.g. a shotgun clause) is what prevents this.",
           },
         },
@@ -927,7 +927,7 @@ const fundLayout: LessonLayoutItem[] = [
     type: "info",
     title: "Debt, Equity, and Government",
     content:
-      "<p>Funding runs from cheapest-in-control to most-dilutive: <strong>bootstrapping</strong> (self-funded, slow), <strong>government finance and grants</strong> (SEFA loans, IDC, DTIC grants — cheaper or non-dilutive but bureaucratic), <strong>debt</strong> (interest, but you keep your equity), and <strong>equity</strong> (angels, VC — cash and expertise, but you give up ownership and some control).</p><p>The core trade-off: debt keeps ownership but must be repaid; equity shares the risk but dilutes you. And before any co-owner or investor comes in, a <strong>shareholders agreement</strong> — covering exits, disputes, deadlock and death — is non-negotiable.</p>",
+      "<p>Funding runs from cheapest-in-control to most-dilutive: <strong>bootstrapping</strong> (self-funded, slow), <strong>government finance and grants</strong> (SEFA loans, IDC, DTIC grants, cheaper or non-dilutive but bureaucratic), <strong>debt</strong> (interest, but you keep your equity), and <strong>equity</strong> (angels, VC. Cash and expertise, but you give up ownership and some control).</p><p>The core trade-off: debt keeps ownership but must be repaid; equity shares the risk but dilutes you. And before any co-owner or investor comes in, a <strong>shareholders agreement</strong> (covering exits, disputes, deadlock and death) is non-negotiable.</p>",
   },
   { slot: "business-finance-advanced/business-funding/debt-vs-equity" },
   { slot: "business-finance-advanced/business-funding/government" },

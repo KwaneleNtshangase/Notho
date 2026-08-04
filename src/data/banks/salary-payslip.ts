@@ -23,7 +23,7 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "Your offer letter says R25 000, but only R18 500 lands in your account. What is the R25 000 called?",
           options: [
-            "Your gross salary — the figure before deductions",
+            "Your gross salary, the figure before deductions",
             "Your net salary",
             "Your annual bonus",
             "A payroll error you should query",
@@ -33,7 +33,7 @@ const lesson1Slots: QuestionSlot[] = [
             correct:
               "Right. Gross is the headline number before PAYE, UIF and other deductions. The R18 500 that actually arrives is your net.",
             incorrect:
-              "R25 000 is the gross — the figure before deductions. What lands in your account (R18 500) is the net.",
+              "R25 000 is the gross. The figure before deductions. What lands in your account (R18 500) is the net.",
           },
         },
       },
@@ -44,8 +44,8 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "Lerato is offered 'R30 000 a month'. What's the smart thing to check before she celebrates?",
           options: [
-            "Whether that's gross (before deductions) or net (take-home)",
-            "Nothing — R30 000 is R30 000",
+            "Whether that's gross or net",
+            "Nothing. R30 000 is R30 000",
             "Whether she'll be paid weekly",
             "If there's a 13th cheque",
           ],
@@ -66,7 +66,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct:
-              "True. Deductions — PAYE, UIF, often pension and medical aid — come off gross, so net is always the smaller number.",
+              "True. Deductions (PAYE, UIF, often pension and medical aid) come off gross, so net is always the smaller number.",
             incorrect:
               "It's true: deductions are subtracted from gross to give net, so net is always lower.",
           },
@@ -92,7 +92,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. Progressive tax is about proportional contribution — higher earners fund more of the healthcare, schools and roads everyone uses.",
+              "Right. Progressive tax is about proportional contribution: higher earners fund more of the healthcare, schools and roads everyone uses.",
             incorrect:
               "It's about fairness of contribution: higher earners pay a larger share toward shared public services.",
           },
@@ -105,17 +105,17 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "Sipho gets a raise that pushes him into a higher tax bracket and panics that his whole salary is now taxed more. Is he right?",
           options: [
-            "No — only the rands inside the higher bracket are taxed at the higher rate",
-            "Yes — his entire salary jumps to the new rate",
-            "Yes — he'll now take home less than before the raise",
-            "No — raises are never taxed at all",
+            "No. Only the rands inside the higher bracket are taxed at the higher rate",
+            "Yes. His entire salary jumps to the new rate",
+            "Yes. He'll now take home less than before the raise",
+            "No. Raises are never taxed at all",
           ],
           correct: 0,
           feedback: {
             correct:
               "Exactly. SA tax is marginal: only the portion above the threshold is taxed higher. A raise always leaves you with more, never less.",
             incorrect:
-              "Only the income above the bracket line is taxed at the higher rate. You never take home less because of a raise — that's the marginal-rate myth.",
+              "Only the income above the bracket line is taxed at the higher rate. You never take home less because of a raise. That's the marginal-rate myth.",
           },
         },
       },
@@ -128,9 +128,9 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct:
-              "True. Each slice of income is taxed at its own rate — this is why moving up a bracket never cuts your take-home pay.",
+              "True. Each slice of income is taxed at its own rate. This is why moving up a bracket never cuts your take-home pay.",
             incorrect:
-              "It's true — tax is charged slice by slice. Only the rands above a threshold get the higher rate, not your whole salary.",
+              "It's true. Tax is charged slice by slice. Only the rands above a threshold get the higher rate, not your whole salary.",
           },
         },
       },
@@ -154,7 +154,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. UIF is a safety net you pay into — it pays out if you're retrenched, on maternity leave, or too ill to work.",
+              "Right. UIF is a safety net you pay into. It pays out if you're retrenched, on maternity leave, or too ill to work.",
             incorrect:
               "UIF is unemployment insurance: it pays you a portion of your income if you lose your job or go on maternity/illness leave.",
           },
@@ -181,7 +181,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct:
-              "True. You pay 1% and your employer matches it — so on R12 000 that's R120 + R120 = R240 a month into the fund.",
+              "True. You pay 1% and your employer matches it, so on R12 000 that's R120 + R120 = R240 a month into the fund.",
             incorrect:
               "It's true: the employer matches your 1%. On R12 000 that's R240 a month total going into UIF.",
           },
@@ -236,7 +236,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. You can only spend what actually arrives, so the budget lives on net pay — never gross.",
+              "Right. You can only spend what actually arrives, so the budget lives on net pay. Never gross.",
             incorrect:
               "Budget on net. Gross includes money that's already been deducted before you ever see it.",
           },
@@ -258,14 +258,14 @@ const lesson1Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Big One: PAYE",
     content:
-      "<p><strong>PAYE (Pay As You Earn)</strong> is income tax deducted monthly. South Africa uses progressive tax — the more you earn, the higher the rate on the top slice of your income. The first ~R99 000 a year is taxed at 0%. <em>Thresholds change annually; these are illustrative.</em></p>",
+      "<p><strong>PAYE (Pay As You Earn)</strong> is income tax deducted monthly. South Africa uses progressive tax. The more you earn, the higher the rate on the top slice of your income. The first ~R99 000 a year is taxed at 0%. <em>Thresholds change annually; these are illustrative.</em></p>",
   },
   { slot: "salary-payslip/lesson-1/progressive-tax" },
   {
     type: "info",
     title: "UIF, Your Safety Net",
     content:
-      "<p><strong>UIF (Unemployment Insurance Fund)</strong> is 1% of your salary — matched by your employer — that helps if you lose your job, go on maternity leave, or need illness benefits. It's capped at a monthly earnings ceiling of R17 712, so the most either side pays is R177.12. On R12 000: you pay R120, your employer pays R120, into a fund you can claim from later.</p>",
+      "<p><strong>UIF (Unemployment Insurance Fund)</strong> is 1% of your salary, matched by your employer, that helps if you lose your job, go on maternity leave, or need illness benefits. It's capped at a monthly earnings ceiling of R17 712, so the most either side pays is R177.12. On R12 000: you pay R120, your employer pays R120, into a fund you can claim from later.</p>",
   },
   { slot: "salary-payslip/lesson-1/uif-basics" },
   { slot: "salary-payslip/lesson-1/net-math" },
@@ -311,7 +311,7 @@ const lesson2Slots: QuestionSlot[] = [
             correct:
               "True. Spreading tax across 12 months is why most employees never face a scary February tax bill.",
             incorrect:
-              "It's true — monthly PAYE spreads your tax over the year instead of a single lump sum at year-end.",
+              "It's true, monthly PAYE spreads your tax over the year instead of a single lump sum at year-end.",
           },
         },
       },
@@ -330,9 +330,9 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. Same total tax, gentler on cash flow — monthly PAYE means no R30 000 surprise in February.",
+              "Right. Same total tax, gentler on cash flow. Monthly PAYE means no R30 000 surprise in February.",
             incorrect:
-              "It doesn't lower the total — it just spreads it. Paying monthly beats a single lump-sum shock at year-end.",
+              "It doesn't lower the total, it just spreads it. Paying monthly beats a single lump-sum shock at year-end.",
           },
         },
       },
@@ -356,7 +356,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. RA contributions are tax-deductible — the single most powerful legal tax tool most South Africans have.",
+              "Right. RA contributions are tax-deductible: the single most powerful legal tax tool most South Africans have.",
             incorrect:
               "The legal lever is a Retirement Annuity: contributions are deductible, so they lower your taxable income and your PAYE.",
           },
@@ -373,7 +373,7 @@ const lesson2Slots: QuestionSlot[] = [
             correct:
               "True. Retirement contributions come off before tax is calculated, shrinking the income SARS taxes.",
             incorrect:
-              "It's true — approved retirement contributions reduce taxable income, which directly reduces your PAYE.",
+              "It's true. Approved retirement contributions reduce taxable income, which directly reduces your PAYE.",
           },
         },
       },
@@ -384,7 +384,7 @@ const lesson2Slots: QuestionSlot[] = [
           question:
             "Ayesha earns R40 000/month and starts putting R3 000/month into an RA. What happens to her PAYE?",
           options: [
-            "It drops — the R3 000 is deducted before her tax is worked out",
+            "It drops. The R3 000 is deducted before her tax is worked out",
             "It rises because she now earns 'extra'",
             "Nothing changes",
             "She stops paying tax entirely",
@@ -392,7 +392,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. Her taxable income falls by R3 000 a month, so SARS taxes less — she often gets a few hundred rand back each month in reduced PAYE.",
+              "Right. Her taxable income falls by R3 000 a month, so SARS taxes less. She often gets a few hundred rand back each month in reduced PAYE.",
             incorrect:
               "Her PAYE drops: the RA contribution lowers taxable income, so less tax is deducted.",
           },
@@ -413,7 +413,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: false,
           feedback: {
             correct:
-              "Correct. PAYE is a statutory duty — the employer must deduct it and pay it over monthly. No side deals.",
+              "Correct. PAYE is a statutory duty. The employer must deduct it and pay it over monthly. No side deals.",
             incorrect:
               "PAYE is mandatory by law. An employee 'agreement' can't replace the employer's legal duty to deduct and pay it.",
           },
@@ -428,7 +428,7 @@ const lesson2Slots: QuestionSlot[] = [
             "The employer's",
             "The employee's alone",
             "SARS deducts it straight from your bank",
-            "Nobody's — it's optional",
+            "Nobody's. It's optional",
           ],
           correct: 0,
           feedback: {
@@ -444,7 +444,7 @@ const lesson2Slots: QuestionSlot[] = [
         step: {
           type: "scenario",
           question:
-            "A small employer offers Nomsa 'the full amount, no PAYE — you sort out your own tax'. What's the risk?",
+            "A small employer offers Nomsa 'the full amount, no PAYE, you sort out your own tax'. What's the risk?",
           options: [
             "It's not legal, and Nomsa could face a large tax bill plus penalties later",
             "It's a great deal with no downside",
@@ -454,7 +454,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. The employer is dodging a legal duty, and Nomsa is left exposed — an unpaid tax bill with interest and penalties waiting at year-end.",
+              "Right. The employer is dodging a legal duty, and Nomsa is left exposed, an unpaid tax bill with interest and penalties waiting at year-end.",
             incorrect:
               "It's a trap. PAYE isn't optional, and 'sort it out yourself' usually ends in a nasty SARS bill with penalties for Nomsa.",
           },
@@ -472,7 +472,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Your 'marginal rate' is:",
           options: [
-            "The rate on your next (or last) rand earned — the top bracket you reach",
+            "The rate on your next (or last) rand earned",
             "The average rate across all your income",
             "A flat 27.5% for everyone",
             "The same thing as your UIF rate",
@@ -480,7 +480,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. Your marginal rate applies only to your top slice of income — useful to know, because it's the rate an RA contribution saves you.",
+              "Right. Your marginal rate applies only to your top slice of income. Useful to know, because it's the rate an RA contribution saves you.",
             incorrect:
               "Marginal rate = the rate on your highest slice of income, not the average. It's what each extra (or deducted) rand is taxed at.",
           },
@@ -495,7 +495,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct:
-              "True. Only that extra rand (and income above the line) is taxed higher — you always keep more of a raise, never less.",
+              "True. Only that extra rand (and income above the line) is taxed higher. You always keep more of a raise, never less.",
             incorrect:
               "It's true. The higher rate only hits income above the threshold, so a raise can never leave you worse off.",
           },
@@ -516,7 +516,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. Rebates create a tax threshold — earn under it in a year and you owe no income tax at all.",
+              "Right. Rebates create a tax threshold, earn under it in a year and you owe no income tax at all.",
             incorrect:
               "It's the tax threshold, created by SARS rebates. Below it, you pay no income tax for the year.",
           },
@@ -531,7 +531,7 @@ const lesson2Layout: LessonLayoutItem[] = [
     type: "info",
     title: "How PAYE Is Calculated",
     content:
-      "<p>PAYE is worked out on your annual income using SARS tax brackets, then deducted monthly so you don't owe a lump sum at year-end.</p><p>You can reduce PAYE legally by contributing to a Retirement Annuity (RA) — contributions are tax-deductible up to 27.5% of income (subject to an annual cap).</p>",
+      "<p>PAYE is worked out on your annual income using SARS tax brackets, then deducted monthly so you don't owe a lump sum at year-end.</p><p>You can reduce PAYE legally by contributing to a Retirement Annuity (RA). Contributions are tax-deductible up to 27.5% of income (subject to an annual cap).</p>",
   },
   { slot: "salary-payslip/lesson-2/what-is-paye" },
   { slot: "salary-payslip/lesson-2/marginal-rate" },
@@ -553,10 +553,10 @@ const lesson3Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "An employee earns R20 000/month. UIF is 1%, but capped at earnings of R17 712. What's their monthly UIF?",
-          options: ["R177.12 (1% of the R17 712 cap)", "R200", "R100", "R400"],
+          options: ["R177.12", "R200", "R100", "R400"],
           correct: 0,
           feedback: {
-            correct: "Right. Above the R17 712 ceiling, UIF stops rising: 1% × R17 712 = R177.12 — the most either side pays.",
+            correct: "Right. Above the R17 712 ceiling, UIF stops rising: 1% × R17 712 = R177.12. The most either side pays.",
             incorrect: "R20 000 is above the R17 712 cap, so UIF is 1% × R17 712 = R177.12, not 1% of the full salary.",
           },
         },
@@ -581,7 +581,7 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "Both you and your employer each pay 1% of your salary to UIF.",
           correct: true,
           feedback: {
-            correct: "True. You pay 1%, your employer pays 1% — a total of 2% of your salary goes into the fund each month.",
+            correct: "True. You pay 1%, your employer pays 1%, a total of 2% of your salary goes into the fund each month.",
             incorrect: "It's true: you pay 1% and your employer matches it, so 2% of your salary flows into UIF monthly.",
           },
         },
@@ -600,9 +600,9 @@ const lesson3Slots: QuestionSlot[] = [
           correct: false,
           feedback: {
             correct:
-              "Correct. UIF is for retrenchment, dismissal, maternity, illness or adoption — not for choosing to leave.",
+              "Correct. UIF is for retrenchment, dismissal, maternity, illness or adoption, not for choosing to leave.",
             incorrect:
-              "Voluntary resignation doesn't qualify. UIF covers retrenchment, dismissal, maternity and illness — not quitting by choice.",
+              "Voluntary resignation doesn't qualify. UIF covers retrenchment, dismissal, maternity and illness, not quitting by choice.",
           },
         },
       },
@@ -620,7 +620,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. Retrenchment is exactly what UIF is for. Voluntary exits — travel, boredom, chosen unpaid leave — don't qualify.",
+              "Right. Retrenchment is exactly what UIF is for. Voluntary exits (travel, boredom, chosen unpaid leave) don't qualify.",
             incorrect:
               "Only involuntary loss of income qualifies. Retrenchment counts; choosing to leave does not.",
           },
@@ -633,17 +633,17 @@ const lesson3Slots: QuestionSlot[] = [
           question:
             "Zanele, earning R15 000/month, is retrenched. Roughly what can UIF pay her while she job-hunts?",
           options: [
-            "A portion of her salary (up to ~60% on a sliding scale) for a limited period",
+            "A portion of her salary for a limited period",
             "Her full salary, indefinitely",
-            "Nothing — UIF is only for pensioners",
+            "Nothing. UIF is only for pensioners",
             "A once-off payment of R500",
           ],
           correct: 0,
           feedback: {
             correct:
-              "Right. UIF replaces part of your income (higher earners get a smaller percentage) for a capped number of days — a bridge, not a full salary.",
+              "Right. UIF replaces part of your income (higher earners get a smaller percentage) for a capped number of days: a bridge, not a full salary.",
             incorrect:
-              "UIF pays a portion of your income (up to ~60%, sliding scale) for a limited time — a bridge while you find work, not your full pay.",
+              "UIF pays a portion of your income (up to ~60%, sliding scale) for a limited time. A bridge while you find work, not your full pay.",
           },
         },
       },
@@ -659,7 +659,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Who pays the Skills Development Levy (SDL)?",
           options: [
-            "The employer only — it's not deducted from your pay",
+            "The employer only. It's not deducted from your pay",
             "The employee only",
             "Both employee and employer equally",
             "SARS deducts it from your bank account",
@@ -681,7 +681,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: false,
           feedback: {
             correct:
-              "Correct. SDL is the employer's cost, not yours — it isn't deducted from your salary at all.",
+              "Correct. SDL is the employer's cost, not yours, it isn't deducted from your salary at all.",
             incorrect:
               "It's not deducted from you. SDL is an employer levy (1% of payroll); it never touches your take-home pay.",
           },
@@ -701,9 +701,9 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. SDL bankrolls skills development — training programmes and learnerships run through the SETAs.",
+              "Right. SDL bankrolls skills development. Training programmes and learnerships run through the SETAs.",
             incorrect:
-              "SDL funds workplace skills training and learnerships through the SETAs — not pensions, UIF or rates.",
+              "SDL funds workplace skills training and learnerships through the SETAs, not pensions, UIF or rates.",
           },
         },
       },
@@ -719,7 +719,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the honest reason to actually understand the UIF line on your payslip?",
           options: [
-            "It's money you can claim when you're out of work — it's your safety net",
+            "It's money you can claim when you're out of work. It's your safety net",
             "It's a scam you should dispute",
             "It secretly increases your salary",
             "It's completely voluntary",
@@ -727,7 +727,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. Most people ignore UIF until they need it. Knowing it exists — and how to claim — is the point of paying in.",
+              "Right. Most people ignore UIF until they need it. Knowing it exists, and how to claim, is the point of paying in.",
             incorrect:
               "UIF is a real benefit you've paid for: income support when you're retrenched or on maternity/illness leave. Worth understanding.",
           },
@@ -741,14 +741,14 @@ const lesson3Slots: QuestionSlot[] = [
             "Thabo earns R15 000. His UIF is R150 and his employer adds R150. Why does this matter to him personally?",
           options: [
             "If he's retrenched, he can claim from that fund while he looks for work",
-            "It doesn't — it's just money gone",
+            "It doesn't. It's just money gone",
             "It's a loan he has to repay later",
             "It's actually his pension",
           ],
           correct: 0,
           feedback: {
             correct:
-              "Right. That R300 a month is buying him a real safety net — income support if the job ever disappears.",
+              "Right. That R300 a month is buying him a real safety net, income support if the job ever disappears.",
             incorrect:
               "It's not lost money or a loan. It's insurance: if Thabo is retrenched, he can claim UIF income while job-hunting.",
           },
@@ -762,7 +762,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct:
-              "True. UIF covers maternity, adoption and illness benefits too — not just job loss. Many parents don't realise they can claim.",
+              "True. UIF covers maternity, adoption and illness benefits too, not just job loss. Many parents don't realise they can claim.",
             incorrect:
               "It's true: UIF pays maternity, adoption and illness benefits as well as unemployment. Worth claiming when eligible.",
           },
@@ -777,7 +777,7 @@ const lesson3Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Two Deductions That Protect You",
     content:
-      "<p>Two payslip lines most people ignore: <strong>UIF</strong> and <strong>SDL</strong>.</p><p><strong>UIF:</strong> you pay 1% of salary (up to a R17 712/month earnings cap, so at most R177.12), your employer pays another 1%. Lose your job, get retrenched, or go on maternity leave, and you can claim a portion of your income for a limited period.</p><p><strong>SDL (Skills Development Levy):</strong> your employer pays 1% of payroll to the SETAs to fund training. You do <em>not</em> pay this — it's an employer cost, so it never appears as a deduction on your payslip.</p>",
+      "<p>Two payslip lines most people ignore: <strong>UIF</strong> and <strong>SDL</strong>.</p><p><strong>UIF:</strong> you pay 1% of salary (up to a R17 712/month earnings cap, so at most R177.12), your employer pays another 1%. Lose your job, get retrenched, or go on maternity leave, and you can claim a portion of your income for a limited period.</p><p><strong>SDL (Skills Development Levy):</strong> your employer pays 1% of payroll to the SETAs to fund training. You do <em>not</em> pay this. It's an employer cost, so it never appears as a deduction on your payslip.</p>",
   },
   { slot: "salary-payslip/lesson-3/uif-rate" },
   { slot: "salary-payslip/lesson-3/uif-claim" },
@@ -804,7 +804,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. You can deduct up to 27.5% of taxable income (subject to an annual rand cap set by SARS) — one of SA's best legal tax breaks.",
+              "Right. You can deduct up to 27.5% of taxable income (subject to an annual rand cap set by SARS): one of SA's best legal tax breaks.",
             incorrect:
               "It's 27.5% of taxable income (up to an annual cap). That's the ceiling on deductible retirement contributions.",
           },
@@ -821,7 +821,7 @@ const lesson4Slots: QuestionSlot[] = [
             correct:
               "True. Approved contributions come off your taxable income, so you're effectively saving with money that would partly have gone to SARS.",
             incorrect:
-              "It's true — approved retirement contributions are pre-tax, so they cut your taxable income and your tax bill.",
+              "It's true. Approved retirement contributions are pre-tax, so they cut your taxable income and your tax bill.",
           },
         },
       },
@@ -832,15 +832,15 @@ const lesson4Slots: QuestionSlot[] = [
           question:
             "Sipho earns R30 000/month and puts R3 000/month into an RA. Roughly what does he gain at tax time?",
           options: [
-            "A tax saving — his contribution cuts taxable income, often putting hundreds of rands a month back in his pocket",
-            "Nothing — RAs give no tax benefit",
+            "A tax saving. His contribution cuts taxable income, often putting hundreds of rands a month back in his pocket",
+            "Nothing. RAs give no tax benefit",
             "He ends up paying more tax",
             "SARS blocks the contribution",
           ],
           correct: 0,
           feedback: {
             correct:
-              "Right. At a ~31% marginal rate, R3 000 into an RA saves him roughly R930/month in tax — while also building his retirement.",
+              "Right. At a ~31% marginal rate, R3 000 into an RA saves him roughly R930/month in tax, while also building his retirement.",
             incorrect:
               "He gains a tax saving: the R3 000 lowers taxable income, so his PAYE drops (often several hundred rand a month).",
           },
@@ -866,7 +866,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. An RA is private — you choose the provider and amount, and it's not tied to any job.",
+              "Right. An RA is private, you choose the provider and amount, and it's not tied to any job.",
             incorrect:
               "It's the Retirement Annuity (RA): a private fund you open and control yourself, separate from any employer.",
           },
@@ -883,7 +883,7 @@ const lesson4Slots: QuestionSlot[] = [
             correct:
               "True. No employer pension? An RA lets you get the same tax break and build retirement savings on your own terms.",
             incorrect:
-              "It's true — RAs are built for the self-employed and anyone whose employer offers no fund.",
+              "It's true. RAs are built for the self-employed and anyone whose employer offers no fund.",
           },
         },
       },
@@ -893,7 +893,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the main advantage of an RA over a workplace pension fund?",
           options: [
-            "It's portable — it stays yours through job changes and self-employment",
+            "It's portable. It stays yours through job changes and self-employment",
             "It guarantees higher investment returns",
             "You can withdraw from it anytime, tax-free",
             "It requires no paperwork at all",
@@ -903,7 +903,7 @@ const lesson4Slots: QuestionSlot[] = [
             correct:
               "Right. An RA isn't tied to an employer, so it moves with you through every job change and career break.",
             incorrect:
-              "The advantage is portability: an RA belongs to you and keeps going regardless of where — or whether — you're employed.",
+              "The advantage is portability: an RA belongs to you and keeps going regardless of where, or whether, you're employed.",
           },
         },
       },
@@ -922,7 +922,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: false,
           feedback: {
             correct:
-              "Correct. Only the Savings Pot — one third of new contributions — is reachable. The Retirement Pot (two thirds) stays locked until retirement.",
+              "Correct. Only the Savings Pot, one third of new contributions, is reachable. The Retirement Pot (two thirds) stays locked until retirement.",
             incorrect:
               "Only the Savings Pot (1/3 of new contributions) is accessible. The other 2/3 is locked away until retirement.",
           },
@@ -955,7 +955,7 @@ const lesson4Slots: QuestionSlot[] = [
           question:
             "Nomsa wants to cash in her whole retirement fund to buy a car. Under the two-pot rules, what can she actually touch?",
           options: [
-            "Only her Savings Pot (about 1/3 of contributions), once per tax year, and it's taxed",
+            "Only her Savings Pot , once per tax year",
             "All of it, whenever she likes",
             "None of it, ever",
             "Only her employer's share",
@@ -963,7 +963,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. The system is designed to stop exactly this — she can dip into the Savings Pot only, once a year, and pays tax on what she takes.",
+              "Right. The system is designed to stop exactly this. She can dip into the Savings Pot only, once a year, and pays tax on what she takes.",
             incorrect:
               "She can only reach the Savings Pot (~1/3), once per tax year, and it's taxed. The rest stays locked for retirement.",
           },
@@ -985,7 +985,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 198000,
           feedback: {
             correct: "Correct: R720 000 × 27.5% = R198 000 a year across all your retirement funds combined.",
-            incorrect: "R720 000 × 27.5% = R198 000 — the combined annual deductible limit.",
+            incorrect: "R720 000 × 27.5% = R198 000, the combined annual deductible limit.",
           },
         },
       },
@@ -1003,7 +1003,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct:
-              "Right. The tax break is immediate — you pay less PAYE this year while also building your future.",
+              "Right. The tax break is immediate. You pay less PAYE this year while also building your future.",
             incorrect:
               "The immediate win is lower income tax now, on top of the long-term retirement growth.",
           },
@@ -1018,7 +1018,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct:
-              "True. It's rare to cut your tax and build wealth with the same rand — the retirement deduction lets you do both.",
+              "True. It's rare to cut your tax and build wealth with the same rand. The retirement deduction lets you do both.",
             incorrect:
               "It's true. Retirement contributions are one of the cleanest legal ways to lower your income tax.",
           },
@@ -1033,7 +1033,7 @@ const lesson4Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Build Wealth and Pay Less Tax",
     content:
-      "<p>South Africa gives you a strong incentive to save for retirement: contributions to approved funds are tax-deductible up to <strong>27.5% of taxable income</strong> (subject to an annual cap).</p><p><strong>Three vehicles:</strong> a <strong>Pension Fund</strong> (employer-run, often matched), a <strong>Provident Fund</strong> (now aligned to pension rules), and a <strong>Retirement Annuity</strong> (private, ideal if you're self-employed or want to save more).</p><p><strong>Two-Pot System (from 1 Sept 2024):</strong> new contributions split into a Savings Pot (1/3, one withdrawal per tax year) and a Retirement Pot (2/3, locked until retirement) — emergency access without gutting your retirement.</p>",
+      "<p>South Africa gives you a strong incentive to save for retirement: contributions to approved funds are tax-deductible up to <strong>27.5% of taxable income</strong> (subject to an annual cap).</p><p><strong>Three vehicles:</strong> a <strong>Pension Fund</strong> (employer-run, often matched), a <strong>Provident Fund</strong> (now aligned to pension rules), and a <strong>Retirement Annuity</strong> (private, ideal if you're self-employed or want to save more).</p><p><strong>Two-Pot System (from 1 Sept 2024):</strong> new contributions split into a Savings Pot (1/3, one withdrawal per tax year) and a Retirement Pot (2/3, locked until retirement): emergency access without gutting your retirement.</p>",
   },
   { slot: "salary-payslip/lesson-4/deduction-limit" },
   { slot: "salary-payslip/lesson-4/vehicles" },

@@ -24,7 +24,7 @@ const lesson1Slots: QuestionSlot[] = [
           options: ["Your payment history", "How many bank accounts you have", "How much you earn", "Your age"],
           correct: 0,
           feedback: {
-            correct: "Right. Payment history is the single biggest factor — pay on time, every time. One missed payment can drop your score sharply.",
+            correct: "Right. Payment history is the single biggest factor. Pay on time, every time. One missed payment can drop your score sharply.",
             incorrect: "It's payment history. Your income and age barely matter; whether you pay on time is what lenders watch most.",
           },
         },
@@ -42,7 +42,7 @@ const lesson1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A high salary doesn't rescue a poor payment record. Lenders price the risk of missed payments into higher interest — or decline him.",
+            correct: "Right. A high salary doesn't rescue a poor payment record. Lenders price the risk of missed payments into higher interest, or decline him.",
             incorrect: "Income doesn't offset missed payments. His history says 'risk', so he'll face higher rates or rejection despite earning well.",
           },
         },
@@ -55,7 +55,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Nothing moves your score more, in either direction, than your track record of paying on time.",
-            incorrect: "It's true — on-time payments are the number-one driver of a healthy score. It's the habit that matters most.",
+            incorrect: "It's true. On-time payments are the number-one driver of a healthy score. It's the habit that matters most.",
           },
         },
       },
@@ -72,7 +72,7 @@ const lesson1Slots: QuestionSlot[] = [
           statement: "Checking your own credit score damages your credit rating.",
           correct: false,
           feedback: {
-            correct: "Correct. Checking your own score is a 'soft inquiry' with zero impact. You're entitled to a free credit report each year — use it.",
+            correct: "Correct. Checking your own score is a 'soft inquiry' with zero impact. You're entitled to a free credit report each year. Use it.",
             incorrect: "It doesn't. Checking your own score is a soft inquiry that never affects your rating. Do it regularly.",
           },
         },
@@ -83,7 +83,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which of these can lower your score slightly?",
           options: [
-            "Applying for lots of new credit in a short time (hard inquiries)",
+            "Applying for lots of new credit in a short time",
             "Checking your own score",
             "Reading your credit report",
             "Budgeting your salary",
@@ -102,8 +102,8 @@ const lesson1Slots: QuestionSlot[] = [
           statement: "It's a good habit to check your own credit report regularly for errors and fraud.",
           correct: true,
           feedback: {
-            correct: "True. Errors and fraudulent accounts do happen. Catching them early — at no cost to your score — protects your borrowing power.",
-            incorrect: "It's true — regular self-checks catch mistakes and fraud early, and they never harm your score.",
+            correct: "True. Errors and fraudulent accounts do happen. Catching them early, at no cost to your score, protects your borrowing power.",
+            incorrect: "It's true, regular self-checks catch mistakes and fraud early, and they never harm your score.",
           },
         },
       },
@@ -126,7 +126,7 @@ const lesson1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. It's a risk estimate built from your borrowing history — a shorthand for 'how likely is this person to pay me back?'",
+            correct: "Right. It's a risk estimate built from your borrowing history. A shorthand for 'how likely is this person to pay me back?'",
             incorrect: "It signals repayment risk, not your wealth or character. Lenders use it to judge how likely you are to repay.",
           },
         },
@@ -139,7 +139,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Bureaus compile your accounts, payments, credit use and applications into the score lenders check.",
-            incorrect: "It's true — bureaus (TransUnion, Experian and others) assemble your history into the score lenders rely on.",
+            incorrect: "It's true: bureaus (TransUnion, Experian and others) assemble your history into the score lenders rely on.",
           },
         },
       },
@@ -149,14 +149,14 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "In general, a higher credit score means:",
           options: [
-            "Lenders see you as lower risk, so you get better rates",
+            "Lenders see you as lower risk",
             "You're forced to borrow more",
             "You pay higher interest",
             "Nothing changes",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Higher score, lower perceived risk, cheaper credit — a good score quietly saves you interest on every loan.",
+            correct: "Right. Higher score, lower perceived risk, cheaper credit. A good score quietly saves you interest on every loan.",
             incorrect: "Higher is better: it signals lower risk, which earns you lower interest rates on loans and cards.",
           },
         },
@@ -193,7 +193,7 @@ const lesson1Slots: QuestionSlot[] = [
           options: [
             "Potentially tens of thousands of rands in interest",
             "A few rands only",
-            "Nothing — rates are the same for everyone",
+            "Nothing. Rates are the same for everyone",
             "Only relevant in the first month",
           ],
           correct: 0,
@@ -211,7 +211,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Today's on-time payments build the track record that earns you lower rates on the big loans down the line.",
-            incorrect: "It's true — a clean payment record now is what unlocks cheaper borrowing (like a home loan) in future.",
+            incorrect: "It's true. A clean payment record now is what unlocks cheaper borrowing (like a home loan) in future.",
           },
         },
       },
@@ -224,7 +224,7 @@ const lesson1Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Your Financial Report Card",
     content:
-      "<p>A bad credit score costs you money every month — through higher interest on every loan you take. A good one is worth tens of thousands in interest saved over a lifetime.</p><p>Your credit score tells lenders how likely you are to repay. Bureaus like TransUnion, Experian and others build it from your payment history, how much credit you use, how long you've had credit, and how many recent applications you've made.</p>",
+      "<p>A bad credit score costs you money every month, through higher interest on every loan you take. A good one is worth tens of thousands in interest saved over a lifetime.</p><p>Your credit score tells lenders how likely you are to repay. Bureaus like TransUnion, Experian and others build it from your payment history, how much credit you use, how long you've had credit, and how many recent applications you've made.</p>",
   },
   { slot: "credit-debt/lesson-1/biggest-factor" },
   { slot: "credit-debt/lesson-1/check-own" },
@@ -247,7 +247,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "You owe R5 000 on a store card at 24% interest and pay only the R150 minimum each month. What happens?",
           options: [
-            "The balance barely moves — interest eats most of your payment",
+            "The balance barely moves, interest eats most of your payment",
             "You clear it in a few months",
             "The interest pauses while you pay",
             "The store writes it off after two years",
@@ -280,7 +280,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The minimum is designed to keep you paying interest for years. Anything extra you can throw at it shortens that dramatically.",
-            incorrect: "It's true — minimums stretch repayment over years and pile on interest. Paying more than the minimum is how you escape.",
+            incorrect: "It's true: minimums stretch repayment over years and pile on interest. Paying more than the minimum is how you escape.",
           },
         },
       },
@@ -298,7 +298,7 @@ const lesson2Slots: QuestionSlot[] = [
           prompt: "A R10 000 credit card balance at 20% a year that you never pay down costs you about R____ every year in interest.",
           correct: 2000,
           feedback: {
-            correct: "Correct: 20% of R10 000 = R2 000 a year — paid for nothing, just for carrying the balance.",
+            correct: "Correct: 20% of R10 000 = R2 000 a year, paid for nothing, just for carrying the balance.",
             incorrect: "20% of R10 000 = R2 000 a year in interest, for as long as you carry it.",
           },
         },
@@ -316,8 +316,8 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Interest is the rental cost of borrowed money — the higher the rate, the more you pay to use someone else's cash.",
-            incorrect: "It's the cost of borrowing — the price of using money you don't have yet, charged as a yearly percentage.",
+            correct: "Right. Interest is the rental cost of borrowed money, the higher the rate, the more you pay to use someone else's cash.",
+            incorrect: "It's the cost of borrowing: the price of using money you don't have yet, charged as a yearly percentage.",
           },
         },
       },
@@ -327,7 +327,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa can put a R4 000 fridge on a 25% store card or save two months and pay cash. Purely on cost, which is cheaper?",
           options: [
-            "Saving and paying cash — she avoids the interest entirely",
+            "Saving and paying cash, she avoids the interest entirely",
             "The store card, because she gets it now",
             "They cost exactly the same",
             "The store card, because interest is free",
@@ -335,7 +335,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Cash avoids the 25% interest completely. The card's convenience has a real price tag she'd keep paying for months.",
-            incorrect: "Cash is cheaper — it dodges the 25% interest. The card only feels cheaper because the cost is spread out and hidden.",
+            incorrect: "Cash is cheaper, it dodges the 25% interest. The card only feels cheaper because the cost is spread out and hidden.",
           },
         },
       },
@@ -351,7 +351,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Interest on a loan or card is usually quoted as an APR. What does that mean?",
           options: [
-            "The annual percentage rate — the yearly cost of borrowing",
+            "The annual percentage rate. The yearly cost of borrowing",
             "A monthly membership fee",
             "The amount you can borrow",
             "A discount on purchases",
@@ -370,8 +370,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "A higher APR means the same debt costs you more each month to carry.",
           correct: true,
           feedback: {
-            correct: "True. The rate is the price. A R5 000 balance costs far more at 30% than at 12% — always ask the rate before you sign.",
-            incorrect: "It's true — a higher APR means more interest on the same balance. The rate is the single most important number.",
+            correct: "True. The rate is the price. A R5 000 balance costs far more at 30% than at 12%. Always ask the rate before you sign.",
+            incorrect: "It's true. A higher APR means more interest on the same balance. The rate is the single most important number.",
           },
         },
       },
@@ -388,7 +388,7 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. If you can't quote the rate, you're not ready to sign — it decides the true cost of the whole deal.",
+            correct: "Right. If you can't quote the rate, you're not ready to sign: it decides the true cost of the whole deal.",
             incorrect: "Always get the rate (APR) first. Without it you can't know what the credit actually costs you.",
           },
         },
@@ -407,7 +407,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Every extra rand goes straight at the principal, shrinking future interest. It's the fastest legal way out of a card.",
-            incorrect: "It's true — extra payments attack the principal, so the debt clears sooner and costs far less interest overall.",
+            incorrect: "It's true, extra payments attack the principal, so the debt clears sooner and costs far less interest overall.",
           },
         },
       },
@@ -417,14 +417,14 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Priya has a small windfall of R2 000. Her card is at 22%. What gives the best guaranteed 'return'?",
           options: [
-            "Paying R2 000 off the 22% card — a guaranteed 22% saving",
+            "Paying R2 000 off the 22% card, a guaranteed 22% saving",
             "Leaving it in a 5% savings account",
             "Buying a lottery ticket",
             "Spending it before it 'disappears'",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Clearing 22% debt is a guaranteed 22% return — better than almost any investment, with zero risk.",
+            correct: "Right. Clearing 22% debt is a guaranteed 22% return: better than almost any investment, with zero risk.",
             incorrect: "Paying down the 22% card is a risk-free 22% return, far beating a 5% savings account. Debt first.",
           },
         },
@@ -443,7 +443,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Killing the priciest debt saves the most interest. Nothing you can safely invest in beats clearing a 20%+ balance.",
-            incorrect: "Target the highest-rate debt first — that's where your money saves the most interest.",
+            incorrect: "Target the highest-rate debt first. That's where your money saves the most interest.",
           },
         },
       },
@@ -456,7 +456,7 @@ const lesson2Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Price of Borrowed Money",
     content:
-      "<p>Interest is what you pay for spending money you don't have. At 20% a year, a R10 000 credit card balance you never clear costs you R2 000 every year — for nothing.</p><p>It's quoted as an annual percentage rate (APR). The minimum-payment trap: paying only the minimum means you repay far more than you borrowed, over far more years than you planned.</p>",
+      "<p>Interest is what you pay for spending money you don't have. At 20% a year, a R10 000 credit card balance you never clear costs you R2 000 every year. For nothing.</p><p>It's quoted as an annual percentage rate (APR). The minimum-payment trap: paying only the minimum means you repay far more than you borrowed, over far more years than you planned.</p>",
   },
   { slot: "credit-debt/lesson-2/min-payment-trap" },
   { slot: "credit-debt/lesson-2/interest-cost" },
@@ -505,7 +505,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. High rate + depreciating or non-essential purchase = bad debt. Low rate on something that grows or earns is a different story.",
-            incorrect: "'Bad' is about high rates on things that lose value and you don't need — not debt in general.",
+            incorrect: "'Bad' is about high rates on things that lose value and you don't need, not debt in general.",
           },
         },
       },
@@ -516,8 +516,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "Debt used to buy something that may grow in value (like an affordable home) can be 'good' debt.",
           correct: true,
           feedback: {
-            correct: "True. Affordable, low-rate debt on an appreciating asset can build wealth — the opposite of a high-rate clothing account.",
-            incorrect: "It's true — affordable debt on an appreciating asset (a home you can afford) is the textbook 'good debt'.",
+            correct: "True. Affordable, low-rate debt on an appreciating asset can build wealth, the opposite of a high-rate clothing account.",
+            incorrect: "It's true, affordable debt on an appreciating asset (a home you can afford) is the textbook 'good debt'.",
           },
         },
       },
@@ -534,8 +534,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "If repayments fit your budget in a good month, you don't need to check what happens if rates rise or income drops.",
           correct: false,
           feedback: {
-            correct: "Correct. Affordability must survive a shock, not just your best month. Rates climb and jobs change — plan for it before you sign.",
-            incorrect: "You do need to check. A repayment that only works in a great month is dangerous — stress-test for rate hikes and lost income.",
+            correct: "Correct. Affordability must survive a shock, not just your best month. Rates climb and jobs change. Plan for it before you sign.",
+            incorrect: "You do need to check. A repayment that only works in a great month is dangerous: stress-test for rate hikes and lost income.",
           },
         },
       },
@@ -553,7 +553,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. 'Just affordable now' breaks at the first shock. If it can't survive a rate hike or a lean month, it's too much debt.",
-            incorrect: "The real question is whether it survives a shock — a rate rise or a lean month. If not, the repayment is too tight.",
+            incorrect: "The real question is whether it survives a shock. A rate rise or a lean month. If not, the repayment is too tight.",
           },
         },
       },
@@ -565,7 +565,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Borrowing to your absolute limit leaves no room for surprises. A buffer is what keeps a setback from becoming a default.",
-            incorrect: "It's true — a gap between your max and your commitment absorbs shocks. Borrowing to the limit is how small setbacks spiral.",
+            incorrect: "It's true, a gap between your max and your commitment absorbs shocks. Borrowing to the limit is how small setbacks spiral.",
           },
         },
       },
@@ -581,15 +581,15 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You can do one thing this month: (A) take an 18% loan for a holiday, or (B) throw extra at a 24% store card until it's gone. Which improves your finances?",
           options: [
-            "B — attack the higher-rate debt you already have",
-            "A — memories are priceless",
-            "Neither — the maths is too scary",
+            "B. Attack the higher-rate debt you already have",
+            "A. Memories are priceless",
+            "Neither. The maths is too scary",
             "Open a third card to 'balance' things",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Clearing a 24% balance beats taking on new 18% debt for a want. Kill expensive debt before funding luxuries.",
-            incorrect: "Option B. Wiping a 24% debt saves more than any holiday loan costs — expensive debt first, wants later.",
+            incorrect: "Option B. Wiping a 24% debt saves more than any holiday loan costs, expensive debt first, wants later.",
           },
         },
       },
@@ -599,15 +599,15 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "When paying down several debts, a strong default is to target:",
           options: [
-            "The highest interest rate first (it costs you the most)",
+            "The highest interest rate first",
             "The one with the nicest logo",
             "Whichever is newest",
-            "None — pay only minimums forever",
+            "None. Pay only minimums forever",
           ],
           correct: 0,
           feedback: {
             correct: "Right. The highest-rate debt bleeds you fastest, so clearing it first saves the most money (the 'avalanche' method).",
-            incorrect: "Target the highest rate first — it's the most expensive, so removing it saves you the most in interest.",
+            incorrect: "Target the highest rate first. It's the most expensive, so removing it saves you the most in interest.",
           },
         },
       },
@@ -619,7 +619,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. New borrowing for wants, on top of costly existing debt, deepens the hole. Clear the expensive stuff first.",
-            incorrect: "It's true — adding want-debt while you owe on a high-rate card just digs deeper. Kill the costly debt first.",
+            incorrect: "It's true: adding want-debt while you owe on a high-rate card just digs deeper. Kill the costly debt first.",
           },
         },
       },
@@ -635,7 +635,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A R3 000 lounge suite on a store account can end up costing about R7 000 paid over years. What lesson does that teach?",
           options: [
-            "Annualise the true cost before signing — the sticker price isn't what you pay",
+            "Annualise the true cost before signing. The sticker price isn't what you pay",
             "Furniture is always a scam",
             "Never buy anything on credit, ever",
             "Store accounts are interest-free",
@@ -655,7 +655,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The price tag hides the interest. Add it all up and many 'affordable' monthly deals suddenly look like bad value.",
-            incorrect: "It's true — total repayment tells the real story. The monthly figure and sticker price both hide the interest.",
+            incorrect: "It's true. Total repayment tells the real story. The monthly figure and sticker price both hide the interest.",
           },
         },
       },
@@ -686,7 +686,7 @@ const lesson3Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Not All Debt Is the Same",
     content:
-      "<p>Good debt can be an affordable home loan on a stable income — the asset may grow and the rate is competitive. Bad debt is high-interest revolving credit for things that lose value fast (clothes, nights out rolled month to month), especially on minimum payments.</p><p>In SA, store cards near 20%+ can turn a R3 000 lounge suite into R7 000 over years. Before you sign, total the real cost and ask if it still feels worth it.</p>",
+      "<p>Good debt can be an affordable home loan on a stable income. The asset may grow and the rate is competitive. Bad debt is high-interest revolving credit for things that lose value fast (clothes, nights out rolled month to month), especially on minimum payments.</p><p>In SA, store cards near 20%+ can turn a R3 000 lounge suite into R7 000 over years. Before you sign, total the real cost and ask if it still feels worth it.</p>",
   },
   { slot: "credit-debt/lesson-3/which-bad" },
   { slot: "credit-debt/lesson-3/stress-test" },
@@ -710,8 +710,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "Paying your full credit card balance by the due date usually avoids interest on new purchases.",
           correct: true,
           feedback: {
-            correct: "True. That's the grace period — clear the full balance monthly and new purchases cost you nothing extra. Carry a balance and you lose it.",
-            incorrect: "It's true — paying in full each month keeps the interest-free grace period. Once you carry a balance, that benefit disappears.",
+            correct: "True. That's the grace period, clear the full balance monthly and new purchases cost you nothing extra. Carry a balance and you lose it.",
+            incorrect: "It's true. Paying in full each month keeps the interest-free grace period. Once you carry a balance, that benefit disappears.",
           },
         },
       },
@@ -740,13 +740,13 @@ const lesson4Slots: QuestionSlot[] = [
           question: "Lerato pays her card in full most months, then one month pays only the minimum. What changes?",
           options: [
             "She starts paying interest, and often loses the grace period on new purchases too",
-            "Nothing — one month doesn't matter",
+            "Nothing. One month doesn't matter",
             "Her interest rate drops as a reward",
             "The bank clears her balance",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Carrying a balance switches interest on — frequently on new spend as well, until she's back to paying in full.",
+            correct: "Right. Carrying a balance switches interest on, frequently on new spend as well, until she's back to paying in full.",
             incorrect: "That one month flips interest on. Carrying a balance usually kills the grace period on new purchases too.",
           },
         },
@@ -766,12 +766,12 @@ const lesson4Slots: QuestionSlot[] = [
             "The interest rate or monthly fees, arrears penalties, and whether you already carry similar debt",
             "Only the free gift on the desk",
             "Whether the card matches your phone cover",
-            "Nothing — the cashier already decided for you",
+            "Nothing: the cashier already decided for you",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Cost and consequences beat a once-off perk. If you can't quote the rate, you're not ready to sign.",
-            incorrect: "Check the rate, fees and penalties — and your existing debt. The free gift is the cheapest, least important part.",
+            incorrect: "Check the rate, fees and penalties, and your existing debt. The free gift is the cheapest, least important part.",
           },
         },
       },
@@ -793,7 +793,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho is offered a store card at checkout but already has two cards he's struggling to clear. Smart response?",
           options: [
-            "Decline — another card just adds temptation and more high-rate debt",
+            "Decline. Another card just adds temptation and more high-rate debt",
             "Take it for the discount",
             "Take it and worry later",
             "Take it to 'spread' the existing debt",
@@ -801,7 +801,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. A third card doesn't spread debt, it grows it. When you're already struggling, more available credit is the last thing you need.",
-            incorrect: "Decline it. Opening more credit while struggling adds temptation and risk — it doesn't 'spread' anything.",
+            incorrect: "Decline it. Opening more credit while struggling adds temptation and risk, it doesn't 'spread' anything.",
           },
         },
       },
@@ -831,8 +831,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "The minimum payment is set low mainly to keep you paying interest for as long as possible.",
           correct: true,
           feedback: {
-            correct: "True. A low minimum keeps the balance — and the interest — alive for years. Paying above it is how you break out.",
-            incorrect: "It's true — a small minimum maximises how long you pay interest. Beating the minimum every month is the escape.",
+            correct: "True. A low minimum keeps the balance, and the interest, alive for years. Paying above it is how you break out.",
+            incorrect: "It's true, a small minimum maximises how long you pay interest. Beating the minimum every month is the escape.",
           },
         },
       },
@@ -844,8 +844,8 @@ const lesson4Slots: QuestionSlot[] = [
           options: ["About R380", "About R70", "Nothing", "About R760"],
           correct: 0,
           feedback: {
-            correct: "Right: R760 − R380 = R380 off the principal — over five times the R70 the minimum would've managed.",
-            incorrect: "Pay R760, minus R380 interest, leaves R380 cutting the debt — far more than the minimum's R70.",
+            correct: "Right: R760 − R380 = R380 off the principal: over five times the R70 the minimum would've managed.",
+            incorrect: "Pay R760, minus R380 interest, leaves R380 cutting the debt. Far more than the minimum's R70.",
           },
         },
       },
@@ -881,7 +881,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. If you can't track it weekly, you can't catch overspending or fraud early. Link tap only to what you watch.",
-            incorrect: "It's true — only tap from an account you monitor weekly, so you spot overspending and dodgy charges quickly.",
+            incorrect: "It's true, only tap from an account you monitor weekly, so you spot overspending and dodgy charges quickly.",
           },
         },
       },
@@ -912,7 +912,7 @@ const lesson4Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Swipe Now, Pay Far More",
     content:
-      "<p>Retail cards tempt you with instant approval and birthday discounts. A credit card can help cash flow if you clear the full balance monthly and any rewards beat the fees. Trouble starts when a revolving balance meets a 20%+ rate — then a R2 500 splurge lingers for years.</p><p>Rule of thumb: never autopay only the minimum unless you're in a structured emergency plan, and unlink tap-to-pay from accounts you can't track weekly.</p>",
+      "<p>Retail cards tempt you with instant approval and birthday discounts. A credit card can help cash flow if you clear the full balance monthly and any rewards beat the fees. Trouble starts when a revolving balance meets a 20%+ rate, then a R2 500 splurge lingers for years.</p><p>Rule of thumb: never autopay only the minimum unless you're in a structured emergency plan, and unlink tap-to-pay from accounts you can't track weekly.</p>",
   },
   { slot: "credit-debt/lesson-4/pay-full" },
   { slot: "credit-debt/lesson-4/before-sign" },
@@ -942,7 +942,7 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Snowball goes smallest balance first — it's about quick wins and momentum, not pure maths.",
+            correct: "Right. Snowball goes smallest balance first. It's about quick wins and momentum, not pure maths.",
             incorrect: "Snowball = smallest balance first. Clearing one fast gives you a win that keeps you going.",
           },
         },
@@ -956,7 +956,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Smallest first: she clears the R800 quickly, feels the win, then rolls that payment onto the R4 000.",
-            incorrect: "Snowball starts with the R800 — the smallest — so she gets a fast win and builds momentum.",
+            incorrect: "Snowball starts with the R800, the smallest, so she gets a fast win and builds momentum.",
           },
         },
       },
@@ -968,7 +968,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Minimums on all (to stay in good standing), plus every spare rand at the smallest balance until it's gone.",
-            incorrect: "It's true — keep paying minimums on everything, and pile any extra onto the smallest debt.",
+            incorrect: "It's true. Keep paying minimums on everything, and pile any extra onto the smallest debt.",
           },
         },
       },
@@ -992,7 +992,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Debt payoff is as much psychology as maths. Fast wins keep you in the game long enough to finish.",
-            incorrect: "It's about momentum — quick, visible wins keep you motivated. It's not the cheapest on interest, but it's the one people stick to.",
+            incorrect: "It's about momentum. Quick, visible wins keep you motivated. It's not the cheapest on interest, but it's the one people stick to.",
           },
         },
       },
@@ -1003,8 +1003,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Sticking with a debt plan you'll actually finish can beat a 'perfect' plan you abandon.",
           correct: true,
           feedback: {
-            correct: "True. The best method is the one you complete. Snowball trades a little interest for motivation — and finished beats optimal.",
-            incorrect: "It's true — a plan you finish beats a mathematically perfect one you quit. That's the snowball's whole appeal.",
+            correct: "True. The best method is the one you complete. Snowball trades a little interest for motivation, and finished beats optimal.",
+            incorrect: "It's true. A plan you finish beats a mathematically perfect one you quit. That's the snowball's whole appeal.",
           },
         },
       },
@@ -1015,13 +1015,13 @@ const lesson5Slots: QuestionSlot[] = [
           question: "Sipho finishes paying off his smallest debt. Under the snowball, what does he do with that freed-up payment?",
           options: [
             "Roll the whole amount onto the next-smallest debt",
-            "Spend it — he's earned a break",
+            "Spend it. He's earned a break",
             "Split it across unrelated wants",
             "Stop paying extra entirely",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. That rolled-over payment is the 'snowball' — each cleared debt makes the next one fall faster.",
+            correct: "Right. That rolled-over payment is the 'snowball'. Each cleared debt makes the next one fall faster.",
             incorrect: "He rolls it onto the next debt. Reusing that freed payment is exactly what makes the snowball accelerate.",
           },
         },
@@ -1045,7 +1045,7 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Avalanche targets the highest rate first — it saves the most interest, though the first win can take longer.",
+            correct: "Right. Avalanche targets the highest rate first. It saves the most interest, though the first win can take longer.",
             incorrect: "Avalanche = highest interest rate first. It's the cheapest on interest; snowball (smallest first) is the most motivating.",
           },
         },
@@ -1058,7 +1058,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Mathematically, clearing the priciest debt first saves the most. Snowball trades a little of that for faster wins.",
-            incorrect: "It's true — avalanche saves the most interest. Snowball costs a bit more but keeps more people motivated to the end.",
+            incorrect: "It's true. Avalanche saves the most interest. Snowball costs a bit more but keeps more people motivated to the end.",
           },
         },
       },
@@ -1068,9 +1068,9 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato is disciplined and mostly cares about paying the least interest. Which method fits her best?",
           options: [
-            "Avalanche — highest interest rate first",
-            "Snowball — smallest balance first",
-            "Neither — pay only minimums",
+            "Avalanche: highest interest rate first",
+            "Snowball, smallest balance first",
+            "Neither. Pay only minimums",
             "Open a new loan",
           ],
           correct: 0,
@@ -1094,7 +1094,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. You can't prioritise what you can't see. Listing balances and rates is step one for both snowball and avalanche.",
-            incorrect: "It's true — start by listing every debt, balance and rate. That's the map for whichever method you choose.",
+            incorrect: "It's true. Start by listing every debt, balance and rate. That's the map for whichever method you choose.",
           },
         },
       },
@@ -1111,7 +1111,7 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Steady, focused extra payments on one target at a time is what clears debt — not sporadic effort or waiting for luck.",
+            correct: "Right. Steady, focused extra payments on one target at a time is what clears debt, not sporadic effort or waiting for luck.",
             incorrect: "Consistency on one target beats chopping and changing or waiting for a windfall. Steady pressure wins.",
           },
         },
@@ -1122,7 +1122,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Whether you pick snowball or avalanche, what's the shared first move against a pile of debts?",
           options: [
-            "Stop adding new debt, then focus extra payments on one debt at a time",
+            "Stop adding new debt",
             "Take a holiday to de-stress first",
             "Spread tiny amounts across all of them",
             "Ignore the smallest debts",
@@ -1130,7 +1130,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Both methods start the same way: stop the bleeding (no new debt) and concentrate firepower on one target.",
-            incorrect: "Both begin by stopping new debt and focusing extra on a single target — the order of targets is the only difference.",
+            incorrect: "Both begin by stopping new debt and focusing extra on a single target. The order of targets is the only difference.",
           },
         },
       },
@@ -1143,7 +1143,7 @@ const lesson5Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Small Wins First",
     content:
-      "<p>The debt snowball: list all debts smallest to largest, pay the minimum on all, and throw every extra rand at the smallest. When it's gone, roll that payment onto the next.</p><p><strong>Why it works:</strong> each paid-off debt is a win that builds momentum. The 'avalanche' (highest rate first) saves more interest — but the best method is the one you'll actually finish.</p>",
+      "<p>The debt snowball: list all debts smallest to largest, pay the minimum on all, and throw every extra rand at the smallest. When it's gone, roll that payment onto the next.</p><p><strong>Why it works:</strong> each paid-off debt is a win that builds momentum. The 'avalanche' (highest rate first) saves more interest, but the best method is the one you'll actually finish.</p>",
   },
   { slot: "credit-debt/lesson-5/which-first" },
   { slot: "credit-debt/lesson-5/why-works" },
@@ -1166,14 +1166,14 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the biggest risk of debt consolidation for most people?",
           options: [
-            "Clearing the cards with the loan, then running them up again",
+            "Clearing the cards with the loan",
             "The new loan is always at a higher rate",
             "Consolidation is illegal in South Africa",
             "Banks always refuse consolidation",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The classic trap: consolidate, feel relief, then re-spend on the now-empty cards — ending with double the debt.",
+            correct: "Right. The classic trap: consolidate, feel relief, then re-spend on the now-empty cards, ending with double the debt.",
             incorrect: "The real danger is re-spending. Consolidating clears the cards, and many people fill them again, doubling their debt.",
           },
         },
@@ -1186,7 +1186,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. It's a tool, not a cure. Without new habits (and often closing the cleared cards), the debt just comes back.",
-            incorrect: "It's true — consolidation reorganises debt but doesn't fix behaviour. Without changed habits, the balances return.",
+            incorrect: "It's true: consolidation reorganises debt but doesn't fix behaviour. Without changed habits, the balances return.",
           },
         },
       },
@@ -1197,7 +1197,7 @@ const lesson6Slots: QuestionSlot[] = [
           question: "A consolidation offer has a lower rate but stretches repayment from 2 years to 6. What's the hidden catch?",
           options: [
             "Even at a lower rate, paying for 6 years can cost more interest overall",
-            "There's no catch — longer is always better",
+            "There's no catch. Longer is always better",
             "It's guaranteed to be cheaper",
             "The rate doesn't matter",
           ],
@@ -1221,8 +1221,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "An NCR-registered debt counsellor can protect you from legal action by creditors while your debts are restructured.",
           correct: true,
           feedback: {
-            correct: "True. Under the National Credit Act, formal debt review is a legal shield — creditors can't sue or repossess while you're under review and paying.",
-            incorrect: "It's true — NCR debt counselling gives legal protection under the NCA: no legal action while you're under review and making payments.",
+            correct: "True. Under the National Credit Act, formal debt review is a legal shield. Creditors can't sue or repossess while you're under review and paying.",
+            incorrect: "It's true. NCR debt counselling gives legal protection under the NCA: no legal action while you're under review and making payments.",
           },
         },
       },
@@ -1240,7 +1240,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. They restructure your payments into one affordable plan the court grants, while a flag on your record signals you're under review.",
-            incorrect: "They negotiate with creditors and set up one court-approved repayment plan — they don't erase debt or lend more.",
+            incorrect: "They negotiate with creditors and set up one court-approved repayment plan, they don't erase debt or lend more.",
           },
         },
       },
@@ -1252,7 +1252,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The flag signals you're under protection and restructuring. It's removed once you complete the programme and get a clearance certificate.",
-            incorrect: "It's true — debt review flags your record while active, and clears once you finish and receive your clearance certificate.",
+            incorrect: "It's true, debt review flags your record while active, and clears once you finish and receive your clearance certificate.",
           },
         },
       },
@@ -1275,7 +1275,7 @@ const lesson6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A lower rate plus disciplined behaviour is where consolidation shines — one cheaper payment and no new balances.",
+            correct: "Right. A lower rate plus disciplined behaviour is where consolidation shines: one cheaper payment and no new balances.",
             incorrect: "It helps when the rate is genuinely lower and you stop adding debt. Combining at any rate, then re-spending, defeats the point.",
           },
         },
@@ -1287,8 +1287,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "One benefit of consolidation is replacing several payments with a single, simpler monthly one.",
           correct: true,
           feedback: {
-            correct: "True. One payment is easier to manage and less likely to be missed — helpful, as long as the rate and total cost stack up.",
-            incorrect: "It's true — a single monthly payment is simpler to track, provided the interest rate and total repaid are actually better.",
+            correct: "True. One payment is easier to manage and less likely to be missed, helpful, as long as the rate and total cost stack up.",
+            incorrect: "It's true. A single monthly payment is simpler to track, provided the interest rate and total repaid are actually better.",
           },
         },
       },
@@ -1298,7 +1298,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Before accepting a consolidation loan, the key comparison to make is:",
           options: [
-            "Total amount repaid (rate × time) versus your current debts",
+            "Total amount repaid versus your current debts",
             "Which lender has the nicest branch",
             "Whichever gives cash back today",
             "The size of the loan you're approved for",
@@ -1342,7 +1342,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Verify registration at ncr.org.za. A quick check protects you from scams charging for a service they can't legally provide.",
-            incorrect: "It's true — you can and should verify NCR registration (ncr.org.za) before handing anyone money or your details.",
+            incorrect: "It's true. You can and should verify NCR registration (ncr.org.za) before handing anyone money or your details.",
           },
         },
       },
@@ -1360,7 +1360,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. 'Wipe your debt' plus a big upfront fee is a scam pattern. Real, NCR-registered help doesn't work that way.",
-            incorrect: "He should walk away. Upfront fees and 'debt wiped' promises are scam signals — verify NCR registration instead.",
+            incorrect: "He should walk away. Upfront fees and 'debt wiped' promises are scam signals. Verify NCR registration instead.",
           },
         },
       },
@@ -1373,7 +1373,7 @@ const lesson6Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Combining Debts Can Save or Sink You",
     content:
-      "<p>Debt consolidation means one new loan to pay off several smaller debts, so you make a single monthly payment.</p><p><strong>When it helps:</strong> a lower rate, a lower total payment, simpler management. <strong>When it hurts:</strong> stretching the term can mean more interest overall, and many people clear their cards then run them up again.</p><p><strong>Debt review (NCR-registered):</strong> if you're over-indebted, a registered debt counsellor negotiates with creditors and a court grants one repayment plan — creditors can't take legal action while you're under review. Avoid anyone not NCR-registered or charging big upfront fees; check at ncr.org.za.</p>",
+      "<p>Debt consolidation means one new loan to pay off several smaller debts, so you make a single monthly payment.</p><p><strong>When it helps:</strong> a lower rate, a lower total payment, simpler management. <strong>When it hurts:</strong> stretching the term can mean more interest overall, and many people clear their cards then run them up again.</p><p><strong>Debt review (NCR-registered):</strong> if you're over-indebted, a registered debt counsellor negotiates with creditors and a court grants one repayment plan. Creditors can't take legal action while you're under review. Avoid anyone not NCR-registered or charging big upfront fees; check at ncr.org.za.</p>",
   },
   { slot: "credit-debt/lesson-6/biggest-risk" },
   { slot: "credit-debt/lesson-6/ncr-protection" },

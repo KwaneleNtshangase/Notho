@@ -24,8 +24,8 @@ const lesson1Slots: QuestionSlot[] = [
           options: ["3–6 months", "1 month", "10–12 months", "Just R1 000 is plenty"],
           correct: 0,
           feedback: {
-            correct: "Right. 3–6 months of essential expenses is the standard — lean toward 6 if your income is irregular or you have dependants.",
-            incorrect: "The target is 3–6 months of essential expenses — enough to survive job loss or a major crisis.",
+            correct: "Right. 3–6 months of essential expenses is the standard. Lean toward 6 if your income is irregular or you have dependants.",
+            incorrect: "The target is 3–6 months of essential expenses, enough to survive job loss or a major crisis.",
           },
         },
       },
@@ -35,14 +35,14 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho is a freelancer with an unpredictable income and two kids. Where in the 3–6 month range should he aim?",
           options: [
-            "Toward the higher end (closer to 6 months), because his income is less certain",
-            "Below 3 months — freelancers need less",
+            "Toward the higher end",
+            "Below 3 months. Freelancers need less",
             "Exactly 1 month is fine",
             "He doesn't need one at all",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Irregular income and dependants mean bigger, less predictable gaps — a deeper buffer (nearer 6 months) fits his risk.",
+            correct: "Right. Irregular income and dependants mean bigger, less predictable gaps, a deeper buffer (nearer 6 months) fits his risk.",
             incorrect: "Less-certain income calls for MORE buffer, not less. Sipho should aim nearer 6 months, not below 3.",
           },
         },
@@ -54,8 +54,8 @@ const lesson1Slots: QuestionSlot[] = [
           statement: "An emergency fund is measured against your essential expenses, not your total spending.",
           correct: true,
           feedback: {
-            correct: "True. In a real crisis you cut the extras. Base the target on rent, food, transport and utilities — the non-negotiables.",
-            incorrect: "It's true — size it on essentials (rent, food, transport, utilities), since that's what you'd actually need to cover in a crisis.",
+            correct: "True. In a real crisis you cut the extras. Base the target on rent, food, transport and utilities: the non-negotiables.",
+            incorrect: "It's true, size it on essentials (rent, food, transport, utilities), since that's what you'd actually need to cover in a crisis.",
           },
         },
       },
@@ -73,7 +73,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: false,
           feedback: {
             correct: "Correct. An emergency fund must be instantly accessible and stable. Shares can drop 30% exactly when you need the cash most.",
-            incorrect: "Never put your emergency fund in shares. It has to be safe and instantly available — markets can crash right when you need it.",
+            incorrect: "Never put your emergency fund in shares. It has to be safe and instantly available. Markets can crash right when you need it.",
           },
         },
       },
@@ -101,14 +101,14 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato's friend says she's 'wasting' her emergency fund in a savings account instead of an equity ETF. Is the friend right?",
           options: [
-            "No — the fund's job is safety and access, not maximum growth",
-            "Yes — always chase the highest return",
-            "Yes — savings accounts are pointless",
-            "No — but only because ETFs are bad",
+            "No. The fund's job is safety and access, not maximum growth",
+            "Yes. Always chase the highest return",
+            "Yes. Savings accounts are pointless",
+            "No, but only because ETFs are bad",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. An emergency fund isn't an investment — it's insurance you can reach in a day. Growth money belongs elsewhere.",
+            correct: "Right. An emergency fund isn't an investment. It's insurance you can reach in a day. Growth money belongs elsewhere.",
             incorrect: "The friend's wrong. The emergency fund is for safety and instant access; the ETF is for long-term money she won't need soon.",
           },
         },
@@ -151,7 +151,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa's essentials are R10 000/month. What's her sensible emergency-fund target range?",
           options: [
-            "About R30 000 to R60 000 (3 to 6 months)",
+            "About R30 000 to R60 000",
             "About R10 000 (one month)",
             "Over R120 000 (a year)",
             "Whatever's left after shopping",
@@ -175,8 +175,8 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "R36 000 feels impossible right now. What's the smart way to begin?",
           options: [
-            "Set a mini-goal first, like R5 000, which already covers small emergencies",
-            "Give up — it's too big to start",
+            "Set a mini-goal first, like R5 000",
+            "Give up. It's too big to start",
             "Wait for a lottery win",
             "Only start once you earn double",
           ],
@@ -195,7 +195,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Pay yourself first, automatically, before the money can be spent. Even R500/month quietly becomes R6 000 a year.",
-            incorrect: "It's true — automating a payday transfer removes willpower from the equation. Small and automatic beats big and occasional.",
+            incorrect: "It's true. Automating a payday transfer removes willpower from the equation. Small and automatic beats big and occasional.",
           },
         },
       },
@@ -205,14 +205,14 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo can only spare R400 a month. Is it worth starting an emergency fund?",
           options: [
-            "Yes — R400/month is ~R4 800 a year, and every rand saved is one not borrowed",
-            "No — R400 is too little to matter",
-            "No — wait until he can save thousands",
+            "Yes. R400/month is ~R4 800 a year, and every rand saved is one not borrowed",
+            "No. R400 is too little to matter",
+            "No. Wait until he can save thousands",
             "Only if he can save R5 000 at once",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. R400/month is real progress — nearly R5 000 in a year, and a buffer that keeps a small crisis off a 22% store card.",
+            correct: "Right. R400/month is real progress, nearly R5 000 in a year, and a buffer that keeps a small crisis off a 22% store card.",
             incorrect: "It's absolutely worth it. R400/month is ~R4 800/year and starts protecting him from debt right away.",
           },
         },
@@ -226,7 +226,7 @@ const lesson1Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Your Financial Airbag",
     content:
-      "<p>One unexpected expense — a R8 000 car repair, a R15 000 medical bill, two weeks without income — is all it takes to wreck a budget with no safety net. That's how debt spirals start.</p><p>An emergency fund is 3–6 months of essential living expenses in cash, reachable within 24 hours. If your essentials are R12 000/month, your target is R36 000–R72 000. Start with a mini-goal of R5 000 — it protects you from small emergencies immediately.</p>",
+      "<p>One unexpected expense (a R8 000 car repair, a R15 000 medical bill, two weeks without income) is all it takes to wreck a budget with no safety net. That's how debt spirals start.</p><p>An emergency fund is 3–6 months of essential living expenses in cash, reachable within 24 hours. If your essentials are R12 000/month, your target is R36 000–R72 000. Start with a mini-goal of R5 000. It protects you from small emergencies immediately.</p>",
   },
   { slot: "emergency-fund/lesson-1/how-many-months" },
   { slot: "emergency-fund/lesson-1/not-stocks" },
@@ -257,7 +257,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. A high-interest savings account is safe, accessible within a day or two, and still earns something against inflation.",
-            incorrect: "A high-interest savings account wins: safe, accessible, and earning interest — unlike a mattress or a volatile fund.",
+            incorrect: "A high-interest savings account wins: safe, accessible, and earning interest: unlike a mattress or a volatile fund.",
           },
         },
       },
@@ -286,7 +286,7 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Money market funds and notice accounts are stable and quick to access — a good fit. An RA is locked away; crypto and single shares are too volatile.",
+            correct: "Right. Money market funds and notice accounts are stable and quick to access. A good fit. An RA is locked away; crypto and single shares are too volatile.",
             incorrect: "Stable, accessible options like a money market fund or notice account fit. Volatile or locked products (crypto, RA) don't.",
           },
         },
@@ -323,7 +323,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. An emergency fund you can't reach quickly isn't doing its job. Fast access is non-negotiable.",
-            incorrect: "It's true — quick access (a day or two) is essential. Money you can't get to in a crisis isn't an emergency fund.",
+            incorrect: "It's true. Quick access (a day or two) is essential. Money you can't get to in a crisis isn't an emergency fund.",
           },
         },
       },
@@ -333,15 +333,15 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A 32-day notice account pays a bit more but needs 32 days' notice to withdraw. Good for a full emergency fund?",
           options: [
-            "Only for part of it — keep some instantly accessible for true emergencies",
-            "Yes — put all of it there for the higher rate",
-            "No — notice accounts are scams",
-            "Yes — emergencies always give 32 days' warning",
+            "Only for part of it. Keep some instantly accessible for true emergencies",
+            "Yes. Put all of it there for the higher rate",
+            "No. Notice accounts are scams",
+            "Yes. Emergencies always give 32 days' warning",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Emergencies don't wait 32 days. A common approach: keep some instantly accessible, and a portion in notice/money-market for a better rate.",
-            incorrect: "Not for all of it — a burst geyser won't wait 32 days. Split it: instant-access for emergencies, notice account for a little extra yield.",
+            incorrect: "Not for all of it, a burst geyser won't wait 32 days. Split it: instant-access for emergencies, notice account for a little extra yield.",
           },
         },
       },
@@ -359,7 +359,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Out of sight, out of temptation. A separate account means you won't accidentally spend the buffer on everyday things.",
-            incorrect: "It's true — a separate account creates a helpful barrier, so the fund isn't quietly spent on daily living.",
+            incorrect: "It's true, a separate account creates a helpful barrier, so the fund isn't quietly spent on daily living.",
           },
         },
       },
@@ -369,14 +369,14 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Ayesha keeps her emergency savings in her main cheque account. What's the risk?",
           options: [
-            "She'll gradually spend it without noticing, because it looks like available money",
+            "She'll gradually spend it without noticing",
             "The bank will freeze it",
             "It will earn too much interest",
             "There's no risk at all",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Mixed in with everyday cash, the buffer just looks spendable — and slowly disappears. A separate account protects it.",
+            correct: "Right. Mixed in with everyday cash, the buffer just looks spendable, and slowly disappears. A separate account protects it.",
             incorrect: "The danger is silent spending: mixed with daily money, it feels available and erodes. Keep it separate.",
           },
         },
@@ -413,7 +413,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Safety first, but a high-interest savings or money market account also helps the buffer keep its buying power over time.",
-            incorrect: "It's true — while safety and access come first, earning near inflation stops the fund quietly losing value each year.",
+            incorrect: "It's true, while safety and access come first, earning near inflation stops the fund quietly losing value each year.",
           },
         },
       },
@@ -448,7 +448,7 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. If access and safety are equal, take the higher interest — it's free help keeping pace with inflation.",
+            correct: "Right. If access and safety are equal, take the higher interest. It's free help keeping pace with inflation.",
             incorrect: "Pick the higher interest when access and safety match. Why leave free growth on the table against inflation?",
           },
         },
@@ -492,7 +492,7 @@ const lesson3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Keeping a work vehicle insured and back on the road protects your income — a textbook emergency use.",
+            correct: "Right. Keeping a work vehicle insured and back on the road protects your income: a textbook emergency use.",
             incorrect: "Choose costs that protect health, housing or income. The insurance excess on your work car qualifies; the deals don't.",
           },
         },
@@ -510,7 +510,7 @@ const lesson3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. It's for shocks that threaten your income, health or safety — not for wants, however tempting the timing.",
+            correct: "Right. It's for shocks that threaten your income, health or safety, not for wants, however tempting the timing.",
             incorrect: "It's for genuine shocks: lost income, urgent medical, essential repairs. Sales, gifts and holidays are wants, not emergencies.",
           },
         },
@@ -522,8 +522,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "An essential repair that keeps you safe or able to earn is a valid use of your emergency fund.",
           correct: true,
           feedback: {
-            correct: "True. A burst geyser or a broken work vehicle threatens your home or income — exactly what the fund exists to handle.",
-            incorrect: "It's true — repairs that protect your safety or your ability to earn are precisely what the emergency fund is for.",
+            correct: "True. A burst geyser or a broken work vehicle threatens your home or income. Exactly what the fund exists to handle.",
+            incorrect: "It's true. Repairs that protect your safety or your ability to earn are precisely what the emergency fund is for.",
           },
         },
       },
@@ -540,8 +540,8 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "If you lose your job, using the emergency fund for rent and food while you search is an appropriate use.",
           correct: true,
           feedback: {
-            correct: "True. Covering essentials after involuntary income loss is the textbook emergency — this is the exact rainy day you saved for.",
-            incorrect: "It's true — rent and food during an unplanned job loss is precisely what the buffer is for. Use it, then rebuild once you're earning.",
+            correct: "True. Covering essentials after involuntary income loss is the textbook emergency. This is the exact rainy day you saved for.",
+            incorrect: "It's true, rent and food during an unplanned job loss is precisely what the buffer is for. Use it, then rebuild once you're earning.",
           },
         },
       },
@@ -558,7 +558,7 @@ const lesson3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Use the buffer for essentials and stretch it by cutting extras. That's exactly why she built it — far better than expensive debt.",
+            correct: "Right. Use the buffer for essentials and stretch it by cutting extras. That's exactly why she built it, far better than expensive debt.",
             incorrect: "She should use the fund for essentials (and trim extras to extend it). Taking a payday loan while sitting on savings is the wrong call.",
           },
         },
@@ -571,7 +571,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. UIF replaces part of your income for a while; your fund tops up the gap. Together they buy you time to find the right job.",
-            incorrect: "It's true — UIF covers part of your income and the emergency fund fills the rest, giving you breathing room to job-hunt properly.",
+            incorrect: "It's true. UIF covers part of your income and the emergency fund fills the rest, giving you breathing room to job-hunt properly.",
           },
         },
       },
@@ -587,7 +587,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Your geyser bursts and damages a wall. The repair is R12 000; insurance will only pay later. You have R18 000 saved. Smartest first step?",
           options: [
-            "Use emergency savings now, then refill when the insurance claim pays out",
+            "Use emergency savings now",
             "Put the R12 000 on a clothing store card at 22%",
             "Ignore the leak for two months",
             "Borrow from a lender who WhatsApps you 'quick cash'",
@@ -613,7 +613,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Helping with a wedding outfit is kind, but it's not YOUR household emergency. Draining the fund for it leaves you exposed.",
-            incorrect: "The odd one out is the wedding-outfit request. The others threaten your income, health or home — the wedding buy doesn't.",
+            incorrect: "The odd one out is the wedding-outfit request. The others threaten your income, health or home. The wedding buy doesn't.",
           },
         },
       },
@@ -625,7 +625,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Clear rules (job loss, critical medical, essential repairs) written down beforehand stop excitement or guilt from draining the fund.",
-            incorrect: "It's true — agreeing your rules up front is what lets you refuse the pressure-buys and keep the fund for real emergencies.",
+            incorrect: "It's true. Agreeing your rules up front is what lets you refuse the pressure-buys and keep the fund for real emergencies.",
           },
         },
       },
@@ -643,7 +643,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. A half-used buffer is a half-open umbrella. Once the crisis passes, redirect spare money to refill it before anything optional.",
-            incorrect: "It's true — refilling comes first after a crisis. Until it's topped up, you're exposed to the next shock.",
+            incorrect: "It's true. Refilling comes first after a crisis. Until it's topped up, you're exposed to the next shock.",
           },
         },
       },
@@ -671,14 +671,14 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Using your emergency fund for a genuine emergency should feel like:",
           options: [
-            "The system working — that's exactly what it's for",
+            "The system working. That's exactly what it's for",
             "A personal failure",
             "A reason to never save again",
             "A sign to invest it in shares next time",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Spending it on a real emergency isn't failure — it's the plan succeeding. Then you calmly rebuild.",
+            correct: "Right. Spending it on a real emergency isn't failure. It's the plan succeeding. Then you calmly rebuild.",
             incorrect: "It's the system working, not a failure. You saved for exactly this; use it, then refill without guilt.",
           },
         },
@@ -692,7 +692,7 @@ const lesson3Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Real Emergencies Only",
     content:
-      "<p>Nomsa saved R24 000 for three months of essentials. When her fridge broke (a R6 500 quote), she used the fund instead of a high-interest store loan. Two months later a cousin wanted R4 000 for a wedding outfit — that was not her household's emergency.</p><p>The fund is for income loss you didn't choose, medical co-payments you can't delay, or essential repairs that keep you safe or earning. Holidays, upgrades and every relative's ask are not the same thing. Clear rules now stop you draining it and starting from zero.</p>",
+      "<p>Nomsa saved R24 000 for three months of essentials. When her fridge broke (a R6 500 quote), she used the fund instead of a high-interest store loan. Two months later a cousin wanted R4 000 for a wedding outfit. That was not her household's emergency.</p><p>The fund is for income loss you didn't choose, medical co-payments you can't delay, or essential repairs that keep you safe or earning. Holidays, upgrades and every relative's ask are not the same thing. Clear rules now stop you draining it and starting from zero.</p>",
   },
   { slot: "emergency-fund/lesson-3/real-emergency" },
   { slot: "emergency-fund/lesson-3/job-loss" },
@@ -722,7 +722,7 @@ const lesson4Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Income risk is anything that threatens the money arriving each month — retrenchment is the classic example.",
+            correct: "Right. Income risk is anything that threatens the money arriving each month. Retrenchment is the classic example.",
             incorrect: "Income risk is about losing or shrinking your monthly income. Retrenchment fits; a fund price wobbling is market risk.",
           },
         },
@@ -734,8 +734,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "Income risk is the chance that the money you earn each month shrinks or stops.",
           correct: true,
           feedback: {
-            correct: "True. Job loss, reduced hours, a failing side-business — all income risk. It's why a cash buffer matters so much.",
-            incorrect: "It's true — income risk is your earnings shrinking or stopping. An emergency fund is the first defence against it.",
+            correct: "True. Job loss, reduced hours, a failing side-business: all income risk. It's why a cash buffer matters so much.",
+            incorrect: "It's true. Income risk is your earnings shrinking or stopping. An emergency fund is the first defence against it.",
           },
         },
       },
@@ -745,7 +745,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato relies entirely on one big client for her freelance income. What risk is she most exposed to?",
           options: [
-            "Income risk — losing that one client would cut most of her earnings at once",
+            "Income risk. Losing that one client would cut most of her earnings at once",
             "No risk at all",
             "Only market risk",
             "Only inflation risk",
@@ -753,7 +753,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. One client is concentrated income risk. Diversifying to several clients or income streams softens the blow if one goes.",
-            incorrect: "It's income risk, and a concentrated one. Losing her single client would gut her earnings — spreading clients reduces it.",
+            incorrect: "It's income risk, and a concentrated one. Losing her single client would gut her earnings. Spreading clients reduces it.",
           },
         },
       },
@@ -769,14 +769,14 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo thought 'risk' only meant the JSE dropping. Then load-shedding spoiled R2 000 of stock in his spaza in a week. What does this show?",
           options: [
-            "Financial risk is broader than markets — it includes income, operational and other shocks",
+            "Financial risk is broader than markets. It includes income, operational and other shocks",
             "Load-shedding isn't a financial risk",
             "Only shares carry risk",
             "His spaza is risk-free",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Risk isn't just markets — spoiled stock, fraud, medical shocks, rate hikes and being underinsured all threaten your money.",
+            correct: "Right. Risk isn't just markets, spoiled stock, fraud, medical shocks, rate hikes and being underinsured all threaten your money.",
             incorrect: "It shows risk is much broader than the JSE. Operational shocks like load-shedding hit real cash just as hard.",
           },
         },
@@ -806,8 +806,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "Naming the different risks you face helps stop one problem from wiping out everything you've built.",
           correct: true,
           feedback: {
-            correct: "True. Once you can name a risk, you can plan for it — insure it, save against it, or knowingly accept it. Unnamed risks catch you off guard.",
-            incorrect: "It's true — listing your risks lets you decide how to handle each, so a single shock doesn't take down everything at once.",
+            correct: "True. Once you can name a risk, you can plan for it. Insure it, save against it, or knowingly accept it. Unnamed risks catch you off guard.",
+            incorrect: "It's true, listing your risks lets you decide how to handle each, so a single shock doesn't take down everything at once.",
           },
         },
       },
@@ -823,7 +823,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "You have third-party-only car insurance and cause a crash that writes off YOUR car. Who pays to replace it?",
           options: [
-            "You do — third-party cover pays for damage to others, not your own car",
+            "You do. Third-party cover pays for damage to others, not your own car",
             "The insurer replaces your car in full",
             "The other driver always pays for everything",
             "SARS refunds the loss",
@@ -831,7 +831,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Third-party cover protects others' property, not yours. Replacing your own car needs comprehensive cover you choose and pay for.",
-            incorrect: "You pay. Third-party only covers damage you cause to others — your own write-off isn't covered without comprehensive insurance.",
+            incorrect: "You pay. Third-party only covers damage you cause to others. Your own write-off isn't covered without comprehensive insurance.",
           },
         },
       },
@@ -843,7 +843,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. People discover the gaps at the worst moment. Reading the wording (or asking your broker) beats a nasty surprise after a crash.",
-            incorrect: "It's true — know your cover before a claim. The gap between what you assumed and what's covered can be very expensive.",
+            incorrect: "It's true. Know your cover before a claim. The gap between what you assumed and what's covered can be very expensive.",
           },
         },
       },
@@ -861,7 +861,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Cheap often means third-party-only or high excesses. Knowing the details now prevents a shock when she claims.",
-            incorrect: "She should check the wording and excess. 'Cheap' can mean big gaps — better to know before an accident, not after.",
+            incorrect: "She should check the wording and excess. 'Cheap' can mean big gaps: better to know before an accident, not after.",
           },
         },
       },
@@ -903,7 +903,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Insure the rare-but-ruinous. You can't save enough for a total loss, but a monthly premium can cover it.",
-            incorrect: "Insurance is for rare, catastrophic losses you couldn't self-fund — like your home. Small, affordable costs you just absorb.",
+            incorrect: "Insurance is for rare, catastrophic losses you couldn't self-fund. Like your home. Small, affordable costs you just absorb.",
           },
         },
       },
@@ -914,8 +914,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "It can be reasonable to 'accept' a small risk when the cost of fully insuring against it is too high.",
           correct: true,
           feedback: {
-            correct: "True. Not everything is worth insuring. For small, affordable risks, paying a premium can cost more than the risk itself — accept it knowingly.",
-            incorrect: "It's true — some small risks are cheaper to accept than to insure. The skill is choosing which, on purpose rather than by neglect.",
+            correct: "True. Not everything is worth insuring. For small, affordable risks, paying a premium can cost more than the risk itself, accept it knowingly.",
+            incorrect: "It's true. Some small risks are cheaper to accept than to insure. The skill is choosing which, on purpose rather than by neglect.",
           },
         },
       },
@@ -951,7 +951,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You need the money in 14 months for a child's university deposit. Which choice best matches that timeline?",
           options: [
-            "Mostly stable, shorter-term savings and low-volatility funds — not all in volatile shares",
+            "Mostly stable, shorter-term savings and low-volatility funds, not all in volatile shares",
             "The whole deposit in one small-cap share tip from social media",
             "Daily forex 'signals' from an anonymous group",
             "Spend half on shoes now and hope for a bonus",
@@ -969,7 +969,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "For money you'll definitely need in under two years, the priority is:",
           options: [
-            "Protecting the amount — stability over chasing high returns",
+            "Protecting the amount, stability over chasing high returns",
             "Maximum growth, whatever the risk",
             "Whatever a friend did with theirs",
             "The most exciting option",
@@ -989,7 +989,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Volatile assets need years to ride out dips. Money with a near deadline belongs somewhere stable, not in shares.",
-            incorrect: "It's true — that's a classic mismatch. Short-deadline money in volatile shares risks a loss right when you need it.",
+            incorrect: "It's true. That's a classic mismatch. Short-deadline money in volatile shares risks a loss right when you need it.",
           },
         },
       },
@@ -1007,7 +1007,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Years in the market let compounding work and smooth out the wobbles. Next month's money has no time to recover.",
-            incorrect: "It's true — time is the great smoother. Long horizons can ride out dips; short-term money can't afford them.",
+            incorrect: "It's true. Time is the great smoother. Long horizons can ride out dips; short-term money can't afford them.",
           },
         },
       },
@@ -1017,7 +1017,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho is 25 and investing for retirement 35 years away. How should his long horizon shape his risk?",
           options: [
-            "He can take more market risk now, since he has decades to recover from dips",
+            "He can take more market risk now",
             "He should avoid all growth assets to be safe",
             "He should keep everything in cash forever",
             "Time horizon doesn't matter at all",
@@ -1025,7 +1025,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. With 35 years, short-term crashes matter far less, and growth assets have time to compound. Long horizon, more room for risk.",
-            incorrect: "A 35-year horizon lets him take more growth risk — dips have decades to recover. All-cash would likely cost him serious compounding.",
+            incorrect: "A 35-year horizon lets him take more growth risk. Dips have decades to recover. All-cash would likely cost him serious compounding.",
           },
         },
       },
@@ -1042,7 +1042,7 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Over decades, temporary drops tend to recover and compounding does the heavy lifting — so short-term volatility matters less.",
+            correct: "Right. Over decades, temporary drops tend to recover and compounding does the heavy lifting, so short-term volatility matters less.",
             incorrect: "It's about time to recover and compound. Long horizons absorb volatility; they don't remove it or come with guarantees.",
           },
         },
@@ -1078,8 +1078,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Higher potential reward almost always comes with a higher chance of loss.",
           correct: true,
           feedback: {
-            correct: "True. There's no free lunch. If something dangles a big return, assume it carries bigger risk — and ask where that risk is hiding.",
-            incorrect: "It's true — reward and risk travel together. A promise of high returns with 'no risk' is the oldest warning sign there is.",
+            correct: "True. There's no free lunch. If something dangles a big return, assume it carries bigger risk, and ask where that risk is hiding.",
+            incorrect: "It's true: reward and risk travel together. A promise of high returns with 'no risk' is the oldest warning sign there is.",
           },
         },
       },
@@ -1096,7 +1096,7 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Good risk-taking isn't brave or timid — it's matched. The tool should fit the goal and the timeline, not the story.",
+            correct: "Right. Good risk-taking isn't brave or timid. It's matched. The tool should fit the goal and the timeline, not the story.",
             incorrect: "It's the one who matches risk to goal and timeline. Blanket fear and big bets on tips are both mismatches.",
           },
         },
@@ -1115,7 +1115,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Guaranteed, sky-high, fixed returns are the signature of scams (and Ponzi schemes). Real investments can't promise that.",
-            incorrect: "It's true — 'guaranteed 8% a week' is a classic scam red flag. No legitimate investment offers fixed, high, risk-free returns.",
+            incorrect: "It's true. 'guaranteed 8% a week' is a classic scam red flag. No legitimate investment offers fixed, high, risk-free returns.",
           },
         },
       },
@@ -1125,14 +1125,14 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A friend brags that 'crypto doubled' his money. What are you not hearing?",
           options: [
-            "The people who lost quietly — you only hear the winners",
+            "The people who lost quietly, you only hear the winners",
             "That crypto is guaranteed to double",
             "That he definitely has skill",
             "That it will happen to you too",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Winners talk, losers go quiet. One doubling story hides many losses — don't mistake a loud win for a reliable strategy.",
+            correct: "Right. Winners talk, losers go quiet. One doubling story hides many losses. Don't mistake a loud win for a reliable strategy.",
             incorrect: "You're not hearing the losers. Big-win stories survive and spread; the quiet losses don't. Judge the odds, not the anecdote.",
           },
         },
@@ -1164,7 +1164,7 @@ const lesson5Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Trade-Off in Plain Words",
     content:
-      "<p>A 32-day notice account pays a modest rate but rarely loses value. A broad equity ETF can average much higher growth over decades but might drop 20% in a bad year. That trade-off isn't good or bad by itself — it depends on when you need the money and whether you can stay calm when markets wobble.</p><p>Many people hear 'crypto doubled' from one friend and never hear the friend who lost quietly. Higher possible reward without real skill, time or diversification is often just a higher chance of loss. Match the tool to the goal and the timeline, not the story that sounds exciting at a braai.</p>",
+      "<p>A 32-day notice account pays a modest rate but rarely loses value. A broad equity ETF can average much higher growth over decades but might drop 20% in a bad year. That trade-off isn't good or bad by itself. It depends on when you need the money and whether you can stay calm when markets wobble.</p><p>Many people hear 'crypto doubled' from one friend and never hear the friend who lost quietly. Higher possible reward without real skill, time or diversification is often just a higher chance of loss. Match the tool to the goal and the timeline, not the story that sounds exciting at a braai.</p>",
   },
   { slot: "emergency-fund/lesson-5/timeline-match" },
   { slot: "emergency-fund/lesson-5/time-horizon" },

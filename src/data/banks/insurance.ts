@@ -31,7 +31,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The greatest need is where people depend on your income and there's debt to cover. That family would be devastated without it.",
-            incorrect: "Life cover matters most where dependants rely on your income and debt exists — the parent of three with a bond, not the single student or the retiree.",
+            incorrect: "Life cover matters most where dependants rely on your income and debt exists, the parent of three with a bond, not the single student or the retiree.",
           },
         },
       },
@@ -43,7 +43,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Life cover exists to protect the people who depend on your income. With no dependants and no debt, that need is small.",
-            incorrect: "It's true — with nobody relying on your income and no debt to settle, there's little for life cover to protect.",
+            incorrect: "It's true: with nobody relying on your income and no debt to settle, there's little for life cover to protect.",
           },
         },
       },
@@ -53,8 +53,8 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho didn't need life cover at 23. At 33 he's married with a baby and a bond. What changed?",
           options: [
-            "People now depend on his income and there's debt — his need for cover jumped",
-            "Nothing — his cover needs are fixed for life",
+            "People now depend on his income and there's debt. His need for cover jumped",
+            "Nothing. His cover needs are fixed for life",
             "He needs less cover now",
             "Only his age matters",
           ],
@@ -96,7 +96,7 @@ const lesson1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Group cover is tied to the job. Between roles — or if a new employer offers less — she could be exposed. Personal cover fills that gap.",
+            correct: "Right. Group cover is tied to the job. Between roles, or if a new employer offers less, she could be exposed. Personal cover fills that gap.",
             incorrect: "The risk is a gap: employer cover usually ends with the job. A personal policy she owns isn't affected by changing employers.",
           },
         },
@@ -139,7 +139,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. It pays your dependants a lump sum if you die, so they can cover debts, living costs and the future you'd have provided.",
-            incorrect: "Life cover pays a lump sum to your family on your death — it's not a pension, medical or car product.",
+            incorrect: "Life cover pays a lump sum to your family on your death. It's not a pension, medical or car product.",
           },
         },
       },
@@ -150,8 +150,8 @@ const lesson1Slots: QuestionSlot[] = [
           statement: "The purpose of life cover is to protect the people who depend on your income after you're gone.",
           correct: true,
           feedback: {
-            correct: "True. It replaces the financial support you provided — keeping a family in their home and children in school.",
-            incorrect: "It's true — life cover exists to protect your dependants financially when your income stops, not to benefit you directly.",
+            correct: "True. It replaces the financial support you provided, keeping a family in their home and children in school.",
+            incorrect: "It's true. Life cover exists to protect your dependants financially when your income stops, not to benefit you directly.",
           },
         },
       },
@@ -164,12 +164,12 @@ const lesson1Slots: QuestionSlot[] = [
             "Settling the bond, covering living costs and the children's schooling",
             "A luxury holiday only",
             "Buying shares on a tip",
-            "Nothing — it must be returned",
+            "Nothing. It must be returned",
           ],
           correct: 0,
           feedback: {
             correct: "Right. The payout replaces lost income: clearing debt like the bond, covering everyday costs, and funding the children's education.",
-            incorrect: "It's there to keep the family afloat — settle the bond, cover living costs, fund schooling — replacing the income that was lost.",
+            incorrect: "It's there to keep the family afloat (settle the bond, cover living costs, fund schooling) replacing the income that was lost.",
           },
         },
       },
@@ -188,7 +188,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 3,
           feedback: {
             correct: "Correct: R300 000 × 10 = R3 million. It's a starting benchmark, not a hard ceiling.",
-            incorrect: "R300 000 × 10 = R3 000 000 — so about R3 million.",
+            incorrect: "R300 000 × 10 = R3 000 000, so about R3 million.",
           },
         },
       },
@@ -213,7 +213,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. It's a quick benchmark. Your real need depends on your debt, dependants and how many years of income they'd need replaced.",
-            incorrect: "It's true — 10× is a handy starting estimate. A precise figure adds up your actual debts, dependants and income-replacement years.",
+            incorrect: "It's true. 10× is a handy starting estimate. A precise figure adds up your actual debts, dependants and income-replacement years.",
           },
         },
       },
@@ -226,7 +226,7 @@ const lesson1Layout: LessonLayoutItem[] = [
     type: "info",
     title: "What Happens When You're Gone?",
     content:
-      "<p>In South Africa, families lose their homes and children leave school when a breadwinner dies without life cover. It's not a rare tragedy — it's the predictable outcome of skipping one product.</p><p>Life insurance pays a lump sum to your family if you die. If people depend on your income — a spouse, children, parents — you need it. A common rule of thumb: 10× your annual salary. Earning R300 000/year suggests about R3 million in cover.</p>",
+      "<p>In South Africa, families lose their homes and children leave school when a breadwinner dies without life cover. It's not a rare tragedy. It's the predictable outcome of skipping one product.</p><p>Life insurance pays a lump sum to your family if you die. If people depend on your income (a spouse, children, parents) you need it. A common rule of thumb: 10× your annual salary. Earning R300 000/year suggests about R3 million in cover.</p>",
   },
   { slot: "insurance/lesson-1/who-needs" },
   { slot: "insurance/lesson-1/employer-not-enough" },
@@ -251,8 +251,8 @@ const lesson2Slots: QuestionSlot[] = [
           options: ["Income protection", "Life insurance", "Lump-sum disability", "Car insurance"],
           correct: 0,
           feedback: {
-            correct: "Right. Income protection pays a percentage of your monthly income while you can't work — it steps in where your salary stops.",
-            incorrect: "It's income protection — designed specifically to replace a portion of your monthly income during a disability.",
+            correct: "Right. Income protection pays a percentage of your monthly income while you can't work, it steps in where your salary stops.",
+            incorrect: "It's income protection: designed specifically to replace a portion of your monthly income during a disability.",
           },
         },
       },
@@ -262,14 +262,14 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo is booked off work for eight months after a serious injury. Which cover keeps money coming in monthly?",
           options: [
-            "Income protection — it replaces a share of his salary while he recovers",
-            "Life insurance — it pays out now",
+            "Income protection, it replaces a share of his salary while he recovers",
+            "Life insurance. It pays out now",
             "His car insurance",
             "Nothing can help",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Income protection bridges the gap, paying monthly while he's unable to earn — protecting the bills that don't pause.",
+            correct: "Right. Income protection bridges the gap, paying monthly while he's unable to earn, protecting the bills that don't pause.",
             incorrect: "Income protection is the one that pays monthly during recovery. Life cover only pays on death; car insurance is unrelated.",
           },
         },
@@ -281,8 +281,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "Income protection pays a regular monthly amount, not a single lump sum.",
           correct: true,
           feedback: {
-            correct: "True. It mirrors a salary — a monthly benefit while you're disabled — which is why it's ideal for covering ongoing living costs.",
-            incorrect: "It's true — income protection pays monthly, like a salary, rather than one lump sum. That's what makes it fit everyday expenses.",
+            correct: "True. It mirrors a salary, a monthly benefit while you're disabled, which is why it's ideal for covering ongoing living costs.",
+            incorrect: "It's true. Income protection pays monthly, like a salary, rather than one lump sum. That's what makes it fit everyday expenses.",
           },
         },
       },
@@ -299,8 +299,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "During your working years, you're more likely to be disabled and unable to work than to die young.",
           correct: true,
           feedback: {
-            correct: "True. Injury and serious illness that stop you earning are more common than early death — yet disability cover is often overlooked.",
-            incorrect: "It's true — being unable to work through injury or illness is more likely than dying young, which is why disability cover matters so much.",
+            correct: "True. Injury and serious illness that stop you earning are more common than early death, yet disability cover is often overlooked.",
+            incorrect: "It's true. Being unable to work through injury or illness is more likely than dying young, which is why disability cover matters so much.",
           },
         },
       },
@@ -318,7 +318,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Your future earnings dwarf your possessions. Protecting your ability to earn is why disability cover is so valuable.",
-            incorrect: "It's your ability to earn. Decades of income outweigh any single possession — which is exactly what disability cover protects.",
+            incorrect: "It's your ability to earn. Decades of income outweigh any single possession, which is exactly what disability cover protects.",
           },
         },
       },
@@ -331,12 +331,12 @@ const lesson2Slots: QuestionSlot[] = [
             "An injury or illness that stops her earning while she's still alive",
             "Her death",
             "Her car being scratched",
-            "None — life cover handles everything",
+            "None. Life cover handles everything",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Life cover only pays on death. If she's disabled and can't work, income protection is what keeps money coming in.",
-            incorrect: "She's exposed to disability — being alive but unable to earn. Life cover doesn't help there; income protection does.",
+            incorrect: "She's exposed to disability. Being alive but unable to earn. Life cover doesn't help there; income protection does.",
           },
         },
       },
@@ -359,8 +359,8 @@ const lesson2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Lump-sum disability pays once, for permanent disability — useful for big one-off costs like adapting your home or clearing debt.",
-            incorrect: "It's lump-sum disability cover — a once-off payout for permanent disability, distinct from income protection's monthly benefit.",
+            correct: "Right. Lump-sum disability pays once, for permanent disability. Useful for big one-off costs like adapting your home or clearing debt.",
+            incorrect: "It's lump-sum disability cover: a once-off payout for permanent disability, distinct from income protection's monthly benefit.",
           },
         },
       },
@@ -372,7 +372,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Monthly income replaces your salary; the lump sum handles big one-off costs. Many people carry both for full protection.",
-            incorrect: "It's true — they complement each other: monthly income for living costs, a lump sum for large one-off needs like home modifications.",
+            incorrect: "It's true, they complement each other: monthly income for living costs, a lump sum for large one-off needs like home modifications.",
           },
         },
       },
@@ -382,10 +382,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A permanent disability means Sipho needs a wheelchair-accessible home AND ongoing monthly income. Ideally he'd have:",
           options: [
-            "Both a lump sum (for the home) and income protection (for monthly living)",
+            "Both a lump sum and income protection",
             "Only life cover",
             "Only car insurance",
-            "Neither — savings alone always suffice",
+            "Neither, savings alone always suffice",
           ],
           correct: 0,
           feedback: {
@@ -414,7 +414,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Your savings, bond and family's lifestyle all rest on your earnings. Lose the income and everything built on it wobbles.",
-            incorrect: "It's because your income underpins everything else — savings, debt repayments, your family's lifestyle. Protect the foundation first.",
+            incorrect: "It's because your income underpins everything else. Savings, debt repayments, your family's lifestyle. Protect the foundation first.",
           },
         },
       },
@@ -425,8 +425,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "Younger workers with decades of earning ahead have a lot of future income worth protecting.",
           correct: true,
           feedback: {
-            correct: "True. A 30-year-old has potentially 30+ years of earnings ahead — an enormous asset that disability cover exists to protect.",
-            incorrect: "It's true — the younger you are, the more future income is at stake, and the more there is for disability cover to protect.",
+            correct: "True. A 30-year-old has potentially 30+ years of earnings ahead. An enormous asset that disability cover exists to protect.",
+            incorrect: "It's true. The younger you are, the more future income is at stake, and the more there is for disability cover to protect.",
           },
         },
       },
@@ -439,7 +439,7 @@ const lesson2Slots: QuestionSlot[] = [
             "Savings can run out fast against years of lost income and extra costs",
             "Savings are always more than enough",
             "Disability never lasts long",
-            "Nothing — savings fully replace insurance",
+            "Nothing: savings fully replace insurance",
           ],
           correct: 0,
           feedback: {
@@ -487,7 +487,7 @@ const lesson3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. It pays on diagnosis — so the money is there to use while you're alive and dealing with the illness.",
+            correct: "Right. It pays on diagnosis, so the money is there to use while you're alive and dealing with the illness.",
             incorrect: "It pays on diagnosis of a covered condition, not on death. The payout is meant to support you through treatment and recovery.",
           },
         },
@@ -499,7 +499,7 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "You have to die for a dread disease policy to pay out.",
           correct: false,
           feedback: {
-            correct: "Correct. It pays on diagnosis, whether or not you recover — that's the whole point, to help you through the illness itself.",
+            correct: "Correct. It pays on diagnosis, whether or not you recover. That's the whole point, to help you through the illness itself.",
             incorrect: "You don't. Dread disease cover pays when you're diagnosed with a covered condition, so you can use the money while you're alive.",
           },
         },
@@ -535,7 +535,7 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "The lump sum from a dread disease policy is subject to income tax in South Africa.",
           correct: false,
           feedback: {
-            correct: "Correct. Proceeds from a life or dread disease policy are generally not taxed as income — they're capital in nature.",
+            correct: "Correct. Proceeds from a life or dread disease policy are generally not taxed as income. They're capital in nature.",
             incorrect: "It's not taxed as income. Dread disease and life payouts are generally tax-free in SA, which adds to their value.",
           },
         },
@@ -554,7 +554,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Every rand of the payout is yours to use, whereas cashing in some investments can trigger tax, leaving you less.",
-            incorrect: "The advantage is you keep it all — no income tax — unlike some savings or investments that may be taxed when you access them.",
+            incorrect: "The advantage is you keep it all, no income tax, unlike some savings or investments that may be taxed when you access them.",
           },
         },
       },
@@ -588,15 +588,15 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "A dread disease payout is a lump sum. What does that let you do?",
           options: [
-            "Decide how to use it — medical bills, debt, income replacement, or home changes",
+            "Decide how to use it, medical bills, debt, income replacement, or home changes",
             "Only pay the hospital directly",
             "Only replace your salary monthly",
-            "Nothing — the insurer chooses",
+            "Nothing, the insurer chooses",
           ],
           correct: 0,
           feedback: {
             correct: "Right. The flexibility is the point: you direct the money wherever it's needed most, unlike a benefit tied to one purpose.",
-            incorrect: "A lump sum is yours to allocate — bills, debt, replacing income, adapting your home. You decide, not the insurer.",
+            incorrect: "A lump sum is yours to allocate: bills, debt, replacing income, adapting your home. You decide, not the insurer.",
           },
         },
       },
@@ -608,7 +608,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Dread disease pays once, flexibly, on diagnosis; income protection pays monthly while you can't work. Many people hold both.",
-            incorrect: "It's true — they're different tools: dread disease is a once-off flexible lump sum; income protection is an ongoing monthly benefit.",
+            incorrect: "It's true. They're different tools: dread disease is a once-off flexible lump sum; income protection is an ongoing monthly benefit.",
           },
         },
       },
@@ -625,7 +625,7 @@ const lesson3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The lump sum buys her breathing room — covering medical shortfalls, unpaid leave, and lightening her debt while she focuses on recovery.",
+            correct: "Right. The lump sum buys her breathing room. Covering medical shortfalls, unpaid leave, and lightening her debt while she focuses on recovery.",
             incorrect: "The point is stability: cover treatment gaps, afford time off, and cut debt. That's what the flexible lump sum is best used for.",
           },
         },
@@ -662,7 +662,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Co-payments, non-covered treatments and time off work add up fast. That combined hit is what dread disease cover softens.",
-            incorrect: "It's true — gaps, co-payments and lost income during a serious illness can drain years of savings, even with medical aid.",
+            incorrect: "It's true, gaps, co-payments and lost income during a serious illness can drain years of savings, even with medical aid.",
           },
         },
       },
@@ -679,7 +679,7 @@ const lesson3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Medical aid settles treatment bills; dread disease hands you cash for everything else — income, debt, home, whatever you need.",
+            correct: "Right. Medical aid settles treatment bills; dread disease hands you cash for everything else. Income, debt, home, whatever you need.",
             incorrect: "They're different: medical aid pays providers for treatment; dread disease pays you a flexible lump sum for the wider costs.",
           },
         },
@@ -693,7 +693,7 @@ const lesson3Layout: LessonLayoutItem[] = [
     type: "info",
     title: "A Lump Sum When You Need It Most",
     content:
-      "<p>Dread disease cover (also called critical illness cover) pays a tax-free lump sum if you're diagnosed with a serious illness — even if you survive and recover.</p><p>Conditions typically include cancer, heart attack, stroke and kidney failure. In SA, treatment for a serious illness can run to hundreds of thousands of rands, and even with medical aid the shortfalls and lost income can wipe out savings. The lump sum is yours to use as you choose — unlike income protection, which replaces your monthly salary.</p>",
+      "<p>Dread disease cover (also called critical illness cover) pays a tax-free lump sum if you're diagnosed with a serious illness, even if you survive and recover.</p><p>Conditions typically include cancer, heart attack, stroke and kidney failure. In SA, treatment for a serious illness can run to hundreds of thousands of rands, and even with medical aid the shortfalls and lost income can wipe out savings. The lump sum is yours to use as you choose: unlike income protection, which replaces your monthly salary.</p>",
   },
   { slot: "insurance/lesson-3/when-pays" },
   { slot: "insurance/lesson-3/tax-free" },
@@ -744,7 +744,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Big debts or many dependants push it up; substantial savings or few dependants pull it down. Use 10× as a first estimate.",
-            incorrect: "It's true — 10× is just a starting point. Your actual need depends on your debt, dependants and savings.",
+            incorrect: "It's true. 10× is just a starting point. Your actual need depends on your debt, dependants and savings.",
           },
         },
       },
@@ -779,8 +779,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "Your outstanding debts, like a home loan, should be included when working out how much life cover you need.",
           correct: true,
           feedback: {
-            correct: "True. A payout that clears the bond keeps your family in their home — one of the most important jobs life cover does.",
-            incorrect: "It's true — debts like the bond belong in the calculation, so the payout can clear them and keep the family housed.",
+            correct: "True. A payout that clears the bond keeps your family in their home, one of the most important jobs life cover does.",
+            incorrect: "It's true, debts like the bond belong in the calculation, so the payout can clear them and keep the family housed.",
           },
         },
       },
@@ -797,7 +797,7 @@ const lesson4Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Dependent children mean years of support and schooling to fund — a big reason her cover should be higher.",
+            correct: "Right. Dependent children mean years of support and schooling to fund. A big reason her cover should be higher.",
             incorrect: "More dependants means more to protect: years of living costs and education. That pushes her cover need up, not down.",
           },
         },
@@ -813,11 +813,11 @@ const lesson4Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "A common target is to replace roughly what share of your net income for your family?",
-          options: ["Around 75%", "About 10%", "Exactly 100% forever", "None — they'll manage"],
+          options: ["Around 75%", "About 10%", "Exactly 100% forever", "None. They'll manage"],
           correct: 0,
           feedback: {
             correct: "Right. Aiming to replace about 75% of net income keeps your family's lifestyle roughly intact without over-insuring.",
-            incorrect: "The usual target is around 75% of net income — enough to keep the household running without paying for excessive cover.",
+            incorrect: "The usual target is around 75% of net income. Enough to keep the household running without paying for excessive cover.",
           },
         },
       },
@@ -842,7 +842,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. A payout can be invested to draw a monthly income, so it replaces a salary over years rather than being spent all at once.",
-            incorrect: "It's true — a lump sum can be invested to generate monthly income, replacing lost earnings over time instead of vanishing quickly.",
+            incorrect: "It's true. A lump sum can be invested to generate monthly income, replacing lost earnings over time instead of vanishing quickly.",
           },
         },
       },
@@ -870,15 +870,15 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "When is it most important to review your life cover?",
           options: [
-            "After big life events — marriage, a child, a new bond, a big raise",
-            "Never — set it and forget it",
+            "After big life events",
+            "Never, set it and forget it",
             "Only when you retire",
             "Only if the insurer calls you",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Life events change what your family would need. A quick review after each keeps your cover matched to reality.",
-            incorrect: "Review after life events — a new child, a bond, a raise. Those are exactly when your cover need shifts.",
+            incorrect: "Review after life events. A new child, a bond, a raise. Those are exactly when your cover need shifts.",
           },
         },
       },
@@ -889,7 +889,7 @@ const lesson4Slots: QuestionSlot[] = [
           question: "Sipho set his cover at 25 when he was single. He's now 35, married with a bond and a child. What should he do?",
           options: [
             "Review and almost certainly increase his cover to match his new responsibilities",
-            "Leave it — the old amount is fine",
+            "Leave it. The old amount is fine",
             "Cancel it entirely",
             "Reduce it",
           ],
@@ -909,7 +909,7 @@ const lesson4Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Calculating Your Cover Gap",
     content:
-      "<p>Most South Africans are underinsured. The question isn't whether to have life cover, but <strong>how much</strong>.</p><p><strong>The 10× rule:</strong> a common starting point is 10× your annual salary — earn R30 000/month (R360 000/year) and that's about R3.6 million.</p><p><strong>More precise:</strong> add up outstanding debt, children's education, the years of income to replace, and final costs. A common target is to replace about 75% of your net income. Review it every couple of years — cover taken out at 25 is usually too little at 35.</p>",
+      "<p>Most South Africans are underinsured. The question isn't whether to have life cover, but <strong>how much</strong>.</p><p><strong>The 10× rule:</strong> a common starting point is 10× your annual salary. Earn R30 000/month (R360 000/year) and that's about R3.6 million.</p><p><strong>More precise:</strong> add up outstanding debt, children's education, the years of income to replace, and final costs. A common target is to replace about 75% of your net income. Review it every couple of years. Cover taken out at 25 is usually too little at 35.</p>",
   },
   { slot: "insurance/lesson-4/tenx-calc" },
   { slot: "insurance/lesson-4/add-up-needs" },
@@ -939,7 +939,7 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Third-party covers the damage YOU cause to OTHERS — their car, property or injury claims. Your own car isn't covered.",
+            correct: "Right. Third-party covers the damage YOU cause to OTHERS, their car, property or injury claims. Your own car isn't covered.",
             incorrect: "Third-party covers damage you cause to others, not your own vehicle. That's the key limitation to understand.",
           },
         },
@@ -950,7 +950,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You have third-party-only cover and cause a crash that writes off your own car. Who pays to replace it?",
           options: [
-            "You do — third-party doesn't fix your own vehicle",
+            "You do. Third-party doesn't fix your own vehicle",
             "The insurer replaces it fully",
             "The other driver always pays",
             "SARS refunds you",
@@ -958,7 +958,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Third-party only pays for damage to others. Replacing your own written-off car needs comprehensive cover.",
-            incorrect: "You'd pay out of pocket. Third-party doesn't touch your own car — only comprehensive cover would replace it.",
+            incorrect: "You'd pay out of pocket. Third-party doesn't touch your own car. Only comprehensive cover would replace it.",
           },
         },
       },
@@ -969,8 +969,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Driving with no insurance means you personally pay for damage you cause to other people's property.",
           correct: true,
           feedback: {
-            correct: "True. With no cover, a crash you cause can leave you owing for someone else's car or property out of your own pocket — potentially huge.",
-            incorrect: "It's true — uninsured, you're personally liable for the damage you cause to others. That can be financially ruinous.",
+            correct: "True. With no cover, a crash you cause can leave you owing for someone else's car or property out of your own pocket: potentially huge.",
+            incorrect: "It's true. Uninsured, you're personally liable for the damage you cause to others. That can be financially ruinous.",
           },
         },
       },
@@ -1002,7 +1002,7 @@ const lesson5Slots: QuestionSlot[] = [
         variantId: "tt-order-mcq",
         step: {
           type: "mcq",
-          question: "Which tier sits in the middle — covering others, plus fire and theft of your own car?",
+          question: "Which tier sits in the middle, covering others, plus fire and theft of your own car?",
           options: [
             "Third-party, fire & theft",
             "Comprehensive",
@@ -1011,7 +1011,7 @@ const lesson5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Third-party, fire & theft adds fire and theft of your car to basic third-party cover — a step below comprehensive.",
+            correct: "Right. Third-party, fire & theft adds fire and theft of your car to basic third-party cover, a step below comprehensive.",
             incorrect: "It's third-party, fire & theft: third-party cover plus fire and theft of your own car, sitting between the cheapest and fullest options.",
           },
         },
@@ -1024,7 +1024,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Comprehensive costs most but protects most. Match the tier to your car's value and your budget, not just the lowest price.",
-            incorrect: "It's true — wider cover costs more. Choose the tier that fits your car's value and budget, balancing price against protection.",
+            incorrect: "It's true. Wider cover costs more. Choose the tier that fits your car's value and budget, balancing price against protection.",
           },
         },
       },
@@ -1040,14 +1040,14 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa just financed a brand-new car she still owes a lot on. Which cover usually fits best?",
           options: [
-            "Comprehensive — a write-off shouldn't leave her owing on a car she can't drive",
+            "Comprehensive. A write-off shouldn't leave her owing on a car she can't drive",
             "Third-party only",
             "No insurance",
             "Only fire cover",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. On a financed car, comprehensive protects both the asset and the loan — many lenders require it for exactly this reason.",
+            correct: "Right. On a financed car, comprehensive protects both the asset and the loan. Many lenders require it for exactly this reason.",
             incorrect: "A financed, high-value car usually needs comprehensive, so a write-off doesn't leave her repaying a loan on a wreck.",
           },
         },
@@ -1058,7 +1058,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo drives an old car worth about R15 000. He's weighing full comprehensive cover. What's reasonable to consider?",
           options: [
-            "A cheaper tier may make sense, since comprehensive premiums could rival the car's low value",
+            "A cheaper tier may make sense",
             "He must always take the most expensive cover",
             "He needs no cover of any kind ever",
             "Insurance is pointless for any car",
@@ -1078,7 +1078,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The car may be cheap, but the Mercedes you might hit isn't. Third-party is the sensible minimum for exactly that risk.",
-            incorrect: "It's true — third-party is the smart minimum. Your car's value doesn't cap what you'd owe for damaging someone else's.",
+            incorrect: "It's true. Third-party is the smart minimum. Your car's value doesn't cap what you'd owe for damaging someone else's.",
           },
         },
       },
@@ -1114,7 +1114,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. It's a trade-off: cheaper each month, but a bigger bill at claim time. Pick an excess you could actually afford to pay.",
-            incorrect: "It's true — higher excess, lower premium, but more out of your pocket per claim. Set it to something you could genuinely cover.",
+            incorrect: "It's true. Higher excess, lower premium, but more out of your pocket per claim. Set it to something you could genuinely cover.",
           },
         },
       },
@@ -1125,7 +1125,7 @@ const lesson5Slots: QuestionSlot[] = [
           question: "Ayesha picks a very high excess to get a cheap premium, but has little savings. What's the risk?",
           options: [
             "If she claims, she may not afford the excess and can't get the repair done",
-            "There's no risk — high excess is always best",
+            "There's no risk. High excess is always best",
             "Her premium will rise instantly",
             "The insurer pays her excess for her",
           ],
@@ -1145,7 +1145,7 @@ const lesson5Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Tiers of Car Insurance",
     content:
-      "<p><strong>Comprehensive:</strong> covers your car plus third-party damage. Most expensive.</p><p><strong>Third-party, fire & theft:</strong> covers others if you cause an accident, plus fire and theft of your own car.</p><p><strong>Third-party only:</strong> covers damage you cause to others. Cheapest — and the sensible minimum.</p><p>Drive with no insurance and YOU pay, out of pocket, for damage you cause to other people's property.</p>",
+      "<p><strong>Comprehensive:</strong> covers your car plus third-party damage. Most expensive.</p><p><strong>Third-party, fire & theft:</strong> covers others if you cause an accident, plus fire and theft of your own car.</p><p><strong>Third-party only:</strong> covers damage you cause to others. Cheapest, and the sensible minimum.</p><p>Drive with no insurance and YOU pay, out of pocket, for damage you cause to other people's property.</p>",
   },
   { slot: "insurance/lesson-5/third-party-covers" },
   { slot: "insurance/lesson-5/three-tiers" },
@@ -1166,12 +1166,12 @@ const lesson6Slots: QuestionSlot[] = [
         variantId: "bvc-which",
         step: {
           type: "mcq",
-          question: "Which insurance covers the physical structure of your home — walls, roof, fitted kitchen?",
+          question: "Which insurance covers the physical structure of your home: walls, roof, fitted kitchen?",
           options: ["Buildings insurance", "Contents insurance", "Car insurance", "Life insurance"],
           correct: 0,
           feedback: {
             correct: "Right. Buildings insurance rebuilds or repairs the structure after events like fire, storm or a burst geyser. If you have a bond, your bank usually requires it.",
-            incorrect: "It's buildings insurance — it covers the structure itself. Your movable belongings are covered by contents insurance instead.",
+            incorrect: "It's buildings insurance. It covers the structure itself. Your movable belongings are covered by contents insurance instead.",
           },
         },
       },
@@ -1196,7 +1196,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Buildings covers the structure; contents covers your belongings. A fire can destroy both, so many homeowners carry each.",
-            incorrect: "It's true — they cover different things (structure vs belongings), so a homeowner frequently needs both.",
+            incorrect: "It's true. They cover different things (structure vs belongings), so a homeowner frequently needs both.",
           },
         },
       },
@@ -1232,7 +1232,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The body corporate's cover stops at the structure. Your possessions inside are your responsibility to insure.",
-            incorrect: "It's true — you need your own contents cover. The body corporate only insures the building, not your belongings.",
+            incorrect: "It's true. You need your own contents cover. The body corporate only insures the building, not your belongings.",
           },
         },
       },
@@ -1242,15 +1242,15 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato buys a townhouse in a sectional-title complex. What should she check about insurance?",
           options: [
-            "Exactly what the body corporate policy covers, then insure her own contents and any gaps",
-            "Nothing — she's fully covered automatically",
+            "Exactly what the body corporate policy covers",
+            "Nothing. She's fully covered automatically",
             "Only her car insurance",
             "That the complex has a nice garden",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Confirm what the body corporate covers, then arrange contents cover and top up any gaps so she's not caught short.",
-            incorrect: "She should check the body corporate's cover and then insure her own contents and gaps — not assume everything's handled.",
+            incorrect: "She should check the body corporate's cover and then insure her own contents and gaps, not assume everything's handled.",
           },
         },
       },
@@ -1267,7 +1267,7 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "Home insurance typically covers damage caused by gradual wear and tear over time.",
           correct: false,
           feedback: {
-            correct: "Correct. Insurance covers sudden, unexpected events — not slow deterioration. A pipe that's been slowly rusting for years is usually excluded.",
+            correct: "Correct. Insurance covers sudden, unexpected events, not slow deterioration. A pipe that's been slowly rusting for years is usually excluded.",
             incorrect: "Wear and tear is almost always excluded. Insurance is for sudden, unexpected damage, not aging or lack of maintenance.",
           },
         },
@@ -1285,8 +1285,8 @@ const lesson6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Insurance is for the sudden and unexpected — a burst pipe. Slow, foreseeable deterioration is a maintenance issue, not a claim.",
-            incorrect: "It covers sudden events like a burst pipe. Slow drips, fading and aging are wear and tear — excluded as maintenance.",
+            correct: "Right. Insurance is for the sudden and unexpected. A burst pipe. Slow, foreseeable deterioration is a maintenance issue, not a claim.",
+            incorrect: "It covers sudden events like a burst pipe. Slow drips, fading and aging are wear and tear, excluded as maintenance.",
           },
         },
       },
@@ -1296,14 +1296,14 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo ignored a slow leak for months; now there's major damage. Why might his claim be rejected?",
           options: [
-            "Insurers exclude gradual damage from neglected maintenance — it's not sudden or unexpected",
+            "Insurers exclude gradual damage from neglected maintenance. It's not sudden or unexpected",
             "Because he has too much cover",
             "Insurers always pay everything",
             "Because leaks are never a problem",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A slow, known leak is a maintenance failure, not a sudden event — so it typically falls outside cover. Fixing small issues early avoids this.",
+            correct: "Right. A slow, known leak is a maintenance failure, not a sudden event, so it typically falls outside cover. Fixing small issues early avoids this.",
             incorrect: "Gradual damage from ignored maintenance is usually excluded. Insurance pays for sudden events, not slow, avoidable deterioration.",
           },
         },
@@ -1340,7 +1340,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. A very old geyser failing from rust may be treated as wear and tear. Knowing your policy's stance beats finding out at claim time.",
-            incorrect: "It's true — an old, rusted geyser can be excluded as wear and tear. Check your policy so a burst-geyser claim isn't a nasty surprise.",
+            incorrect: "It's true. An old, rusted geyser can be excluded as wear and tear. Check your policy so a burst-geyser claim isn't a nasty surprise.",
           },
         },
       },
@@ -1371,7 +1371,7 @@ const lesson6Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Protecting Your Biggest Asset",
     content:
-      "<p>Two types of insurance protect a home. <strong>Buildings insurance</strong> covers the structure — walls, roof, fitted kitchen, plumbing — paying to rebuild after fire, storm or a burst geyser. If you have a bond, your bank usually requires it. <strong>Contents insurance</strong> covers your furniture, appliances, electronics and valuables inside.</p><p>In sectional-title, the body corporate usually insures the structure, so you still need contents cover. Watch the exclusions: gradual wear and tear is generally not covered, and an aging, rusted geyser may be excluded — check the wording.</p>",
+      "<p>Two types of insurance protect a home. <strong>Buildings insurance</strong> covers the structure (walls, roof, fitted kitchen, plumbing) paying to rebuild after fire, storm or a burst geyser. If you have a bond, your bank usually requires it. <strong>Contents insurance</strong> covers your furniture, appliances, electronics and valuables inside.</p><p>In sectional-title, the body corporate usually insures the structure, so you still need contents cover. Watch the exclusions: gradual wear and tear is generally not covered, and an aging, rusted geyser may be excluded. Check the wording.</p>",
   },
   { slot: "insurance/lesson-6/buildings-vs-contents" },
   { slot: "insurance/lesson-6/sectional-title" },

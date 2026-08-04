@@ -7,7 +7,8 @@ Read the question aloud. If it sounds like a textbook, a quiz-app filler, or a c
 
 ## Non-negotiables (every question)
 1. **Concrete over abstract.** Use real rands, real products, real institutions. "R2 300 in a Capitec cheque account" beats "some money in a bank account".
-2. **South African by default.** SARS, SARB, JSE, TFSA (R36k/yr, R500k lifetime), two-pot, RA, UIF, stokvel, Capitec/FNB/TymeBank, load-shedding budgets, black tax. Never "401(k)", "IRS", "$".
+2. **South African by default.** SARS, SARB, JSE, TFSA (R46k/yr, R500k lifetime), two-pot, RA, UIF, stokvel, Capitec/FNB/TymeBank, load-shedding budgets, black tax. Never "401(k)", "IRS", "$".
+   **Always check a figure against `docs/SA-REGULATORY-FIGURES.md` before you use it** — that file is the single source of truth and it moves.
 3. **A person, a situation, a consequence.** The best questions put a named person in a decision with a cost. "Thabo earns R80k/month and spends it all — SARS bills him R280k. What should he have done?" No floating definitions.
 4. **One idea per question.** If a learner could get it wrong for two different reasons, split it.
 5. **Distractors are plausible and diagnostic.** Each wrong option should be a real misconception, not filler. "Making you happy" as a function of money works because it's a tempting wrong answer. "Purple" does not. Never include joke options, "all/none of the above", or an option that's obviously longest = correct.
@@ -35,6 +36,14 @@ Every lesson shows **more than 3 questions** — at least 4 answerable slots, ev
 **Concept: inflation erodes cash.**
 - *v1 (mcq):* "Inflation is about 5%. You keep R1 000 as cash for a year. What's true?" → correct: "It still says R1 000 but buys about R950 worth of goods." Distractors: "grows to R1 050" (confuses inflation with interest), "loses R50 you can see" (thinks rands vanish).
 - *v2 (true/false):* "Your salary went up 4% but inflation was 6%. You can afford more this year." → False; feedback does the 4−6 = −2% real cut.
-- *v3 (fill-blank):* "The Reserve Bank targets inflation between 3% and ___%." → 6.
+- *v3 (fill-blank):* "R20 000 sits in cash for a year while inflation runs at 5%. In today's buying power it is worth about R____." → 19000.
 
 Three angles, one idea, no repetition, all unmistakably SA.
+
+**Note on fill-blanks:** answers are marked correct within a **±10% tolerance**
+(`LessonView.tsx`). That makes percentages useless as answers — "6" would accept
+anything from 5.4 to 6.6, and "10.5" would accept 9.45 to 11.55. Use **rand
+amounts**, where a 10% band still discriminates properly. (The old version of this
+example asked for the top of the SARB's "3–6% band"; that target has since been
+replaced by a **3% point target ±1pp**, which is exactly the kind of drift a
+percentage answer invites.)

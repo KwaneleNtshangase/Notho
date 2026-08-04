@@ -223,3 +223,48 @@ Worth stating plainly rather than discovering later.
 - **`/api/health` does not check Resend.** Outbound email can be broken while
   everything here is green. Watch the Resend dashboard after any change to
   `MAIL_FROM_ADDRESS` — see `docs/EMAIL-MIGRATION-NOTHO.md`.
+
+---
+
+## Open question: unbounded question re-queue
+
+Not a monitoring gap — a product decision that hasn't been made. Recorded here
+because it was found while fixing the E2E suite and would otherwise be lost.
+
+`src/app/(app)/lesson/[courseId]/[lessonId]/page.tsx`, in the wrong-answer branch:
+
+```ts
+mistakenQids,                                  // deduplicated
+steps: [...prev.steps, requeuedCopy(step)],    // not
+```
+
+A missed question is appended to the end of the lesson so it comes back. Good:
+that is mastery-based repetition working as intended. But the append is not
+gated on `mistakenQids`, so **a question missed three times is appended three
+times**. There is no cap.
+
+For most users this is invisible — they get a question wrong once, see it again,
+get it right. The person it affects is the one who keeps missing the same
+concept, whose lesson keeps growing while they are already struggling. In an app
+whose purpose is building financial confidence, that is worth deciding on
+deliberately rather than by default.
+
+It is also what made the lesson E2E specs unfixable for four attempts. They
+answered by clicking the first option, wrong roughly three times in four, so the
+lesson grew faster than the tests consumed it — `stepIndex` was observed passing
+102 inside a single lesson. No iteration budget could ever be large enough. The
+specs now learn the correct answer from the app's own feedback and replay it
+when a question returns (`answerCurrentQuestion` in `e2e/helpers.ts`), which
+sidesteps the issue without changing app behaviour.
+
+**Three options, if you decide to act:**
+
+1. **Leave it.** Repetition until mastery is the point. Accept that a struggling
+   user gets a longer lesson — arguably the correct outcome.
+2. **One pending copy per question.** Append only if that `qid` is not already
+   queued. A missed question returns once per pass rather than once per mistake.
+3. **Cap total re-queues per lesson.** Bounds worst-case length regardless of
+   how the mistakes are distributed.
+
+Whichever you pick, the reducer is unit-testable without a browser, so this
+belongs in `src/lib/__tests__/` rather than in E2E.

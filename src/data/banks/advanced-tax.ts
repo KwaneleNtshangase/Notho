@@ -31,11 +31,11 @@ const cgtSlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "An individual in the 45% tax bracket has an effective CGT rate of about:",
-          options: ["18% (45% × 40% inclusion)", "45%", "40%", "27%"],
+          options: ["18%", "45%", "40%", "27%"],
           correct: 0,
           feedback: {
             correct: "Right. Only 40% of the gain is included, then taxed at your marginal rate: 45% × 40% = 18% effective at the top.",
-            incorrect: "It's 18%. Just 40% of the gain is included, and 45% × 40% = 18% — never the full 45%.",
+            incorrect: "It's 18%. Just 40% of the gain is included, and 45% × 40% = 18%. Never the full 45%.",
           },
         },
       },
@@ -46,7 +46,7 @@ const cgtSlots: QuestionSlot[] = [
           statement: "CGT is a separate tax in South Africa, with its own dedicated rate.",
           correct: false,
           feedback: {
-            correct: "Correct. It's not separate — a portion of the gain is added to your taxable income and taxed at your normal rates.",
+            correct: "Correct. It's not separate. A portion of the gain is added to your taxable income and taxed at your normal rates.",
             incorrect: "It isn't separate. CGT is a top-up to income tax: part of the gain is included and taxed at your marginal rate.",
           },
         },
@@ -91,7 +91,7 @@ const cgtSlots: QuestionSlot[] = [
           options: ["R3 million", "R2 million", "R1 million", "R5 million"],
           correct: 0,
           feedback: {
-            correct: "Right. Budget 2026 raised it to R3 million (from R2 million) — the first increase since 2012.",
+            correct: "Right. Budget 2026 raised it to R3 million (from R2 million): the first increase since 2012.",
             incorrect: "It's R3 million now (raised from R2 million in Budget 2026). That's the gain on your main home that's excluded.",
           },
         },
@@ -139,14 +139,14 @@ const cgtSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Which of these triggers CGT?",
           options: [
-            "Selling, gifting, or emigrating with an asset (a 'disposal')",
+            "Selling, gifting, or emigrating with an asset",
             "Earning your monthly salary",
             "Holding shares that have risen in value",
             "Opening a savings account",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. CGT is triggered by a disposal — including a gift or emigration, not just a sale for cash.",
+            correct: "Right. CGT is triggered by a disposal, including a gift or emigration, not just a sale for cash.",
             incorrect: "It's a disposal (sale, gift, emigration) that triggers CGT. A paper gain on something you still hold isn't taxed yet.",
           },
         },
@@ -158,7 +158,7 @@ const cgtSlots: QuestionSlot[] = [
           statement: "Gifting shares to a friend triggers no CGT because no money changes hands.",
           correct: false,
           feedback: {
-            correct: "Correct. A gift is a deemed disposal at market value — the donor pays CGT on the gain as if they'd sold.",
+            correct: "Correct. A gift is a deemed disposal at market value. The donor pays CGT on the gain as if they'd sold.",
             incorrect: "It does trigger CGT. SARS treats a gift as a disposal at market value, so the donor is taxed on the gain.",
           },
         },
@@ -194,7 +194,7 @@ const cgtSlots: QuestionSlot[] = [
           statement: "Assets held inside a Tax-Free Savings Account are exempt from CGT.",
           correct: true,
           feedback: {
-            correct: "Right. Growth inside a TFSA — including capital gains — is entirely tax-free, which is why growth assets suit it.",
+            correct: "Right. Growth inside a TFSA, including capital gains, is entirely tax-free, which is why growth assets suit it.",
             incorrect: "They are exempt. A TFSA shelters qualifying growth from CGT (and from tax on interest and dividends) completely.",
           },
         },
@@ -205,15 +205,15 @@ const cgtSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Zanele has R500 000 of unrealised gains and R180 000 of unrealised losses this tax year, and wants to unlock the gains. Most tax-efficient?",
           options: [
-            "Realise both — net gain R320 000, less the exclusion, is taxed",
+            "Realise both, net gain R320 000, less the exclusion, is taxed",
             "Sell only the winners and ignore the losers",
             "Gift the winners to her spouse to avoid CGT entirely",
-            "Hold everything — CGT only applies when you need the cash",
+            "Hold everything. CGT only applies when you need the cash",
           ],
           correct: 0,
           feedback: {
             correct: "Right. The R180 000 loss offsets the gain → net R320 000; after the R50 000 exclusion, R270 000 is taxed. Harvesting the loss saves real tax.",
-            incorrect: "Realise the loss too — it offsets the gain rand-for-rand. (A spousal transfer only defers CGT; it doesn't avoid it.)",
+            incorrect: "Realise the loss too: it offsets the gain rand-for-rand. (A spousal transfer only defers CGT; it doesn't avoid it.)",
           },
         },
       },
@@ -226,7 +226,7 @@ const cgtLayout: LessonLayoutItem[] = [
     type: "info",
     title: "What CGT Is, and the Effective Rate",
     content:
-      "<p>Capital Gains Tax isn't a separate tax in SA — it's a top-up to income tax. When you <strong>dispose</strong> of an asset (sell, gift, emigrate, or die), a portion of the profit is added to your taxable income.</p><p>Individuals include <strong>40%</strong> of the gain; at the top 45% bracket that's an <strong>18% effective</strong> rate (45% × 40%) — not 45%. Two shields help: an <strong>annual exclusion of R50 000</strong> and a <strong>primary-residence exclusion of R3 000 000</strong> (both raised in Budget 2026).</p>",
+      "<p>Capital Gains Tax isn't a separate tax in SA. It's a top-up to income tax. When you <strong>dispose</strong> of an asset (sell, gift, emigrate, or die), a portion of the profit is added to your taxable income.</p><p>Individuals include <strong>40%</strong> of the gain; at the top 45% bracket that's an <strong>18% effective</strong> rate (45% × 40%), not 45%. Two shields help: an <strong>annual exclusion of R50 000</strong> and a <strong>primary-residence exclusion of R3 000 000</strong> (both raised in Budget 2026).</p>",
   },
   { slot: "advanced-tax/cgt-fundamentals/inclusion" },
   { slot: "advanced-tax/cgt-fundamentals/exclusions" },
@@ -257,7 +257,7 @@ const divSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Salary (deductible, taxed in your hands), dividend (from after-tax profit), or a loan account (with s7C interest rules).",
-            incorrect: "The three routes are salary, dividend, and loan account — each taxed differently.",
+            incorrect: "The three routes are salary, dividend, and loan account, each taxed differently.",
           },
         },
       },
@@ -268,7 +268,7 @@ const divSlots: QuestionSlot[] = [
           statement: "A salary paid by your company is tax-deductible for the company, while a dividend is paid from after-tax profit.",
           correct: true,
           feedback: {
-            correct: "Right. That deductibility is the key difference — salary reduces company tax; dividends come after the 27% has been paid.",
+            correct: "Right. That deductibility is the key difference. Salary reduces company tax; dividends come after the 27% has been paid.",
             incorrect: "It's true. Salary is a deductible expense; dividends are paid out of profit that has already been taxed at 27%.",
           },
         },
@@ -279,15 +279,15 @@ const divSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Drawing money from your company as a 'loan account' to yourself:",
           options: [
-            "Is allowed but must carry interest at the official rate (s7C), so it's not a long-term extraction plan",
+            "Is allowed but must carry interest at the official rate (s7C)",
             "Is completely tax-free forever",
             "Is illegal in South Africa",
             "Avoids all company tax",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Loan accounts trigger s7C interest rules — useful short-term, but not a way to permanently take profit tax-free.",
-            incorrect: "A loan account is allowed but attracts s7C interest requirements — it's not a tax-free long-term solution.",
+            correct: "Right. Loan accounts trigger s7C interest rules, useful short-term, but not a way to permanently take profit tax-free.",
+            incorrect: "A loan account is allowed but attracts s7C interest requirements. It's not a tax-free long-term solution.",
           },
         },
       },
@@ -303,14 +303,14 @@ const divSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Your Pty Ltd pays you R200 000 as salary and you're in the 45% bracket. Roughly what do you keep?",
           options: [
-            "About R110 000 (income tax at your marginal rate)",
-            "The full R200 000 — salary is untaxed",
+            "About R110 000",
+            "The full R200 000. Salary is untaxed",
             "About R146 000 (company saves 27%)",
             "About R58 000",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Salary is deductible for the company (no 27% there), but you pay income tax on it — ≈R110 000 net at 45%.",
+            correct: "Right. Salary is deductible for the company (no 27% there), but you pay income tax on it: ≈R110 000 net at 45%.",
             incorrect: "Salary avoids company tax but is taxed in your hands. At 45%, R200 000 leaves roughly R110 000 net.",
           },
         },
@@ -322,7 +322,7 @@ const divSlots: QuestionSlot[] = [
           statement: "Because a salary is deductible for the company, it isn't subject to the 27% company tax.",
           correct: true,
           feedback: {
-            correct: "Right. The salary is an expense that reduces company profit, so no company tax is paid on that amount — only your income tax.",
+            correct: "Right. The salary is an expense that reduces company profit, so no company tax is paid on that amount, only your income tax.",
             incorrect: "It's true. A deductible salary escapes the 27% company tax; the tax happens in your hands at your marginal rate.",
           },
         },
@@ -333,7 +333,7 @@ const divSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Why might a lower-earning owner prefer a salary over a dividend?",
           options: [
-            "Salary uses the tax rebates and lower brackets, so little or no tax may apply on modest amounts",
+            "Salary uses the tax rebates and lower brackets",
             "Salary is always tax-free",
             "Dividends are illegal for small companies",
             "Salary avoids all tax at every income level",
@@ -357,10 +357,10 @@ const divSlots: QuestionSlot[] = [
           type: "mcq",
           question: "A dividend is paid from after-tax profit. What's the combined effective tax (company + dividends tax)?",
           options: [
-            "About 41.6% (27% company tax, then 20% dividends tax)",
+            "About 41.6%",
             "Exactly 20%",
             "Exactly 27%",
-            "0% — dividends are tax-free",
+            "0%. Dividends are tax-free",
           ],
           correct: 0,
           feedback: {
@@ -389,8 +389,8 @@ const divSlots: QuestionSlot[] = [
           statement: "A dividend avoids UIF and pension obligations that a salary would create.",
           correct: true,
           feedback: {
-            correct: "Right. Dividends aren't remuneration, so no UIF or pension contributions attach — one reason owners use them.",
-            incorrect: "It's true — a dividend isn't remuneration, so it carries no UIF or pension obligations, unlike a salary.",
+            correct: "Right. Dividends aren't remuneration, so no UIF or pension contributions attach, one reason owners use them.",
+            incorrect: "It's true. A dividend isn't remuneration, so it carries no UIF or pension obligations, unlike a salary.",
           },
         },
       },
@@ -406,14 +406,14 @@ const divSlots: QuestionSlot[] = [
           type: "mcq",
           question: "At the very top bracket, per R100 of company profit, a dividend versus a salary:",
           options: [
-            "Leaves slightly more in hand (≈R58.40 vs ≈R55)",
+            "Leaves slightly more in hand",
             "Leaves far less",
             "Is exactly the same",
             "Is tax-free either way",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. At 45%, the dividend's ≈41.6% load beats a 45% salary by a few rand per R100 — the gap is small.",
+            correct: "Right. At 45%, the dividend's ≈41.6% load beats a 45% salary by a few rand per R100. The gap is small.",
             incorrect: "The dividend edges ahead at the top (≈R58.40 vs ≈R55 per R100). The margin is small, though.",
           },
         },
@@ -425,7 +425,7 @@ const divSlots: QuestionSlot[] = [
           statement: "There's a single 'best' extraction method that's right for every business owner.",
           correct: false,
           feedback: {
-            correct: "Correct. It depends on your bracket and needs — most owners use a mix of salary and dividends, not one or the other.",
+            correct: "Correct. It depends on your bracket and needs: most owners use a mix of salary and dividends, not one or the other.",
             incorrect: "There isn't. The right split depends on your income level and goals; a blend of salary and dividend usually wins.",
           },
         },
@@ -436,14 +436,14 @@ const divSlots: QuestionSlot[] = [
           type: "scenario",
           question: "A top-bracket owner wants to extract R100 000 of profit as tax-efficiently as possible. A reasonable takeaway is:",
           options: [
-            "A dividend is marginally better here, but a salary/dividend mix (using deductions) is usually best overall",
+            "A dividend is marginally better here, but a salary/dividend mix is usually best overall",
             "Always take the whole amount as salary",
             "Dividends are never worth it",
             "Take it as an untaxed loan permanently",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The dividend wins slightly at the top, but blending — a modest salary plus dividends — typically optimises the total.",
+            correct: "Right. The dividend wins slightly at the top, but blending, a modest salary plus dividends, typically optimises the total.",
             incorrect: "At the top the dividend edges it, but the practical answer is a mix. A permanent untaxed loan isn't an option (s7C).",
           },
         },
@@ -457,7 +457,7 @@ const divLayout: LessonLayoutItem[] = [
     type: "info",
     title: "How Business Owners Extract Wealth",
     content:
-      "<p>When your Pty Ltd makes a profit, there are three main ways to take money out. <strong>Salary:</strong> deductible for the company, taxed in your hands at up to 45%. <strong>Dividend:</strong> paid from after-tax profit — 27% company tax, then 20% dividends withholding tax, about <strong>41.6% combined</strong>. <strong>Loan account:</strong> allowed, but must carry interest at the official rate (s7C), so it's not a long-term plan.</p><p>At the very top bracket a dividend edges out a salary (≈R58.40 vs ≈R55 per R100 of profit), but lower down a salary using rebates and lower brackets often wins — so most owners use a mix.</p>",
+      "<p>When your Pty Ltd makes a profit, there are three main ways to take money out. <strong>Salary:</strong> deductible for the company, taxed in your hands at up to 45%. <strong>Dividend:</strong> paid from after-tax profit, 27% company tax, then 20% dividends withholding tax, about <strong>41.6% combined</strong>. <strong>Loan account:</strong> allowed, but must carry interest at the official rate (s7C), so it's not a long-term plan.</p><p>At the very top bracket a dividend edges out a salary (≈R58.40 vs ≈R55 per R100 of profit), but lower down a salary using rebates and lower brackets often wins, so most owners use a mix.</p>",
   },
   { slot: "advanced-tax/dividend-vs-salary/routes" },
   { slot: "advanced-tax/dividend-vs-salary/salary" },
@@ -479,10 +479,10 @@ const trustSlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Income retained inside a South African trust is taxed at:",
-          options: ["A flat 45%, with no rebates", "18% always", "0% — trusts are exempt", "27%, the company rate"],
+          options: ["A flat 45%", "18% always", "0%. Trusts are exempt", "27%, the company rate"],
           correct: 0,
           feedback: {
-            correct: "Right. A trust that keeps income is taxed at a flat 45% — the harshest rate, with no rebates or exclusions.",
+            correct: "Right. A trust that keeps income is taxed at a flat 45%, the harshest rate, with no rebates or exclusions.",
             incorrect: "Retained trust income is taxed at a flat 45%, with none of the rebates individuals get.",
           },
         },
@@ -494,8 +494,8 @@ const trustSlots: QuestionSlot[] = [
           statement: "A trust gets the same annual rebates and CGT exclusion that an individual does.",
           correct: false,
           feedback: {
-            correct: "Correct. Trusts get no rebates and no annual CGT exclusion — one reason retaining income in a trust is tax-expensive.",
-            incorrect: "It doesn't. Trusts receive no rebates and no annual exclusions, unlike individuals — that's the trade-off.",
+            correct: "Correct. Trusts get no rebates and no annual CGT exclusion: one reason retaining income in a trust is tax-expensive.",
+            incorrect: "It doesn't. Trusts receive no rebates and no annual exclusions, unlike individuals. That's the trade-off.",
           },
         },
       },
@@ -504,10 +504,10 @@ const trustSlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "A trust's CGT inclusion rate is 80%. At the 45% trust rate, the effective CGT on a gain retained in the trust is about:",
-          options: ["36% (80% × 45%)", "18%", "45%", "20%"],
+          options: ["36%", "18%", "45%", "20%"],
           correct: 0,
           feedback: {
-            correct: "Right. 80% inclusion × 45% = 36% effective — double the 18% an individual pays on the same gain.",
+            correct: "Right. 80% inclusion × 45% = 36% effective. Double the 18% an individual pays on the same gain.",
             incorrect: "It's 36%: 80% inclusion × 45% rate. That's twice an individual's 18% effective CGT.",
           },
         },
@@ -524,7 +524,7 @@ const trustSlots: QuestionSlot[] = [
           type: "mcq",
           question: "The 'conduit principle' lets a trust reduce tax by:",
           options: [
-            "Distributing income to beneficiaries in the same year, so it's taxed in their (often lower) hands",
+            "Distributing income to beneficiaries in the same year",
             "Never paying any tax at all",
             "Converting income into a company dividend",
             "Ignoring SARS entirely",
@@ -532,7 +532,7 @@ const trustSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Income that flows through to beneficiaries in the same tax year is taxed at their rates, not the flat 45%.",
-            incorrect: "The conduit principle passes income to beneficiaries the same year, taxing it in their hands — usually below 45%.",
+            incorrect: "The conduit principle passes income to beneficiaries the same year, taxing it in their hands, usually below 45%.",
           },
         },
       },
@@ -543,7 +543,7 @@ const trustSlots: QuestionSlot[] = [
           statement: "Income kept in the trust is taxed at 45%, but income distributed to beneficiaries the same year is taxed at their own rates.",
           correct: true,
           feedback: {
-            correct: "Right. That's the core planning move — distribute rather than retain, to access beneficiaries' lower brackets.",
+            correct: "Right. That's the core planning move, distribute rather than retain, to access beneficiaries' lower brackets.",
             incorrect: "It's true. Retain and it's 45%; distribute in the same year and the beneficiary is taxed at their (often lower) rate.",
           },
         },
@@ -578,14 +578,14 @@ const trustSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Despite the 45% rate, why do people still use trusts?",
           options: [
-            "Estate planning and asset protection — assets in a trust fall outside your personal estate",
+            "Estate planning and asset protection. Assets in a trust fall outside your personal estate",
             "Trusts are always the lowest-tax option",
             "Trusts are exempt from all tax",
             "The law requires everyone to have one",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The draw is protection and estate planning — trust assets sit outside your estate, reducing estate duty and shielding assets.",
+            correct: "Right. The draw is protection and estate planning. Trust assets sit outside your estate, reducing estate duty and shielding assets.",
             incorrect: "It's about estate planning and asset protection, not a lower tax rate. Trust assets fall outside your personal estate.",
           },
         },
@@ -597,7 +597,7 @@ const trustSlots: QuestionSlot[] = [
           statement: "Assets properly held in a trust generally fall outside your personal estate for estate-duty purposes.",
           correct: true,
           feedback: {
-            correct: "Right. That's a central estate-planning benefit — growth happens outside your estate, limiting future estate duty.",
+            correct: "Right. That's a central estate-planning benefit. Growth happens outside your estate, limiting future estate duty.",
             incorrect: "It's true. Assets in a trust aren't part of your personal estate, which is why trusts feature in estate planning.",
           },
         },
@@ -608,15 +608,15 @@ const trustSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Someone sets up a trust expecting it to slash their income tax. What's the reality?",
           options: [
-            "Retained trust income is taxed at a harsh 45% — trusts are for protection and estate planning, not a low tax rate",
+            "Retained trust income is taxed at a harsh 45%. Trusts are for protection and estate planning, not a low tax rate",
             "Trusts always cut income tax to near zero",
             "Trusts are illegal tax shelters",
             "Trust income is never taxed",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The benefit is structural (protection, estate planning), not a low rate — retained income is taxed at 45%.",
-            incorrect: "Trusts don't slash income tax — retained income is taxed at 45%. Their value is asset protection and estate planning.",
+            correct: "Right. The benefit is structural (protection, estate planning), not a low rate. Retained income is taxed at 45%.",
+            incorrect: "Trusts don't slash income tax. Retained income is taxed at 45%. Their value is asset protection and estate planning.",
           },
         },
       },
@@ -632,7 +632,7 @@ const trustSlots: QuestionSlot[] = [
           type: "mcq",
           question: "You lend money interest-free to your family trust. What does s7C do?",
           options: [
-            "Treats the forgone interest (at the official rate) as an ongoing donation, which can attract donations tax",
+            "Treats the forgone interest as an ongoing donation",
             "Makes the loan completely tax-free",
             "Bans loans to trusts",
             "Converts the loan into a salary",
@@ -640,7 +640,7 @@ const trustSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. s7C targets interest-free (or low-interest) loans to trusts: the shortfall is treated as a donation each year.",
-            incorrect: "s7C treats the missing interest on a low/interest-free loan to a trust as a deemed donation — potentially donations tax.",
+            incorrect: "s7C treats the missing interest on a low/interest-free loan to a trust as a deemed donation: potentially donations tax.",
           },
         },
       },
@@ -651,7 +651,7 @@ const trustSlots: QuestionSlot[] = [
           statement: "Interest-free loans to a trust are completely ignored by SARS.",
           correct: false,
           feedback: {
-            correct: "Correct. s7C exists precisely to catch them — the forgone interest is treated as a donation.",
+            correct: "Correct. s7C exists precisely to catch them. The forgone interest is treated as a donation.",
             incorrect: "They're not ignored. s7C treats the forgone interest on such loans as a deemed donation, which can be taxed.",
           },
         },
@@ -670,7 +670,7 @@ const trustSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. It closed a loophole where value was moved into trusts via interest-free loans with no tax cost.",
-            incorrect: "s7C closed the interest-free-loan loophole for shifting wealth into trusts — it doesn't ban trusts or make them tax-free.",
+            incorrect: "s7C closed the interest-free-loan loophole for shifting wealth into trusts, it doesn't ban trusts or make them tax-free.",
           },
         },
       },
@@ -683,7 +683,7 @@ const trustLayout: LessonLayoutItem[] = [
     type: "info",
     title: "Trusts: Taxed Hard, Used for Protection",
     content:
-      "<p>Income <strong>retained</strong> in a South African trust is taxed at a flat <strong>45%</strong>, with an 80% CGT inclusion (an effective 36% on gains) and no rebates or exclusions. So a trust is not an income-tax saver.</p><p>The planning tool is the <strong>conduit principle</strong>: income distributed to beneficiaries in the same tax year is taxed in their (often lower) hands instead. People use trusts mainly for <strong>estate planning and asset protection</strong> — assets held in a trust fall outside your personal estate. Note s7C: interest-free loans to a trust are treated as ongoing donations.</p>",
+      "<p>Income <strong>retained</strong> in a South African trust is taxed at a flat <strong>45%</strong>, with an 80% CGT inclusion (an effective 36% on gains) and no rebates or exclusions. So a trust is not an income-tax saver.</p><p>The planning tool is the <strong>conduit principle</strong>: income distributed to beneficiaries in the same tax year is taxed in their (often lower) hands instead. People use trusts mainly for <strong>estate planning and asset protection</strong>. Assets held in a trust fall outside your personal estate. Note s7C: interest-free loans to a trust are treated as ongoing donations.</p>",
   },
   { slot: "advanced-tax/trust-tax-vehicle/flat-rate" },
   { slot: "advanced-tax/trust-tax-vehicle/conduit" },
@@ -706,14 +706,14 @@ const foreignSlots: QuestionSlot[] = [
           type: "mcq",
           question: "How does SA tax a person who is a South African tax resident?",
           options: [
-            "On their worldwide income (residence-based taxation)",
+            "On their worldwide income",
             "Only on income earned inside SA",
             "Only on income earned abroad",
             "Not at all if any income is foreign",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. SA uses residence-based taxation — residents are taxed on income from anywhere in the world.",
+            correct: "Right. SA uses residence-based taxation. Residents are taxed on income from anywhere in the world.",
             incorrect: "SA taxes residents on worldwide income. Where the money is earned doesn't remove it from SA's net.",
           },
         },
@@ -738,7 +738,7 @@ const foreignSlots: QuestionSlot[] = [
           options: ["Only SA-source income", "Their worldwide income", "Nothing, ever", "Only foreign income"],
           correct: 0,
           feedback: {
-            correct: "Right. Non-residents are taxed only on income from an SA source — that's the key difference from residents.",
+            correct: "Right. Non-residents are taxed only on income from an SA source. That's the key difference from residents.",
             incorrect: "Non-residents are taxed only on SA-source income. Worldwide taxation applies to residents, not non-residents.",
           },
         },
@@ -787,8 +787,8 @@ const foreignSlots: QuestionSlot[] = [
           statement: "Foreign employment income above R1.25 million is taxed in SA even if you already paid some tax abroad.",
           correct: true,
           feedback: {
-            correct: "Right — but a foreign tax credit (s6quat) offsets the foreign tax paid, so the same income isn't taxed twice in full.",
-            incorrect: "It is taxable above R1.25m — though s6quat gives a credit for foreign tax paid, preventing full double taxation.",
+            correct: "Right, but a foreign tax credit (s6quat) offsets the foreign tax paid, so the same income isn't taxed twice in full.",
+            incorrect: "It is taxable above R1.25m, though s6quat gives a credit for foreign tax paid, preventing full double taxation.",
           },
         },
       },
@@ -804,15 +804,15 @@ const foreignSlots: QuestionSlot[] = [
           type: "mcq",
           question: "You pay tax on foreign income abroad AND it's taxable in SA. What stops it being taxed twice in full?",
           options: [
-            "A foreign tax credit (s6quat) for the tax already paid overseas",
-            "Nothing — you pay full tax twice",
+            "A foreign tax credit for the tax already paid overseas",
+            "Nothing. You pay full tax twice",
             "SA simply ignores the income",
             "You must renounce SA residency",
           ],
           correct: 0,
           feedback: {
             correct: "Right. s6quat credits the foreign tax you've paid against your SA liability on that same income.",
-            incorrect: "The relief is the s6quat foreign tax credit — it offsets overseas tax against your SA bill on the same income.",
+            incorrect: "The relief is the s6quat foreign tax credit, it offsets overseas tax against your SA bill on the same income.",
           },
         },
       },
@@ -823,7 +823,7 @@ const foreignSlots: QuestionSlot[] = [
           statement: "Foreign tax credits (s6quat) can reduce your SA tax on income that was already taxed abroad.",
           correct: true,
           feedback: {
-            correct: "Right. That's their purpose — to prevent double taxation by crediting the foreign tax already paid.",
+            correct: "Right. That's their purpose: to prevent double taxation by crediting the foreign tax already paid.",
             incorrect: "They can. s6quat credits foreign tax paid against your SA liability on the same income, avoiding double tax.",
           },
         },
@@ -834,7 +834,7 @@ const foreignSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho, an SA tax resident, earns R2 million abroad and pays some foreign tax. How is he taxed in SA?",
           options: [
-            "R1.25m may be exempt (if he qualifies); the rest is taxed in SA, less a s6quat credit for foreign tax paid",
+            "R1.25m may be exempt ; the rest is taxed in SA, less a s6quat credit for foreign tax paid",
             "The full R2m is tax-free in SA",
             "He pays full SA tax on R2m with no relief",
             "He owes nothing anywhere",
@@ -865,7 +865,7 @@ const foreignSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. It's the dividing line — residence pulls your global income into the SA net; non-residence limits it to SA-source.",
+            correct: "Right. It's the dividing line, residence pulls your global income into the SA net; non-residence limits it to SA-source.",
             incorrect: "Residency is the key: residents are taxed worldwide, non-residents only on SA-source income.",
           },
         },
@@ -877,7 +877,7 @@ const foreignSlots: QuestionSlot[] = [
           statement: "Simply leaving South Africa for a while automatically ends your SA tax residency.",
           correct: false,
           feedback: {
-            correct: "Correct. Ceasing residency is a formal test (and process with SARS) — not something that happens just by travelling.",
+            correct: "Correct. Ceasing residency is a formal test (and process with SARS), not something that happens just by travelling.",
             incorrect: "It doesn't happen automatically. Ending tax residency involves specific tests and a formal process with SARS.",
           },
         },
@@ -888,14 +888,14 @@ const foreignSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato works abroad for a few months but stays an SA tax resident. Her foreign salary is:",
           options: [
-            "Part of her worldwide income taxable in SA (with the exemption and credits possibly reducing it)",
+            "Part of her worldwide income taxable in SA",
             "Completely outside SA's tax net",
             "Taxed only by the foreign country, never SA",
             "Automatically exempt with no conditions",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. As a resident, it's in the SA net — though the R1.25m exemption and s6quat credits may reduce the SA tax.",
+            correct: "Right. As a resident, it's in the SA net, though the R1.25m exemption and s6quat credits may reduce the SA tax.",
             incorrect: "As an SA resident, her foreign salary is taxable in SA (worldwide income), subject to the exemption and foreign tax credits.",
           },
         },
@@ -909,7 +909,7 @@ const foreignLayout: LessonLayoutItem[] = [
     type: "info",
     title: "SA Residents Are Taxed on Worldwide Income",
     content:
-      "<p>South Africa uses <strong>residence-based taxation</strong>: if you're an SA tax resident, your <strong>worldwide</strong> income is taxable here. Non-residents are taxed only on SA-source income.</p><p>Two big reliefs for residents working abroad: the <strong>foreign employment exemption</strong> (s10(1)(o)(ii)) — up to <strong>R1.25 million</strong> of foreign salary is exempt if you spend more than 183 days abroad (including a continuous 60-day stretch) in a 12-month period — and <strong>foreign tax credits</strong> (s6quat), which offset tax already paid overseas so the same income isn't taxed twice.</p>",
+      "<p>South Africa uses <strong>residence-based taxation</strong>: if you're an SA tax resident, your <strong>worldwide</strong> income is taxable here. Non-residents are taxed only on SA-source income.</p><p>Two big reliefs for residents working abroad: the <strong>foreign employment exemption</strong> (s10(1)(o)(ii)), up to <strong>R1.25 million</strong> of foreign salary is exempt if you spend more than 183 days abroad (including a continuous 60-day stretch) in a 12-month period, and <strong>foreign tax credits</strong> (s6quat), which offset tax already paid overseas so the same income isn't taxed twice.</p>",
   },
   { slot: "advanced-tax/foreign-income-tax/worldwide" },
   { slot: "advanced-tax/foreign-income-tax/exemption" },

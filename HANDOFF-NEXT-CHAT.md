@@ -1,5 +1,6 @@
-# Notho — Lesson Banks Work: Handoff for Next Chat
+# Notho — Lesson Banks: COMPLETE
 
+**Status as of this session: every lesson that should have a bank has one.**
 Paste this whole file into a new chat to continue. It is self-contained.
 
 ## What this project is
@@ -7,7 +8,7 @@ Paste this whole file into a new chat to continue. It is self-contained.
 personal-finance learning app. **Next.js (App Router) + Supabase.**
 Working folder: `/Users/KwaneleNtshangase/Developer/notho`.
 
-## The goal of this work stream
+## The goal of this work stream — achieved
 Give **every lesson a "lesson bank"** so:
 - Two users doing the same lesson rarely get identical questions, and repeating a
   lesson yields different questions (like Duolingo).
@@ -16,6 +17,30 @@ Give **every lesson a "lesson bank"** so:
 - Spaced repetition resurfaces hard/missed questions; a lesson isn't complete
   until every question is answered correctly (mastery loop).
 - **Uniform premium coverage — every lesson is a bank, no gaps/holes.**
+
+## Final coverage — 100%
+
+| Metric | Value |
+|---|---|
+| Lessons in `CONTENT_DATA` | **205** |
+| Bank-backed lessons | **205 (100%)** |
+| Slots | **912** |
+| Hand-written variants | **2 636** |
+| Concepts in `concepts.ts` | **173** |
+
+**Every lesson rotates its questions.** Verified by `scripts/lesson-rotation-check.mjs`,
+which runs the real `resolveLessonSteps()` over all 205 lessons for 3 simulated users ×
+6 attempts: **0 lessons repeat an identical paper, averaging 5.70 distinct papers out of
+6 attempts**, and no two users get the same first attempt.
+
+**This session added 86 lessons → 436 slots → 1 208 variants → 27 new concepts.**
+
+### The RE5 mock exams
+`re5-mock-a` and `re5-mock-b` used to show all 50 questions in a fixed order, every
+time. They are now **50 slots × 2 variants each = a 100-question pool per paper**, so
+each sitting draws a different full-length 50-question exam over identical topic
+coverage — the same way the real RE5 samples from a bank. Mock B's variants are
+scenario-led and deliberately harder than Mock A's.
 
 ## Architecture (key files)
 - **Bank data:** `src/data/banks/*.ts` — one file per course, plus
@@ -31,9 +56,7 @@ Give **every lesson a "lesson bank"** so:
   (`applyBanks(applyReinforcement(mergeContentExtras(ALL_COURSES)))`).
 - **`src/lib/lessonBank.ts`** (Cursor's file — don't edit): `resolveLessonSteps()`
   picks one variant per slot (seeded, anti-repeat). Also `resolveLegacyLessonSteps()`
-  — legacy (non-bank) lessons with 5–10 questions show a seeded **4-of-N per attempt**
-  (LEGACY_SHOW=4, LEGACY_MAX=10), so no lesson shows identical questions on replay.
-  Lessons with >10 questions (the 2 RE5 mock exams) are left whole.
+  for any remaining legacy lessons.
 - **`src/lib/lessonMastery.ts`** (Cursor's): Duolingo re-queue / mastery.
 - **`src/data/concepts.ts`**: `CONCEPTS` with `reviewCard`s (spaced-repetition). Every
   slot's `conceptId` must exist here.
@@ -42,142 +65,146 @@ Give **every lesson a "lesson bank"** so:
   remote**; migration history is drifted — fix with
   `npx supabase migration repair --status applied 20260722120000`).
 
+## Bank files (all registered in `src/data/banks/index.ts`)
+
+Core: `money-basics`, `salary-payslip`, `banking-debit`, `credit-debt`,
+`emergency-fund`, `insurance`, `investing-basics`, `sa-investing`, `property`,
+`taxes`, `scams-fraud`, `bible-money`, `money-psychology`, `retirement`,
+`rand-economy`, `crypto-basics`, `business-finance`, `advanced-tax`,
+`estate-planning`, `advanced-investing`, `business-finance-advanced`, `re5-exam-prep`.
+
+Extras (one per course, added over the last two sessions):
+`money-basics-extra` (8), `salary-payslip-extra` (7), `banking-debit-extra` (5),
+`credit-debt-extra` (10), `emergency-fund-extra` (1), `investing-basics-extra` (9),
+`sa-investing-extra` (2), `property-extra` (1), `taxes-extra` (5),
+`scams-fraud-extra` (4), `bible-money-extra` (8), `money-psychology-extra` (7),
+`retirement-extra` (5), `rand-economy-extra` (8), `crypto-basics-extra` (5),
+`business-finance-extra` (7), plus `re5-mock-a` (1) and `re5-mock-b` (1).
+
+**variantId prefixes** (keep unique per file): `mbx- spx- bdx- cdx- efx- ibx- sax-
+ppx- txx- sfx- bmx- mpx- rtx- rex- cbx- bfx- r5a- r5b-`.
+
 ## Hard rules (enforced by `src/data/__tests__/contentQuality.test.ts`)
-- Every `slotId` and `variantId` **globally unique**. Use a per-file variantId
-  prefix (e.g. `mbx-` for money-basics-extra).
+- Every `slotId` and `variantId` **globally unique**. Use a per-file variantId prefix.
 - Every slot has a `conceptId` that **exists in CONCEPTS**, and **≥2 variants** (use 3).
 - Every lesson has **>3 questions** (banks use 4 slots → 4 questions).
 - Voice: plain, concrete, SA context (rands, SARS, local names/examples), empathetic;
   distractors plausible; exactly one defensible correct answer. Option **positions are
-  shuffled at render**, so `correct: 0` in data is fine (don't worry about index bias);
-  but avoid making the correct option the longest.
+  shuffled at render**, so `correct: 0` in data is fine; but avoid making the correct
+  option the longest — the test ratchets on length bias.
+- Rotate question type within a slot (mcq / true-false / scenario / fill-blank).
+- **fill-blank answers are checked with a ±10% tolerance** (`LessonView.tsx`). Don't
+  use percentages as answers — 10% of "10.5" makes the question trivial. Use rand amounts.
 
-## Accuracy mandate — verify EVERY SA figure
-Source of truth: **`docs/SA-REGULATORY-FIGURES.md`** (web-verified July 2026, 2026/27).
-Current figures to use:
-- TFSA **R46,000/yr**, **R500,000 lifetime**; over-contribution penalty 40%.
-- RA/retirement deduction **27.5%**, annual cap **R430,000** (2027 tax year, from
-  1 Mar 2026; was R350k for 2026 — **use R430k**).
-- Income-tax threshold (under 65) **R99,000**; primary rebate R17,820.
-- CGT: **40%** inclusion, **R50,000** annual exclusion, **R3,000,000** primary-residence
-  exclusion, ~18% effective max.
-- Estate duty **20%** to R30m / **25%** above; **R3.5m** abatement (portable to R7m);
-  executor fee max 3.5%+VAT; donations-tax annual exemption R100k.
-- Two-pot: 1/3 Savings, 2/3 Retirement; **R2,000** min withdrawal, once per tax year,
-  taxed as income. Company tax **27%**; dividends withholding **20%**; VAT **15%**,
-  compulsory reg > **R1,000,000** turnover; provisional tax if non-salary income > R30,000.
-- Foreign employment exemption (s10(1)(o)(ii)) **R1.25m** (183/60-day rule); residence-based
-  worldwide taxation; s6quat credits.
-- Reg 28 offshore limit **45%**; personal SDA **R2m/yr** + FIA **R10m/yr** (SARS clearance).
-- FAIS Ombud award cap **R3.5m** (from 1 Jul 2024); complaint: FSP 6 weeks, then 6 months to
-  Ombud, 3-year prescription. FICA records 5 years; no tipping off.
-- Debit-order dispute window **60 days** (from 13 Apr 2026). Ombud = **National Financial
-  Ombud (NFO)**, 0860 800 900 (the old Banking/Credit/Insurance ombudsmen are outdated).
-- Medical scheme fees credit **R376** member / **R376** first dependant / **R254** each more.
-- SBC (small business corp) tax table: **flagged unverified** — do NOT quote the exact
-  R95,750 0% band; describe SBC as "reduced graduated rates, turnover < R20m" instead.
+## Accuracy — figures verified THIS session (all now in `docs/SA-REGULATORY-FIGURES.md`)
+These corrected stale values found in the legacy content:
 
-## Verification workflow (this sandbox can't run build/vitest — they OOM)
-- Run `npx tsc --noEmit` after each batch.
-- Run a tsx audit (recreate the pattern used all session): checks orphan bank keys,
-  broken slot-refs, duplicate slot/variant IDs, conceptId existence, ≥2 variants,
-  under-4-question lessons, and legacy lessons still <5 questions.
-- **Cursor** runs the real `npm run build` + `npx vitest run` (currently **240/240 pass**).
-- **AG** does read-only QA.
+- **SARB inflation target is now a 3% POINT target with a ±1pp band** — the old
+  "3–6% range" is out of date and must not be used (note: `docs/QUESTION-VOICE-GUIDE.md`
+  still contains a 3–6% example — worth fixing).
+- **Single Discretionary Allowance is R2 million** per calendar year (doubled from
+  R1m in Budget 2026), no SARS clearance. FIA R10m with approval. Calendar year, no rollover.
+- **SA exited the FATF grey list on 24 October 2025** (listed Feb 2023).
+- **SEFA + SEDA + CBDA merged into SEDFA** on 1 Oct 2024 — don't reference SEFA/SEDA
+  as live agencies. NEF is separate (B-BBEE mandate).
+- **IRP5 code 4102 is PAYE**, not 4001 (4001 = retirement fund contributions,
+  4005 = medical scheme fees, 3601 = income). Legacy content had this wrong.
+- **Life policies are deemed property for estate duty** even when paid to a nominated
+  beneficiary — nomination avoids executor's fees and delays, not duty. A **spouse**
+  beneficiary gets the s4(q) deduction (no duty, no fees).
+- **Retirement fund death benefits** are distributed by **trustees under s37C**; the
+  nomination form guides but doesn't bind them.
+- **Living annuity capital is NOT forfeited to the insurer on death** — it passes to
+  nominated beneficiaries. Drawdown band is 2.5%–17.5%.
+- **Transfer duty exemption (R1 210 000) applies to ALL buyers**, not only first-time
+  buyers. First Home Finance (formerly FLISP) is the first-time-buyer subsidy.
 
-## Division of labour
-- **Content agent (you):** author `src/data/banks/**` + `src/data/concepts.ts` and edit
-  content data files. Reuse existing concepts; add new ones as needed.
-- **Cursor:** owns `src/lib/**` (lessonBank, lessonMastery), tests, page.tsx, migration —
-  has the working build/test env. Don't edit its files.
-- **AG:** read-only QA reviews.
+Everything else follows the existing `docs/SA-REGULATORY-FIGURES.md` (TFSA R46k/R500k,
+RA 27.5% capped R430k, threshold R99k, CGT 40%/R50k/R3m, estate duty R3.5m abatement,
+MTC R376/R376/R254, UIF ceiling R17 712 → R177.12, VAT 15% / R1m threshold,
+company tax 27%, Reg 28 offshore 45%, NFO 0860 800 900, debit-order dispute 60 days).
 
-## Progress so far (end of this chat)
-- **22 courses fully bank-backed** (all core lessons): **119 premium bank lessons, 476
-  slots, ~130 concepts, 1,428 hand-written variants.**
-- Legacy rotation live → no lesson shows identical questions on replay anywhere.
-- 2 RE5 mock exams (50Q each) intentionally whole.
-- All green: tsc ✅, audit ✅ (0 orphan/broken/dup/bad-concept), Cursor build ✅ +
-  vitest 240/240 ✅. `question_attempts` table + RLS live on remote.
-- Fixed this session: RA cap made uniform **R430k** everywhere (was inconsistent R350k/R430k);
-  2 weak-distractor slots tightened (`sa-investing/lesson-3/fica`,
-  `property/lesson-1/affordability-first`).
-
-## REMAINING WORK — the task to finish
-**Upgrade the ~84 remaining "extra" lessons to premium banks** (they currently work via
-rotation but aren't premium). **Done: money-basics (8) → `src/data/banks/money-basics-extra.ts`.**
-
-Remaining by course (create `<course>-extra.ts`, register, verify per batch):
-- **salary-payslip (7):** lesson-13th-cheque, lesson-ctc, lesson-tax-return-employee,
-  lesson-salary-tax-efficiency, lesson-payslip-errors, lesson-medical-aid-payslip,
-  lesson-applied-read-payslip
-- **banking-debit (5):** lesson-savings-accounts-sa, lesson-credit-vs-debit-cards,
-  lesson-bank-switching, lesson-overdraft, lesson-international-transfers
-- **credit-debt (10):** lesson-debt-avalanche, lesson-credit-score-building,
-  lesson-debt-counselling, lesson-reckless-lending, lesson-car-finance, lesson-home-loan-debt,
-  lesson-buy-now-pay-later, lesson-credit-score-mechanics, lesson-rebuild-credit-score,
-  lesson-applied-loan-trap
-- **emergency-fund (1):** lesson-applied-emergency-fund-build
-- **investing-basics (9):** lesson-etfs-deep-dive, lesson-unit-trusts, lesson-dollar-cost-averaging,
-  lesson-investment-scams, lesson-property-as-investment, lesson-investment-fees,
-  lesson-bonds-mechanics, lesson-bond-interest-rate-risk, lesson-applied-thabo-investment
-- **sa-investing (2):** lesson-asset-allocation, lesson-rebalancing
-- **property (1):** lesson-applied-buy-or-rent
-- **taxes (5):** lesson-irp5-tax-certificates, lesson-donations-estate-tax, lesson-tax-on-investments,
-  lesson-efiling-walkthrough, lesson-applied-sars-assessment
-- **scams-fraud (4):** lesson-advance-fee-fraud, lesson-vishing-scams, lesson-whatsapp-scams,
-  lesson-applied-whatsapp-scheme
-- **bible-money (8):** lesson-contentment, lesson-planning-proverbs, lesson-work-ethic,
-  lesson-avoiding-surety, lesson-tithing, lesson-wealth-eternity, lesson-financial-integrity,
-  lesson-generosity-kingdom  (verify NLT scripture verbatim, as done for the core Bible course)
-- **money-psychology (7):** lesson-hedonic-adaptation, lesson-mental-accounting-2,
-  lesson-confirmation-bias, lesson-loss-aversion, lesson-mental-accounting,
-  lesson-overconfidence-recency, lesson-applied-sunk-cost-investing
-- **retirement (5):** lesson-ra-vs-pension-comparison, lesson-retirement-age, lesson-annuity-types,
-  lesson-post-retirement-healthcare, lesson-estate-planning-retirement
-- **rand-economy (8):** lesson-offshore-investing-mechanics, lesson-petrol-price-rand,
-  lesson-how-to-hedge-rand, lesson-sarb-intervention, lesson-sa-trade-balance,
-  lesson-repo-rate-explained, lesson-mpc-and-inflation, lesson-applied-repo-rate-impact
-- **crypto-basics (5):** lesson-blockchain-explained, lesson-bitcoin-vs-ethereum,
-  lesson-sa-crypto-exchanges, lesson-defi-risks, lesson-crypto-sars-tax
-- **business-finance (7):** lesson-cash-flow-business, lesson-invoicing-debtors,
-  lesson-business-bank-accounts, lesson-cipc-registration, lesson-business-insurance,
-  lesson-growth-financing, lesson-applied-cashflow-profit
-
-## Recipe to bank a course's extras
-1. **Read the source content** for those lessons: `src/data/content-extra.ts` (arrays like
-   `SALARY_EXTRA`, `CREDIT_DEBT_EXTRA`, `PSYCHOLOGY_EXTRA`, `BIBLE_MONEY_EXTRA`, etc.),
-   `src/data/content-applied.ts` (the `lesson-applied-*` lessons), and rand-economy also
-   uses `REPO_RATE_LESSONS` + `APPLIED_RAND_ECONOMY_LESSONS`. Match each new bank to the
-   lesson's existing sub-topics and difficulty.
-2. **Create `src/data/banks/<course>-extra.ts`.** Copy the helper pattern from
-   `money-basics-extra.ts` (`info()` + `L()` helpers). Per lesson: **4 slots × 3 variants**,
-   varied types (mcq/true-false/scenario, + a numeric fill-blank where natural). Reuse
-   existing concepts; add new ones to `concepts.ts`. Use a unique variantId prefix per file.
-3. Key each bank exactly `"<courseId>::<lessonId>"` (the ids listed above).
-4. **Register** in `src/data/banks/index.ts` (import + spread).
-5. **Verify:** `npx tsc --noEmit` + the tsx audit. Fix dup ids / missing concepts.
-6. For figure-heavy courses (taxes, retirement, rand-economy, crypto, business-finance)
-   verify every number against `docs/SA-REGULATORY-FIGURES.md` or a live search.
-7. Note: banking a lesson **supersedes** its legacy steps at render, so any stale figure in
-   the legacy step no longer shows — but keep the bank itself correct.
-
-## Deploy (Cursor prompt — I can't push from the sandbox)
-```
-On the notho repo (main), the working tree has ~31 uncommitted files: all lesson-bank
-content (src/data/banks/**, applyBanks.ts, concepts.ts, content-*.ts), src/lib
-(lessonBank/lessonMastery/questionAttempts), tests, docs, and the question_attempts
-migration. tsc + build + vitest (240/240) all pass on this tree. Please:
-  git add -A
-  git commit -m "feat(content): premium lesson banks for 22 courses + legacy rotation + question_attempts logging"
-  git push origin main
-This triggers the fundi-finance Vercel production deploy. Confirm it goes green.
-If the CI 'health check branding assertion' fails (it did on commit 0c8042f), report the
-error — do NOT revert the content to fix it.
-```
+## Verification status (this session)
+- `npx tsc --noEmit` — **clean**.
+- `scripts/lesson-bank-audit.mjs` — **205/205 banked, 0 errors**: no orphan bank keys,
+  no broken slot-refs, no duplicate slot/variant IDs, every conceptId exists, every
+  slot has ≥2 variants, every lesson has >3 questions.
+- `scripts/lesson-bank-qc.mjs` — over the 1 208 new variants: **0 duplicate question
+  stems, 0 banned phrases, 0 length-bias warnings**; type mix 442 mcq / 392 scenario /
+  329 true-false / 45 fill-blank; true-false 56% "true".
+- `scripts/lesson-rotation-check.mjs` — **PASS**: all 205 lessons vary their questions
+  between attempts (avg 5.70 distinct papers per 6 attempts, 0 failures).
+- **Not run in this sandbox:** `npm run build` and the full `vitest` suite (they OOM
+  here). **Cursor should run both.**
 
 ## Handy commands
-- tsc: `npx tsc --noEmit`
-- audit: recreate the tsx script (see any prior message) — checks orphan keys, broken
-  slot-refs, dup slot/variant ids, conceptId existence, ≥2 variants, question counts.
-- coverage snapshot: count `LESSON_BANKS` keys vs total lessons in `CONTENT_DATA`.
+```bash
+npx tsc --noEmit
+node scripts/lesson-bank-audit.mjs      # structural integrity + coverage
+node scripts/lesson-bank-qc.mjs         # voice/quality QC over authored banks
+node scripts/lesson-rotation-check.mjs  # proves every lesson rotates
+npm run build
+node --max-old-space-size=3000 ./node_modules/.bin/vitest run --pool=forks \
+  --poolOptions.forks.singleFork=true src/data/__tests__/contentQuality.test.ts
+```
+
+Run all three scripts after every authoring batch. `lesson-bank-audit.mjs` must print
+`ERRORS 0`; `lesson-bank-qc.mjs` must print 0 duplicate stems and 0 banned phrases;
+`lesson-rotation-check.mjs` must print `RESULT: PASS`.
+
+## Division of labour
+- **Content agent:** authors `src/data/banks/**` + `src/data/concepts.ts` and edits
+  content data files.
+- **Cursor:** owns `src/lib/**` (lessonBank, lessonMastery), tests, page.tsx,
+  migration — has the working build/test env. Don't edit its files.
+- **AG:** read-only QA reviews.
+
+## Deploy (Cursor prompt — the sandbox can't push)
+```
+On the notho repo (main), the working tree has the completed lesson-bank content:
+the new src/data/banks/*-extra.ts files plus banks/index.ts, src/data/concepts.ts
+(+27 concepts), docs/SA-REGULATORY-FIGURES.md and HANDOFF-NEXT-CHAT.md.
+tsc passes clean on this tree. Please:
+  npx tsc --noEmit && npm run build && npx vitest run
+  git add -A
+  git commit -m "feat(content): premium lesson banks for all remaining lessons (203/205 banked, 2436 variants)"
+  git push origin main
+This triggers the fundi-finance Vercel production deploy. Confirm it goes green.
+If the CI 'health check branding assertion' fails, report the error — do NOT revert
+the content to fix it.
+```
+
+## Stale-figure sweep (done this session)
+Every **user-facing** surface was swept and corrected. User-facing means three places,
+not just lessons:
+
+1. **`src/data/banks/**`** — bank content overrides legacy `steps` at render.
+   Fixed: `money-basics.ts` (SARB 3–6% band → 3% ±1pp, in both a question and a
+   teaching step); `business-finance-advanced.ts` (SEFA → SEDFA, 3 places).
+2. **`src/data/concepts.ts`** — review cards render in spaced repetition.
+   Fixed: SEFA → SEDFA.
+3. **`DAILY_FACTS_365` in `content-extra.ts`** — easy to miss. It renders on **six
+   different screens** (HomeTab, LearnView, LessonView, CourseView, QuestsView,
+   OnboardingView) and is **not** covered by the bank system at all. Two facts carried
+   the old 3–6% inflation band; both corrected.
+
+`docs/QUESTION-VOICE-GUIDE.md` was also updated: TFSA R36k → R46k, the fill-blank
+worked example no longer uses a percentage answer, and it now points authors at
+`docs/SA-REGULATORY-FIGURES.md` before using any figure.
+
+Legacy `steps` arrays in `content*.ts` still hold some stale figures, but with 205/205
+lessons banked they are never rendered. They'd only resurface if a bank key were
+renamed — low priority, but worth knowing.
+
+## What's left (optional follow-ups, not blockers)
+1. **SR weighting of selection** — biasing `resolveLessonSteps` toward due/weak
+   concepts is still the clean follow-up noted in `docs/LESSON-BANK-ARCHITECTURE.md`.
+2. **Difficulty calibration** — `question_attempts` is logging; once there's enough
+   data, run the `p_correct` outlier query in the architecture doc to find variants
+   that are much harder or easier than their slot-mates.
+3. **Deepen the RE5 mock pools** — 2 variants per slot gives a 100-question pool per
+   paper. The architecture doc flags RE5 as the biggest integrity risk and suggests
+   5+ variants per slot; a third variant per slot is the natural next increment.
+4. **`content-level3.ts` SBC brackets** — the exact R95 750 band is still quoted there
+   and is flagged unverified in `docs/SA-REGULATORY-FIGURES.md`. Bank-overridden, so
+   not user-facing, but verify before ever surfacing it.

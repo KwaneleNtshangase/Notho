@@ -60,7 +60,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 1,
       explanation:
-        "A need is something you can't survive or earn without — like transport to work. The rest are wants you could go without.",
+        "A need is something you can't survive or earn without. Like transport to work. The rest are wants you could go without.",
     },
     courses: ["money-basics"],
   },
@@ -79,7 +79,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Small repeated buys — airtime, taxi fare, snacks — are easy to forget but add up fast. Tracking shows the real total.",
+        "Small repeated buys (airtime, taxi fare, snacks) are easy to forget but add up fast. Tracking shows the real total.",
     },
     courses: ["money-basics"],
   },
@@ -98,7 +98,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Work out each per kg: R60÷2 = R30 vs R135÷5 = R27. The 5kg is cheaper per kg — as long as you'll use it before it spoils.",
+        "Work out each per kg: R60÷2 = R30 vs R135÷5 = R27. The 5kg is cheaper per kg. As long as you'll use it before it spoils.",
     },
     courses: ["money-basics"],
   },
@@ -109,7 +109,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Who pays the Skills Development Levy (SDL)?",
       options: [
-        "The employer only — it's not deducted from your pay",
+        "The employer only. It's not deducted from your pay",
         "The employee only",
         "Both employee and employer equally",
         "SARS deducts it from your account",
@@ -146,10 +146,10 @@ export const CONCEPTS: Concept[] = [
       question:
         "Does cancelling a debit order at your bank also cancel the underlying contract or debt?",
       options: [
-        "No — it only stops the payment; the contract remains",
-        "Yes — both end together",
+        "No. It only stops the payment; the contract remains",
+        "Yes. Both end together",
         "Yes, but only for gym contracts",
-        "No — you can't cancel debit orders yourself",
+        "No. You can't cancel debit orders yourself",
       ],
       correct: 0,
       explanation:
@@ -167,7 +167,7 @@ export const CONCEPTS: Concept[] = [
       options: ["60 days", "7 days", "14 days", "90 days"],
       correct: 0,
       explanation:
-        "You have 60 days from the debit date to report it unauthorised and claim a reversal. The free National Financial Ombud (NFO) — 0860 800 900 — handles unresolved cases.",
+        "You have 60 days from the debit date to report it unauthorised and claim a reversal. The free National Financial Ombud (NFO), 0860 800 900, handles unresolved cases.",
     },
     courses: ["banking-debit"],
   },
@@ -179,10 +179,10 @@ export const CONCEPTS: Concept[] = [
       question:
         "Does paying your full credit card balance by the due date usually avoid interest on new purchases?",
       options: [
-        "Yes — that's the interest-free grace period",
-        "No — interest always applies regardless",
+        "Yes. That's the interest-free grace period",
+        "No. Interest always applies regardless",
         "Yes, but only on store cards",
-        "No — paying the minimum is enough",
+        "No. Paying the minimum is enough",
       ],
       correct: 0,
       explanation:
@@ -204,7 +204,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Snowball = smallest balance first, for quick wins and momentum. Avalanche (highest rate first) saves the most interest — pick the one you'll finish.",
+        "Snowball = smallest balance first, for quick wins and momentum. Avalanche (highest rate first) saves the most interest. Pick the one you'll finish.",
     },
     courses: ["credit-debt"],
   },
@@ -240,7 +240,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Income risk threatens the money arriving each month — retrenchment is the classic case. Financial risk also spans fraud, medical shocks, rate hikes and underinsurance, not just markets.",
+        "Income risk threatens the money arriving each month. Retrenchment is the classic case. Financial risk also spans fraud, medical shocks, rate hikes and underinsurance, not just markets.",
     },
     courses: ["emergency-fund"],
   },
@@ -276,7 +276,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "It pays a tax-free lump sum on diagnosis, so you can use the money while you're alive — for treatment gaps, debt, or replacing income.",
+        "It pays a tax-free lump sum on diagnosis, so you can use the money while you're alive, for treatment gaps, debt, or replacing income.",
     },
     courses: ["insurance"],
   },
@@ -323,7 +323,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You need money in 11 months for school fees. Which stance fits best?",
       options: [
-        "Emphasise capital you can access without severe loss — controlled risk",
+        "Emphasise capital you can access without severe loss: controlled risk",
         "100% in speculative trades because 'markets bounce back'",
         "Borrow the full amount on a microloan",
         "Keep it all as cash under a mattress",
@@ -348,7 +348,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "A bond is debt: you lend to a government or company for scheduled interest plus principal at maturity. Bonds are calmer than shares but not risk-free — prices fall when rates rise.",
+        "A bond is debt: you lend to a government or company for scheduled interest plus principal at maturity. Bonds are calmer than shares but not risk-free. Prices fall when rates rise.",
     },
     courses: ["investing-basics"],
   },
@@ -366,7 +366,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "A unit trust pools investors' money into a managed basket, giving instant diversification. An ETF usually tracks an index and trades like a share; both can sit in a TFSA. Compare the TER (yearly cost) — small fee gaps compound over decades.",
+        "A unit trust pools investors' money into a managed basket, giving instant diversification. An ETF usually tracks an index and trades like a share; both can sit in a TFSA. Compare the TER (yearly cost), small fee gaps compound over decades.",
     },
     courses: ["sa-investing"],
   },
@@ -379,7 +379,7 @@ export const CONCEPTS: Concept[] = [
       options: ["R10 500", "R7 000", "R17 500", "R35 000"],
       correct: 0,
       explanation:
-        "30% of R35 000 = R10 500 — and that must cover the bond PLUS rates, levies and insurance. Bank approval isn't the same as affordability: buy below your max and stress-test the repayment against rate rises.",
+        "30% of R35 000 = R10 500, and that must cover the bond PLUS rates, levies and insurance. Bank approval isn't the same as affordability: buy below your max and stress-test the repayment against rate rises.",
     },
     courses: ["property"],
   },
@@ -391,7 +391,7 @@ export const CONCEPTS: Concept[] = [
       question: "You earn more than R30 000 a year from non-salary sources (freelance, rental). What must you do?",
       options: [
         "Register as a provisional taxpayer and submit estimates twice a year",
-        "Nothing — side income is tax-free",
+        "Nothing. Side income is tax-free",
         "File only every second year",
         "Pay 45% immediately",
       ],
@@ -408,14 +408,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Do medical scheme (medical aid) credits reduce your taxable income, or your tax bill directly?",
       options: [
-        "Your tax bill directly — a rand-for-rand credit",
+        "Your tax bill directly, a rand-for-rand credit",
         "Your taxable income",
-        "Neither — they do nothing",
+        "Neither. They do nothing",
         "They increase your tax",
       ],
       correct: 0,
       explanation:
-        "Medical credits come off your tax owed directly (R376/month for the member and first dependant, R254 each additional in 2026/27) — better than a deduction. Retirement contributions (up to 27.5%) reduce taxable income; PBO donations are deductible up to 10% with a Section 18A certificate.",
+        "Medical credits come off your tax owed directly (R376/month for the member and first dependant, R254 each additional in 2026/27): better than a deduction. Retirement contributions (up to 27.5%) reduce taxable income; PBO donations are deductible up to 10% with a Section 18A certificate.",
     },
     courses: ["taxes"],
   },
@@ -439,14 +439,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "An email from 'fnb-security@gmail.com' says your account is frozen. What do you do?",
       options: [
-        "Call FNB on a number from their official site — don't click the link",
+        "Call FNB on a number from their official site. Don't click the link",
         "Click the link to unfreeze it",
         "Reply with your ID number to verify",
         "Forward it to your contacts",
       ],
       correct: 0,
       explanation:
-        "Real banks don't email from Gmail, and never ask for your PIN/password/OTP. Contact the bank yourself through your app or a number you look up — never the details in the message.",
+        "Real banks don't email from Gmail, and never ask for your PIN/password/OTP. Contact the bank yourself through your app or a number you look up. Never the details in the message.",
     },
     courses: ["scams-fraud"],
   },
@@ -464,7 +464,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Sudden signal loss can mean a SIM swap — a criminal hijacking your number to receive your OTPs. Call your network at once; a SIM-swap PIN and an authenticator app help prevent it.",
+        "Sudden signal loss can mean a SIM swap, a criminal hijacking your number to receive your OTPs. Call your network at once; a SIM-swap PIN and an authenticator app help prevent it.",
     },
     courses: ["scams-fraud"],
   },
@@ -493,14 +493,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Someone you've never met in person, after weeks of messages, has an 'emergency' and needs a fee. What is this?",
       options: [
-        "A classic romance-scam script — don't send money",
+        "A classic romance-scam script. Don't send money",
         "True love being tested",
         "A genuine emergency you must fund",
         "A sign to send more to prove you care",
       ],
       correct: 0,
       explanation:
-        "Trust is built to set up the 'emergency'. Never send cash, airtime or gift-card codes to someone you've only met online — and tell a trusted person, since scammers isolate you.",
+        "Trust is built to set up the 'emergency'. Never send cash, airtime or gift-card codes to someone you've only met online, and tell a trusted person, since scammers isolate you.",
     },
     courses: ["scams-fraud"],
   },
@@ -518,7 +518,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Speed matters — fast reporting can freeze downstream accounts. Keep evidence, open a SAPS case (10111) for a case number, and don't let shame delay you: being scammed isn't your fault.",
+        "Speed matters. Fast reporting can freeze downstream accounts. Keep evidence, open a SAPS case (10111) for a case number, and don't let shame delay you: being scammed isn't your fault.",
     },
     courses: ["scams-fraud"],
   },
@@ -587,10 +587,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "The US Federal Reserve raises interest rates sharply. What typically happens to the rand?",
       options: [
-        "It weakens — capital flows to the US dollar for better yields",
-        "It strengthens — US growth is good for SA trade",
-        "Nothing — exchange rates are independent of interest rates",
-        "It strengthens — investors seek diversification",
+        "It weakens, capital flows to the US dollar for better yields",
+        "It strengthens. US growth is good for SA trade",
+        "Nothing. Exchange rates are independent of interest rates",
+        "It strengthens: investors seek diversification",
       ],
       correct: 0,
       explanation:
@@ -605,14 +605,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You hold R100 000 in a global (offshore) equity ETF. The rand weakens from R18/$ to R20/$ while the shares themselves don't move. Roughly what happens to your investment in rand?",
       options: [
-        "It rises to about R111 000 — the currency move alone adds value",
+        "It rises to about R111 000. The currency move alone adds value",
         "It stays at R100 000",
         "It falls to about R90 000",
         "It becomes worthless",
       ],
       correct: 0,
       explanation:
-        "Offshore assets are priced in foreign currency, so when the rand weakens they're worth more in rand. R100 000 ÷ R18 = $5 556; at R20/$ that's about R111 000 — roughly an 11% gain from currency alone. That's why a global ETF is the most accessible rand hedge; rand-only assets (SA bonds, fixed deposits) give no currency protection.",
+        "Offshore assets are priced in foreign currency, so when the rand weakens they're worth more in rand. R100 000 ÷ R18 = $5 556; at R20/$ that's about R111 000, roughly an 11% gain from currency alone. That's why a global ETF is the most accessible rand hedge; rand-only assets (SA bonds, fixed deposits) give no currency protection.",
     },
     courses: ["rand-economy"],
   },
@@ -1119,14 +1119,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A Pty Ltd owner in the top bracket extracts profit. Roughly how does taking a dividend compare with taking a salary?",
       options: [
-        "Dividend ≈41.6% total (27% company + 20% dividends tax); salary up to 45% — the dividend edges ahead at the top",
+        "Dividend ≈41.6% total (27% company + 20% dividends tax); salary up to 45%, the dividend edges ahead at the top",
         "Salary is always tax-free to the owner",
         "Dividends are never taxed",
         "They are identical in every case",
       ],
       correct: 0,
       explanation:
-        "Salary is deductible for the company but taxed in your hands at up to 45%. A dividend comes from after-tax profit: 27% company tax, then 20% dividends withholding tax — about 41.6% combined. At the top bracket the dividend wins slightly; lower down, a salary (using rebates and lower brackets) often wins, so most owners use a mix.",
+        "Salary is deductible for the company but taxed in your hands at up to 45%. A dividend comes from after-tax profit: 27% company tax, then 20% dividends withholding tax: about 41.6% combined. At the top bracket the dividend wins slightly; lower down, a salary (using rebates and lower brackets) often wins, so most owners use a mix.",
     },
     courses: ["advanced-tax"],
   },
@@ -1144,7 +1144,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "A trust that retains income is taxed at a flat 45% (and 80% CGT inclusion — an effective 36% on gains), the harshest rate, with no rebates or annual exclusions. The 'conduit principle' is the planning tool: income distributed to beneficiaries in the same tax year is taxed in their hands at their (often lower) rates instead.",
+        "A trust that retains income is taxed at a flat 45% (and 80% CGT inclusion, an effective 36% on gains), the harshest rate, with no rebates or annual exclusions. The 'conduit principle' is the planning tool: income distributed to beneficiaries in the same tax year is taxed in their hands at their (often lower) rates instead.",
     },
     courses: ["advanced-tax"],
   },
@@ -1162,7 +1162,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "SA uses residence-based taxation — residents are taxed on worldwide income. Foreign employment income can be exempt up to R1.25 million a year if you spend more than 183 days (including a continuous 60-day stretch) working abroad in a 12-month period. Foreign tax credits (s6quat) stop the same income being taxed twice; non-residents are taxed only on SA-source income.",
+        "SA uses residence-based taxation. Residents are taxed on worldwide income. Foreign employment income can be exempt up to R1.25 million a year if you spend more than 183 days (including a continuous 60-day stretch) working abroad in a 12-month period. Foreign tax credits (s6quat) stop the same income being taxed twice; non-residents are taxed only on SA-source income.",
     },
     courses: ["advanced-tax"],
   },
@@ -1173,14 +1173,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What happens to your estate if you die without a valid will (intestate)?",
       options: [
-        "The Intestate Succession Act decides who inherits — not your wishes, and cohabiting partners get nothing automatically",
+        "The Intestate Succession Act decides who inherits, not your wishes, and cohabiting partners get nothing automatically",
         "The government keeps everything",
         "Your closest friend inherits by default",
         "Nothing can ever be distributed",
       ],
       correct: 0,
       explanation:
-        "Dying intestate hands distribution to a fixed legal formula. Unmarried partners aren't automatically recognised, minor children's inheritances can go to the state Guardian's Fund, and the Master appoints an executor (often a bank at up to 3.5% + VAT). A valid will — signed before two competent witnesses, none of them beneficiaries — avoids all of this.",
+        "Dying intestate hands distribution to a fixed legal formula. Unmarried partners aren't automatically recognised, minor children's inheritances can go to the state Guardian's Fund, and the Master appoints an executor (often a bank at up to 3.5% + VAT). A valid will (signed before two competent witnesses, none of them beneficiaries) avoids all of this.",
     },
     courses: ["estate-planning"],
   },
@@ -1209,14 +1209,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Your retirement-fund nomination names your ex-spouse, but your will leaves everything to your children. Who gets the retirement fund?",
       options: [
-        "It's decided outside your will — for retirement funds, trustees allocate to financial dependants (s37C); a will can't override it",
-        "Your children — the will always wins",
+        "It's decided outside your will, for retirement funds, trustees allocate to financial dependants (s37C); a will can't override it",
+        "Your children. The will always wins",
         "It's split equally by law",
         "The state takes it",
       ],
       correct: 0,
       explanation:
-        "Beneficiary nominations on retirement funds and life policies bypass your will. For retirement funds, s37C gives trustees discretion to distribute among all financial dependants, whatever the nomination says; life-policy nominees are paid directly by the insurer. Review nominations after every major life event — a stale form can send money to an ex-spouse.",
+        "Beneficiary nominations on retirement funds and life policies bypass your will. For retirement funds, s37C gives trustees discretion to distribute among all financial dependants, whatever the nomination says; life-policy nominees are paid directly by the insurer. Review nominations after every major life event. A stale form can send money to an ex-spouse.",
     },
     courses: ["estate-planning"],
   },
@@ -1227,7 +1227,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A 'value' factor tilt means systematically overweighting which stocks?",
       options: [
-        "Cheap ones — low price-to-earnings and price-to-book relative to peers",
+        "Cheap ones: low price-to-earnings and price-to-book relative to peers",
         "Whatever rose most in the last 12 months",
         "Growth stocks with the highest future expectations",
         "Whatever the fund manager fancies that day",
@@ -1246,13 +1246,13 @@ export const CONCEPTS: Concept[] = [
       question: "How much of a South African retirement fund (Regulation 28) may be invested offshore?",
       options: [
         "Up to 45% offshore; TFSAs and discretionary investments have no offshore limit",
-        "0% — retirement funds must stay fully local",
-        "100% — there's no limit anywhere",
+        "0%. Retirement funds must stay fully local",
+        "100%. There's no limit anywhere",
         "Exactly 30%",
       ],
       correct: 0,
       explanation:
-        "Regulation 28 caps retirement funds (RA, pension, provident) at 45% offshore (raised from 30% in 2022). TFSAs and personal discretionary investments have no such limit — you can hold 100% global equity there. To move money out personally, the single discretionary allowance is R2 million/year (raised in Budget 2026) plus a R10 million/year foreign investment allowance with SARS tax clearance.",
+        "Regulation 28 caps retirement funds (RA, pension, provident) at 45% offshore (raised from 30% in 2022). TFSAs and personal discretionary investments have no such limit. You can hold 100% global equity there. To move money out personally, the single discretionary allowance is R2 million/year (raised in Budget 2026) plus a R10 million/year foreign investment allowance with SARS tax clearance.",
     },
     courses: ["advanced-investing"],
   },
@@ -1263,8 +1263,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Two retirees average the same 10% return over 20 years, but one gets bad returns early and good later. What happens?",
       options: [
-        "The one with bad returns early can run out of money years sooner — the ORDER of returns matters",
-        "They end identically — only the average matters",
+        "The one with bad returns early can run out of money years sooner. The ORDER of returns matters",
+        "They end identically. Only the average matters",
         "The one with bad returns early always ends richer",
         "Sequence of returns is irrelevant once you retire",
       ],
@@ -1288,7 +1288,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "A sole proprietor is you — profits are taxed at your marginal rate (up to 45%) and your personal assets are exposed. A Pty Ltd is a separate legal entity with limited liability and 27% company tax (qualifying small companies, turnover under R20m, get reduced SBC rates). Watch the Personal Service Provider trap: a Pty Ltd earning 80%+ from one or two clients is taxed at individual rates, not 27%.",
+        "A sole proprietor is you. Profits are taxed at your marginal rate (up to 45%) and your personal assets are exposed. A Pty Ltd is a separate legal entity with limited liability and 27% company tax (qualifying small companies, turnover under R20m, get reduced SBC rates). Watch the Personal Service Provider trap: a Pty Ltd earning 80%+ from one or two clients is taxed at individual rates, not 27%.",
     },
     courses: ["business-finance-advanced"],
   },
@@ -1306,7 +1306,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "The income statement shows profit over a period; the balance sheet shows what you own and owe at a point in time; the cash flow statement shows actual cash moving in and out. A business can be profitable yet cash-flow negative — which is how profitable companies still fail. Watch the current ratio (below 1 is a liquidity risk) and debtor days (rising = customers paying too slowly).",
+        "The income statement shows profit over a period; the balance sheet shows what you own and owe at a point in time; the cash flow statement shows actual cash moving in and out. A business can be profitable yet cash-flow negative, which is how profitable companies still fail. Watch the current ratio (below 1 is a liquidity risk) and debtor days (rising = customers paying too slowly).",
     },
     courses: ["business-finance-advanced"],
   },
@@ -1324,7 +1324,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "The earnings-based method (EBITDA × an industry multiple) is most common — SA SMEs typically trade at 2-5× EBITDA versus 8-15× for listed companies. Other methods: discounted cash flow (theoretically sound but assumption-sensitive) and net asset value (a floor for asset-heavy businesses). Customer concentration, owner-dependence and messy books all discount the multiple.",
+        "The earnings-based method (EBITDA × an industry multiple) is most common, SA SMEs typically trade at 2-5× EBITDA versus 8-15× for listed companies. Other methods: discounted cash flow (theoretically sound but assumption-sensitive) and net asset value (a floor for asset-heavy businesses). Customer concentration, owner-dependence and messy books all discount the multiple.",
     },
     courses: ["business-finance-advanced"],
   },
@@ -1342,7 +1342,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Debt (bank loans, asset finance) charges interest but you keep your equity; equity investors (angels, VC) provide cash and often expertise but take ownership and some control. Government options (SEFA loans, IDC, DTIC grants) are cheaper or non-dilutive but bureaucratic. Before taking investment, a shareholders agreement — covering exits, deadlock, and death — is non-negotiable.",
+        "Debt (bank loans, asset finance) charges interest but you keep your equity; equity investors (angels, VC) provide cash and often expertise but take ownership and some control. Government options (SEDFA loans, IDC, DTIC grants) are cheaper ornon-dilutive but bureaucratic. Before taking investment, a shareholders agreement (covering exits, deadlock, and death) is non-negotiable.",
     },
     courses: ["business-finance-advanced"],
   },
@@ -1484,14 +1484,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You know you should save R500 this month, but you spend it on something you'll barely remember. Which bias best explains this?",
       options: [
-        "Present bias — overvaluing a reward now over a bigger reward later",
-        "Anchoring — fixating on the first price you saw",
-        "Sunk cost — refusing to abandon money already spent",
-        "Herd mentality — copying what others do",
+        "Present bias, overvaluing a reward now over a bigger reward later",
+        "Anchoring: fixating on the first price you saw",
+        "Sunk cost, refusing to abandon money already spent",
+        "Herd mentality. Copying what others do",
       ],
       correct: 0,
       explanation:
-        "Present bias (hyperbolic discounting) is the pull toward an immediate reward even when waiting pays more. The most reliable counter is to remove the in-the-moment choice — automate the saving with a debit order on payday, before you can spend it.",
+        "Present bias (hyperbolic discounting) is the pull toward an immediate reward even when waiting pays more. The most reliable counter is to remove the in-the-moment choice, automate the saving with a debit order on payday, before you can spend it.",
     },
     courses: ["money-psychology"],
   },
@@ -1509,7 +1509,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Herd mentality plus FOMO gets people buying near the top, after prices have already run. The number of buyers says nothing about whether an asset is sound. A personal rule — understand it first, and wait 48 hours before acting — defuses the urgency that hype cycles rely on.",
+        "Herd mentality plus FOMO gets people buying near the top, after prices have already run. The number of buyers says nothing about whether an asset is sound. A personal rule (understand it first, and wait 48 hours before acting) defuses the urgency that hype cycles rely on.",
     },
     courses: ["money-psychology"],
   },
@@ -1520,14 +1520,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A share you paid R10 000 for is now worth R4 000 and the outlook is poor, but selling feels unbearable. What bias is at work?",
       options: [
-        "Loss aversion — the pain of a loss feels far stronger than an equal gain",
-        "Present bias — you want a reward now",
-        "Confirmation bias — you seek agreeing opinions",
+        "Loss aversion. The pain of a loss feels far stronger than an equal gain",
+        "Present bias: you want a reward now",
+        "Confirmation bias, you seek agreeing opinions",
         "Anchoring to a sale price",
       ],
       correct: 0,
       explanation:
-        "Loss aversion (Kahneman & Tversky) means a loss hurts roughly twice as much as an equal gain feels good — so people hold losers hoping to break even and panic-sell at the bottom. The fix: judge an investment on its future prospects, not the price you paid, which is irrelevant to what happens next.",
+        "Loss aversion (Kahneman & Tversky) means a loss hurts roughly twice as much as an equal gain feels good, so people hold losers hoping to break even and panic-sell at the bottom. The fix: judge an investment on its future prospects, not the price you paid, which is irrelevant to what happens next.",
     },
     courses: ["money-psychology"],
   },
@@ -1538,7 +1538,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Sipho's salary jumps from R20k to R30k. He upgrades his flat, car and subscriptions, and still saves only R1k a month. What happened?",
       options: [
-        "Lifestyle inflation — spending rose to match the raise, so wealth didn't grow",
+        "Lifestyle inflation. Spending rose to match the raise, so wealth didn't grow",
         "Loss aversion made him hold cash",
         "Anchoring to his old salary",
         "Present bias about a future reward",
@@ -1556,14 +1556,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A colleague posts a new car and luxury holidays. What does their visible spending actually tell you about their finances?",
       options: [
-        "Very little — visible consumption is often funded by debt, not wealth",
+        "Very little. Visible consumption is often funded by debt, not wealth",
         "They are clearly financially secure",
         "You should finance a similar car to keep up",
         "They must have a strategy worth copying exactly",
       ],
       correct: 0,
       explanation:
-        "Displayed wealth and real wealth are weakly correlated — the holiday may sit on a personal loan and the car on a 72-month finance deal. Comparison spending on credit is a fast route to financial stress. The only meaningful benchmark is your own goals and net-worth progress.",
+        "Displayed wealth and real wealth are weakly correlated. The holiday may sit on a personal loan and the car on a 72-month finance deal. Comparison spending on credit is a fast route to financial stress. The only meaningful benchmark is your own goals and net-worth progress.",
     },
     courses: ["money-psychology"],
   },
@@ -1648,7 +1648,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Biblical stewardship starts with ownership: God owns everything, and we manage it on His behalf. Luke 16:10 adds that faithfulness with small amounts shapes how we handle larger ones — reframing spending, saving, and giving as stewardship decisions, not just personal preferences.",
+        "Biblical stewardship starts with ownership: God owns everything, and we manage it on His behalf. Luke 16:10 adds that faithfulness with small amounts shapes how we handle larger ones, reframing spending, saving, and giving as stewardship decisions, not just personal preferences.",
     },
     courses: ["bible-money"],
   },
@@ -1666,7 +1666,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Proverbs repeatedly praises foresight: the ant stores food for winter (6:6-8), and good planning beats hasty shortcuts (21:5). Practically this is your emergency fund, retirement contributions, and steady investing — preparing for the seasons ahead instead of consuming everything now.",
+        "Proverbs repeatedly praises foresight: the ant stores food for winter (6:6-8), and good planning beats hasty shortcuts (21:5). Practically this is your emergency fund, retirement contributions, and steady investing: preparing for the seasons ahead instead of consuming everything now.",
     },
     courses: ["bible-money"],
   },
@@ -1684,7 +1684,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "'Firstfruits' means giving first, as a priority — not from leftovers. Scripture links generosity to flourishing (Proverbs 11:24-25) and describes cheerful, uncoerced giving (2 Corinthians 9:7). Helping the poor is even framed as lending to the Lord, who repays (Proverbs 19:17).",
+        "'Firstfruits' means giving first, as a priority, not from leftovers. Scripture links generosity to flourishing (Proverbs 11:24-25) and describes cheerful, uncoerced giving (2 Corinthians 9:7). Helping the poor is even framed as lending to the Lord, who repays (Proverbs 19:17).",
     },
     courses: ["bible-money"],
   },
@@ -1714,14 +1714,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You buy Bitcoin on a SA exchange, hold it a year, then sell at a profit. How does SARS treat that gain?",
       options: [
-        "It's taxable — capital gains tax applies, and the exchange shares your data with SARS",
+        "It's taxable. Capital gains tax applies, and the exchange shares your data with SARS",
         "It's completely tax-free",
         "Crypto is anonymous, so SARS can't see it",
         "Only foreign crypto is taxed",
       ],
       correct: 0,
       explanation:
-        "SARS treats crypto as a taxable asset. Hold-and-sell gains fall under capital gains tax (40% of the gain is included in your taxable income); active trading is taxed as income. Blockchain is pseudonymous, not anonymous — SA exchanges like Luno and VALR share data with SARS, so non-disclosure is tax evasion.",
+        "SARS treats crypto as a taxable asset. Hold-and-sell gains fall under capital gains tax (40% of the gain is included in your taxable income); active trading is taxed as income. Blockchain is pseudonymous, not anonymous, SA exchanges like Luno and VALR share data with SARS, so non-disclosure is tax evasion.",
     },
     courses: ["crypto-basics"],
   },
@@ -1741,7 +1741,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "FAIS (Act 37 of 2002) is market-conduct law — it governs HOW advice and intermediary services are rendered, not product returns. The FSCA (which replaced the FSB under the Twin Peaks reform) is the conduct regulator; the Prudential Authority handles institutional soundness.",
+        "FAIS (Act 37 of 2002) is market-conduct law, it governs HOW advice and intermediary services are rendered, not product returns. The FSCA (which replaced the FSB under the Twin Peaks reform) is the conduct regulator; the Prudential Authority handles institutional soundness.",
     },
     courses: ["re5-exam-prep"],
   },
@@ -1759,7 +1759,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Advice is a recommendation, guidance or proposal of a financial nature (e.g. to buy, replace or cancel a product). Purely factual information with no recommendation is NOT advice. An 'intermediary service' is any act (other than advice) done for the client — like submitting an application or handling premiums. The Key Individual manages/oversees; the representative renders the services.",
+        "Advice is a recommendation, guidance or proposal of a financial nature (e.g. to buy, replace or cancel a product). Purely factual information with no recommendation is NOT advice. An 'intermediary service' is any act (other than advice) done for the client: like submitting an application or handling premiums. The Key Individual manages/oversees; the representative renders the services.",
     },
     courses: ["re5-exam-prep"],
   },
@@ -1772,7 +1772,7 @@ export const CONCEPTS: Concept[] = [
       options: ["Category II (discretionary FSP)", "Category I", "Category III", "Category IV"],
       correct: 0,
       explanation:
-        "Category I = advice and/or intermediary services (ordinary advisers). Category II = discretionary FSPs. Category IIA = hedge funds. Category III = administrative FSPs (LISPs). Category IV = assistance business. A licence only covers the categories and product subcategories approved — and you may not act as an FSP without one.",
+        "Category I = advice and/or intermediary services (ordinary advisers). Category II = discretionary FSPs. Category IIA = hedge funds. Category III = administrative FSPs (LISPs). Category IV = assistance business. A licence only covers the categories and product subcategories approved, and you may not act as an FSP without one.",
     },
     courses: ["re5-exam-prep"],
   },
@@ -1785,12 +1785,12 @@ export const CONCEPTS: Concept[] = [
       options: [
         "When the FSP no longer meets fit & proper, got the licence by fraud, or seriously contravened the Act",
         "Only if the FSP agrees",
-        "Never — licences are permanent",
+        "Never. Licences are permanent",
         "Only after a criminal conviction",
       ],
       correct: 0,
       explanation:
-        "The FSCA can suspend (temporary, often with conditions) or withdraw (ends authorisation) for cause. Normally it gives notice and a chance to make representations first — but where delay would prejudice clients or the public, it may act first and hear representations after. A licence also lapses on liquidation or death. Obligations to clients that arose before survive.",
+        "The FSCA can suspend (temporary, often with conditions) or withdraw (ends authorisation) for cause. Normally it gives notice and a chance to make representations first, but where delay would prejudice clients or the public, it may act first and hear representations after. A licence also lapses on liquidation or death. Obligations to clients that arose before survive.",
     },
     courses: ["re5-exam-prep"],
   },
@@ -1814,7 +1814,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Can an FSP debar a representative by quietly removing them from the register without telling them?",
       options: [
-        "No — debarment needs notice, reasons and a chance to respond",
+        "No. Debarment needs notice, reasons and a chance to respond",
         "Yes, the FSP controls its own register",
         "Yes, if the FSCA is told within 15 days",
         "Yes, if the rep already resigned",
@@ -1839,7 +1839,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "The fit & proper pillars are honesty/integrity & good standing, competence (qualifications, regulatory exams, experience, training), CPD, operational ability, and financial soundness. There is no 'guaranteed returns' requirement — FAIS regulates conduct, not performance. These standards must be met continuously, not just at appointment.",
+        "The fit & proper pillars are honesty/integrity & good standing, competence (qualifications, regulatory exams, experience, training), CPD, operational ability, and financial soundness. There is no 'guaranteed returns' requirement, FAIS regulates conduct, not performance. These standards must be met continuously, not just at appointment.",
     },
     courses: ["re5-exam-prep"],
   },
@@ -1857,7 +1857,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "CPD runs 1 June–31 May, with hours (commonly 6, 12 or up to 18) scaling with the number and complexity of authorised classes of business. CPD must be verifiable and relevant. Product-specific and class-of-business training are separate competency requirements — they don't count as CPD. Competence is measured from DOFA (qualification generally within six years).",
+        "CPD runs 1 June–31 May, with hours (commonly 6, 12 or up to 18) scaling with the number and complexity of authorised classes of business. CPD must be verifiable and relevant. Product-specific and class-of-business training are separate competency requirements. They don't count as CPD. Competence is measured from DOFA (qualification generally within six years).",
     },
     courses: ["re5-exam-prep"],
   },
@@ -1875,7 +1875,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "The General Code requires providers to render services honestly, fairly, with due skill, care and diligence, and in the interests of clients and the industry's integrity. Information must be factually correct, clear and not misleading, and provided timeously so clients can decide — and key oral disclosures must be confirmed in writing within a reasonable time.",
+        "The General Code requires providers to render services honestly, fairly, with due skill, care and diligence, and in the interests of clients and the industry's integrity. Information must be factually correct, clear and not misleading, and provided timeously so clients can decide, and key oral disclosures must be confirmed in writing within a reasonable time.",
     },
     courses: ["re5-exam-prep"],
   },
@@ -1887,13 +1887,13 @@ export const CONCEPTS: Concept[] = [
       question: "A representative doesn't mention the commission they'll earn, saying 'the client only cares about the product'. What's breached?",
       options: [
         "The duty to disclose remuneration and manage the conflict of interest",
-        "Nothing — commission is confidential",
+        "Nothing. Commission is confidential",
         "The record-keeping rule",
         "The financial soundness pillar",
       ],
       correct: 0,
       explanation:
-        "The Code requires disclosure about the provider (licence, contact, supervision), the product supplier (relationship, restrictions), and the product (terms, fees, penalties, material risks) — including the provider's remuneration/commission and its basis. Hiding commission is a breach and also a conflict of interest that must be managed and disclosed.",
+        "The Code requires disclosure about the provider (licence, contact, supervision), the product supplier (relationship, restrictions), and the product (terms, fees, penalties, material risks). Including the provider's remuneration/commission and its basis. Hiding commission is a breach and also a conflict of interest that must be managed and disclosed.",
     },
     courses: ["re5-exam-prep"],
   },
@@ -1906,12 +1906,12 @@ export const CONCEPTS: Concept[] = [
       options: [
         "Proceed only if it records the instruction and the warnings given",
         "Secretly change the risk profile so it 'fits'",
-        "Refuse — the Code bans the sale outright",
+        "Refuse, the Code bans the sale outright",
         "Proceed and say nothing",
       ],
       correct: 0,
       explanation:
-        "Before advising, a provider must do a needs analysis and suitability analysis, and keep a record of advice showing what was considered and why the recommendation suits the client. If a client acts against advice, record the instruction and the warnings given — never falsify the risk profile. Limited-scope advice must be flagged with its limitations and risks.",
+        "Before advising, a provider must do a needs analysis and suitability analysis, and keep a record of advice showing what was considered and why the recommendation suits the client. If a client acts against advice, record the instruction and the warnings given. Never falsify the risk profile. Limited-scope advice must be flagged with its limitations and risks.",
     },
     courses: ["re5-exam-prep"],
   },
@@ -1971,7 +1971,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You suspect a client's cash deposits are the proceeds of crime. Under FICA you must:",
       options: [
-        "File a suspicious transaction report with the FIC — and not tip off the client",
+        "File a suspicious transaction report with the FIC, and not tip off the client",
         "Ask the client to explain first",
         "Report it to the FSCA instead",
         "Close the account and delete the records",
@@ -1991,14 +1991,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "In zero-based budgeting, what should income minus all your allocations equal?",
       options: [
-        "Exactly R0 — every rand is assigned a job, including savings",
+        "Exactly R0. Every rand is assigned a job, including savings",
         "Whatever's left over as spending money",
         "At least R500 as a buffer",
         "A negative number you cover with credit",
       ],
       correct: 0,
       explanation:
-        "Zero-based budgeting gives every rand a purpose before the month starts — rent, food, debt and savings are all categories that must add up to your full net income. 'Zero left over' doesn't mean spend everything; money assigned to savings and investments is allocated, not spent.",
+        "Zero-based budgeting gives every rand a purpose before the month starts. Rent, food, debt and savings are all categories that must add up to your full net income. 'Zero left over' doesn't mean spend everything; money assigned to savings and investments is allocated, not spent.",
     },
     courses: ["money-basics"],
   },
@@ -2009,14 +2009,14 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A person earning R180 000/month spends R185 000/month. What's their cash flow?",
       options: [
-        "Negative — they're going backwards despite a high income",
+        "Negative. They're going backwards despite a high income",
         "Strongly positive because they earn a lot",
         "Zero, and perfectly fine",
         "Irrelevant at high incomes",
       ],
       correct: 0,
       explanation:
-        "Cash flow is income minus expenses. Negative cash flow destroys wealth at any income — R180k earned, R185k spent is −R5k a month. Most money problems are spending problems, not income problems, and cutting expenses improves cash flow immediately and is fully in your control.",
+        "Cash flow is income minus expenses. Negative cash flow destroys wealth at any income. R180k earned, R185k spent is −R5k a month. Most money problems are spending problems, not income problems, and cutting expenses improves cash flow immediately and is fully in your control.",
     },
     courses: ["money-basics"],
   },
@@ -2028,13 +2028,13 @@ export const CONCEPTS: Concept[] = [
       question: "You're offered R45 000 but market rate for the role is R52 000–R58 000. Best move?",
       options: [
         "Present your market research and propose about R54 000",
-        "Accept quietly — you're lucky to be offered",
+        "Accept quietly. You're lucky to be offered",
         "Demand R70 000 as a shock anchor",
         "Wait until after you start to raise it",
       ],
       correct: 0,
       explanation:
-        "Most employers build negotiation room into offers and expect a respectful, data-backed counter. Proposing mid-market (≈R54k) with research behind it is professional, not greedy — and a single conversation can add R100k+ a year permanently. Your salary is the biggest financial lever you have.",
+        "Most employers build negotiation room into offers and expect a respectful, data-backed counter. Proposing mid-market (≈R54k) with research behind it is professional, not greedy, and a single conversation can add R100k+ a year permanently. Your salary is the biggest financial lever you have.",
     },
     courses: ["money-basics"],
   },
@@ -2052,7 +2052,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "A real goal has a specific amount, a vehicle, a deadline and a reason — 'save more' is a wish. Reverse-engineer big goals into a monthly number (R60 000 in 12 months = R5 000/month) and keep short-, medium- and long-term goals in separate accounts so you don't raid one for another.",
+        "A real goal has a specific amount, a vehicle, a deadline and a reason. 'save more' is a wish. Reverse-engineer big goals into a monthly number (R60 000 in 12 months = R5 000/month) and keep short-, medium- and long-term goals in separate accounts so you don't raid one for another.",
     },
     courses: ["money-basics"],
   },
@@ -2070,7 +2070,7 @@ export const CONCEPTS: Concept[] = [
       ],
       correct: 0,
       explanation:
-        "Freelancing uses credentials you've already paid for, at near-zero startup cost. A single client at R4 000–R6 000/month meaningfully changes your finances — and fully invested in a TFSA it compounds tax-free. Remember: all side income is taxable, and non-salary income over R30 000 means registering for provisional tax.",
+        "Freelancing uses credentials you've already paid for, at near-zero startup cost. A single client at R4 000–R6 000/month meaningfully changes your finances, and fully invested in a TFSA it compounds tax-free. Remember: all side income is taxable, and non-salary income over R30 000 means registering for provisional tax.",
     },
     courses: ["money-basics"],
   },
@@ -2084,13 +2084,956 @@ export const CONCEPTS: Concept[] = [
         "Full disclosure of income, debts and assets, with a joint plan to tackle it",
         "Deal with it quietly after the wedding",
         "Secretly pay it off as a gift",
-        "Ignore it — money is private",
+        "Ignore it. Money is private",
       ],
       correct: 0,
       explanation:
-        "Money silence is a top source of relationship conflict and costly mistakes. Full financial transparency before big commitments — plus a shared 'family document register' (accounts, policies, will location, beneficiaries) — prevents hidden debt becoming a shared crisis and avoids chaos when an emergency or death strikes.",
+        "Money silence is a top source of relationship conflict and costly mistakes. Full financial transparency before big commitments, plus a shared 'family document register' (accounts, policies, will location, beneficiaries): prevents hidden debt becoming a shared crisis and avoids chaos when an emergency or death strikes.",
     },
     courses: ["money-basics"],
+  },
+
+  // ── Salary & Payslip (extras) ────────────────────────────────────────────
+  {
+    id: "bonus-planning",
+    name: "Bonuses and 13th Cheques",
+    category: "Salary & Payslip",
+    reviewCard: {
+      question: "Your December bonus is R30 000 and your marginal rate is 31%. What should your allocation plan be built on?",
+      options: [
+        "About R20 700, the amount left after PAYE",
+        "The full R30 000",
+        "R30 000 plus your normal salary",
+        "Whatever is left in January",
+      ],
+      correct: 0,
+      explanation:
+        "Bonuses are employment income and fully taxed at your marginal rate: R30 000 × 31% = R9 300 PAYE, leaving about R20 700. Decide the split before payday, high-interest debt and an emergency fund first, because willpower fails once the money lands.",
+    },
+    courses: ["salary-payslip"],
+  },
+  {
+    id: "ctc-structure",
+    name: "Cost to Company",
+    category: "Salary & Payslip",
+    reviewCard: {
+      question: "A job offer says 'CTC R480 000 per year'. What does that figure represent?",
+      options: [
+        "The employer's total annual cost, including employer pension, medical aid, UIF and SDL",
+        "The cash that lands in your account each year",
+        "Your gross salary before PAYE only",
+        "Your take-home pay after all deductions",
+      ],
+      correct: 0,
+      explanation:
+        "CTC is what the employer spends on you in total, not what you receive. R480 000 CTC typically nets R28 000–R36 000 a month depending on structure, so two identical CTC offers can pay very differently. Always ask for the breakdown and an estimated net figure before comparing.",
+    },
+    courses: ["salary-payslip"],
+  },
+  {
+    id: "payslip-errors",
+    name: "Payslip Errors and Your Rights",
+    category: "Salary & Payslip",
+    reviewCard: {
+      question: "Your employer deducts R2 000 for a damaged company laptop without asking you. Is that lawful?",
+      options: [
+        "No. The BCEA requires written consent or a court order for damage deductions",
+        "Yes, employers may recover company losses from salaries",
+        "Yes, if the deduction is under R5 000",
+        "Only if you have been employed for over a year",
+      ],
+      correct: 0,
+      explanation:
+        "The Basic Conditions of Employment Act blocks deductions for loss or damage without prior written consent or a court order, and section 33 entitles you to a written payslip every payday. Query errors in writing and escalate to the CCMA or Department of Employment and Labour if they aren't fixed.",
+    },
+    courses: ["salary-payslip"],
+  },
+  {
+    id: "medical-tax-credit",
+    name: "Medical Scheme Fees Tax Credit",
+    category: "Salary & Payslip",
+    reviewCard: {
+      question: "You cover yourself, your partner and two children on medical aid. What is your monthly medical tax credit?",
+      options: ["R1 260", "R752", "R1 504", "R376"],
+      correct: 0,
+      explanation:
+        "R376 for the main member, R376 for the first dependant and R254 for each additional dependant: R376 + R376 + (2 × R254) = R1 260 a month. It's a credit off tax owed rather than a deduction from income, so it's worth the same rands in every tax bracket, and payroll applies it monthly.",
+    },
+    courses: ["salary-payslip"],
+  },
+
+  // ── Banking (extras) ─────────────────────────────────────────────────────
+  {
+    id: "savings-account-rates",
+    name: "Comparing Savings Accounts",
+    category: "Banking",
+    reviewCard: {
+      question: "You have R100 000 in savings. Moving from a 6% account to a 10% account is worth how much a year?",
+      options: ["R4 000", "R400", "R10 000", "Nothing. Rates are regulated"],
+      correct: 0,
+      explanation:
+        "R100 000 × (10% − 6%) = R4 000 a year, for one afternoon of comparing. Notice accounts pay more than call accounts because you surrender instant access. Interest is exempt only to R23 800 a year under 65; a TFSA removes the tax entirely.",
+    },
+    courses: ["banking-debit"],
+  },
+  {
+    id: "credit-vs-debit",
+    name: "Credit Cards vs Debit Cards",
+    category: "Banking",
+    reviewCard: {
+      question: "What is the only way to use a credit card without paying interest?",
+      options: [
+        "Settle the full outstanding balance by the due date every month",
+        "Pay the minimum each month",
+        "Keep utilisation below 50%",
+        "Use it only for purchases under R500",
+      ],
+      correct: 0,
+      explanation:
+        "Full settlement keeps you inside the interest-free period; anything less and the balance accrues at 20%+. Credit cards also carry stronger chargeback rights than debit cards, which matters when you pay now for something delivered later. Cash advances have no interest-free period at all.",
+    },
+    courses: ["banking-debit"],
+  },
+  {
+    id: "bank-switching",
+    name: "Switching Banks",
+    category: "Banking",
+    reviewCard: {
+      question: "How long should you keep your old bank account open after switching?",
+      options: [
+        "About two months, until every debit order has migrated",
+        "Close it the same day",
+        "One week",
+        "At least a year",
+      ],
+      correct: 0,
+      explanation:
+        "Debit orders take one to two billing cycles to move. Open the new account first, give payroll the new details before the cut-off, update every debit order (insurance first, so no policy lapses), keep a small buffer in the old account, then close it. R185 a month in fees is R2 220 a year.",
+    },
+    courses: ["banking-debit"],
+  },
+  {
+    id: "overdraft",
+    name: "Overdrafts",
+    category: "Banking",
+    reviewCard: {
+      question: "You reach into your overdraft from the 20th of every month until payday. What does that pattern tell you?",
+      options: [
+        "Your expenses exceed your income for part of every month",
+        "You are managing cash flow well",
+        "Your overdraft limit is too low",
+        "Nothing. It is normal",
+      ],
+      correct: 0,
+      explanation:
+        "A permanent overdraft is a budget deficit wearing a credit costume. Overdrafts price at roughly prime + 5–8% with interest accruing daily, similar to or worse than a credit card, and many carry a facility fee whether you use them or not. A bigger limit funds the gap instead of closing it.",
+    },
+    courses: ["banking-debit"],
+  },
+  {
+    id: "forex-transfers",
+    name: "Foreign Currency and Transfers",
+    category: "Banking",
+    reviewCard: {
+      question: "How much can an adult South African transfer offshore each calendar year without SARS clearance?",
+      options: [
+        "R2 million, under the Single Discretionary Allowance",
+        "R100 000",
+        "Nothing without clearance",
+        "R10 million",
+      ],
+      correct: 0,
+      explanation:
+        "The Single Discretionary Allowance is R2 million per calendar year with no clearance required; the Foreign Investment Allowance adds up to R10 million with SARS approval. Both reset in January. The real cost of a transfer hides in the exchange rate margin (2–4% at most banks), not the advertised fee. Compare the amount that actually arrives.",
+    },
+    courses: ["banking-debit"],
+  },
+
+  // ── Credit & Debt (extras) ───────────────────────────────────────────────
+  {
+    id: "debt-avalanche",
+    name: "The Debt Avalanche",
+    category: "Credit & Debt",
+    reviewCard: {
+      question: "You have a card at 22%, a personal loan at 17% and car finance at 12.75%. Where does every spare rand go?",
+      options: [
+        "The 22% card, while paying minimums on the rest",
+        "The car finance, because it is the largest",
+        "Split evenly across all three",
+        "The oldest account",
+      ],
+      correct: 0,
+      explanation:
+        "The avalanche sorts debts by interest rate and attacks the highest first, because that is where each rand of debt costs most. When one clears, roll its payment onto the next debt so the pace accelerates. The snowball (smallest balance first) costs slightly more in interest but delivers faster wins. The best method is the one you'll actually finish.",
+    },
+    courses: ["credit-debt"],
+  },
+  {
+    id: "credit-utilisation",
+    name: "Credit Utilisation",
+    category: "Credit & Debt",
+    reviewCard: {
+      question: "You owe R16 000 on a credit card with a R20 000 limit. What does that signal to a lender?",
+      options: [
+        "80% utilisation, which reads as financial stress",
+        "80% utilisation, which is fine because you are under the limit",
+        "20% utilisation, which is healthy",
+        "Nothing. Utilisation is not scored",
+      ],
+      correct: 0,
+      explanation:
+        "Utilisation is roughly 30% of your credit score, second only to payment history. Keep combined balances below 30% of your total limits, ideally under 10% before a bond application. Closing an unused card raises utilisation by shrinking available credit, which is why old zero-balance accounts are usually worth keeping open.",
+    },
+    courses: ["credit-debt"],
+  },
+  {
+    id: "debt-counselling",
+    name: "Debt Counselling",
+    category: "Credit & Debt",
+    reviewCard: {
+      question: "Which body registers legitimate debt counsellors in South Africa?",
+      options: [
+        "The National Credit Regulator",
+        "SARS",
+        "The Reserve Bank",
+        "The JSE",
+      ],
+      correct: 0,
+      explanation:
+        "Verify any counsellor at ncr.org.za before signing anything. Debt review restructures your debts into one affordable payment with legal protection from creditors while you comply, but flags you at the bureaux and blocks new credit until you finish. Insist on your clearance certificate at the end. Without it the flag stays.",
+    },
+    courses: ["credit-debt"],
+  },
+  {
+    id: "reckless-lending",
+    name: "Reckless Lending",
+    category: "Credit & Debt",
+    reviewCard: {
+      question: "Under the NCA, when is credit 'reckless'?",
+      options: [
+        "When the provider grants it without properly assessing affordability",
+        "When the interest rate feels high to the borrower",
+        "When the borrower has no credit history",
+        "When the loan is approved on the same day",
+      ],
+      correct: 0,
+      explanation:
+        "The affordability assessment is a legal duty on the lender, and a court can set aside or restructure a reckless agreement. Personal loan rates are capped by a repo-linked formula (repo + 21%) and exceeding it is an offence reportable to the NCR. Mashonisas fall outside the NCA entirely, no cap, no affordability rules, no recourse.",
+    },
+    courses: ["credit-debt"],
+  },
+  {
+    id: "car-finance",
+    name: "Car Finance",
+    category: "Credit & Debt",
+    reviewCard: {
+      question: "What does a balloon (residual) payment on car finance actually do?",
+      options: [
+        "Defers 20–30% of the debt to the end of the term, where it still has to be paid",
+        "Reduces the total amount you owe",
+        "Covers your final year of instalments",
+        "Is written off when the term ends",
+      ],
+      correct: 0,
+      explanation:
+        "A balloon makes the monthly figure look affordable while a large lump sum waits at the end: usually refinanced at more interest, so buyers pay for years without ever owning the car. A bigger deposit cuts interest and avoids negative equity. Keep total transport costs near 20% of income: instalment, insurance, fuel and maintenance together.",
+    },
+    courses: ["credit-debt"],
+  },
+  {
+    id: "home-loan-prepayment",
+    name: "Paying Extra Into Your Bond",
+    category: "Credit & Debt",
+    reviewCard: {
+      question: "You have a bond at 11% and a savings account paying 7%. Where should a R20 000 windfall go?",
+      options: [
+        "Into the bond, where it saves 11% tax-free",
+        "Into savings, for flexibility",
+        "Split evenly between them",
+        "Into a new store account",
+      ],
+      correct: 0,
+      explanation:
+        "Extra bond payments earn a guaranteed, tax-free return equal to your interest rate, and early payments save most because interest compounds on the outstanding balance for the remaining term. An access bond keeps the money available to redraw. When rates fall, keep paying the old instalment. The difference goes straight to capital.",
+    },
+    courses: ["credit-debt"],
+  },
+  {
+    id: "bnpl",
+    name: "Buy Now, Pay Later",
+    category: "Credit & Debt",
+    reviewCard: {
+      question: "You have four BNPL commitments running at R300, R450, R250 and R600 a month. What have you added to your budget?",
+      options: ["R1 600 a month", "R1 200 a month", "R800 a month", "Nothing. BNPL is not debt"],
+      correct: 0,
+      explanation:
+        "BNPL is 0% only while you pay on time; miss an instalment and late fees arrive. The real danger is stacking. Each commitment feels small alone but they add up to a monthly obligation you never budgeted. SA providers increasingly report to credit bureaux, so missed payments hit your record and live commitments reduce what a bond assessor says you can afford.",
+    },
+    courses: ["credit-debt"],
+  },
+  {
+    id: "credit-report-disputes",
+    name: "Your Credit Report",
+    category: "Credit & Debt",
+    reviewCard: {
+      question: "A company offers to 'remove your blacklisting' for R2 500. What is really going on?",
+      options: [
+        "Accurate adverse information cannot be removed on request. Only errors can be disputed, free",
+        "They have a legal channel consumers do not",
+        "It works, but takes about six months",
+        "It is legal, but only for judgments",
+      ],
+      correct: 0,
+      explanation:
+        "You are entitled to one free report a year from each registered bureau (TransUnion, Experian, XDS), and checking your own score is a soft enquiry that harms nothing. Dispute genuine errors in writing and the bureau must investigate. Correct listings run their prescribed term. What rebuilds a score is bringing arrears current and twelve to twenty-four months of on-time payments.",
+    },
+    courses: ["credit-debt"],
+  },
+
+  // ── Investing (extras) ───────────────────────────────────────────────────
+  {
+    id: "investment-fees",
+    name: "Investment Fees",
+    category: "Investing",
+    reviewCard: {
+      question: "You invest R200 000. Fund A charges a 0.2% TER, Fund B charges 2%. What is the fee difference in year one?",
+      options: ["R3 600", "R400", "R40", "R200"],
+      correct: 0,
+      explanation:
+        "R200 000 × 1.8% = R3 600 in the first year, and the gap compounds because money paid in fees never grows for you. Over 30 years a 1% annual fee can consume roughly a fifth of your final value. Returns are uncertain but fees are contractual. Under the FAIS General Code they must be disclosed in writing, so ask for the total effective annual cost in both percent and rands.",
+    },
+    courses: ["investing-basics"],
+  },
+  {
+    id: "dollar-cost-averaging",
+    name: "Dollar-Cost Averaging",
+    category: "Investing",
+    reviewCard: {
+      question: "The JSE drops 30% in month four of your R2 000-a-month ETF plan. What is the right move?",
+      options: [
+        "Keep the debit order running. You are buying the same units cheaper",
+        "Stop until markets recover",
+        "Sell everything to prevent further losses",
+        "Switch to whatever went up last month",
+      ],
+      correct: 0,
+      explanation:
+        "Investing a fixed amount monthly buys more units when prices fall and fewer when they rise, and removes the timing decision entirely. A fall early in a long plan is helpful to a contributor. You only lose money in a fall if you sell. Date the debit order just after payday, and raise it whenever your income rises.",
+    },
+    courses: ["investing-basics"],
+  },
+  {
+    id: "reits",
+    name: "Property Investment and REITs",
+    category: "Investing",
+    reviewCard: {
+      question: "A flat costs R1.2 million and rents for R8 000 a month. What is the gross rental yield?",
+      options: ["8%", "6.7%", "12%", "0.67%"],
+      correct: 0,
+      explanation:
+        "R96 000 annual rent ÷ R1 200 000 = 8% gross, before rates, levies, insurance, maintenance, agent fees and vacant months, which routinely take a third of the rent. Buy-to-let is a small business, not passive income, and eviction is a months-long court process. A listed REIT gives property exposure with no tenants and same-day liquidity, but no leverage and no control.",
+    },
+    courses: ["investing-basics"],
+  },
+  {
+    id: "interest-rate-risk",
+    name: "Bond Prices and Interest Rates",
+    category: "Investing",
+    reviewCard: {
+      question: "The SARB cuts the repo rate unexpectedly. What typically happens to the price of existing bonds?",
+      options: [
+        "They rise, because their older higher coupons are now more attractive",
+        "They fall",
+        "They are unaffected",
+        "They stop paying interest",
+      ],
+      correct: 0,
+      explanation:
+        "Bond prices and interest rates move in opposite directions. Duration measures how sensitive a bond's price is to that movement, a 20-year bond swings far more than a 2-year one. Held to maturity, an RSA Retail Bond returns your capital regardless, so a rate rise costs you opportunity, not capital. Bond funds have no maturity date, so their value keeps moving.",
+    },
+    courses: ["investing-basics"],
+  },
+  {
+    id: "asset-allocation",
+    name: "Asset Allocation",
+    category: "Investing",
+    reviewCard: {
+      question: "What should mainly decide how much equity you hold?",
+      options: [
+        "How long until you need the money, and the volatility you can actually tolerate",
+        "Last year's best-performing asset class",
+        "What your colleagues are buying",
+        "The size of your account",
+      ],
+      correct: 0,
+      explanation:
+        "The split between equities, bonds, property and cash drives most of the variation in returns: far more than which shares you pick. Money needed within two years generally shouldn't sit in equities. Most SA investors hold meaningful offshore exposure because their salary, home and currency are already local; Regulation 28 caps retirement-fund offshore exposure at 45%.",
+    },
+    courses: ["sa-investing"],
+  },
+  {
+    id: "rebalancing",
+    name: "Rebalancing",
+    category: "Investing",
+    reviewCard: {
+      question: "Your target is 70% equities and 30% bonds. After a strong equity year you are at 80/20. What should you do?",
+      options: [
+        "Rebalance back to 70/30, ideally by directing new contributions to bonds",
+        "Leave it. The winners are working",
+        "Sell all your bonds",
+        "Move everything to cash",
+      ],
+      correct: 0,
+      explanation:
+        "Drift means you are carrying more risk than you chose. Rebalance annually, or when an asset class moves about five percentage points from target. The cheapest method is directing new money to the underweight asset rather than selling; where you must sell, do it inside a TFSA or retirement fund where there is no CGT. In a taxable account the R50 000 annual exclusion often covers a modest gain.",
+    },
+    courses: ["sa-investing"],
+  },
+
+  // ── Taxes (extras) ───────────────────────────────────────────────────────
+  {
+    id: "donations-tax",
+    name: "Donations Tax",
+    category: "Taxes",
+    reviewCard: {
+      question: "You donate R200 000 to your adult son. How is it taxed?",
+      options: [
+        "The first R100 000 is exempt; the remaining R100 000 attracts 20% donations tax",
+        "The full R200 000 is exempt",
+        "The full R200 000 is taxed at 20%",
+        "Your son pays income tax on it",
+      ],
+      correct: 0,
+      explanation:
+        "Individuals get a R100 000 annual exemption, and the excess is taxed at 20% (25% above R30m cumulative). The donor pays, not the recipient, and SARS can hold the recipient jointly liable if the donor doesn't. Donations between spouses are exempt without limit, and the annual exemption renews each year, so staging large gifts across tax years is ordinary planning.",
+    },
+    courses: ["taxes"],
+  },
+  {
+    id: "dividends-tax",
+    name: "Dividends Withholding Tax",
+    category: "Taxes",
+    reviewCard: {
+      question: "You earn R50 000 in dividends from JSE shares held outside a TFSA. What actually reaches you?",
+      options: ["R40 000", "R50 000", "R32 500", "R45 000"],
+      correct: 0,
+      explanation:
+        "Dividends withholding tax is 20% and is deducted at source, so R10 000 never reaches your account and there is nothing further to declare. Interest is different: exempt to R23 800 a year under 65, then taxed at your marginal rate. Inside a TFSA, dividends, interest and capital gains are all completely untaxed.",
+    },
+    courses: ["taxes"],
+  },
+  {
+    id: "efiling",
+    name: "SARS eFiling",
+    category: "Taxes",
+    reviewCard: {
+      question: "What should you do before accepting a SARS auto-assessment?",
+      options: [
+        "Check it against your IRP5, IT3s and any deduction SARS was not told about",
+        "Accept it immediately so the refund arrives sooner",
+        "Wait for the deadline to pass",
+        "Phone SARS to confirm it is genuine",
+      ],
+      correct: 0,
+      explanation:
+        "Auto-assessments are built from third-party data, so a private RA, out-of-pocket medical expenses or a travel logbook claim will be missing. A 'Supporting Documents Required' notice is routine verification, upload proof by the deadline or the claims get disallowed. Keep your banking details verified on eFiling, since unverified details are the most common cause of a delayed refund.",
+    },
+    courses: ["taxes"],
+  },
+
+  // ── Scams & Fraud (extras) ───────────────────────────────────────────────
+  {
+    id: "advance-fee-fraud",
+    name: "Advance Fee Fraud",
+    category: "Scams & Fraud",
+    reviewCard: {
+      question: "An email says you have won $500 000 in a lottery you never entered, but you must pay R2 500 in 'release fees'. What is it?",
+      options: [
+        "Advance fee fraud. The fee is the entire point",
+        "A legitimate international lottery",
+        "A tax requirement on foreign winnings",
+        "A refundable processing charge",
+      ],
+      correct: 0,
+      explanation:
+        "Being asked to pay before receiving money you're owed is the most reliable marker of fraud. Legitimate payouts deduct costs from the amount. The same shape covers fake job offers charging for 'licences' or training, which is unlawful in SA. SARS never phones demanding an immediate EFT, and no authority accepts gift-card vouchers.",
+    },
+    courses: ["scams-fraud"],
+  },
+  {
+    id: "vishing",
+    name: "Vishing (Voice Call Fraud)",
+    category: "Scams & Fraud",
+    reviewCard: {
+      question: "A caller from 'the bank's fraud department' asks for your OTP so they can block a fraudulent transaction. What should you do?",
+      options: [
+        "Hang up and call the bank on the number from your card or app",
+        "Give the OTP so the transaction is blocked",
+        "Give only the first three digits",
+        "Ask them to confirm by SMS first",
+      ],
+      correct: 0,
+      explanation:
+        "An OTP authorises a transaction. It can never block one, so no bank will ever ask for it. Scammers open with your name, ID number and recent transactions because leaked data is cheap; knowing your details is a credibility play, not proof. There is no such thing as a 'safe account': real banks freeze accounts rather than asking you to move money.",
+    },
+    courses: ["scams-fraud"],
+  },
+  {
+    id: "whatsapp-scams",
+    name: "WhatsApp Scams",
+    category: "Scams & Fraud",
+    reviewCard: {
+      question: "An unknown number messages: 'It's Lungelo from varsity, I'm stranded and lost my wallet, please EFT R1 500.' Best response?",
+      options: [
+        "Call the real Lungelo on the number you already have",
+        "Send the money. He is a friend in trouble",
+        "Reply asking for his banking details",
+        "Ask a security question by message",
+      ],
+      correct: 0,
+      explanation:
+        "A voice call to the number you already hold defeats impersonation in seconds. The other WhatsApp patterns: fake investment groups where screenshots and enthusiasm are manufactured; QR codes and links, which you never need to receive money; and account takeover, where forwarding the six-digit code hands over your account. Two-step verification prevents it.",
+    },
+    courses: ["scams-fraud"],
+  },
+
+  // ── Money & the Bible (extras) ───────────────────────────────────────────
+  {
+    id: "biblical-planning",
+    name: "Planning in Proverbs",
+    category: "Money & the Bible",
+    reviewCard: {
+      question: "Proverbs 24:27 says 'Do your planning and prepare your fields before building your house.' What does that apply to today?",
+      options: [
+        "Securing your income before committing to a large lifestyle expense",
+        "Buying property before renting",
+        "Building a house before starting a business",
+        "Avoiding agriculture",
+      ],
+      correct: 0,
+      explanation:
+        "The field produced the income; the house was the comfort. Establish what produces income before committing to what consumes it. Proverbs 21:5 favours careful planning over hasty shortcuts, 13:11 contrasts quick money that disappears with wealth gathered little by little, and 27:23 urges knowing the condition of your flocks: the ancient version of actually looking at your accounts.",
+    },
+    courses: ["bible-money"],
+  },
+  {
+    id: "biblical-work",
+    name: "Faithful Labour",
+    category: "Money & the Bible",
+    reviewCard: {
+      question: "Colossians 3:23 says to 'work willingly at whatever you do, as though you were working for the Lord rather than for people.' What does that imply?",
+      options: [
+        "The quality of your work matters regardless of who is watching or what the job is",
+        "Only ministry work counts spiritually",
+        "You should work unpaid overtime indefinitely",
+        "Career ambition is wrong",
+      ],
+      correct: 0,
+      explanation:
+        "It dignifies ordinary work and sets a standard that doesn't move with the level of supervision. Diligence and rest are both commended. The Sabbath principle makes rest a discipline, not laziness. Luke 16:10 ties faithfulness in small things, like accurate timesheets and honest expense claims, to trustworthiness with much.",
+    },
+    courses: ["bible-money"],
+  },
+  {
+    id: "surety-biblical",
+    name: "Surety and Co-signing",
+    category: "Money & the Bible",
+    reviewCard: {
+      question: "A friend asks you to co-sign their car loan. What does Proverbs teach, and what does SA law say?",
+      options: [
+        "Proverbs warns against surety, and co-signing makes you jointly and severally liable for the full debt",
+        "Proverbs commends it as generosity, and liability is shared equally",
+        "Scripture is neutral, and the lender must sue the borrower first",
+        "It is required of family members, and liability is limited to half",
+      ],
+      correct: 0,
+      explanation:
+        "Proverbs 22:26-27 warns: 'Don't agree to guarantee another person's debt... if you can't pay it, even your bed will be snatched from under you.' In SA the lender can pursue you for the entire balance without first exhausting the other borrower, and the default lands on your credit record. The test before any guarantee: could you pay the full amount yourself today without harm?",
+    },
+    courses: ["bible-money"],
+  },
+  {
+    id: "tithing",
+    name: "Tithing",
+    category: "Money & the Bible",
+    reviewCard: {
+      question: "What does the word 'tithe' literally mean?",
+      options: ["A tenth", "A gift", "An offering", "A sacrifice"],
+      correct: 0,
+      explanation:
+        "The practice predates the Law, Abraham gives a tenth in Genesis 14, and Malachi 3:10 invites Israel to bring the whole tithe and test God's provision. Scripture doesn't legislate gross versus net, and 2 Corinthians 9:7 puts the weight on a decided, cheerful heart rather than a formula. It never promises that giving guarantees wealth, and teaching that it does burdens those least able to carry it.",
+    },
+    courses: ["bible-money"],
+  },
+  {
+    id: "treasures-eternity",
+    name: "Wealth and Eternity",
+    category: "Money & the Bible",
+    reviewCard: {
+      question: "Matthew 6:19-21 contrasts treasure on earth with treasure in heaven. What is the central claim?",
+      options: [
+        "Where your treasure is, your heart follows",
+        "Saving money is sinful",
+        "Wealth should be destroyed",
+        "Only the poor please God",
+      ],
+      correct: 0,
+      explanation:
+        "It is a statement about the direction of the heart, not a ban on saving, Proverbs commends saving, and 13:22 speaks well of leaving an inheritance. Abraham, Job and Lydia were wealthy and faithful. 1 Timothy 6:17-19 tells the rich not to be proud or trust in wealth but to be generous and rich in good works: a posture, not a threshold.",
+    },
+    courses: ["bible-money"],
+  },
+  {
+    id: "biblical-integrity",
+    name: "Financial Integrity",
+    category: "Money & the Bible",
+    reviewCard: {
+      question: "Proverbs 11:1 says the Lord detests dishonest scales but delights in accurate weights. What does that cover today?",
+      options: [
+        "Honest pricing, accurate invoices and truthful declarations",
+        "Only literal weighing equipment",
+        "Bank interest rates",
+        "Currency exchange",
+      ],
+      correct: 0,
+      explanation:
+        "Scales were the point of sale, so the modern equivalent is every number someone relies on: invoices, quotes, tax returns, expense claims. Inflating a deduction is a dishonest weight and legally it is evasion, not planning. Luke 16:10 ties small faithfulness to large, Psalm 37:21 frames repaying debt as character, and Proverbs 22:1 ranks a good name above great riches.",
+    },
+    courses: ["bible-money"],
+  },
+
+  // ── Money Psychology (extras) ────────────────────────────────────────────
+  {
+    id: "hedonic-adaptation",
+    name: "Hedonic Adaptation",
+    category: "Money Psychology",
+    reviewCard: {
+      question: "You upgrade your phone every year and each one feels ordinary within two months. What is happening?",
+      options: [
+        "Hedonic adaptation, your baseline resets, so the same upgrade is needed again",
+        "The phones are getting worse",
+        "You are choosing the wrong brand",
+        "You need a more expensive model",
+      ],
+      correct: 0,
+      explanation:
+        "Hedonic adaptation is the return to your usual level of happiness after a change, and it is fast, which is why upgrades rarely deliver what they promised and why lifestyle inflation feels invisible. Experiences resist it better than possessions. The strongest counters: bank part of every raise before adapting to it, space out treats, and deliberately notice what you already have.",
+    },
+    courses: ["money-psychology"],
+  },
+  {
+    id: "mental-accounting",
+    name: "Mental Accounting",
+    category: "Money Psychology",
+    reviewCard: {
+      question: "You budget your salary carefully but spend an R8 000 bonus within a week. What is driving that?",
+      options: [
+        "Mental accounting. The bonus is labelled 'extra' rather than income",
+        "The bonus is genuinely different money",
+        "You are bad with money generally",
+        "Bonuses cannot be budgeted",
+      ],
+      correct: 0,
+      explanation:
+        "A rand is a rand, but we treat money differently depending on where it came from, and a SARS refund is your own overpaid tax coming back, not a windfall. The bias also hides real costs: R20 000 in savings at 6% next to R20 000 on a card at 20% costs about R2 800 a year. Used deliberately, named goal accounts make the same bias work in your favour.",
+    },
+    courses: ["money-psychology"],
+  },
+  {
+    id: "confirmation-bias",
+    name: "Confirmation Bias",
+    category: "Money Psychology",
+    reviewCard: {
+      question: "After buying a share, you follow five accounts that are bullish on it and mute the critics. What is the effect?",
+      options: [
+        "You have built an environment where you will never see the warning signs",
+        "You are filtering out noise",
+        "You are diversifying your information",
+        "You are reducing your risk",
+      ],
+      correct: 0,
+      explanation:
+        "Confirmation bias is seeking information that supports what you already believe, and it feels exactly like research. After buying, good news becomes significant and bad news becomes noise. The remedies are uncomfortable by design: seek the strongest argument against your position, write your reasoning down before deciding including what would prove you wrong, and ask people with no stake in the outcome.",
+    },
+    courses: ["money-psychology"],
+  },
+  {
+    id: "overconfidence-bias",
+    name: "Overconfidence and Recency",
+    category: "Money Psychology",
+    reviewCard: {
+      question: "You made money on three trades and now believe you have a knack for it. What is the risk?",
+      options: [
+        "Three outcomes cannot distinguish skill from luck, but they can justify much bigger bets",
+        "You should trade more to confirm it",
+        "You have proven your ability",
+        "You should teach others",
+      ],
+      correct: 0,
+      explanation:
+        "Overconfidence makes people trade more, and more trading reliably lowers net returns. Recency bias makes us extrapolate the last few years. Raising equity exposure after a run, or abandoning markets after a crash. Hindsight bias then convinces us we saw it coming. The honest response is to diversify, automate, and write predictions down before the outcome is known.",
+    },
+    courses: ["money-psychology"],
+  },
+
+  // ── Retirement (extras) ──────────────────────────────────────────────────
+  {
+    id: "ra-vs-pension",
+    name: "RA vs Pension Fund",
+    category: "Retirement",
+    reviewCard: {
+      question: "Your employer pension has high fees but the employer contributes 7.5%. Should you opt out and use an RA instead?",
+      options: [
+        "No. The employer contribution usually outweighs the fee difference; run an RA alongside it",
+        "Yes, fees always matter more",
+        "Yes, RAs always outperform",
+        "It makes no difference either way",
+      ],
+      correct: 0,
+      explanation:
+        "An RA gives you control of provider, funds and fees and follows you between jobs, but a 7.5% employer contribution dwarfs a 1% fee gap. You can hold both: the 27.5% deduction (capped at R430 000) applies to your combined contributions, and any excess rolls forward. On resignation, transferring to a preservation fund, a new employer fund or an RA is tax-neutral; cashing out is the costliest retirement decision most people make.",
+    },
+    courses: ["retirement"],
+  },
+  {
+    id: "retirement-age",
+    name: "Choosing When to Retire",
+    category: "Retirement",
+    reviewCard: {
+      question: "Why does retiring ten years earlier require substantially more capital?",
+      options: [
+        "Fewer years of contributions and growth, and more years of withdrawals",
+        "Tax rates are higher for early retirees",
+        "Annuities cost more before 60",
+        "Medical aid doubles",
+      ],
+      correct: 0,
+      explanation:
+        "It's a double hit, and the last ten years before retirement usually add more than the first ten because compounding works on the largest balance you'll ever have. The honest levers are saving more, needing less, or working part-time. Early income also reduces sequence risk: withdrawing during an early market fall does damage that later gains cannot undo.",
+    },
+    courses: ["retirement"],
+  },
+  {
+    id: "annuity-types",
+    name: "Annuity Types",
+    category: "Retirement",
+    reviewCard: {
+      question: "Which type of annuity removes the risk of outliving your money?",
+      options: [
+        "A guaranteed (life) annuity, which pays for as long as you live",
+        "A living annuity",
+        "A unit trust",
+        "A fixed deposit",
+      ],
+      correct: 0,
+      explanation:
+        "The insurer takes the longevity risk, and you give up the capital and the flexibility. A living annuity lets you choose the investments and a drawdown between 2.5% and 17.5%, keeps the capital inheritable, and leaves both investment and longevity risk with you. The common answer is a hybrid: guarantee your essential expenses, keep the discretionary portion flexible. Both incomes are taxed as income.",
+    },
+    courses: ["retirement"],
+  },
+  {
+    id: "retirement-healthcare",
+    name: "Healthcare in Retirement",
+    category: "Retirement",
+    reviewCard: {
+      question: "Can most retirees safely drop medical aid to save money once they stop working?",
+      options: [
+        "No. Rejoining brings waiting periods and a permanent late-joiner penalty",
+        "Yes, healthcare needs fall in retirement",
+        "Yes, provided they have savings",
+        "Yes, the state covers retirees",
+      ],
+      correct: 0,
+      explanation:
+        "Medical inflation consistently outpaces general inflation, so planning healthcare on CPI understates it badly. Downgrade rather than cancel, so membership stays continuous. Every registered option must still cover PMBs. The most commonly ignored late-life cost is frail care or assisted living, which medical schemes largely don't cover.",
+    },
+    courses: ["retirement"],
+  },
+
+  // ── Rand & Economy (extras) ──────────────────────────────────────────────
+  {
+    id: "offshore-mechanics",
+    name: "How Offshore Investing Works",
+    category: "Rand & Economy",
+    reviewCard: {
+      question: "Does investing offshore through a JSE-listed global ETF require SARS tax clearance?",
+      options: [
+        "No. It is a rand-denominated local purchase, so no money leaves the country",
+        "Yes, for any offshore exposure",
+        "Yes, above R100 000",
+        "Only for retirement funds",
+      ],
+      correct: 0,
+      explanation:
+        "A JSE-listed global ETF gives global share exposure plus rand exposure, bought locally in rands, and uses none of your allowance. If the rand moves from R17/$ to R19/$ with markets flat, R100 000 becomes about R111 800. To externalise actual rands you have the R2m Single Discretionary Allowance and a R10m Foreign Investment Allowance with SARS approval. Regulation 28 caps retirement funds at 45% offshore; discretionary money is unrestricted.",
+    },
+    courses: ["rand-economy"],
+  },
+  {
+    id: "petrol-price",
+    name: "The Rand and the Petrol Price",
+    category: "Rand & Economy",
+    reviewCard: {
+      question: "Is the Basic Fuel Price the only cost component of South African petrol?",
+      options: [
+        "No. The fuel levy, RAF levy, margins and transport all sit on top",
+        "Yes, the BFP is the full price",
+        "No, but the rest is only VAT",
+        "Yes, apart from the retailer's profit",
+      ],
+      correct: 0,
+      explanation:
+        "Oil is priced in dollars, so the pump price depends on both the oil price and the exchange rate. Petrol can rise even when oil falls. The levies are set in the Budget, which is why petrol can move with no change in oil or the rand. Fuel reaches even non-drivers through taxi fares and food prices, so increases hit low-income households proportionally hardest.",
+    },
+    courses: ["rand-economy"],
+  },
+  {
+    id: "sarb-intervention",
+    name: "The SARB and Currency Markets",
+    category: "Rand & Economy",
+    reviewCard: {
+      question: "Does the SARB manage the rand by setting an official exchange rate?",
+      options: [
+        "No. The rand floats freely and the SARB targets inflation",
+        "Yes, it sets a daily rate",
+        "Yes, the rand is pegged to the dollar",
+        "Only during a crisis",
+      ],
+      correct: 0,
+      explanation:
+        "Higher rates tend to support the rand by attracting capital, but global risk sentiment often dominates. The rand is a liquid emerging-market currency used as a risk proxy, so it moves on news that has nothing to do with SA. South Africa's FATF grey listing in February 2023 weighed on the currency; SA exited the grey list on 24 October 2025.",
+    },
+    courses: ["rand-economy"],
+  },
+  {
+    id: "trade-balance",
+    name: "SA's Trade Balance",
+    category: "Rand & Economy",
+    reviewCard: {
+      question: "Does a stronger rand make South African exports more competitive globally?",
+      options: [
+        "No. It makes SA goods more expensive abroad, though imports get cheaper",
+        "Yes, exports become cheaper",
+        "It has no effect on exports",
+        "Only for commodity exports",
+      ],
+      correct: 0,
+      explanation:
+        "South Africa exports mined commodities, so the rand behaves like a commodity currency. A platinum price collapse means fewer export dollars and a weaker rand, while a boom supports it. Households feel currency moves through fuel, electronics, medicine and imported food inputs, which is why a weaker rand pushes inflation up. Nobody forecasts currencies reliably, so a steady offshore allocation beats trying to time it.",
+    },
+    courses: ["rand-economy"],
+  },
+  {
+    id: "inflation-targeting",
+    name: "Inflation Targeting",
+    category: "Rand & Economy",
+    reviewCard: {
+      question: "What is the SARB's inflation target?",
+      options: [
+        "3%, with a tolerance band of one percentage point either side",
+        "Between 3% and 6%",
+        "Below 10%",
+        "There is no target",
+      ],
+      correct: 0,
+      explanation:
+        "South Africa moved from the old 3–6% range to a 3% point target with a ±1 percentage point band. What matters to you is the real return: 10.5% interest with 4.8% inflation is 5.7% real, while 6% with 8% inflation is a loss. That's why holding long-term savings entirely in cash isn't safe. It's a slow, certain erosion of purchasing power dressed up as caution.",
+    },
+    courses: ["rand-economy"],
+  },
+
+  // ── Crypto (extras) ──────────────────────────────────────────────────────
+  {
+    id: "blockchain",
+    name: "How Blockchain Works",
+    category: "Crypto",
+    reviewCard: {
+      question: "Are all blockchain transactions completely anonymous?",
+      options: [
+        "No. They are pseudonymous, and the public ledger makes them unusually traceable",
+        "Yes, that is the whole point",
+        "Yes, for Bitcoin but not other coins",
+        "Only for amounts under R10 000",
+      ],
+      correct: 0,
+      explanation:
+        "Each block is cryptographically linked to the one before and thousands of computers hold copies, so altered history is immediately visible and confirmed transactions can't be reversed by anyone. The ledger is permanently public, and licensed SA exchanges verify identity under FICA, which is the link between a wallet address and a real person. Blockchain is more traceable than cash, not less.",
+    },
+    courses: ["crypto-basics"],
+  },
+  {
+    id: "crypto-custody",
+    name: "Exchanges and Custody",
+    category: "Crypto",
+    reviewCard: {
+      question: "What does 'not your keys, not your coins' mean?",
+      options: [
+        "Crypto held on an exchange is a claim against that company, not a holding you control",
+        "Exchanges charge for storing keys",
+        "You need a password to trade",
+        "Private keys expire annually",
+      ],
+      correct: 0,
+      explanation:
+        "Crypto assets are a declared financial product in SA, so exchanges need an FSP licence. That gives you conduct oversight and a complaints route, but never makes the asset safe. Long-term holdings belong in self-custody. Use app-based two-factor authentication rather than SMS, because SIM swap fraud is common here, and never share a seed phrase: legitimate support will never ask for it.",
+    },
+    courses: ["crypto-basics"],
+  },
+  {
+    id: "defi-risks",
+    name: "DeFi Risks",
+    category: "Crypto",
+    reviewCard: {
+      question: "A DeFi platform promises 40% a year on stablecoins. What is the most important first question?",
+      options: [
+        "Where does the yield come from, and who is paying it?",
+        "Which wallet should I use?",
+        "Can I withdraw daily?",
+        "Is the app well designed?",
+      ],
+      correct: 0,
+      explanation:
+        "If nobody can explain the source of the return in plain terms, the source is usually new depositors. A 'rug pull' is developers draining the pooled funds and disappearing, and because transactions are irreversible the money is gone. The FSCA doesn't audit smart contracts, there's no CODI deposit cover and no ombud, so only money you could lose entirely belongs here.",
+    },
+    courses: ["crypto-basics"],
+  },
+
+  // ── Business Finance (extras) ────────────────────────────────────────────
+  {
+    id: "invoicing-debtors",
+    name: "Invoicing and Debtors",
+    category: "Business Finance",
+    reviewCard: {
+      question: "Is charging interest on overdue invoices illegal in South Africa?",
+      options: [
+        "No. It is lawful when your agreed terms provide for it",
+        "Yes, always",
+        "Yes, unless a court orders it",
+        "Only registered credit providers may do it",
+      ],
+      correct: 0,
+      explanation:
+        "The clause has to be in the agreed terms before the work starts, adding it to an overdue invoice doesn't create the obligation. Every day of payment terms is a day you finance your client for free, and '30 days from statement' can mean nearly 60 days after the work. Consistent follow-up before the due date is what gets you paid first, because recovery rates fall sharply as debt ages.",
+    },
+    courses: ["business-finance"],
+  },
+  {
+    id: "business-insurance",
+    name: "Small Business Insurance",
+    category: "Business Finance",
+    reviewCard: {
+      question: "A client trips over a cable in your office and sues you for R600 000. Which cover responds?",
+      options: [
+        "Public liability insurance",
+        "Professional indemnity",
+        "Business interruption",
+        "Key person cover",
+      ],
+      correct: 0,
+      explanation:
+        "Public liability covers third-party injury and property damage, and corporates often require proof of it before contracting with you. Professional indemnity covers claims that your advice or work caused a client financial loss, relevant to any professional service, not just doctors and lawyers. Business interruption replaces income while you can't trade, which usually exceeds the value of damaged equipment.",
+    },
+    courses: ["business-finance"],
   },
 ];
 

@@ -25,7 +25,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Guaranteed high returns with no risk is the classic scam signal. If it sounds too good to be true, it is.",
-            incorrect: "It's almost certainly a scam. No legitimate investment guarantees high returns with zero risk — that combination doesn't exist.",
+            incorrect: "It's almost certainly a scam. No legitimate investment guarantees high returns with zero risk. That combination doesn't exist.",
           },
         },
       },
@@ -33,11 +33,11 @@ const lesson1Slots: QuestionSlot[] = [
         variantId: "nfl-tf",
         step: {
           type: "true-false",
-          statement: "Higher potential return always comes with higher risk — there's no high return with zero risk.",
+          statement: "Higher potential return always comes with higher risk. There's no high return with zero risk.",
           correct: true,
           feedback: {
             correct: "True. Risk and reward travel together. Anyone promising big returns with no risk is selling a fantasy or a fraud.",
-            incorrect: "It's true — reward tracks risk. 'High return, no risk' is the definition of a scam, not an opportunity.",
+            incorrect: "It's true: reward tracks risk. 'High return, no risk' is the definition of a scam, not an opportunity.",
           },
         },
       },
@@ -47,14 +47,14 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A friend says a scheme pays a 'guaranteed 8% every week'. What should you conclude?",
           options: [
-            "It's a red flag — that's Ponzi-scheme territory, not real investing",
+            "It's a red flag. That's Ponzi-scheme territory, not real investing",
             "It's a great deal, invest immediately",
             "It's a normal savings account",
             "The Reserve Bank backs it",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. 8% a week is impossible to sustain honestly — it's the signature of a scam that pays early joiners with later joiners' money.",
+            correct: "Right. 8% a week is impossible to sustain honestly. It's the signature of a scam that pays early joiners with later joiners' money.",
             incorrect: "Walk away. A 'guaranteed' weekly return that high is a Ponzi hallmark, not a legitimate investment.",
           },
         },
@@ -74,7 +74,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Savings and money market sit low: stable but modest. Single shares, crypto and leverage sit at the high-risk end.",
-            incorrect: "Low-risk means a savings or money market account — stable, modest returns. The others are high-risk, high-swing.",
+            incorrect: "Low-risk means a savings or money market account. Stable, modest returns. The others are high-risk, high-swing.",
           },
         },
       },
@@ -95,11 +95,11 @@ const lesson1Slots: QuestionSlot[] = [
         variantId: "sp-match-tf",
         step: {
           type: "true-false",
-          statement: "There's no single 'best' risk level — the right choice depends on your goal and how long you can wait.",
+          statement: "There's no single 'best' risk level. The right choice depends on your goal and how long you can wait.",
           correct: true,
           feedback: {
             correct: "True. The stable end suits near-term money; the growth end suits long-term goals. Match the tool to the timeline.",
-            incorrect: "It's true — 'best' depends on your goal and horizon. Short-term money wants stability; long-term money can take more risk.",
+            incorrect: "It's true. 'best' depends on your goal and horizon. Short-term money wants stability; long-term money can take more risk.",
           },
         },
       },
@@ -117,7 +117,7 @@ const lesson1Slots: QuestionSlot[] = [
           prompt: "You leave R100 000 in cash and inflation is 6%. In one year it loses about R____ in buying power.",
           correct: 6000,
           feedback: {
-            correct: "Correct: 6% of R100 000 = R6 000 of purchasing power gone. 'Doing nothing' isn't safe — it's a slow loss.",
+            correct: "Correct: 6% of R100 000 = R6 000 of purchasing power gone. 'Doing nothing' isn't safe. It's a slow loss.",
             incorrect: "6% of R100 000 = R6 000 of buying power lost in a year.",
           },
         },
@@ -129,7 +129,7 @@ const lesson1Slots: QuestionSlot[] = [
           statement: "Keeping all your long-term money in cash is completely risk-free.",
           correct: false,
           feedback: {
-            correct: "Correct. Cash carries inflation risk — it slowly loses buying power. Over a decade, R100 000 in cash can buy roughly half as much.",
+            correct: "Correct. Cash carries inflation risk. It slowly loses buying power. Over a decade, R100 000 in cash can buy roughly half as much.",
             incorrect: "It isn't risk-free. Cash steadily loses purchasing power to inflation, which is why long-term money usually needs growth assets.",
           },
         },
@@ -140,7 +140,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho keeps his entire long-term savings in a 0%-interest account 'to be safe'. Over 10 years at 6% inflation, what happens?",
           options: [
-            "Its buying power roughly halves — 'safe' from crashes, not from inflation",
+            "Its buying power roughly halves, 'safe' from crashes, not from inflation",
             "It doubles automatically",
             "Nothing changes at all",
             "It's fully protected from inflation",
@@ -148,7 +148,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. At ~6% a year, prices roughly double over a decade, so idle cash buys about half as much. For long-term goals, that's a real loss.",
-            incorrect: "It loses badly to inflation — after 10 years it buys about half as much. Cash is safe from crashes but not from rising prices.",
+            incorrect: "It loses badly to inflation. After 10 years it buys about half as much. Cash is safe from crashes but not from rising prices.",
           },
         },
       },
@@ -166,7 +166,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Time smooths out volatility. A 20-year investor can ride out a crash that would devastate someone who needs the money next year.",
-            incorrect: "It's true — a longer horizon lets you absorb short-term dips and benefit from long-term growth. Time is the great cushion.",
+            incorrect: "It's true, a longer horizon lets you absorb short-term dips and benefit from long-term growth. Time is the great cushion.",
           },
         },
       },
@@ -179,7 +179,7 @@ const lesson1Slots: QuestionSlot[] = [
             "There's time for dips to recover and for growth to compound",
             "Because long-term investments can't fall",
             "Because the government guarantees them",
-            "It doesn't — horizon is irrelevant",
+            "It doesn't. Horizon is irrelevant",
           ],
           correct: 0,
           feedback: {
@@ -194,7 +194,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa (25) is investing for retirement 35 years away. How should her horizon shape her risk?",
           options: [
-            "She can take more market risk now — decades give dips time to recover",
+            "She can take more market risk now. Decades give dips time to recover",
             "She should avoid all growth assets to be safe",
             "She should keep everything in cash forever",
             "Her horizon makes no difference",
@@ -202,7 +202,7 @@ const lesson1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. With 35 years, short-term crashes matter far less and growth assets can compound. Long horizon, more room for risk.",
-            incorrect: "A 35-year horizon supports more growth risk — dips have decades to recover. All-cash would likely cost her serious compounding.",
+            incorrect: "A 35-year horizon supports more growth risk. Dips have decades to recover. All-cash would likely cost her serious compounding.",
           },
         },
       },
@@ -215,7 +215,7 @@ const lesson1Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Golden Rule of Investing",
     content:
-      "<p>Leave R100 000 in cash instead of investing and you quietly lose about R6 000 a year in buying power to inflation. After 10 years, that R100 000 buys what R55 000 used to. Doing nothing isn't safe — it's slow financial erosion.</p><p>Higher potential return always comes with higher risk. There's no high return with zero risk — that's the definition of a scam. The spectrum runs from low risk/low return (savings, money market) → medium (bonds, balanced funds) → high (shares, ETFs, property).</p>",
+      "<p>Leave R100 000 in cash instead of investing and you quietly lose about R6 000 a year in buying power to inflation. After 10 years, that R100 000 buys what R55 000 used to. Doing nothing isn't safe. It's slow financial erosion.</p><p>Higher potential return always comes with higher risk. There's no high return with zero risk. That's the definition of a scam. The spectrum runs from low risk/low return (savings, money market) → medium (bonds, balanced funds) → high (shares, ETFs, property).</p>",
   },
   { slot: "investing-basics/lesson-1/no-free-lunch" },
   { slot: "investing-basics/lesson-1/spectrum" },
@@ -241,7 +241,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Time is everything. Starting even 10 years earlier can double or triple your final amount.",
-            incorrect: "It's time. The earlier you start, the longer compounding has to work — that matters more than the size of each contribution.",
+            incorrect: "It's time. The earlier you start, the longer compounding has to work. That matters more than the size of each contribution.",
           },
         },
       },
@@ -253,7 +253,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Those extra years compound on top of everything else, so an early starter often ends far ahead of a bigger-but-later saver.",
-            incorrect: "It's true — extra years are the most powerful lever in compounding. Early and small often beats late and large.",
+            incorrect: "It's true. Extra years are the most powerful lever in compounding. Early and small often beats late and large.",
           },
         },
       },
@@ -263,14 +263,14 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Two people each invest R500/month at the same return. One starts at 25, the other at 35. At 60, who likely has much more?",
           options: [
-            "The one who started at 25 — the extra decade compounds enormously",
+            "The one who started at 25",
             "They'll have exactly the same",
             "The one who started at 35",
-            "Neither — start age doesn't matter",
+            "Neither. Start age doesn't matter",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The early starter's first decade keeps compounding for 35 years — that head start is often worth hundreds of thousands more.",
+            correct: "Right. The early starter's first decade keeps compounding for 35 years. That head start is often worth hundreds of thousands more.",
             incorrect: "The 25-year-old wins big. Those ten extra years compound the whole way to 60, dwarfing the later starter.",
           },
         },
@@ -295,7 +295,7 @@ const lesson2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Your returns start earning their own returns, which is what creates exponential (not just steady) growth over time.",
-            incorrect: "It means earning interest on your interest. Each year's growth joins the pot and earns more — that snowball is the whole point.",
+            incorrect: "It means earning interest on your interest. Each year's growth joins the pot and earns more. That snowball is the whole point.",
           },
         },
       },
@@ -319,8 +319,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "Compound growth speeds up over time, because the base it grows on keeps getting bigger.",
           correct: true,
           feedback: {
-            correct: "True. Early on it feels slow, but as the pot grows, each year adds more than the last — that's why time matters so much.",
-            incorrect: "It's true — compounding accelerates. The bigger the balance, the bigger each year's growth, so late years add the most.",
+            correct: "True. Early on it feels slow, but as the pot grows, each year adds more than the last. That's why time matters so much.",
+            incorrect: "It's true, compounding accelerates. The bigger the balance, the bigger each year's growth, so late years add the most.",
           },
         },
       },
@@ -338,7 +338,7 @@ const lesson2Slots: QuestionSlot[] = [
           prompt: "Investing R500/month for 20 years, you contribute about R____ of your own money (before any growth).",
           correct: 120000,
           feedback: {
-            correct: "Correct: R500 × 12 × 20 = R120 000 contributed. With growth, the total can be well over R400 000 — the rest is compounding.",
+            correct: "Correct: R500 × 12 × 20 = R120 000 contributed. With growth, the total can be well over R400 000. The rest is compounding.",
             incorrect: "R500 × 12 months × 20 years = R120 000 of your own contributions. Compounding adds the rest on top.",
           },
         },
@@ -365,11 +365,11 @@ const lesson2Slots: QuestionSlot[] = [
         variantId: "lr-patience-tf",
         step: {
           type: "true-false",
-          statement: "Compounding rewards patience — the biggest gains usually come in the later years.",
+          statement: "Compounding rewards patience. The biggest gains usually come in the later years.",
           correct: true,
           feedback: {
             correct: "True. The curve is slow then steep. Staying invested through the slow early years is what unlocks the dramatic later growth.",
-            incorrect: "It's true — the later years grow the most, because the base is largest then. Patience is the price of the big gains.",
+            incorrect: "It's true. The later years grow the most, because the base is largest then. Patience is the price of the big gains.",
           },
         },
       },
@@ -385,15 +385,15 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "For compound growth, when is the best time to start investing?",
           options: [
-            "As early as possible — even small amounts",
+            "As early as possible, even small amounts",
             "Only once you earn a big salary",
             "Only after age 40",
-            "Never — it's not worth it",
+            "Never. It's not worth it",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Time beats amount. Starting small and early usually outperforms starting big and late, thanks to the extra years of compounding.",
-            incorrect: "As early as you can. Small amounts started young beat larger amounts started late — the extra years do the work.",
+            incorrect: "As early as you can. Small amounts started young beat larger amounts started late. The extra years do the work.",
           },
         },
       },
@@ -404,8 +404,8 @@ const lesson2Slots: QuestionSlot[] = [
           statement: "Even R200 or R300 a month is worth starting with, because time does much of the work.",
           correct: true,
           feedback: {
-            correct: "True. Waiting for a 'big enough' amount wastes your most valuable asset — time. Start small now and increase later.",
-            incorrect: "It's true — starting small still harnesses time, your biggest advantage. Begin now, add more as you earn more.",
+            correct: "True. Waiting for a 'big enough' amount wastes your most valuable asset. Time. Start small now and increase later.",
+            incorrect: "It's true: starting small still harnesses time, your biggest advantage. Begin now, add more as you earn more.",
           },
         },
       },
@@ -415,8 +415,8 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo keeps waiting to invest until he can 'afford R2 000/month'. Meanwhile he could start R400/month now. What's the cost of waiting?",
           options: [
-            "Lost years of compounding — the one thing he can never get back",
-            "Nothing — waiting is always better",
+            "Lost years of compounding. The one thing he can never get back",
+            "Nothing. Waiting is always better",
             "He saves on fees by waiting",
             "There's no difference",
           ],
@@ -436,7 +436,7 @@ const lesson2Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The 8th Wonder of the World",
     content:
-      "<p>Compound interest means you earn interest on your interest. Over time that creates exponential growth.</p><p>R10 000 at 10% a year: R11 000 after year 1, R16 105 after 5 years, R25 937 after 10, R67 275 after 20, R174 494 after 30 — and you did nothing after year 1. Time did the work. R500/month for 20 years at ~10% becomes over R400 000, from about R120 000 of your own contributions.</p>",
+      "<p>Compound interest means you earn interest on your interest. Over time that creates exponential growth.</p><p>R10 000 at 10% a year: R11 000 after year 1, R16 105 after 5 years, R25 937 after 10, R67 275 after 20, R174 494 after 30, and you did nothing after year 1. Time did the work. R500/month for 20 years at ~10% becomes over R400 000, from about R120 000 of your own contributions.</p>",
   },
   { slot: "investing-basics/lesson-2/main-ingredient" },
   { slot: "investing-basics/lesson-2/interest-on-interest" },
@@ -460,7 +460,7 @@ const lesson3Slots: QuestionSlot[] = [
           statement: "Buying shares in 10 different South African mining companies is good diversification.",
           correct: false,
           feedback: {
-            correct: "Correct. Ten companies in one sector and one country isn't diversified — if mining crashes, all ten fall together.",
+            correct: "Correct. Ten companies in one sector and one country isn't diversified, if mining crashes, all ten fall together.",
             incorrect: "That's concentration, not diversification. Real diversification spreads across different sectors, asset classes and geographies.",
           },
         },
@@ -471,15 +471,15 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho owns five bank shares and thinks he's diversified. What's the flaw?",
           options: [
-            "They're all in one sector — a banking downturn would hit all five at once",
-            "Nothing — five shares is always diversified",
+            "They're all in one sector. A banking downturn would hit all five at once",
+            "Nothing. Five shares is always diversified",
             "He owns too few shares to matter",
             "Banks never lose value",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Owning many shares in the same sector still leaves you exposed to that sector's bad year. Spread across sectors and asset types.",
-            incorrect: "The flaw is concentration in one sector. A banking slump would drag all five down together — that's not real diversification.",
+            incorrect: "The flaw is concentration in one sector. A banking slump would drag all five down together. That's not real diversification.",
           },
         },
       },
@@ -491,7 +491,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. The number of shares matters less than their variety. Twenty companies in one industry still rise and fall together.",
-            incorrect: "It's true — variety, not count, is what diversifies. Many shares in one sector share the same fate.",
+            incorrect: "It's true. Variety, not count, is what diversifies. Many shares in one sector share the same fate.",
           },
         },
       },
@@ -514,7 +514,7 @@ const lesson3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Diversification is not putting all your eggs in one basket — if one part falls, the others cushion the blow.",
+            correct: "Right. Diversification is not putting all your eggs in one basket, if one part falls, the others cushion the blow.",
             incorrect: "It's spreading across different assets so a single bad investment can't sink you. Concentration is the opposite.",
           },
         },
@@ -527,7 +527,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. It won't maximise your best-case return, but it protects you from any single failure being catastrophic.",
-            incorrect: "It's true — the goal is protection: no single investment failing should be able to wipe you out.",
+            incorrect: "It's true. The goal is protection: no single investment failing should be able to wipe you out.",
           },
         },
       },
@@ -537,7 +537,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Instead of picking three shares, Nomsa buys one broad ETF holding hundreds of companies. How does that help?",
           options: [
-            "One company doing badly barely dents her — the risk is spread across many",
+            "One company doing badly barely dents her. The risk is spread across many",
             "It guarantees she'll make money",
             "It removes all risk entirely",
             "It's worse than owning three shares",
@@ -561,7 +561,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Beyond owning many shares, a well-diversified portfolio also spreads across:",
           options: [
-            "Different asset classes — shares, bonds, property, cash",
+            "Different asset classes, shares, bonds, property, cash",
             "Only technology shares",
             "Only one bank's products",
             "Only cryptocurrencies",
@@ -569,7 +569,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Mixing asset classes (and regions) means they don't all move together, smoothing the ride when one has a bad year.",
-            incorrect: "True diversification spreads across asset classes — shares, bonds, property, cash — not just many shares in one place.",
+            incorrect: "True diversification spreads across asset classes (shares, bonds, property, cash) not just many shares in one place.",
           },
         },
       },
@@ -581,7 +581,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. If the local economy struggles, global holdings may hold up (and vice versa). Spreading across regions reduces single-country risk.",
-            incorrect: "It's true — mixing SA and global exposure means one country's downturn doesn't sink your whole portfolio.",
+            incorrect: "It's true. Mixing SA and global exposure means one country's downturn doesn't sink your whole portfolio.",
           },
         },
       },
@@ -598,7 +598,7 @@ const lesson3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Spreading across asset classes and regions is the essence of diversification — no single event can undo everything.",
+            correct: "Right. Spreading across asset classes and regions is the essence of diversification. No single event can undo everything.",
             incorrect: "The diversified option mixes local and global shares, bonds, property and cash. The others are all concentrated in one thing.",
           },
         },
@@ -617,7 +617,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. In a broad market crash, most things can fall together. Diversification cushions single-company disasters, not every downturn.",
-            incorrect: "It's true — diversification lowers single-investment risk, but a broad market drop can still pull most assets down. No guarantee.",
+            incorrect: "It's true. Diversification lowers single-investment risk, but a broad market drop can still pull most assets down. No guarantee.",
           },
         },
       },
@@ -635,7 +635,7 @@ const lesson3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. It's protection, not a profit guarantee. You give up the huge upside of one lucky pick in exchange for not being wiped out by one loser.",
-            incorrect: "It protects against a single failure sinking you — it doesn't guarantee profit or remove risk. That trade-off is the point.",
+            incorrect: "It protects against a single failure sinking you, it doesn't guarantee profit or remove risk. That trade-off is the point.",
           },
         },
       },
@@ -666,7 +666,7 @@ const lesson3Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Don't Put All Your Eggs in One Basket",
     content:
-      "<p>Diversification means spreading your investments across different assets so one bad investment can't wipe you out.</p><p>A diversified portfolio might look like: 30% SA shares (a JSE ETF), 30% global shares (e.g. an S&P 500 ETF), 20% bonds, 10% property (a REIT), 10% cash. The point isn't to maximise your best case — it's to make sure no single failure can ruin you.</p>",
+      "<p>Diversification means spreading your investments across different assets so one bad investment can't wipe you out.</p><p>A diversified portfolio might look like: 30% SA shares (a JSE ETF), 30% global shares (e.g. an S&P 500 ETF), 20% bonds, 10% property (a REIT), 10% cash. The point isn't to maximise your best case. It's to make sure no single failure can ruin you.</p>",
   },
   { slot: "investing-basics/lesson-3/mining-not-diverse" },
   { slot: "investing-basics/lesson-3/what-is" },
@@ -689,7 +689,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "You need funds in 11 months for school fees. Which stance fits best?",
           options: [
-            "Emphasise capital you can access without severe loss — controlled risk",
+            "Emphasise capital you can access without severe loss",
             "Put 100% in speculative trades because 'markets always bounce back'",
             "Borrow the full amount on a microloan",
             "Keep it all as cash under a mattress",
@@ -697,7 +697,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. A fixed, near deadline needs stability. A crash just before the fees are due could leave you short with no time to recover.",
-            incorrect: "Short needs deserve predictable access and controlled risk — not hype trades or a microloan. Match the tool to the months, not the story.",
+            incorrect: "Short needs deserve predictable access and controlled risk, not hype trades or a microloan. Match the tool to the months, not the story.",
           },
         },
       },
@@ -727,7 +727,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. Under two years, there's little time to recover from a dip, so protecting the amount beats reaching for returns.",
-            incorrect: "It's true — short timelines favour stability. There's no time to ride out a crash, so capital protection comes first.",
+            incorrect: "It's true. Short timelines favour stability. There's no time to ride out a crash, so capital protection comes first.",
           },
         },
       },
@@ -744,8 +744,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "If you might need every rand next year, investments that swing wildly month to month are usually a poor fit.",
           correct: true,
           feedback: {
-            correct: "True. Volatility plus a fixed near deadline is a classic mismatch — you could be forced to sell low exactly when you need the cash.",
-            incorrect: "It's true — near-term money needs steadier choices. Wild swings and a fixed deadline can force you to sell at the worst moment.",
+            correct: "True. Volatility plus a fixed near deadline is a classic mismatch. You could be forced to sell low exactly when you need the cash.",
+            incorrect: "It's true. Near-term money needs steadier choices. Wild swings and a fixed deadline can force you to sell at the worst moment.",
           },
         },
       },
@@ -762,8 +762,8 @@ const lesson4Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A dip at the wrong moment, with a deadline looming, means selling at a loss just before a rebound — the timeline mismatch trap.",
-            incorrect: "The danger is being forced to sell during a dip because your deadline arrives — locking in a loss right before a recovery.",
+            correct: "Right. A dip at the wrong moment, with a deadline looming, means selling at a loss just before a rebound, the timeline mismatch trap.",
+            incorrect: "The danger is being forced to sell during a dip because your deadline arrives, locking in a loss right before a recovery.",
           },
         },
       },
@@ -773,7 +773,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo puts his rent money for next month into shares 'to grow it a bit'. Why is that risky?",
           options: [
-            "If shares drop this month, he might not have his rent — wrong tool for a one-month need",
+            "If shares drop this month, he might not have his rent. Wrong tool for a one-month need",
             "Shares always rise in a month",
             "It's a perfectly safe plan",
             "Rent money grows fastest in shares",
@@ -804,7 +804,7 @@ const lesson4Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Longer timelines absorb dips far better — provided behaviour stays steady. Time is the cushion that makes volatility tolerable.",
+            correct: "Right. Longer timelines absorb dips far better. Provided behaviour stays steady. Time is the cushion that makes volatility tolerable.",
             incorrect: "The 20-year friend. A long horizon can ride out crashes; a 4-year goal has much less room to recover.",
           },
         },
@@ -816,8 +816,8 @@ const lesson4Slots: QuestionSlot[] = [
           statement: "A longer horizon lets you tolerate more short-term ups and downs, as long as you don't panic-sell.",
           correct: true,
           feedback: {
-            correct: "True. Time only helps if you stay invested. The mistake isn't the dip — it's selling into it and missing the recovery.",
-            incorrect: "It's true — but the catch is behaviour. A long horizon absorbs volatility only if you hold through the dips instead of panic-selling.",
+            correct: "True. Time only helps if you stay invested. The mistake isn't the dip. It's selling into it and missing the recovery.",
+            incorrect: "It's true, but the catch is behaviour. A long horizon absorbs volatility only if you hold through the dips instead of panic-selling.",
           },
         },
       },
@@ -830,7 +830,7 @@ const lesson4Slots: QuestionSlot[] = [
             "Panic-selling and locking in the loss instead of waiting for recovery",
             "The market never recovering, guaranteed",
             "Being charged tax on the dip",
-            "Nothing — crashes don't matter long-term",
+            "Nothing. Crashes don't matter long-term",
           ],
           correct: 0,
           feedback: {
@@ -871,7 +871,7 @@ const lesson4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. A 1-year goal, a 5-year goal and a 30-year goal each deserve different risk. Labelling the date stops you mismatching them.",
-            incorrect: "It's true — assigning a date to each goal lets you match the risk to the timeline, instead of treating all your money the same.",
+            incorrect: "It's true: assigning a date to each goal lets you match the risk to the timeline, instead of treating all your money the same.",
           },
         },
       },
@@ -881,15 +881,15 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa's goal that was 6 years away is now only 18 months away. What should she reconsider?",
           options: [
-            "Dialling down risk, since there's now little time to recover from a dip",
+            "Dialling down risk",
             "Taking more risk to catch up",
-            "Nothing — the plan never changes",
+            "Nothing, the plan never changes",
             "Moving it all into one hot share",
           ],
           correct: 0,
           feedback: {
             correct: "Right. As a goal gets closer, its horizon shortens, so it makes sense to move toward stability and protect what she's built.",
-            incorrect: "As the date nears, she should reduce risk, not increase it — there's little time left to recover from a bad patch.",
+            incorrect: "As the date nears, she should reduce risk, not increase it. There's little time left to recover from a bad patch.",
           },
         },
       },
@@ -902,7 +902,7 @@ const lesson4Layout: LessonLayoutItem[] = [
     type: "info",
     title: "When Do You Need the Money?",
     content:
-      "<p>Anele saved R40 000 in a notice account for a car deposit nine months away. Her colleague put the same amount in volatile single shares for the same goal. When prices dipped 18%, only one of them could still buy the car without delay.</p><p>Time horizon is the gap between today and when you must spend the money. Under two years usually favours stability; five years or more can carry more growth assets — if you won't panic-sell. Mixing up timelines is how people sell low right before prices recover.</p>",
+      "<p>Anele saved R40 000 in a notice account for a car deposit nine months away. Her colleague put the same amount in volatile single shares for the same goal. When prices dipped 18%, only one of them could still buy the car without delay.</p><p>Time horizon is the gap between today and when you must spend the money. Under two years usually favours stability; five years or more can carry more growth assets, if you won't panic-sell. Mixing up timelines is how people sell low right before prices recover.</p>",
   },
   { slot: "investing-basics/lesson-4/short-need" },
   { slot: "investing-basics/lesson-4/volatile-mismatch" },
@@ -926,8 +926,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Owning one share means you own a small part of that company.",
           correct: true,
           feedback: {
-            correct: "True. A share is part-ownership (equity) in the business, usually with voting and dividend rights — not a loan to the company.",
-            incorrect: "It's true — a share is a slice of ownership in the company, not a loan. That's the difference between shares (equity) and bonds (debt).",
+            correct: "True. A share is part-ownership (equity) in the business, usually with voting and dividend rights, not a loan to the company.",
+            incorrect: "It's true. A share is a slice of ownership in the company, not a loan. That's the difference between shares (equity) and bonds (debt).",
           },
         },
       },
@@ -945,7 +945,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. You own a slice of the company. If it grows and pays dividends, you can gain; if it struggles, your slice can lose value.",
-            incorrect: "You're buying part-ownership of the company. That's equity — different from lending (bonds) or saving (a deposit).",
+            incorrect: "You're buying part-ownership of the company. That's equity, different from lending (bonds) or saving (a deposit).",
           },
         },
       },
@@ -981,8 +981,8 @@ const lesson5Slots: QuestionSlot[] = [
           options: ["Dividend", "PAYE refund", "Debit order", "UIF payout"],
           correct: 0,
           feedback: {
-            correct: "Right. A dividend is a share of profits paid to owners when the board declares one — a reward for holding the shares.",
-            incorrect: "It's a dividend — profits shared with owners. It's not a tax refund, a bank charge or a UIF benefit.",
+            correct: "Right. A dividend is a share of profits paid to owners when the board declares one: a reward for holding the shares.",
+            incorrect: "It's a dividend. Profits shared with owners. It's not a tax refund, a bank charge or a UIF benefit.",
           },
         },
       },
@@ -993,8 +993,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "Dividends are only paid when a company's board decides to declare them.",
           correct: true,
           feedback: {
-            correct: "True. Dividends aren't guaranteed — a company can cut or skip them, for example to reinvest or during hard times.",
-            incorrect: "It's true — dividends depend on the board's decision. They can be reduced or skipped, so they're not a fixed, guaranteed income.",
+            correct: "True. Dividends aren't guaranteed. A company can cut or skip them, for example to reinvest or during hard times.",
+            incorrect: "It's true. Dividends depend on the board's decision. They can be reduced or skipped, so they're not a fixed, guaranteed income.",
           },
         },
       },
@@ -1028,14 +1028,14 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why might a diversified equity ETF be easier for a beginner than picking three individual shares?",
           options: [
-            "It spreads your money across many companies, so one bad firm barely hurts you",
+            "It spreads your money across many companies",
             "ETFs always pay higher returns every year",
             "ETFs never fall in price",
             "SARS forbids buying individual shares",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A broad ETF dilutes company-specific risk across dozens or hundreds of holdings — it doesn't guarantee profit, but one bad pick won't sink you.",
+            correct: "Right. A broad ETF dilutes company-specific risk across dozens or hundreds of holdings, it doesn't guarantee profit, but one bad pick won't sink you.",
             incorrect: "The benefit is spreading risk across many companies. ETFs still rise and fall; they just don't hang on any single firm's fate.",
           },
         },
@@ -1048,7 +1048,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. One ETF can hold dozens or hundreds of companies, giving instant diversification without picking each share yourself.",
-            incorrect: "It's true — a single ETF bundles many companies together, which is exactly why it's a simple way to diversify.",
+            incorrect: "It's true, a single ETF bundles many companies together, which is exactly why it's a simple way to diversify.",
           },
         },
       },
@@ -1058,7 +1058,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Before buying an ETF, Lerato checks its factsheet. Which detail matters most for her long-term returns?",
           options: [
-            "The fee (total expense ratio) — high fees quietly eat returns over decades",
+            "The fee (total expense ratio)",
             "The colour of the logo",
             "Whether a friend mentioned it",
             "The provider's advert",
@@ -1083,8 +1083,8 @@ const lesson5Slots: QuestionSlot[] = [
           statement: "If a share you own loses value because the business struggled, that's normal market behaviour, not necessarily fraud.",
           correct: true,
           feedback: {
-            correct: "True. Share prices rise and fall with a company's fortunes. A loss can be ordinary risk — different from a scam, which promises what markets can't.",
-            incorrect: "It's true — shares can fall when a business struggles. That's normal risk, not fraud. Scams are the ones promising guaranteed, risk-free returns.",
+            correct: "True. Share prices rise and fall with a company's fortunes. A loss can be ordinary risk, different from a scam, which promises what markets can't.",
+            incorrect: "It's true. Shares can fall when a business struggles. That's normal risk, not fraud. Scams are the ones promising guaranteed, risk-free returns.",
           },
         },
       },
@@ -1102,7 +1102,7 @@ const lesson5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Shares are volatile in the short term but have historically grown over the long term. Expecting a smooth ride sets you up to panic.",
-            incorrect: "Expect ups and downs. Shares grow over the long run, not smoothly — and no good company is immune to price falls.",
+            incorrect: "Expect ups and downs. Shares grow over the long run, not smoothly, and no good company is immune to price falls.",
           },
         },
       },
@@ -1112,7 +1112,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo's ETF drops 15% in a bad month and he wants to sell everything. For a long-term investor, what's usually wiser?",
           options: [
-            "Hold through the dip, since selling locks in the loss",
+            "Hold through the dip",
             "Sell immediately to avoid more loss",
             "Buy a single hot share instead",
             "Never invest again",
@@ -1133,7 +1133,7 @@ const lesson5Layout: LessonLayoutItem[] = [
     type: "info",
     title: "A Small Slice of a Company",
     content:
-      "<p>When you buy a share on the JSE, you buy part-ownership of a listed company. If it grows profits and pays dividends, you can earn from both a rising price and the payouts. If the business struggles, your slice can lose value — that's normal market behaviour, not necessarily fraud.</p><p>Many beginners start with broad ETFs holding dozens or hundreds of companies, so one bad decision at one firm doesn't dominate the outcome. Outside a TFSA you still pay tax, so wrapping long-term equity ETFs inside your annual TFSA limit can make sense when the rules allow.</p>",
+      "<p>When you buy a share on the JSE, you buy part-ownership of a listed company. If it grows profits and pays dividends, you can earn from both a rising price and the payouts. If the business struggles, your slice can lose value. That's normal market behaviour, not necessarily fraud.</p><p>Many beginners start with broad ETFs holding dozens or hundreds of companies, so one bad decision at one firm doesn't dominate the outcome. Outside a TFSA you still pay tax, so wrapping long-term equity ETFs inside your annual TFSA limit can make sense when the rules allow.</p>",
   },
   { slot: "investing-basics/lesson-5/own-slice" },
   { slot: "investing-basics/lesson-5/dividend" },
@@ -1176,7 +1176,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "True. That's the core difference: bonds are loans that pay interest; shares are ownership that can pay dividends and grow.",
-            incorrect: "It's true — bonds = lending (debt), shares = owning (equity). It's the fundamental distinction between the two.",
+            incorrect: "It's true, bonds = lending (debt), shares = owning (equity). It's the fundamental distinction between the two.",
           },
         },
       },
@@ -1193,7 +1193,7 @@ const lesson6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. You get scheduled interest and, at the end of the term, your original amount back — assuming the issuer can pay.",
+            correct: "Right. You get scheduled interest and, at the end of the term, your original amount back. Assuming the issuer can pay.",
             incorrect: "A bond promises interest plus return of your principal at maturity. It's a loan contract, not profit-sharing or a guarantee to beat inflation.",
           },
         },
@@ -1211,8 +1211,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "When interest rates rise sharply, the prices of many existing bonds tend to fall.",
           correct: true,
           feedback: {
-            correct: "True. New bonds pay the higher rate, so older bonds paying less become less attractive — buyers will only take them at a lower price.",
-            incorrect: "It's true — when rates rise, older lower-rate bonds look worse, so their prices drop. Rate moves and bond prices pull in opposite directions.",
+            correct: "True. New bonds pay the higher rate, so older bonds paying less become less attractive. Buyers will only take them at a lower price.",
+            incorrect: "It's true. When rates rise, older lower-rate bonds look worse, so their prices drop. Rate moves and bond prices pull in opposite directions.",
           },
         },
       },
@@ -1222,14 +1222,14 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why do existing bond prices fall when interest rates rise?",
           options: [
-            "New bonds pay more, so older lower-rate bonds are worth less to buyers",
+            "New bonds pay more",
             "Because bonds are scams",
             "Because the Reserve Bank confiscates them",
-            "They don't — bond prices never move",
+            "They don't. Bond prices never move",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. If new bonds offer a better rate, nobody pays full price for your older, lower-paying one — so its market price drops.",
+            correct: "Right. If new bonds offer a better rate, nobody pays full price for your older, lower-paying one, so its market price drops.",
             incorrect: "It's supply and demand: higher new rates make older, lower-rate bonds less attractive, so their prices fall to compensate.",
           },
         },
@@ -1241,7 +1241,7 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "Bonds are completely risk-free investments.",
           correct: false,
           feedback: {
-            correct: "Correct. Bonds are calmer than shares but not risk-free — the issuer can struggle to pay, and prices move when interest rates change.",
+            correct: "Correct. Bonds are calmer than shares but not risk-free. The issuer can struggle to pay, and prices move when interest rates change.",
             incorrect: "They aren't risk-free. An issuer can default, and bond prices fall when rates rise. Calmer than shares, but not zero risk.",
           },
         },
@@ -1265,7 +1265,7 @@ const lesson6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Bonds tend to be calmer than shares, so they cushion a portfolio in downturns — the trade-off is usually lower growth over decades.",
+            correct: "Right. Bonds tend to be calmer than shares, so they cushion a portfolio in downturns. The trade-off is usually lower growth over decades.",
             incorrect: "Bonds add stability, cushioning share falls, typically in exchange for lower long-term returns. They don't beat shares or remove risk.",
           },
         },
@@ -1277,8 +1277,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "Over long periods, bonds usually deliver lower returns than shares but with a calmer ride.",
           correct: true,
           feedback: {
-            correct: "True. That calmness is the point — bonds trade some growth for stability, which is why many portfolios blend both.",
-            incorrect: "It's true — bonds generally grow less than shares over decades, but move less violently. Many investors hold both for balance.",
+            correct: "True. That calmness is the point: bonds trade some growth for stability, which is why many portfolios blend both.",
+            incorrect: "It's true. Bonds generally grow less than shares over decades, but move less violently. Many investors hold both for balance.",
           },
         },
       },
@@ -1295,8 +1295,8 @@ const lesson6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Balanced funds exist exactly for moderate timelines and temperaments — a professionally-set mix of shares and bonds.",
-            incorrect: "A balanced/multi-asset fund fits her goal — a set mix of shares and bonds. Chat-app schemes and cash-under-the-bed don't.",
+            correct: "Right. Balanced funds exist exactly for moderate timelines and temperaments, a professionally-set mix of shares and bonds.",
+            incorrect: "A balanced/multi-asset fund fits her goal, a set mix of shares and bonds. Chat-app schemes and cash-under-the-bed don't.",
           },
         },
       },
@@ -1319,7 +1319,7 @@ const lesson6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Rather than buying individual bond certificates, most retail investors use bond funds, ETFs, or fixed products — simpler and diversified.",
+            correct: "Right. Rather than buying individual bond certificates, most retail investors use bond funds, ETFs, or fixed products: simpler and diversified.",
             incorrect: "Most people use unit trusts, bond ETFs or bank fixed products, not individual certificates. It's the practical, diversified route.",
           },
         },
@@ -1331,8 +1331,8 @@ const lesson6Slots: QuestionSlot[] = [
           statement: "Comparing a bond fund's yield with a high-interest savings rate is a reasonable thing to do before choosing.",
           correct: true,
           feedback: {
-            correct: "True. Compare the numbers, how long each is fixed for, and any early-withdrawal penalties — that's how you judge which suits your goal.",
-            incorrect: "It's true — comparing yields, fixed terms and penalties across options is exactly how to choose sensibly between them.",
+            correct: "True. Compare the numbers, how long each is fixed for, and any early-withdrawal penalties. That's how you judge which suits your goal.",
+            incorrect: "It's true, comparing yields, fixed terms and penalties across options is exactly how to choose sensibly between them.",
           },
         },
       },
@@ -1342,7 +1342,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho wants to compare bond and savings options. Where should he get the numbers?",
           options: [
-            "Official provider sites or apps (licensed institutions), not screenshots from strangers",
+            "Official provider sites or apps , not screenshots from strangers",
             "Whatever a WhatsApp group forwards him",
             "A random social media tip",
             "He shouldn't compare at all",
@@ -1350,7 +1350,7 @@ const lesson6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Use licensed providers' own .co.za sites or apps for real rates and terms. Forwarded screenshots are how scams spread.",
-            incorrect: "Get numbers from official, licensed sources — not forwarded screenshots or social tips, which are prime scam territory.",
+            incorrect: "Get numbers from official, licensed sources, not forwarded screenshots or social tips, which are prime scam territory.",
           },
         },
       },
@@ -1363,7 +1363,7 @@ const lesson6Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Lending, Not Owning",
     content:
-      "<p>A government or company bond is a loan you give in return for interest and your principal back at maturity. Stable bonds can steady a portfolio when shares fall — but they're not risk-free if the issuer struggles or interest rates move sharply.</p><p>In SA, everyday investors usually access bonds through unit trusts, bond ETFs, or bank fixed products rather than buying individual certificates. Expected returns are usually lower than shares over decades, but the ride is calmer.</p>",
+      "<p>A government or company bond is a loan you give in return for interest and your principal back at maturity. Stable bonds can steady a portfolio when shares fall, but they're not risk-free if the issuer struggles or interest rates move sharply.</p><p>In SA, everyday investors usually access bonds through unit trusts, bond ETFs, or bank fixed products rather than buying individual certificates. Expected returns are usually lower than shares over decades, but the ride is calmer.</p>",
   },
   { slot: "investing-basics/lesson-6/lender" },
   { slot: "investing-basics/lesson-6/rates-and-prices" },

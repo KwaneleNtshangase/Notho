@@ -34,6 +34,15 @@ for anything that changes yearly. Every figure below was web-verified in **July
 | **Interest exemption** | **R23 800**/yr under 65; R34 500 65+ | Local interest only. |
 | **CGT (individuals)** | 40% inclusion; **R50 000** annual exclusion; **R3 000 000** primary-residence exclusion; ~18% effective max | Primary-residence exclusion rose to R3m for 2026/27. |
 | **Provisional tax** | Register if non-salary income > **R30 000**/yr | Two estimates a year (Aug, Feb). |
+| **SARB inflation target** | **3% point target, ±1 percentage point** tolerance band | **Changed** — replaced the old **3–6% range**. Announced by Treasury + SARB; Kganyago reaffirmed the 3% target in 2026. Do **not** write "between 3% and 6%" anywhere in content. |
+| **Single Discretionary Allowance (SDA)** | **R2 000 000** per calendar year, **no SARS clearance** | **Doubled from R1m in Budget 2026.** Adults 18+. Runs on the **calendar** year, not the tax year — unused allowance does not roll over. |
+| **Foreign Investment Allowance (FIA)** | **R10 000 000** per calendar year, **SARS approval required** | On top of the SDA → up to R12m a year combined. Buying a JSE-listed global (feeder) ETF uses **neither** allowance — no money leaves the country. |
+| **FATF grey list** | South Africa **EXITED on 24 October 2025** | Listed Feb 2023; all 22 action items completed by June 2025. Next Mutual Evaluation runs 2026–2027. Content must not describe SA as currently grey-listed. |
+| **SMME development finance** | **SEDFA** (Small Enterprise Development and Finance Agency) | **SEFA + SEDA + CBDA merged into SEDFA on 1 Oct 2024**; the old entities were dissolved in Dec 2024. Do not reference "SEFA" or "SEDA" as live agencies. The **NEF** is separate, with a B-BBEE mandate. |
+| **IRP5 source codes** | **3601** income · **4102** PAYE · **4001** retirement fund contributions · **4005** medical scheme fees | Verified against SARS/TaxTim. Earlier content incorrectly labelled **4001** as PAYE — it is not. |
+| **Living annuity drawdown** | Regulated band **2.5%–17.5%** a year | Investor bears investment and longevity risk. Remaining capital passes to nominated beneficiaries (it is **not** forfeited to the insurer). |
+| **Retirement fund death benefits** | Distributed by **trustees under s37C** of the Pension Funds Act | Your nomination form **guides but does not bind** the trustees, whose duty is to identify dependants. The benefit falls outside your estate. |
+| **Life policy & estate duty** | Domestic policies on the life of the deceased are **deemed property** (s3(3)(a) Estate Duty Act) | Nominating a beneficiary avoids **executor's fees and delays**, but **not** estate duty. A **spouse** beneficiary qualifies for the s4(q) deduction → no duty and no executor's fees. |
 
 ## Fixed in this accuracy pass (shown-to-user content)
 

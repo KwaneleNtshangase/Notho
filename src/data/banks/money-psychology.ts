@@ -46,7 +46,7 @@ const l1Slots: QuestionSlot[] = [
           statement: "Present bias makes future rewards feel more valuable than an immediate one.",
           correct: false,
           feedback: {
-            correct: "Correct — it's the reverse. Present bias inflates the value of what you can have right now.",
+            correct: "Correct. It's the reverse. Present bias inflates the value of what you can have right now.",
             incorrect: "It's the other way round: present bias overweights the immediate reward and discounts the future one.",
           },
         },
@@ -60,7 +60,7 @@ const l1Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Taking less now instead of more later, just for the immediacy, is present bias in action.",
-            incorrect: "That's present bias — overvaluing the reward you can get immediately over a bigger delayed one.",
+            incorrect: "That's present bias. Overvaluing the reward you can get immediately over a bigger delayed one.",
           },
         },
       },
@@ -78,7 +78,7 @@ const l1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. Automation makes the decision once and moves the money before you can spend it.",
-            incorrect: "It is — automation removes the daily temptation. The money leaves before present bias can act.",
+            incorrect: "It is. Automation removes the daily temptation. The money leaves before present bias can act.",
           },
         },
       },
@@ -95,7 +95,7 @@ const l1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Systems beat willpower — set the saving to happen automatically and it survives a weak moment.",
+            correct: "Right. Systems beat willpower. Set the saving to happen automatically and it survives a weak moment.",
             incorrect: "Willpower fades; automation doesn't. Making the choice once, up front, is what defeats present bias.",
           },
         },
@@ -106,7 +106,7 @@ const l1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thandi keeps meaning to save 'whatever's left' but never does. Best fix?",
           options: [
-            "Move savings automatically on payday, before spending",
+            "Move savings automatically on payday",
             "Try harder to resist each month",
             "Only save in months she feels motivated",
             "Wait for a bigger salary",
@@ -137,7 +137,7 @@ const l1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The invested difference compounds — small delays, repeated for years, become a large gap.",
+            correct: "Right. The invested difference compounds. Small delays, repeated for years, become a large gap.",
             incorrect: "The one who invests the difference tends to end up well ahead, because that money compounds over time.",
           },
         },
@@ -155,7 +155,7 @@ const l1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The advantage is compounding — money kept and invested grows on itself year after year.",
+            correct: "Right. The advantage is compounding. Money kept and invested grows on itself year after year.",
             incorrect: "It's compounding: delaying a purchase and investing that money lets it grow on itself over time.",
           },
         },
@@ -167,7 +167,7 @@ const l1Slots: QuestionSlot[] = [
           statement: "Present bias is a personal failing that disciplined people simply never experience.",
           correct: false,
           feedback: {
-            correct: "Correct. It's a universal wiring quirk — even disciplined people design systems to work around it, not through it.",
+            correct: "Correct. It's a universal wiring quirk. Even disciplined people design systems to work around it, not through it.",
             incorrect: "Everyone has present bias. The difference is that some people build systems (like automation) to outsmart it.",
           },
         },
@@ -191,7 +191,7 @@ const l1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. A small immediate treat wins over your future self — that's present bias steering the wheel.",
+            correct: "Right. A small immediate treat wins over your future self. That's present bias steering the wheel.",
             incorrect: "The others serve your future self. Trading a savings transfer for a forgettable treat is present bias at work.",
           },
         },
@@ -204,7 +204,7 @@ const l1Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. They hand you the reward immediately and push the cost into a future that feels far away.",
-            incorrect: "They do — the whole appeal is the reward now, pain later, which is exactly the lever present bias pulls.",
+            incorrect: "They do. The whole appeal is the reward now, pain later, which is exactly the lever present bias pulls.",
           },
         },
       },
@@ -221,7 +221,7 @@ const l1Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Reward now, cost later is the exact shape present bias falls for — so read the total price before agreeing.",
+            correct: "Right. Reward now, cost later is the exact shape present bias falls for, so read the total price before agreeing.",
             incorrect: "The draw is 'reward now, pay later', which present bias overvalues. It often costs more once you add it up.",
           },
         },
@@ -235,7 +235,7 @@ const l1Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Why You Choose R100 Now Over R150 Later",
     content:
-      "<p><strong>Present bias</strong> is the tendency to overvalue an immediate reward over a larger future one. It's why you know you should save but still spend. Economists call the underlying mechanism <em>hyperbolic discounting</em> — the future gets steeply 'discounted' the moment now is on the table.</p><p>The most powerful counter isn't more willpower — it's removing the in-the-moment decision. Automate the saving (a debit order on payday) so the money moves before you can spend it.</p>",
+      "<p><strong>Present bias</strong> is the tendency to overvalue an immediate reward over a larger future one. It's why you know you should save but still spend. Economists call the underlying mechanism <em>hyperbolic discounting</em>. The future gets steeply 'discounted' the moment now is on the table.</p><p>The most powerful counter isn't more willpower. It's removing the in-the-moment decision. Automate the saving (a debit order on payday) so the money moves before you can spend it.</p>",
   },
   { slot: "money-psychology/lesson-1/define" },
   { slot: "money-psychology/lesson-1/counter" },
@@ -266,7 +266,7 @@ const l2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. An initial 'anchor' number quietly reshapes how you judge every price after it.",
-            incorrect: "Anchoring is about a first number setting your reference point — the others describe different biases.",
+            incorrect: "Anchoring is about a first number setting your reference point: the others describe different biases.",
           },
         },
       },
@@ -277,7 +277,7 @@ const l2Slots: QuestionSlot[] = [
           statement: "A 'WAS R3 000, NOW R1 500' tag uses anchoring to make R1 500 feel cheap.",
           correct: true,
           feedback: {
-            correct: "Right. The R3 000 anchor makes R1 500 feel like a steal — even if the item's real value is far lower.",
+            correct: "Right. The R3 000 anchor makes R1 500 feel like a steal. Even if the item's real value is far lower.",
             incorrect: "It does. The crossed-out R3 000 is the anchor; it's there to make R1 500 look like a bargain.",
           },
         },
@@ -290,8 +290,8 @@ const l2Slots: QuestionSlot[] = [
           options: ["Anchoring", "Sunk cost fallacy", "Loss aversion", "Herd mentality"],
           correct: 0,
           feedback: {
-            correct: "Right. The R5 000 became your anchor, so R2 000 feels modest by comparison — regardless of true worth.",
-            incorrect: "That's anchoring — the first (high) price sets the reference that makes the next one seem reasonable.",
+            correct: "Right. The R5 000 became your anchor, so R2 000 feels modest by comparison, regardless of true worth.",
+            incorrect: "That's anchoring, the first (high) price sets the reference that makes the next one seem reasonable.",
           },
         },
       },
@@ -307,7 +307,7 @@ const l2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Your best defence against anchoring while shopping is to:",
           options: [
-            "Judge value by what the item is worth to you, not the 'original' price",
+            "Judge value by what the item is worth to you",
             "Always buy when there's a discount",
             "Compare everything to the highest price you saw",
             "Trust that a bigger discount means a better deal",
@@ -344,7 +344,7 @@ const l2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. First offers anchor negotiations — which is why coming in with your own researched number matters.",
+            correct: "Right. First offers anchor negotiations, which is why coming in with your own researched number matters.",
             incorrect: "The opening number is an anchor that drags the whole negotiation toward it. Counter it with your own figure.",
           },
         },
@@ -361,7 +361,7 @@ const l2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You paid R8 000 for concert tickets. The day before, you get sick and also get a better offer for that evening. What's the rational move?",
           options: [
-            "The R8 000 is gone — choose tonight's best option regardless",
+            "The R8 000 is gone. Choose tonight's best option regardless",
             "Attend anyway, since the money is already spent",
             "Attend briefly so the spend is partly justified",
             "Demand a refund on the basis of illness",
@@ -369,7 +369,7 @@ const l2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The R8 000 is spent either way. Only future costs and benefits should decide tonight.",
-            incorrect: "The R8 000 is a sunk cost — gone no matter what. Decide based on what's best for you now, not the past spend.",
+            incorrect: "The R8 000 is a sunk cost. Gone no matter what. Decide based on what's best for you now, not the past spend.",
           },
         },
       },
@@ -387,7 +387,7 @@ const l2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. It's letting unrecoverable past spending trap you into a decision that no longer makes sense.",
-            incorrect: "Sunk cost is about past, unrecoverable spending driving present choices — the others are different biases.",
+            incorrect: "Sunk cost is about past, unrecoverable spending driving present choices. The others are different biases.",
           },
         },
       },
@@ -399,7 +399,7 @@ const l2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. It's gone regardless of your next move, so only future costs and benefits should count.",
-            incorrect: "It should be ignored — you can't get it back, so it shouldn't sway a forward-looking decision.",
+            incorrect: "It should be ignored. You can't get it back, so it shouldn't sway a forward-looking decision.",
           },
         },
       },
@@ -415,7 +415,7 @@ const l2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You're 30% through a R15 000 course that turns out to be useless. What should decide whether you continue?",
           options: [
-            "The future value of continuing, not the R15 000 already gone",
+            "The future value of continuing",
             "Finishing it to 'get your money's worth'",
             "Continuing only to avoid admitting a mistake",
             "Whether stopping feels uncomfortable",
@@ -423,7 +423,7 @@ const l2Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The R15 000 is spent regardless. Continue only if the remaining benefit beats the remaining cost.",
-            incorrect: "The R15 000 is a sunk cost. Base the choice on future value — 'getting your money's worth' just adds to the loss.",
+            incorrect: "The R15 000 is a sunk cost. Base the choice on future value. 'getting your money's worth' just adds to the loss.",
           },
         },
       },
@@ -440,7 +440,7 @@ const l2Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. 'Too much invested to stop' is the classic trap — past spend can't be recovered by spending more.",
+            correct: "Right. 'Too much invested to stop' is the classic trap. Past spend can't be recovered by spending more.",
             incorrect: "The fallacy is throwing good money after bad because of what you've already spent. The others are rational choices.",
           },
         },
@@ -453,7 +453,7 @@ const l2Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. Stopping a bad path frees your money and time for something with a better future return.",
-            incorrect: "It usually is — continuing only to honour a sunk cost tends to deepen the loss, not recover it.",
+            incorrect: "It usually is. Continuing only to honour a sunk cost tends to deepen the loss, not recover it.",
           },
         },
       },
@@ -466,7 +466,7 @@ const l2Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Two Traps That Cost People Thousands",
     content:
-      "<p><strong>Anchoring:</strong> the first price you see reshapes how you judge every price after it. A R5 000 jacket makes a R2 000 one feel 'cheap' — even when R2 000 is still a lot.</p><p><strong>Sunk cost fallacy:</strong> continuing something because of money already spent, even when it no longer makes sense. 'I've paid for the gym, so I'll keep going even though I never do' — versus cancelling and stopping the future waste. Money that's already gone should never drive your next decision.</p>",
+      "<p><strong>Anchoring:</strong> the first price you see reshapes how you judge every price after it. A R5 000 jacket makes a R2 000 one feel 'cheap'. Even when R2 000 is still a lot.</p><p><strong>Sunk cost fallacy:</strong> continuing something because of money already spent, even when it no longer makes sense. 'I've paid for the gym, so I'll keep going even though I never do': versus cancelling and stopping the future waste. Money that's already gone should never drive your next decision.</p>",
   },
   { slot: "money-psychology/lesson-2/anchoring-define" },
   { slot: "money-psychology/lesson-2/anchoring-counter" },
@@ -496,7 +496,7 @@ const l3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The brain reads 'lots of people are doing it' as proof it's correct — often wrongly.",
+            correct: "Right. The brain reads 'lots of people are doing it' as proof it's correct, often wrongly.",
             incorrect: "Herding is moving with the crowd for its own sake. The others are deliberate, independent strategies.",
           },
         },
@@ -508,7 +508,7 @@ const l3Slots: QuestionSlot[] = [
           statement: "When 'everyone' is buying an asset, that's reliable proof its price is low.",
           correct: false,
           feedback: {
-            correct: "Correct. Mass buying usually comes after a big run-up — the crowd often arrives near the top, not the bottom.",
+            correct: "Correct. Mass buying usually comes after a big run-up. The crowd often arrives near the top, not the bottom.",
             incorrect: "It's not. By the time everyone's buying, the price has usually already risen a lot. Popularity isn't value.",
           },
         },
@@ -522,7 +522,7 @@ const l3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Fear of missing out is the emotional engine that pushes people into the herd.",
-            incorrect: "That's FOMO — the fear of missing out that fuels herd buying. It's an emotion, not an analysis.",
+            incorrect: "That's FOMO, the fear of missing out that fuels herd buying. It's an emotion, not an analysis.",
           },
         },
       },
@@ -545,7 +545,7 @@ const l3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. If you can't explain how it generates a return, you're guessing — not investing.",
+            correct: "Right. If you can't explain how it generates a return, you're guessing, not investing.",
             incorrect: "The only sound basis is understanding the asset. Buyer counts and others' gains tell you nothing about value.",
           },
         },
@@ -558,7 +558,7 @@ const l3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. A cooling-off delay strips out the urgency that herd behaviour and scams depend on.",
-            incorrect: "It's a good rule — a deliberate wait defuses FOMO and gives you time to check the thing out properly.",
+            incorrect: "It's a good rule. A deliberate wait defuses FOMO and gives you time to check the thing out properly.",
           },
         },
       },
@@ -593,7 +593,7 @@ const l3Slots: QuestionSlot[] = [
           statement: "Mass buying often happens after a price has already risen a lot, not at the bottom.",
           correct: true,
           feedback: {
-            correct: "Right. Hype spreads once something has already run — which is exactly when early buyers tend to sell.",
+            correct: "Right. Hype spreads once something has already run, which is exactly when early buyers tend to sell.",
             incorrect: "It does. The crowd usually piles in late, near the top, after the big move has already happened.",
           },
         },
@@ -611,8 +611,8 @@ const l3Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Late-arriving demand is often what early buyers sell into — leaving the herd holding the drop.",
-            incorrect: "The specific risk is buying near the top as insiders exit — not a guaranteed loss, but a poor entry point.",
+            correct: "Right. Late-arriving demand is often what early buyers sell into. Leaving the herd holding the drop.",
+            incorrect: "The specific risk is buying near the top as insiders exit, not a guaranteed loss, but a poor entry point.",
           },
         },
       },
@@ -630,7 +630,7 @@ const l3Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. You'd be buying later and higher. Their entry has nothing to do with whether yours makes sense.",
-            incorrect: "Past gains for them say nothing about your entry now — often higher and later. Judge the asset, not their story.",
+            incorrect: "Past gains for them say nothing about your entry now: often higher and later. Judge the asset, not their story.",
           },
         },
       },
@@ -646,15 +646,15 @@ const l3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How do scammers weaponise FOMO?",
           options: [
-            "They manufacture urgency ('limited spots, act now') to stop you thinking",
+            "They manufacture urgency to stop you thinking",
             "They give you unlimited time to decide",
             "They carefully explain every risk",
             "They discourage you from recruiting others",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Urgency is the pressure lever — it exists to bypass the part of you that would check first.",
-            incorrect: "The tell is manufactured urgency. Slowing you down is the last thing a scam wants — it wants you to rush.",
+            correct: "Right. Urgency is the pressure lever. It exists to bypass the part of you that would check first.",
+            incorrect: "The tell is manufactured urgency. Slowing you down is the last thing a scam wants, it wants you to rush.",
           },
         },
       },
@@ -666,7 +666,7 @@ const l3Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. Real opportunities survive a 48-hour pause. Pressure to act now is a reason to check harder.",
-            incorrect: "They are red flags — legitimate opportunities don't evaporate if you take a day to verify them.",
+            incorrect: "They are red flags. Legitimate opportunities don't evaporate if you take a day to verify them.",
           },
         },
       },
@@ -676,15 +676,15 @@ const l3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "An 'investment group' says spots close tonight and friends are joining fast. Best response?",
           options: [
-            "Slow down and verify it independently — urgency is the pressure tactic",
+            "Slow down and verify it independently. Urgency is the pressure tactic",
             "Join before it closes so you don't miss out",
             "Ask how much others put in and match it",
             "Recruit others to get in with you",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. 'Closes tonight' plus social pressure is the classic setup — verify first, and let the deadline pass if needed.",
-            incorrect: "The deadline and the crowd are the trap. Step back and verify — a real opportunity won't punish you for checking.",
+            correct: "Right. 'Closes tonight' plus social pressure is the classic setup. Verify first, and let the deadline pass if needed.",
+            incorrect: "The deadline and the crowd are the trap. Step back and verify, a real opportunity won't punish you for checking.",
           },
         },
       },
@@ -697,7 +697,7 @@ const l3Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Why Everyone Else Buying Makes You Want to Buy",
     content:
-      "<p><strong>Herd mentality</strong> is the pull to do what everyone else is doing — our brains read a moving crowd as proof the direction is right. <strong>FOMO</strong> (fear of missing out) is its emotional engine.</p><p>The problem: the crowd usually arrives late, after prices have already run, and buys just as early holders sell. Protect yourself with three questions — do I understand what I'm buying? Would I buy it if no one was talking about it? Can I explain how it makes a return? — and a rule to wait 48 hours before acting.</p>",
+      "<p><strong>Herd mentality</strong> is the pull to do what everyone else is doing. Our brains read a moving crowd as proof the direction is right. <strong>FOMO</strong> (fear of missing out) is its emotional engine.</p><p>The problem: the crowd usually arrives late, after prices have already run, and buys just as early holders sell. Protect yourself with three questions. Do I understand what I'm buying? Would I buy it if no one was talking about it? Can I explain how it makes a return?, and a rule to wait 48 hours before acting.</p>",
   },
   { slot: "money-psychology/lesson-3/define" },
   { slot: "money-psychology/lesson-3/independent" },
@@ -740,7 +740,7 @@ const l4Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. That asymmetry is why a R1 000 loss stings far more than a R1 000 gain delights.",
-            incorrect: "They did — the pain of a loss lands at roughly twice the intensity of an equivalent gain.",
+            incorrect: "They did. The pain of a loss lands at roughly twice the intensity of an equivalent gain.",
           },
         },
       },
@@ -752,8 +752,8 @@ const l4Slots: QuestionSlot[] = [
           options: ["Loss aversion", "Present bias", "Anchoring", "Herd mentality"],
           correct: 0,
           feedback: {
-            correct: "Right. Equal amounts, unequal feelings — the loss hits harder. That's loss aversion.",
-            incorrect: "That's loss aversion — the same rand amount hurts more as a loss than it pleases as a gain.",
+            correct: "Right. Equal amounts, unequal feelings. The loss hits harder. That's loss aversion.",
+            incorrect: "That's loss aversion. The same rand amount hurts more as a loss than it pleases as a gain.",
           },
         },
       },
@@ -777,7 +777,7 @@ const l4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The urge to avoid 'locking in' the loss keeps people holding broken investments far too long.",
-            incorrect: "Loss aversion makes you hold, hoping to break even — even when the case for the investment is gone.",
+            incorrect: "Loss aversion makes you hold, hoping to break even: even when the case for the investment is gone.",
           },
         },
       },
@@ -794,7 +794,7 @@ const l4Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. If you wouldn't buy it now, holding it is just loss aversion — the past price is irrelevant.",
+            correct: "Right. If you wouldn't buy it now, holding it is just loss aversion. The past price is irrelevant.",
             incorrect: "The forward-looking question is whether you'd buy it today. What you paid and how much you've lost don't matter now.",
           },
         },
@@ -806,7 +806,7 @@ const l4Slots: QuestionSlot[] = [
           statement: "The price you originally paid should be the main factor in deciding whether to sell.",
           correct: false,
           feedback: {
-            correct: "Correct. Your purchase price is history — the decision should rest on future prospects, not what you paid.",
+            correct: "Correct. Your purchase price is history. The decision should rest on future prospects, not what you paid.",
             incorrect: "It shouldn't. Anchoring to your purchase price is the bias. Decide on future prospects, not past cost.",
           },
         },
@@ -831,7 +831,7 @@ const l4Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The pain gets so intense that people sell at the worst possible moment, locking in the loss.",
-            incorrect: "Loss aversion drives panic-selling at the bottom — the emotional pain overrides the long-term plan.",
+            incorrect: "Loss aversion drives panic-selling at the bottom, the emotional pain overrides the long-term plan.",
           },
         },
       },
@@ -842,7 +842,7 @@ const l4Slots: QuestionSlot[] = [
           statement: "Fear of losses can keep someone sitting in cash for years, quietly losing buying power to inflation.",
           correct: true,
           feedback: {
-            correct: "Right. Avoiding all risk isn't safe — inflation erodes idle cash every year it isn't growing.",
+            correct: "Right. Avoiding all risk isn't safe, inflation erodes idle cash every year it isn't growing.",
             incorrect: "It can. Dodging every loss by staying in cash guarantees a slow, real loss to inflation over time.",
           },
         },
@@ -877,7 +877,7 @@ const l4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The healthiest reframe against loss aversion is to:",
           options: [
-            "Judge investments on future prospects, not the price you paid",
+            "Judge investments on future prospects",
             "Never sell anything, ever",
             "Avoid investing altogether",
             "Follow your gut in the moment",
@@ -896,8 +896,8 @@ const l4Slots: QuestionSlot[] = [
           statement: "Your purchase price is irrelevant to an investment's future performance.",
           correct: true,
           feedback: {
-            correct: "Right. The market doesn't know or care what you paid — only future prospects drive future returns.",
-            incorrect: "It is irrelevant — future performance depends on the asset from here, not on the number you happened to pay.",
+            correct: "Right. The market doesn't know or care what you paid: only future prospects drive future returns.",
+            incorrect: "It is irrelevant. Future performance depends on the asset from here, not on the number you happened to pay.",
           },
         },
       },
@@ -914,8 +914,8 @@ const l4Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. 'I'd never buy it now but can't sell it' is loss aversion in a sentence — the analysis already says sell.",
-            incorrect: "If you wouldn't buy it today, holding only to avoid the loss is loss aversion — not a strategy.",
+            correct: "Right. 'I'd never buy it now but can't sell it' is loss aversion in a sentence. The analysis already says sell.",
+            incorrect: "If you wouldn't buy it today, holding only to avoid the loss is loss aversion, not a strategy.",
           },
         },
       },
@@ -928,7 +928,7 @@ const l4Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Why Losing Hurts Twice as Much as Winning Feels Good",
     content:
-      "<p>Daniel Kahneman and Amos Tversky showed that humans feel the pain of a loss roughly <strong>twice as intensely</strong> as the pleasure of an equal gain. Losing R1 000 hurts about twice as much as gaining R1 000 feels good.</p><p>That asymmetry quietly wrecks returns: people hold losing investments too long hoping to break even, panic-sell at market bottoms, or avoid investing at all. The rational response is to evaluate an investment on its future prospects — if you wouldn't buy it today, the price you paid shouldn't keep you in it.</p>",
+      "<p>Daniel Kahneman and Amos Tversky showed that humans feel the pain of a loss roughly <strong>twice as intensely</strong> as the pleasure of an equal gain. Losing R1 000 hurts about twice as much as gaining R1 000 feels good.</p><p>That asymmetry quietly wrecks returns: people hold losing investments too long hoping to break even, panic-sell at market bottoms, or avoid investing at all. The rational response is to evaluate an investment on its future prospects, if you wouldn't buy it today, the price you paid shouldn't keep you in it.</p>",
   },
   { slot: "money-psychology/lesson-4/define" },
   { slot: "money-psychology/lesson-4/holding-losers" },
@@ -958,7 +958,7 @@ const l5Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Earn more, spend more, save the same — so income goes up but wealth doesn't. (Note: that economy-wide version is price inflation, a different thing.)",
+            correct: "Right. Earn more, spend more, save the same, so income goes up but wealth doesn't. (Note: that economy-wide version is price inflation, a different thing.)",
             incorrect: "Lifestyle inflation is personal: spending climbs with income so you never get ahead. Economy-wide price rises are separate.",
           },
         },
@@ -970,7 +970,7 @@ const l5Slots: QuestionSlot[] = [
           statement: "Lifestyle inflation only happens to people who are bad with money.",
           correct: false,
           feedback: {
-            correct: "Correct. It's a near-universal human tendency — even financially literate people have to actively resist it.",
+            correct: "Correct. It's a near-universal human tendency. Even financially literate people have to actively resist it.",
             incorrect: "It affects almost everyone. It's not a character flaw; it's a default you have to consciously push against.",
           },
         },
@@ -984,7 +984,7 @@ const l5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. The whole R10k raise was absorbed by higher spending, so his savings didn't move.",
-            incorrect: "That's lifestyle inflation — the raise vanished into upgraded spending, leaving his savings flat.",
+            incorrect: "That's lifestyle inflation. The raise vanished into upgraded spending, leaving his savings flat.",
           },
         },
       },
@@ -1002,7 +1002,7 @@ const l5Slots: QuestionSlot[] = [
           prompt: "You get a R4 000/month raise and commit to saving half before upgrading anything. That's R____ more saved each month.",
           correct: 2000,
           feedback: {
-            correct: "Right: half of R4 000 is R2 000 saved every month — the rest you can enjoy guilt-free.",
+            correct: "Right: half of R4 000 is R2 000 saved every month. The rest you can enjoy guilt-free.",
             incorrect: "Half of a R4 000 raise is R2 000. Bank that first; the other R2 000 is yours to spend.",
           },
         },
@@ -1015,7 +1015,7 @@ const l5Slots: QuestionSlot[] = [
           options: [
             "Save at least half the increase before upgrading anything",
             "Upgrade your car first, then see what's left",
-            "Spend it all — you earned it",
+            "Spend it all, you earned it",
             "Wait and let the money sit in your account",
           ],
           correct: 0,
@@ -1033,7 +1033,7 @@ const l5Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. Capturing part of each increase is how a rising salary actually becomes a growing net worth.",
-            incorrect: "It does — banking part of each raise first is the mechanism that converts higher income into real wealth.",
+            incorrect: "It does. Banking part of each raise first is the mechanism that converts higher income into real wealth.",
           },
         },
       },
@@ -1069,7 +1069,7 @@ const l5Slots: QuestionSlot[] = [
           options: ["Lifestyle inflation", "Too low an income", "Bad luck", "High taxes"],
           correct: 0,
           feedback: {
-            correct: "Right. Her income is growing — it's the matching rise in spending that keeps her savings stuck.",
+            correct: "Right. Her income is growing. It's the matching rise in spending that keeps her savings stuck.",
             incorrect: "It's lifestyle inflation. The income is there; the spending grows to match it, so nothing is left to save.",
           },
         },
@@ -1081,7 +1081,7 @@ const l5Slots: QuestionSlot[] = [
           statement: "Earning more automatically means you'll build more wealth.",
           correct: false,
           feedback: {
-            correct: "Correct. Wealth comes from the gap between income and spending — if spending rises too, the gap never widens.",
+            correct: "Correct. Wealth comes from the gap between income and spending, if spending rises too, the gap never widens.",
             incorrect: "Not automatically. If spending climbs with income, a bigger salary can still leave you saving nothing.",
           },
         },
@@ -1106,7 +1106,7 @@ const l5Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. A one-off treat ends; a bigger monthly commitment follows you for years and is painful to unwind.",
-            incorrect: "The risk is that fixed costs commit you every month and are hard to undo — unlike a single one-off purchase.",
+            incorrect: "The risk is that fixed costs commit you every month and are hard to undo, unlike a single one-off purchase.",
           },
         },
       },
@@ -1117,7 +1117,7 @@ const l5Slots: QuestionSlot[] = [
           statement: "One-off treats usually do more long-term damage to wealth than permanently higher monthly commitments.",
           correct: false,
           feedback: {
-            correct: "Correct. It's the reverse — a recurring commitment compounds month after month, while a one-off is done.",
+            correct: "Correct. It's the reverse: a recurring commitment compounds month after month, while a one-off is done.",
             incorrect: "It's the other way round. Higher fixed monthly costs quietly drain wealth for years; a single treat doesn't.",
           },
         },
@@ -1128,7 +1128,7 @@ const l5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A raise arrives. Which choice best protects your future wealth?",
           options: [
-            "Bank half the raise, then consider small upgrades",
+            "Bank half the raise",
             "Finance a nicer car immediately",
             "Move to a much pricier flat",
             "Add several new subscriptions",
@@ -1149,7 +1149,7 @@ const l5Layout: LessonLayoutItem[] = [
     type: "info",
     title: "The Silent Wealth Destroyer",
     content:
-      "<p><strong>Lifestyle inflation</strong> is when every income increase is matched by a spending increase — you earn more but never build wealth. Sipho earns R20k and spends R19k; promoted to R30k, he upgrades the flat, car and subscriptions and now spends R29k — still saving just R1k.</p><p>The fix is a rule you set in advance: when a raise lands, save at least half of the increase before upgrading anything. Wealth lives in the gap between what you earn and what you spend — protect the gap.</p>",
+      "<p><strong>Lifestyle inflation</strong> is when every income increase is matched by a spending increase. You earn more but never build wealth. Sipho earns R20k and spends R19k; promoted to R30k, he upgrades the flat, car and subscriptions and now spends R29k. Still saving just R1k.</p><p>The fix is a rule you set in advance: when a raise lands, save at least half of the increase before upgrading anything. Wealth lives in the gap between what you earn and what you spend, protect the gap.</p>",
   },
   { slot: "money-psychology/lesson-5/define" },
   { slot: "money-psychology/lesson-5/fix" },
@@ -1173,7 +1173,7 @@ const l6Slots: QuestionSlot[] = [
           statement: "People who post luxury purchases and travel online are almost always in a strong financial position.",
           correct: false,
           feedback: {
-            correct: "Correct. Visible wealth and real wealth are weakly correlated — a lot of it is funded by debt, not savings.",
+            correct: "Correct. Visible wealth and real wealth are weakly correlated. A lot of it is funded by debt, not savings.",
             incorrect: "Not really. Displayed spending is often credit-funded. What people show reveals little about their actual finances.",
           },
         },
@@ -1184,7 +1184,7 @@ const l6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Someone's visible spending on social media tells you:",
           options: [
-            "Little about their real finances — it's often debt-funded",
+            "Little about their real finances. It's often debt-funded",
             "That they are definitely wealthy",
             "Their exact net worth",
             "A strategy you should copy",
@@ -1192,7 +1192,7 @@ const l6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. A feed is a highlight reel, not a balance sheet. The car may be on 72-month finance.",
-            incorrect: "It tells you very little — displays are often debt-funded. You're seeing a highlight reel, not their bank balance.",
+            incorrect: "It tells you very little. Displays are often debt-funded. You're seeing a highlight reel, not their bank balance.",
           },
         },
       },
@@ -1202,7 +1202,7 @@ const l6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "An influencer flaunts designer clothes and a new car every week. What's a realistic read?",
           options: [
-            "It may be free product, credit, or finance — not proof of wealth",
+            "It may be free product, credit, or finance, not proof of wealth",
             "They are clearly financially secure",
             "You should try to match their lifestyle",
             "They must have saved very carefully",
@@ -1264,7 +1264,7 @@ const l6Slots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Their car changes nothing about your plan. Your progress is measured against your goals, not their feed.",
-            incorrect: "The sound move is to return to your own goals. Matching their spending — or just gloating — helps nothing.",
+            incorrect: "The sound move is to return to your own goals. Matching their spending, or just gloating, helps nothing.",
           },
         },
       },
@@ -1287,7 +1287,7 @@ const l6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Remove the trigger and add a delay — the urge usually fades once the 72 hours pass.",
+            correct: "Right. Remove the trigger and add a delay, the urge usually fades once the 72 hours pass.",
             incorrect: "Muting triggers and adding a waiting period works. The other options feed the impulse rather than defusing it.",
           },
         },
@@ -1300,7 +1300,7 @@ const l6Slots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. If you still want it in 72 hours, it's probably real; most impulses simply evaporate.",
-            incorrect: "It helps a lot — a deliberate pause lets the impulse fade so only genuine wants survive.",
+            incorrect: "It helps a lot: a deliberate pause lets the impulse fade so only genuine wants survive.",
           },
         },
       },
@@ -1317,8 +1317,8 @@ const l6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. The wait breaks the impulse loop — and 'it'll sell out' is usually manufactured urgency.",
-            incorrect: "A 72-hour wait defuses the impulse. Buying now on urgency — or on credit — is how the loop keeps its grip.",
+            correct: "Right. The wait breaks the impulse loop, and 'it'll sell out' is usually manufactured urgency.",
+            incorrect: "A 72-hour wait defuses the impulse. Buying now on urgency, or on credit, is how the loop keeps its grip.",
           },
         },
       },
@@ -1341,7 +1341,7 @@ const l6Slots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. You inherit real, interest-bearing debt to copy a picture that might be debt too — a double trap.",
+            correct: "Right. You inherit real, interest-bearing debt to copy a picture that might be debt too, a double trap.",
             incorrect: "The danger is real debt taken on to mimic a display that may already be debt-funded. Nothing about that builds wealth.",
           },
         },
@@ -1353,7 +1353,7 @@ const l6Slots: QuestionSlot[] = [
           statement: "Financially secure people often live more modestly than their income would allow.",
           correct: true,
           feedback: {
-            correct: "Right. Quiet, below-your-means spending is a common feature of real financial security — it just isn't posted online.",
+            correct: "Right. Quiet, below-your-means spending is a common feature of real financial security, it just isn't posted online.",
             incorrect: "They often do. Real security tends to look modest, because the wealth is being kept and invested, not displayed.",
           },
         },
@@ -1364,14 +1364,14 @@ const l6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "To 'keep up', Andile finances a car matching his colleague's. Six months later he's stretched thin. The lesson?",
           options: [
-            "Visible consumption is a poor guide — spend against your own plan, not others' displays",
+            "Visible consumption is a poor guide. Spend against your own plan, not others' displays",
             "He should have bought the car sooner",
             "Social proof is a reliable financial signal",
             "Taking on the debt was harmless",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. He bought real debt to match an image. Your plan — not someone's feed — should set your spending.",
+            correct: "Right. He bought real debt to match an image. Your plan, not someone's feed, should set your spending.",
             incorrect: "The lesson is that displays are a poor guide. Andile took on real strain to copy an image; spend against your own plan.",
           },
         },
@@ -1385,7 +1385,7 @@ const l6Layout: LessonLayoutItem[] = [
     type: "info",
     title: "Instagram Shows the Highlight Reel, Not the Balance Sheet",
     content:
-      "<p>Social media supercharges an old trap: comparing your lifestyle to everyone else's — now thousands of curated personas at once. What you don't see is the debt behind the display. The luxury holiday may sit on a personal loan; the designer clothes may be gifted or on credit; the car may be on a 72-month finance deal eating 30% of their income.</p><p>Practical boundaries: mute accounts that trigger spending, use a 72-hour wait on non-essentials, and measure yourself against your own goals and net worth — the only comparison that means anything.</p>",
+      "<p>Social media supercharges an old trap: comparing your lifestyle to everyone else's: now thousands of curated personas at once. What you don't see is the debt behind the display. The luxury holiday may sit on a personal loan; the designer clothes may be gifted or on credit; the car may be on a 72-month finance deal eating 30% of their income.</p><p>Practical boundaries: mute accounts that trigger spending, use a 72-hour wait on non-essentials, and measure yourself against your own goals and net worth. The only comparison that means anything.</p>",
   },
   { slot: "money-psychology/lesson-6/highlight-reel" },
   { slot: "money-psychology/lesson-6/comparison-trap" },

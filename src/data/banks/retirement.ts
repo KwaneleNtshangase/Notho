@@ -62,7 +62,7 @@ const twoPotSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. A third is accessible (Savings Pot); two-thirds is locked away for retirement.",
-            incorrect: "It's 1/3 Savings, 2/3 Retirement — a third you can reach in emergencies, two-thirds preserved for retirement.",
+            incorrect: "It's 1/3 Savings, 2/3 Retirement. A third you can reach in emergencies, two-thirds preserved for retirement.",
           },
         },
       },
@@ -79,7 +79,7 @@ const twoPotSlots: QuestionSlot[] = [
           statement: "You can withdraw from your Savings Pot every month if you need to.",
           correct: false,
           feedback: {
-            correct: "Correct. It's once per tax year, with a R2 000 minimum — it was built as an emergency provision, not a monthly account.",
+            correct: "Correct. It's once per tax year, with a R2 000 minimum. It was built as an emergency provision, not a monthly account.",
             incorrect: "It's once per tax year (minimum R2 000), not monthly. The Savings Pot is for genuine emergencies.",
           },
         },
@@ -90,15 +90,15 @@ const twoPotSlots: QuestionSlot[] = [
           type: "mcq",
           question: "How often can you access the Savings Pot before retirement?",
           options: [
-            "Once per tax year (minimum R2 000)",
+            "Once per tax year",
             "Once a month",
-            "Never — it's fully locked",
+            "Never. It's fully locked",
             "Whenever you like, unlimited",
           ],
           correct: 0,
           feedback: {
             correct: "Right. One withdrawal per tax year, R2 000 minimum. Frequent dipping isn't allowed by design.",
-            incorrect: "It's one withdrawal per tax year, minimum R2 000 — deliberately limited so it stays an emergency buffer.",
+            incorrect: "It's one withdrawal per tax year, minimum R2 000. Deliberately limited so it stays an emergency buffer.",
           },
         },
       },
@@ -108,14 +108,14 @@ const twoPotSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Lindi already took a Savings Pot withdrawal this tax year and wants another before the year ends. Can she?",
           options: [
-            "No — only one Savings Pot withdrawal per tax year is allowed",
+            "No. Only one Savings Pot withdrawal per tax year is allowed",
             "Yes, she can withdraw monthly",
             "Yes, there's no limit",
             "Only if her employer signs off",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. One per tax year is the rule — she'd have to wait for the new tax year.",
+            correct: "Right. One per tax year is the rule. She'd have to wait for the new tax year.",
             incorrect: "The Savings Pot allows just one withdrawal per tax year. Lindi has used hers; the next chance is next tax year.",
           },
         },
@@ -134,7 +134,7 @@ const twoPotSlots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. It's added to your taxable income for the year and taxed at your marginal rate (18-45%).",
-            incorrect: "It is taxed — the withdrawal is added to your income and taxed at your marginal rate, so early access costs you.",
+            incorrect: "It is taxed. The withdrawal is added to your income and taxed at your marginal rate, so early access costs you.",
           },
         },
       },
@@ -144,15 +144,15 @@ const twoPotSlots: QuestionSlot[] = [
           type: "mcq",
           question: "You earn R420 000/year and withdraw R50 000 from your Savings Pot. For tax, SARS treats the R50 000 as:",
           options: [
-            "Extra income — added on top and taxed at your marginal rate",
+            "Extra income, added on top and taxed at your marginal rate",
             "Tax-free emergency money",
             "Taxed at a flat 5%",
             "Never taxed, since it's your own money",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. It's added to your R420 000, so you're taxed as if you earned R470 000 — often R15 000-R18 000 more tax.",
-            incorrect: "It's added to your income and taxed at your marginal rate — pushing your taxable income to R470 000 that year.",
+            correct: "Right. It's added to your R420 000, so you're taxed as if you earned R470 000, often R15 000-R18 000 more tax.",
+            incorrect: "It's added to your income and taxed at your marginal rate: pushing your taxable income to R470 000 that year.",
           },
         },
       },
@@ -194,7 +194,7 @@ const twoPotSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. Most people used to cash out everything on resignation. Two-pot protects the bulk while allowing emergency access.",
-            incorrect: "It exists to preserve retirement savings — previously 90%+ cashed out entirely when changing jobs, arriving at retirement with nothing.",
+            incorrect: "It exists to preserve retirement savings, previously 90%+ cashed out entirely when changing jobs, arriving at retirement with nothing.",
           },
         },
       },
@@ -205,7 +205,7 @@ const twoPotSlots: QuestionSlot[] = [
           statement: "You can access your Retirement Pot (the 2/3) any time before retirement if you resign.",
           correct: false,
           feedback: {
-            correct: "Correct. The Retirement Pot is locked until retirement — that's the whole point. Only the Savings Pot is accessible early.",
+            correct: "Correct. The Retirement Pot is locked until retirement. That's the whole point. Only the Savings Pot is accessible early.",
             incorrect: "The Retirement Pot stays locked until retirement, even if you resign. Only the Savings Pot can be reached early.",
           },
         },
@@ -216,15 +216,15 @@ const twoPotSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Before September 2024, most people cashed out their entire pension when switching jobs. How does the two-pot system change that?",
           options: [
-            "The Retirement Pot stays locked, so you can't raid it all — only the Savings Pot is reachable",
-            "Nothing changes — you can still cash out everything",
+            "The Retirement Pot stays locked",
+            "Nothing changes. You can still cash out everything",
             "It lets you cash out even more, even faster",
             "It removes retirement saving altogether",
           ],
           correct: 0,
           feedback: {
             correct: "Right. Locking the two-thirds is what protects your future self from a job-change cash-out.",
-            incorrect: "Two-pot locks the Retirement Pot (2/3), so a resignation can no longer drain your whole pension — only the Savings Pot is accessible.",
+            incorrect: "Two-pot locks the Retirement Pot (2/3), so a resignation can no longer drain your whole pension. Only the Savings Pot is accessible.",
           },
         },
       },
@@ -237,7 +237,7 @@ const twoPotLayout: LessonLayoutItem[] = [
     type: "info",
     title: "The Biggest Retirement Change in 30 Years",
     content:
-      "<p>From 1 September 2024, every rand you contribute to a pension, provident, or retirement annuity fund is split into two pots — affecting roughly 7 million formal employees.</p><p><strong>Savings Pot (1/3):</strong> one withdrawal per tax year (minimum R2 000), taxed as income — an emergency provision only. <strong>Retirement Pot (2/3):</strong> locked until retirement, no exceptions. <strong>Vested Pot:</strong> everything saved before 1 Sep 2024, under the old rules.</p>",
+      "<p>From 1 September 2024, every rand you contribute to a pension, provident, or retirement annuity fund is split into two pots, affecting roughly 7 million formal employees.</p><p><strong>Savings Pot (1/3):</strong> one withdrawal per tax year (minimum R2 000), taxed as income: an emergency provision only. <strong>Retirement Pot (2/3):</strong> locked until retirement, no exceptions. <strong>Vested Pot:</strong> everything saved before 1 Sep 2024, under the old rules.</p>",
   },
   { slot: "retirement/two-pot-basics/the-split" },
   { slot: "retirement/two-pot-basics/savings-access" },
@@ -259,10 +259,10 @@ const howMuchSlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Planners typically target retirement income of roughly what share of your final salary?",
-          options: ["70-80%", "100%", "40%", "120%"],
+          options: ["70", "100%", "40%", "120%"],
           correct: 0,
           feedback: {
-            correct: "Right. The 'replacement ratio' is about 70-80% — you usually need less than your full salary in retirement.",
+            correct: "Right. The 'replacement ratio' is about 70-80%. You usually need less than your full salary in retirement.",
             incorrect: "It's about 70-80% of your final salary. You need less than 100% because saving stops and work costs drop.",
           },
         },
@@ -274,8 +274,8 @@ const howMuchSlots: QuestionSlot[] = [
           statement: "You typically need less than your full working salary once you retire.",
           correct: true,
           feedback: {
-            correct: "Right. No more retirement contributions, lower work costs, often less tax — hence the 70-80% target.",
-            incorrect: "You usually need less — around 70-80%. Saving stops, commuting and work costs fall, and tax is often lower.",
+            correct: "Right. No more retirement contributions, lower work costs, often less tax, hence the 70-80% target.",
+            incorrect: "You usually need less. Around 70-80%. Saving stops, commuting and work costs fall, and tax is often lower.",
           },
         },
       },
@@ -285,14 +285,14 @@ const howMuchSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Earning R60 000/month now, roughly what monthly income do planners suggest targeting for retirement?",
           options: [
-            "About R42 000-R48 000 (70-80% of R60 000)",
+            "About R42 000-R48 000",
             "About R60 000 (your full salary)",
             "About R20 000",
             "About R72 000 (more than now)",
           ],
           correct: 0,
           feedback: {
-            correct: "Right. 70-80% of R60 000 is R42 000-R48 000 — the replacement-ratio target.",
+            correct: "Right. 70-80% of R60 000 is R42 000-R48 000, the replacement-ratio target.",
             incorrect: "Aim for about 70-80% of your salary: R42 000-R48 000/month. You generally need less in retirement, not more.",
           },
         },
@@ -361,7 +361,7 @@ const howMuchSlots: QuestionSlot[] = [
           options: ["15% of income", "5% of income", "2% of income", "40% of income"],
           correct: 0,
           feedback: {
-            correct: "Right. Around 15% total from the start — often 7.5% employee + 7.5% employer in a pension fund.",
+            correct: "Right. Around 15% total from the start: often 7.5% employee + 7.5% employer in a pension fund.",
             incorrect: "It's roughly 15% of income from your first job. Start after 35 and you'll need more like 20-25%.",
           },
         },
@@ -373,7 +373,7 @@ const howMuchSlots: QuestionSlot[] = [
           statement: "The later you start saving for retirement, the higher your contribution rate needs to be to catch up.",
           correct: true,
           feedback: {
-            correct: "Right. Less time to compound means a bigger slice of income — 15% at 25 can become 25%+ starting at 40.",
+            correct: "Right. Less time to compound means a bigger slice of income. 15% at 25 can become 25%+ starting at 40.",
             incorrect: "It does rise. Starting later leaves less time to compound, so you must contribute a larger share to catch up.",
           },
         },
@@ -387,7 +387,7 @@ const howMuchSlots: QuestionSlot[] = [
           correct: 0,
           feedback: {
             correct: "Right. 7.5% + 7.5% = 15%, which hits the rule-of-thumb target if you start early.",
-            incorrect: "7.5% + 7.5% = 15% — which is exactly the comfortable-retirement target when you begin at your first job.",
+            incorrect: "7.5% + 7.5% = 15%, which is exactly the comfortable-retirement target when you begin at your first job.",
           },
         },
       },
@@ -405,7 +405,7 @@ const howMuchSlots: QuestionSlot[] = [
           correct: true,
           feedback: {
             correct: "Right. Fifteen extra years of compounding usually outweighs doubling the contribution rate later. Time is the biggest lever.",
-            incorrect: "Starting at 25 with 15% typically wins — the 15-year compounding head start beats a doubled rate that starts at 40.",
+            incorrect: "Starting at 25 with 15% typically wins. The 15-year compounding head start beats a doubled rate that starts at 40.",
           },
         },
       },
@@ -422,7 +422,7 @@ const howMuchSlots: QuestionSlot[] = [
           ],
           correct: 0,
           feedback: {
-            correct: "Right. Compounding rewards time in the market — early contributions grow on themselves for decades.",
+            correct: "Right. Compounding rewards time in the market. Early contributions grow on themselves for decades.",
             incorrect: "It's compounding: early money has more years to grow on itself, which beats a bigger contribution started later.",
           },
         },
@@ -433,7 +433,7 @@ const howMuchSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Themba saves R1 000/month from age 25; Sipho saves the same R1 000/month but from age 35. At 65, who has more?",
           options: [
-            "Themba, by a wide margin — ten more years of compounding",
+            "Themba, by a wide margin, ten more years of compounding",
             "Sipho, because he earns more later",
             "They end up the same",
             "It's impossible to say",
@@ -454,7 +454,7 @@ const howMuchLayout: LessonLayoutItem[] = [
     type: "info",
     title: "The Replacement Ratio and the 4% Rule",
     content:
-      "<p><strong>Replacement ratio:</strong> planners target about 70-80% of your final salary as retirement income — you need less than your full salary once saving stops and work costs fall.</p><p><strong>The 4% rule:</strong> you can sustainably draw about 4% of your portfolio a year, so capital needed = annual income ÷ 0.04. Need R30 000/month (R360 000/year)? That's R9 million. The other lever is time: starting early lets compounding do the heavy lifting.</p>",
+      "<p><strong>Replacement ratio:</strong> planners target about 70-80% of your final salary as retirement income. You need less than your full salary once saving stops and work costs fall.</p><p><strong>The 4% rule:</strong> you can sustainably draw about 4% of your portfolio a year, so capital needed = annual income ÷ 0.04. Need R30 000/month (R360 000/year)? That's R9 million. The other lever is time: starting early lets compounding do the heavy lifting.</p>",
   },
   { slot: "retirement/how-much-retire/replacement-ratio" },
   { slot: "retirement/how-much-retire/four-percent" },
