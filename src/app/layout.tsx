@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { GlobalErrorListeners } from "@/components/GlobalErrorListeners";
 import { ErrorReportingInit } from "@/components/ErrorReportingInit";
 import { ServiceWorkerRegistration } from "@/lib/sw/ServiceWorkerRegistration";
 import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
@@ -78,6 +79,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ErrorBoundary>
+          {/*
+            Inside the boundary but above the app: catches uncaught throws and
+            unhandled promise rejections, which error boundaries do not see.
+            Renders nothing.
+          */}
+          <GlobalErrorListeners />
           <PostHogProvider>{children}</PostHogProvider>
           <ServiceWorkerRegistration />
           <ErrorReportingInit />
