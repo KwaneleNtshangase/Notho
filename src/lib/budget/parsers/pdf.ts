@@ -104,15 +104,27 @@ export async function parsePdfStatement(
   // document disposes.
   const hasRunningBalance = rows.filter((r) => r.balanceAfter !== undefined).length >= 3;
   let signWarning: string | undefined;
+
+  // Detect credit-card statements from the document text. SA banks (Discovery,
+  // Capitec, FNB, Absa, Nedbank) all print at least one of these phrases.
+  const isCreditCard = /credit\s*card|credit\s*limit|minimum\s*payment|available\s*credit|payment\s*due/i.test(fullText);
+
   if (hasRunningBalance) {
     const oriented = orientByBalanceChain(rows);
     const checked = verifySignsAgainstBalanceChain(
       oriented.rows,
-      generic.balances.openingBalance
+      generic.balances.openingBalance,
+      { isCreditCard }
     );
     rows = checked.rows;
     if (checked.corrected > 0) {
       signWarning = `${checked.corrected} row${checked.corrected === 1 ? "" : "s"} had their in/out direction corrected against the statement's own running balance.`;
+    } else if (checked.invertedMajority && isCreditCard) {
+      signWarning =
+        "This is a credit-card statement, where purchases increase the balance. Directions were read from the Debit/Credit columns.";
+    } else if (checked.invertedMajority) {
+      signWarning =
+        "Every row's direction is inverted relative to the running balance, but we found no credit-card markers in this statement. Review the in/out direction on each row before importing.";
     } else if (checked.unverified > checked.verified) {
       signWarning =
         "Most rows could not be checked against the running balance - review the in/out direction on each before importing.";

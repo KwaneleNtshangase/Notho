@@ -43,6 +43,9 @@
     { "y": 580, "items": [
       { "x": 170, "text": "Closing balance" },
       { "x": 505, "text": "R 10,799.99" }
+    ] },
+    { "y": 560, "items": [
+      { "x": 61, "text": "Credit Limit: R 25,000.00  Available Credit: R 14,200.01  Minimum Payment Due: R 250.00  Payment Due Date: 2026-07-05" }
     ] }
   ]
 }

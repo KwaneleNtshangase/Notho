@@ -127,18 +127,19 @@ export function orientByBalanceChain<T extends SignCheckRow>(rows: T[]): {
  */
 export function verifySignsAgainstBalanceChain<T extends SignCheckRow>(
   rows: T[],
-  openingBalance?: number
+  openingBalance?: number,
+  options?: { isCreditCard?: boolean }
 ): {
-  // The unverified branches below return `{ ...row, needsReview: true,
-  // uncertainAmount: true }`, so those flags are part of the contract and must
-  // be declared. Returning a bare `T[]` meant callers could not see the very
-  // flags this function exists to raise — the compiler rejected reading them
-  // even though they were there at runtime.
   rows: (T & { needsReview?: boolean; uncertainAmount?: boolean })[];
   corrected: number;
   unverified: number;
   verified: number;
+  /** True when the majority of checked rows have signs inverted relative to
+   *  the balance chain (credit-card convention or wrong column reading). */
+  invertedMajority: boolean;
 } {
+  const isCreditCard = options?.isCreditCard ?? false;
+
   // ── First pass: classify each row without mutating ──────────────────
   type Classification = "verified" | "inverted" | "unverified" | "skip";
   const classes: Classification[] = [];
@@ -171,11 +172,16 @@ export function verifySignsAgainstBalanceChain<T extends SignCheckRow>(
   const totalVerified = classes.filter((c) => c === "verified").length;
   const totalChecked = totalInverted + totalVerified + classes.filter((c) => c === "unverified").length;
 
-  // ── Credit-card detection ──────────────────────────────────────────
+  // ── Inverted-majority detection ────────────────────────────────────
   // If the audit would flip MOST or ALL checked rows, the balance convention
-  // is inverted (credit card: purchases increase the outstanding balance).
-  // In that case, the column reading is correct and the chain is wrong about
-  // the sign convention. Flag every row for review instead of flipping.
+  // is inverted relative to the column reading. Two possibilities:
+  //
+  // 1. Credit-card statement: purchases increase the outstanding balance, so
+  //    a purchase in the Debit column shows delta=+amount. The column reading
+  //    is correct; the chain convention is inverted. Treat as verified.
+  //
+  // 2. Unknown layout with wrong column assignment: genuinely ambiguous.
+  //    Flag for review — do not flip, do not verify.
   const invertedMajority = totalChecked > 0 && totalInverted > totalVerified;
 
   // ── Second pass: apply corrections ─────────────────────────────────
@@ -190,8 +196,16 @@ export function verifySignsAgainstBalanceChain<T extends SignCheckRow>(
       return row;
     }
     if (cls === "inverted") {
+      if (invertedMajority && isCreditCard) {
+        // Credit-card convention confirmed: the column reading is correct.
+        // The balance goes up on a purchase because it is outstanding debt,
+        // but the Debit column correctly says "money out". Verified.
+        verified += 1;
+        return row;
+      }
       if (invertedMajority) {
-        // Credit-card convention: do NOT flip, flag for review instead.
+        // Inverted but no credit-card evidence — genuinely ambiguous.
+        // Flag for review; do not flip.
         unverified += 1;
         return { ...row, needsReview: true, uncertainAmount: true };
       }
@@ -203,7 +217,7 @@ export function verifySignsAgainstBalanceChain<T extends SignCheckRow>(
     return { ...row, needsReview: true, uncertainAmount: true };
   });
 
-  return { rows: out, corrected, unverified, verified };
+  return { rows: out, corrected, unverified, verified, invertedMajority };
 }
 
 export function reconcileTransactions(

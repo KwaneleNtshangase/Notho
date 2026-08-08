@@ -71,25 +71,15 @@ function lines(rows: [number, string][][]) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// FINDING 1 — CRITICAL: Credit-card sign inversion
+// FINDING 1 — Credit-card sign convention (FIXED)
+//
+// On a credit card, purchases increase the outstanding balance. The audit
+// detects this as invertedMajority, and the document's credit-card markers
+// confirm the convention. Signs are left alone and verified — zero
+// needsReview flags.
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe("FINDING 1 — credit-card statements invert the balance convention", () => {
-  /**
-   * On a credit card, a purchase INCREASES the outstanding balance:
-   *   Opening 10 000 → Purchase R500 → Balance 10 500
-   *
-   * The parser reads "R 500.00" in the Debit column and correctly assigns -500
-   * (money out). But verifySignsAgainstBalanceChain sees:
-   *   delta = 10500 - 10000 = +500
-   *   amount = -500
-   *   |delta + amount| = 0 ≤ 1  →  INVERTED!  →  corrects to +500
-   *
-   * Every purchase becomes income. Every payment becomes spending.
-   * Reconciliation passes because the chain is internally consistent.
-   * No warning. This is the worst available outcome.
-   */
-
+describe("FINDING 1 — credit-card statement import", () => {
   async function parseCreditCardFixture() {
     const fixture = loadLayout("pdf-credit-card.layout.json");
     vi.spyOn(pdfText, "extractPdfText").mockResolvedValueOnce({
@@ -103,45 +93,69 @@ describe("FINDING 1 — credit-card statements invert the balance convention", (
     return result;
   }
 
-  it("should record a credit-card purchase as spending (negative), not income", async () => {
+  it("records a credit-card purchase as spending (negative)", async () => {
     const result = await parseCreditCardFixture();
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
-    // Woolworths is a purchase — it should be NEGATIVE (expense)
     const woolworths = result.transactions.find((t) =>
       /woolworths/i.test(t.description)
     );
     expect(woolworths).toBeDefined();
-    // BUG: the balance chain audit flips this to +500 (income)
     expect(woolworths!.amountZAR).toBeLessThan(0);
+    expect(woolworths!.amountZAR).toBeCloseTo(-500, 2);
   });
 
-  it("should record a credit-card payment as money in (positive), not spending", async () => {
+  it("records a credit-card payment as money in (positive)", async () => {
     const result = await parseCreditCardFixture();
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
-    // "Payment received" reduces the outstanding balance — it is income/money-in
     const payment = result.transactions.find((t) =>
       /payment received/i.test(t.description)
     );
     expect(payment).toBeDefined();
-    // BUG: the balance chain audit flips this to -200 (expense)
     expect(payment!.amountZAR).toBeGreaterThan(0);
+    expect(payment!.amountZAR).toBeCloseTo(200, 2);
   });
 
-  it("should NOT report a clean reconciliation when every sign was flipped", async () => {
+  it("produces zero needsReview rows on a credit-card statement", async () => {
     const result = await parseCreditCardFixture();
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
-    // If the audit flipped signs silently, reconciliation.ok will still be true
-    // because the chain is internally consistent. This test asserts that the
-    // system should AT MINIMUM warn or flag lowConfidence.
-    const allPositive = result.transactions.every((t) => t.amountZAR >= 0);
-    // A statement with only income and no spending should be suspicious
-    expect(allPositive).toBe(false);
+    const flagged = result.transactions.filter(
+      (t) => (t as { needsReview?: boolean }).needsReview
+    );
+    expect(flagged).toHaveLength(0);
+  });
+
+  it("still flags every row when inversion is detected but no credit-card markers exist", () => {
+    // Same balance chain as the credit-card fixture but with no "credit card",
+    // "credit limit" etc. in the text — genuinely ambiguous.
+    const rows = [
+      { amountZAR: -500, balanceAfter: 10500 },
+      { amountZAR: -150, balanceAfter: 10650 },
+      { amountZAR: 200, balanceAfter: 10450 },
+      { amountZAR: -349.99, balanceAfter: 10799.99 },
+    ];
+
+    // Without credit-card hint: all inverted rows are flagged, not flipped
+    const noCC = verifySignsAgainstBalanceChain(rows, 10000);
+    expect(noCC.invertedMajority).toBe(true);
+    expect(noCC.corrected).toBe(0);
+    expect(noCC.unverified).toBe(4);
+    expect(noCC.rows.every((r) => r.needsReview)).toBe(true);
+
+    // With credit-card hint: all inverted rows are verified, not flagged
+    const withCC = verifySignsAgainstBalanceChain(rows, 10000, { isCreditCard: true });
+    expect(withCC.invertedMajority).toBe(true);
+    expect(withCC.corrected).toBe(0);
+    expect(withCC.verified).toBe(4);
+    expect(withCC.rows.every((r) => !r.needsReview)).toBe(true);
+    // Signs are preserved — the column reading is trusted
+    expect(withCC.rows[0].amountZAR).toBe(-500);
+    expect(withCC.rows[2].amountZAR).toBe(200);
   });
 });
 
@@ -239,29 +253,15 @@ describe("FINDING 3 — 2-row statement gets no balance chain audit", () => {
     expect(result.transactions).toHaveLength(2);
   });
 
-  it("should flag low confidence or needsReview when only 2 rows are present", async () => {
+  it("flags lowConfidence when only 2 rows are present (no balance chain audit)", async () => {
     const result = await parseTwoRowFixture();
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
-    // With only 2 rows, no balance chain audit runs. The signs are entirely
-    // trusted from column geometry. If geometry were wrong, there is no
-    // safety net. The result should be flagged.
-    //
-    // BUG: reconciliation.ok could be true (opening + sum = closing checks
-    // out because column geometry happened to be correct HERE), but nothing
-    // protects against a layout where it isn't.
-    //
-    // At minimum, lowConfidence should be true OR each row should have
-    // needsReview when the audit could not run.
-    const unaudited = result.transactions.length < 3;
-    if (unaudited) {
-      // Either the result is low confidence or all rows are flagged
-      const allReviewed = result.transactions.every(
-        (t) => (t as { needsReview?: boolean }).needsReview
-      );
-      expect(result.lowConfidence || allReviewed).toBe(true);
-    }
+    // With only 2 rows, the balance chain audit cannot run (needs >= 3).
+    // The sign assignment from column geometry is untested, so the result
+    // must be lowConfidence.
+    expect(result.lowConfidence).toBe(true);
   });
 });
 
@@ -378,26 +378,15 @@ describe("FINDING 5 — findAmountTokens joins adjacent fields via space/comma",
    * Example: card number "12" and amount "345.00" join as "12 345.00"
    * which parses as 12345.00 — a 100× inflation.
    */
-  it("should not join a card number '12' and amount '345.00' into '12345.00'", () => {
-    // In the full text, these items would appear as "12 345.00"
+  it("joins '12 345.00' into 12345.00 — known ambiguity with SA space thousands separators", () => {
+    // SA banks use space as a thousands separator: "12 345.00" is a legitimate
+    // R12,345.00. But the same text can be a card number "12" next to "345.00".
+    // The regex cannot distinguish the two, so it joins them. This test pins
+    // that behaviour — if the regex changes, this test catches it.
     const tokens = findAmountTokens("12 345.00");
-    // BUG: This matches the thousands-separator pattern and parses as 12345.00
-    // The correct parse should be just 345.00, since "12" is not a thousands group
-    // (it's a separate field that happens to be adjacent).
-    //
-    // However, looking at the regex, "12 345.00" matches `\d{1,3}(?:[\s,]\d{3})*\.\d{2}`
-    // where "12" is the leading group and " 345" is a thousands group. This is
-    // indistinguishable from a real "12 345.00" amount with space thousands separator.
-    //
-    // This is a fundamental ambiguity in SA amount formatting.
     expect(tokens.length).toBeGreaterThanOrEqual(1);
-    // The question is whether 12345.00 is found or just 345.00
     const hasInflated = tokens.some((t) => Math.abs(t.value - 12345) < 0.01);
-    const hasCorrect = tokens.some((t) => Math.abs(t.value - 345) < 0.01);
-    // Document the behaviour: the regex DOES join them.
-    // This is accepted as a known limitation — SA banks legitimately use
-    // space thousands separators, so "12 345.00" IS ambiguous.
-    expect(hasInflated || hasCorrect).toBe(true);
+    expect(hasInflated).toBe(true);
   });
 
   it("should not join comma-separated fields: '12,345.00' is legitimate", () => {
