@@ -83,9 +83,9 @@ exports[`buildReport > fixed fixture snapshot 1`] = `
   "insights": {
     "actions": [
       {
-        "detail": "Moving money to savings first - before spending - is the habit that makes the rate stick. Your R17 500 surplus already covers it - it just needs a job.",
+        "detail": "Move money into savings the day you get paid, before you spend any of it. Doing it in that order is what makes it stick. You already have R17 500 left over each period, so the money is there - it just needs somewhere to go.",
         "id": "payday-setaside",
-        "impact": "~ R1 250/month lifts your rate from 10% to ~15% - about R15 000 extra set aside over 12 months",
+        "impact": "About R1 250 a month takes you from 10% to 15% - roughly R15 000 more saved over a year",
         "isTopPriority": true,
         "lesson": {
           "courseId": "emergency-fund",
@@ -95,9 +95,9 @@ exports[`buildReport > fixed fixture snapshot 1`] = `
         "title": "Set aside a fixed amount on payday",
       },
       {
-        "detail": "Food & Groceries is your biggest flexible spending category at R3 200 (42.7% of spending). One change here beats ten small ones elsewhere.",
+        "detail": "Food & Groceries is the biggest thing you can actually cut back on - R3 200, or 42.7% of your spending. One change here does more than ten small ones elsewhere.",
         "id": "trim-food",
-        "impact": "~ R320/month freed - enough to reach a ~11% set-aside rate",
+        "impact": "Frees up about R320 a month - enough to put away 11% of your income",
         "lesson": {
           "courseId": "money-basics",
           "lessonId": "lesson-2",
@@ -108,38 +108,38 @@ exports[`buildReport > fixed fixture snapshot 1`] = `
     ],
     "benchmarks": [
       {
-        "label": "Set-aside (savings) rate",
+        "label": "How much of your income you save",
         "target": "20%+ of income",
         "tone": "warn",
         "value": "10%",
       },
       {
-        "label": "Debt repayments",
+        "label": "How much goes to debt",
         "target": "below 35%",
         "tone": "good",
         "value": "0% of income",
       },
       {
-        "label": "Needs (essentials)",
-        "target": "~50% guideline",
+        "label": "Needs - things you must pay",
+        "target": "about 50%",
         "tone": "warn",
         "value": "67% of spending",
       },
       {
-        "label": "Wants (lifestyle)",
-        "target": "~30% guideline",
+        "label": "Wants - things you choose",
+        "target": "about 30%",
         "tone": "good",
         "value": "0% of spending",
       },
       {
-        "label": "Budget used (like-for-like)",
+        "label": "How much of your budget you used",
         "target": "100% or less",
         "tone": "good",
         "value": "91%",
       },
     ],
     "coachParagraphs": [
-      "Over 1–30 June 2026 you earned R25 000, spent R5 000 on day-to-day living and set aside R2 500 (10% of income) into savings vehicles like a stokvel or savings account - leaving you R17 500 ahead.",
+      "Over 1–30 June 2026 you earned R25 000, spent R5 000 on day-to-day living, and put R2 500 away into savings - a stokvel, a savings account or similar. That's 10% of your income, which left you R17 500 ahead.",
       "Your biggest day-to-day category was Food & Groceries at R3 200 (42.7% of all spending).",
     ],
     "dataQualityAlert": null,
@@ -147,37 +147,37 @@ exports[`buildReport > fixed fixture snapshot 1`] = `
     "healthCapNote": null,
     "healthComponents": [
       {
-        "label": "Cash flow",
+        "label": "Money in vs out",
         "max": 25,
-        "note": "Ended R17 500 ahead",
+        "note": "You finished R17 500 ahead",
         "score": 25,
         "tone": "good",
       },
       {
-        "label": "Savings habit",
+        "label": "Saving habit",
         "max": 25,
-        "note": "10% of income set aside (guideline: 20%)",
+        "note": "You put away 10% of your income (a good target is 20%)",
         "score": 14,
         "tone": "warn",
       },
       {
-        "label": "Debt load",
+        "label": "Debt payments",
         "max": 20,
-        "note": "No debt repayments recorded",
+        "note": "No debt payments recorded",
         "score": 20,
         "tone": "good",
       },
       {
-        "label": "Budget coverage",
+        "label": "Useful budget",
         "max": 15,
-        "note": "91% of budget used · budgets cover 100% of day-to-day spend",
+        "note": "You used 91% of your budget, and your budgets cover 100% of your day-to-day spending",
         "score": 15,
         "tone": "good",
       },
       {
-        "label": "Data quality",
+        "label": "Complete records",
         "max": 15,
-        "note": "0% of spending is unclassified",
+        "note": "0% of your spending hasn't been sorted into a category",
         "score": 15,
         "tone": "good",
       },
@@ -186,25 +186,25 @@ exports[`buildReport > fixed fixture snapshot 1`] = `
     "healthScoreRaw": 89,
     "highlights": [
       {
-        "text": "You ended the period R17 500 ahead.",
+        "text": "You ended this period R17 500 ahead.",
         "tone": "good",
       },
       {
-        "text": "You set aside 10% of income (R2 500); the common guideline is 20%.",
+        "text": "You put away 10% of your income (R2 500). Most people aim for 20%.",
         "tone": "warn",
       },
       {
-        "text": "Food & Groceries came in R800 under budget - well controlled.",
+        "text": "You spent R800 less than you planned on Food & Groceries - nicely controlled.",
         "tone": "good",
       },
     ],
     "risks": [
-      "Transport: R300 over budget (120% used).",
-      "100% of income comes from one source (Salary / Wages).",
+      "Transport: R300 over budget - you used 120% of it.",
+      "100% of your income comes from one place (Salary / Wages). If that stops, so does most of your money.",
     ],
-    "verdict": "A strong period - you finished R17 500 ahead and set aside 10% of income.",
+    "verdict": "A strong period. You finished R17 500 ahead and put away 10% of your income.",
     "wins": [
-      "Food & Groceries: R800 under budget (80% used).",
+      "Food & Groceries: R800 under budget - you used 80% of it.",
     ],
   },
   "largestTransactions": [

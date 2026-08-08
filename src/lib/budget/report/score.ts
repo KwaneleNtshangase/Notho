@@ -108,13 +108,13 @@ export function monthsSpanned(monthlySpend: Pick<MonthlySpend, "isPartial">[]): 
 function scoreCashFlow(input: ScoreInput): HealthComponent {
   const max = 25;
   if (input.totalIncomeCents <= 0) {
-    return { label: "Cash flow", score: 0, max, tone: "bad", note: "No income recorded this period" };
+    return { label: "Money in vs out", score: 0, max, tone: "bad", note: "No income was recorded this period" };
   }
   const ratio = input.netCents / input.totalIncomeCents;
   if (ratio >= 0.1)
-    return { label: "Cash flow", score: 25, max, tone: "good", note: `Ended ${rand(input.netCents)} ahead` };
+    return { label: "Money in vs out", score: 25, max, tone: "good", note: `You finished ${rand(input.netCents)} ahead` };
   if (ratio >= 0)
-    return { label: "Cash flow", score: 16, max, tone: "good", note: `Slightly ahead (${rand(input.netCents)})` };
+    return { label: "Money in vs out", score: 16, max, tone: "good", note: `You finished slightly ahead (${rand(input.netCents)})` };
 
   // A negative net does NOT always mean overspending. If day-to-day living
   // stayed inside income and the gap only appears after set-aside, the user
@@ -125,18 +125,18 @@ function scoreCashFlow(input: ScoreInput): HealthComponent {
   const afterLivingCents = input.totalIncomeCents - input.consumptionCents;
   const isAllocationGap = afterLivingCents >= 0;
   const note = isAllocationGap
-    ? `Living costs stayed within income - the ${rand(-input.netCents)} gap came from setting aside more than the surplus`
-    : `Spent ${rand(-input.netCents)} more than earned`;
+    ? `Your living costs stayed inside your income. The ${rand(-input.netCents)} gap is there because you put away more than you had left over`
+    : `You spent ${rand(-input.netCents)} more than you earned`;
 
   if (ratio >= -0.1)
-    return { label: "Cash flow", score: 6, max, tone: isAllocationGap ? "info" : "warn", note };
-  return { label: "Cash flow", score: 0, max, tone: isAllocationGap ? "warn" : "bad", note };
+    return { label: "Money in vs out", score: 6, max, tone: isAllocationGap ? "info" : "warn", note };
+  return { label: "Money in vs out", score: 0, max, tone: isAllocationGap ? "warn" : "bad", note };
 }
 
 function scoreSavingsHabit(input: ScoreInput): HealthComponent {
   const max = 25;
   const r = input.savingsRatePct;
-  const note = `${r}% of income set aside (guideline: ${GUIDELINES.savingsRatePct}%)`;
+  const note = `You put away ${r}% of your income (a good target is ${GUIDELINES.savingsRatePct}%)`;
   // You can't genuinely be credited for saving while you're spending more than
   // you earn - that money is coming from reserves or debt, not surplus. Cap the
   // score at half and flag it, rather than rewarding a possibly-borrowed habit.
@@ -148,21 +148,21 @@ function scoreSavingsHabit(input: ScoreInput): HealthComponent {
     // they had not overspent.
     const livedWithinIncome = input.totalIncomeCents - input.consumptionCents >= 0;
     return {
-      label: "Savings habit",
+      label: "Saving habit",
       score: capped,
       max,
       tone: "warn",
       note: livedWithinIncome
-        ? `${r}% set aside, but ${rand(-input.netCents)} of it came from reserves rather than this period's surplus - that part isn't newly saved`
-        : `${r}% set aside, but you ran a ${rand(-input.netCents)} deficit - saving on borrowed/reserve money doesn't fully count`,
+        ? `You put away ${r}%, but ${rand(-input.netCents)} of it came from savings you already had, not from new money this period`
+        : `You put away ${r}%, but you were ${rand(-input.netCents)} short overall - saving with borrowed money or old savings doesn't fully count`,
     };
   }
-  if (r >= 20) return { label: "Savings habit", score: 25, max, tone: "good", note };
-  if (r >= 15) return { label: "Savings habit", score: 19, max, tone: "good", note };
-  if (r >= 10) return { label: "Savings habit", score: 14, max, tone: "warn", note };
-  if (r >= 5) return { label: "Savings habit", score: 8, max, tone: "warn", note };
-  if (r > 0) return { label: "Savings habit", score: 4, max, tone: "bad", note };
-  return { label: "Savings habit", score: 0, max, tone: "bad", note: "Nothing set aside this period" };
+  if (r >= 20) return { label: "Saving habit", score: 25, max, tone: "good", note };
+  if (r >= 15) return { label: "Saving habit", score: 19, max, tone: "good", note };
+  if (r >= 10) return { label: "Saving habit", score: 14, max, tone: "warn", note };
+  if (r >= 5) return { label: "Saving habit", score: 8, max, tone: "warn", note };
+  if (r > 0) return { label: "Saving habit", score: 4, max, tone: "bad", note };
+  return { label: "Saving habit", score: 0, max, tone: "bad", note: "You didn't put anything away this period" };
 }
 
 function scoreDebtLoad(input: ScoreInput): HealthComponent {
@@ -173,37 +173,37 @@ function scoreDebtLoad(input: ScoreInput): HealthComponent {
     // Be honest: with lots of unclassified spend, "no debt" may just mean
     // "no debt we can see".
     return {
-      label: "Debt load",
+      label: "Debt payments",
       score: dirty ? 14 : 20,
       max,
       tone: dirty ? "warn" : "good",
       note: dirty
-        ? `No debt repayments visible - but ${input.dataQuality.unclassifiedExpenseSharePct}% of spending is unclassified`
-        : "No debt repayments recorded",
+        ? `We can't see any debt payments - but ${input.dataQuality.unclassifiedExpenseSharePct}% of your spending hasn't been sorted yet`
+        : "No debt payments recorded",
     };
   }
   if (input.totalIncomeCents <= 0)
-    return { label: "Debt load", score: 0, max, tone: "bad", note: "Debt repayments with no income recorded" };
+    return { label: "Debt payments", score: 0, max, tone: "bad", note: "You paid off debt but no income was recorded" };
   const share = debt / input.totalIncomeCents;
-  const note = `${Math.round(share * 100)}% of income to debt (guideline: below ${GUIDELINES.debtShareOfIncomePct}%)`;
+  const note = `${Math.round(share * 100)}% of your income goes to debt (try to keep this under ${GUIDELINES.debtShareOfIncomePct}%)`;
   if (share <= 0.15) {
     // A clean-looking debt share can't earn near-full marks while a big slice of
     // spending is unclassified - undetected debt could be hiding in "Other". Cap
     // it at half and mark it unverified so the score matches the inline caveat.
     if (dirty) {
       return {
-        label: "Debt load",
+        label: "Debt payments",
         score: 10,
         max,
         tone: "warn",
-        note: `Unverified - ${input.dataQuality.unclassifiedExpenseSharePct}% of spending is unclassified, so hidden debt can't be ruled out`,
+        note: `We can't be sure - ${input.dataQuality.unclassifiedExpenseSharePct}% of your spending hasn't been sorted, so there may be debt we can't see`,
       };
     }
-    return { label: "Debt load", score: 20, max, tone: "good", note };
+    return { label: "Debt payments", score: 20, max, tone: "good", note };
   }
-  if (share <= 0.35) return { label: "Debt load", score: 12, max, tone: "warn", note };
-  if (share <= 0.5) return { label: "Debt load", score: 5, max, tone: "bad", note };
-  return { label: "Debt load", score: 0, max, tone: "bad", note };
+  if (share <= 0.35) return { label: "Debt payments", score: 12, max, tone: "warn", note };
+  if (share <= 0.5) return { label: "Debt payments", score: 5, max, tone: "bad", note };
+  return { label: "Debt payments", score: 0, max, tone: "bad", note };
 }
 
 /** Budgets several times bigger than actual spend aren't real constraints. */
@@ -220,32 +220,32 @@ function hasMisalignedBudget(input: ScoreInput): boolean {
 function scoreBudgetDiscipline(input: ScoreInput): HealthComponent {
   const max = 15;
   if (input.dayToDayBudgetedCents <= 0) {
-    return { label: "Budget coverage", score: 4, max, tone: "warn", note: "No day-to-day budgets set yet" };
+    return { label: "Useful budget", score: 4, max, tone: "warn", note: "You haven't set any everyday budgets yet" };
   }
   const used = input.budgetUsedPct ?? 0;
   // Coverage matters as much as adherence: staying under budget on two small
   // categories while most spending runs unmanaged is not discipline.
   const covered = pctOf(input.budgetedActualCents, input.consumptionCents);
-  const note = `${used}% of budget used, but budgets only cover ${covered}% of day-to-day spend`;
-  const goodNote = `${used}% of budget used · budgets cover ${covered}% of day-to-day spend`;
+  const note = `You used ${used}% of your budget, but your budgets only cover ${covered}% of what you spend day to day`;
+  const goodNote = `You used ${used}% of your budget, and your budgets cover ${covered}% of your day-to-day spending`;
   if (hasMisalignedBudget(input))
-    return { label: "Budget coverage", score: 9, max, tone: "warn", note: `A budget is set several times bigger than actual spend, so coverage isn't a real constraint` };
+    return { label: "Useful budget", score: 9, max, tone: "warn", note: "One of your budgets is set far higher than you actually spend, so it can never warn you" };
   if (used <= 100 && covered >= 60)
-    return { label: "Budget coverage", score: 15, max, tone: "good", note: goodNote };
+    return { label: "Useful budget", score: 15, max, tone: "good", note: goodNote };
   if (used <= 100 && covered >= 30)
-    return { label: "Budget coverage", score: 9, max, tone: "warn", note };
-  if (used <= 115) return { label: "Budget coverage", score: 7, max, tone: "warn", note };
-  return { label: "Budget coverage", score: 3, max, tone: "bad", note };
+    return { label: "Useful budget", score: 9, max, tone: "warn", note };
+  if (used <= 115) return { label: "Useful budget", score: 7, max, tone: "warn", note };
+  return { label: "Useful budget", score: 3, max, tone: "bad", note };
 }
 
 function scoreDataQuality(input: ScoreInput): HealthComponent {
   const max = 15;
   const share = input.dataQuality.unclassifiedExpenseSharePct;
-  const note = `${share}% of spending is unclassified`;
-  if (share <= 10) return { label: "Data quality", score: 15, max, tone: "good", note };
-  if (share <= 25) return { label: "Data quality", score: 9, max, tone: "warn", note };
-  if (share <= 40) return { label: "Data quality", score: 5, max, tone: "bad", note };
-  return { label: "Data quality", score: 0, max, tone: "bad", note };
+  const note = `${share}% of your spending hasn't been sorted into a category`;
+  if (share <= 10) return { label: "Complete records", score: 15, max, tone: "good", note };
+  if (share <= 25) return { label: "Complete records", score: 9, max, tone: "warn", note };
+  if (share <= 40) return { label: "Complete records", score: 5, max, tone: "bad", note };
+  return { label: "Complete records", score: 0, max, tone: "bad", note };
 }
 
 // ─── Composite ────────────────────────────────────────────────────────────────

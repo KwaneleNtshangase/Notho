@@ -5,6 +5,7 @@ import {
   View,
   Text,
   Image,
+  Link,
   StyleSheet,
   Svg,
   Path,
@@ -45,21 +46,49 @@ const GROUP_META: Record<CategoryGroup, { label: string; color: string }> = {
   wants: { label: "Wants (lifestyle)", color: "#7C4DFF" },
   goals: { label: "Goals (savings & debt payoff)", color: "#00BFA5" },
   business: { label: "Business (side hustle)", color: "#E6B84C" },
-  unclassified: { label: "Unclassified", color: "#9E9E9E" },
+  unclassified: { label: "Not sorted yet", color: "#9E9E9E" },
 };
+
+/**
+ * Where the app lives on the web. Lesson references in the PDF have to be
+ * absolute - a reader opening this file in Preview or Acrobat has no notion of
+ * the app's routing - so they point at the same /lesson/:courseId/:lessonId
+ * route the in-app cards use (see CosmoCoachCard / InteractiveReportModal).
+ */
+const APP_BASE_URL = "https://www.notho.co.za";
+
+/** Deep link to a lesson, matching the in-app route exactly. */
+function lessonHref(lesson: { courseId: string; lessonId: string }): string {
+  return `${APP_BASE_URL}/lesson/${encodeURIComponent(lesson.courseId)}/${encodeURIComponent(lesson.lessonId)}`;
+}
 
 /**
  * Cover contents strip. Page numbers are structural - the document below is a
  * fixed sequence of five <Page> blocks - so keep this in step if a page is
  * added or removed.
+ *
+ * `anchor` is the named PDF destination the entry jumps to. Each one must match
+ * an `id` on a <SectionAnchor> at the top of the corresponding page; react-pdf
+ * turns `<Link src="#name">` into a goTo action and `id` into a named
+ * destination, which is what makes these entries clickable rather than
+ * decorative.
  */
-const COVER_CONTENTS: { page: string; title: string; blurb: string }[] = [
-  { page: "2", title: "What Cosmo noticed", blurb: "The story, your wins and risks, next moves" },
-  { page: "3", title: "Monthly performance", blurb: "Budget vs actual and the trend over time" },
-  { page: "4", title: "Where the money went", blurb: "Needs, wants & goals vs the guidelines" },
-  { page: "5", title: "Every category", blurb: "Full spend and set-aside tables" },
-  { page: "6", title: "Income & transactions", blurb: "Sources, commitments, top merchants" },
+const COVER_CONTENTS: { page: string; anchor: string; title: string; blurb: string }[] = [
+  { page: "2", anchor: "cosmo", title: "What Cosmo noticed", blurb: "Your story, your wins and risks, what to do next" },
+  { page: "3", anchor: "monthly", title: "Monthly performance", blurb: "What you planned vs what you spent, month by month" },
+  { page: "4", anchor: "where", title: "Where the money went", blurb: "Needs, wants and goals - and how that compares" },
+  { page: "5", anchor: "categories", title: "Every category", blurb: "The full lists, spending and savings" },
+  { page: "6", anchor: "income", title: "Income & transactions", blurb: "Where money came from and who you paid" },
 ];
+
+/**
+ * Zero-height marker that registers a named destination at the top of a page.
+ * It has to sit in normal flow (not `fixed`) so it picks up a real box - the
+ * renderer reads `box.top` when it writes the destination.
+ */
+function SectionAnchor({ id }: { id: string }) {
+  return <View id={id} style={{ height: 0 }} />;
+}
 
 function toneColor(tone: InsightTone): string {
   switch (tone) {
@@ -609,7 +638,10 @@ function HealthScoreCard({ model }: { model: ReportModel }) {
       {healthComponents.map((c) => (
         <View key={c.label} style={{ flexDirection: "row", alignItems: "center", marginBottom: 3 }}>
           <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: toneColor(c.tone), marginRight: 5 }} />
-          <Text style={{ fontSize: 7.5, color: C.white, width: 108 }}>
+          {/* 124pt fits the longest plain-English label plus its score on one
+              line at 7.5pt. Anything narrower wraps and knocks the note out of
+              alignment down the whole column. */}
+          <Text style={{ fontSize: 7.5, color: C.white, width: 124 }}>
             {c.label} {c.score}/{c.max}
           </Text>
           <Text style={{ fontSize: 7, color: C.onNavyMuted, flex: 1 }}>{c.note}</Text>
@@ -665,10 +697,10 @@ function ExpenseTable({
           with its header stranded at the foot of a page. */}
       <View style={styles.tableHeader} minPresenceAhead={80}>
         <Text style={{ width: "24%" }}>Category</Text>
-        <Text style={{ width: "15%", textAlign: "right" }}>Budgeted</Text>
-        <Text style={{ width: "15%", textAlign: "right" }}>Actual</Text>
-        <Text style={{ width: "16%", textAlign: "right" }}>Variance</Text>
-        <Text style={{ width: "11%", textAlign: "right" }}>Var %</Text>
+        <Text style={{ width: "15%", textAlign: "right" }}>You planned</Text>
+        <Text style={{ width: "15%", textAlign: "right" }}>You spent</Text>
+        <Text style={{ width: "16%", textAlign: "right" }}>Difference</Text>
+        <Text style={{ width: "11%", textAlign: "right" }}>Budget used</Text>
         <Text style={{ width: "19%", textAlign: "right" }}>Share</Text>
       </View>
       {rows.map((r, idx) => (
@@ -882,7 +914,7 @@ export function BudgetReportDocument({
     if (topGroup === "unclassified") {
       return {
         tone: "bad",
-        text: `The biggest slice (${topGroupPct}%) is unclassified - until it's categorised, this chart can't tell you where that money really went.`,
+        text: `Your biggest slice (${topGroupPct}%) hasn't been sorted into a category yet. Until you sort it, this chart can't show you where that money really went.`,
       };
     }
     if (topGroup === "business") {
@@ -940,7 +972,7 @@ export function BudgetReportDocument({
         label: "Poor",
         color: C.expense,
         tone: "bad" as InsightTone,
-        note: `This budget isn't doing any work: you used only ${used}% of it, so nothing you spent could ever have been flagged. Set limits near what you actually spend and the variances start meaning something.`,
+        note: `This budget isn't doing any work: you used only ${used}% of it, so nothing you spent could ever have been flagged. Set your limits close to what you really spend, and going over will start to mean something.`,
       };
     }
     if (used > 300) {
@@ -948,7 +980,7 @@ export function BudgetReportDocument({
         label: "Poor",
         color: C.expense,
         tone: "bad" as InsightTone,
-        note: `Spending ran ${(used / 100).toFixed(1)}x the plan. Limits this far below reality flag everything, which is the same as flagging nothing - rebuild them from what you actually spend.`,
+        note: `You spent ${(used / 100).toFixed(1)} times your plan. Limits set this far below real life warn you about everything, which is the same as warning you about nothing - rebuild them from what you actually spend.`,
       };
     }
     if (used > 110) {
@@ -956,7 +988,7 @@ export function BudgetReportDocument({
         label: "Fair",
         color: C.goldSoft,
         tone: "warn" as InsightTone,
-        note: `You went past plan by ${used - 100}%. The limits are roughly the right shape but set a little tighter than you can hold.`,
+        note: `You went ${used - 100}% past your plan. The limits are about right, just a little tighter than you can hold.`,
       };
     }
     if (coverage < 60) {
@@ -966,14 +998,14 @@ export function BudgetReportDocument({
         tone: "warn" as InsightTone,
         note: coverageExplainedBelow
           ? ""
-          : `Limits are realistic where they exist, but they only cover ${coverage}% of your day-to-day spending - the rest runs unwatched.`,
+          : `Your limits are realistic where you've set them, but they only cover ${coverage}% of your day-to-day spending - the rest goes unwatched.`,
       };
     }
     return {
       label: "Good",
       color: C.teal,
       tone: "good" as InsightTone,
-      note: `Spending tracked plan closely (${used}% used across ${coverage}% of day-to-day spending), so these variances are a real signal.`,
+      note: `Your spending stayed close to your plan (${used}% of budget used, covering ${coverage}% of day-to-day spending), so when a number here moves, it means something.`,
     };
   })();
 
@@ -1050,7 +1082,7 @@ export function BudgetReportDocument({
               <Text style={styles.statLabel}>Set aside (savings & stokvel)</Text>
               <Text style={[styles.statValue, { color: C.gold }]}>{zar(model.setAsideCents)}</Text>
               <Text style={styles.statDelta}>
-                <Text style={{ color: C.onNavyMuted }}>{model.savingsRatePct}% of income · guideline 20%</Text>
+                <Text style={{ color: C.onNavyMuted }}>{model.savingsRatePct}% of your income · 20% is a good target</Text>
               </Text>
             </View>
             {(() => {
@@ -1105,18 +1137,31 @@ export function BudgetReportDocument({
               borderTop: `1px solid ${C.card}`,
             }}
           >
-            <Text style={{ fontSize: 8, color: C.gold, fontWeight: 700, letterSpacing: 0.8, marginBottom: 8 }}>
+            <Text style={{ fontSize: 8, color: C.gold, fontWeight: 700, letterSpacing: 0.8, marginBottom: 3 }}>
               IN THIS REPORT
+            </Text>
+            <Text style={{ fontSize: 7, color: C.onNavyMuted, marginBottom: 8 }}>
+              Tap any line to jump straight to that page.
             </Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               {COVER_CONTENTS.map((c) => (
-                <View key={c.title} style={{ width: "50%", flexDirection: "row", marginBottom: 6, paddingRight: 12 }}>
-                  <Text style={{ fontSize: 8, color: C.teal, fontWeight: 700, width: 16 }}>{c.page}</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 8.5, color: C.white, fontWeight: 700 }}>{c.title}</Text>
-                    <Text style={{ fontSize: 7, color: C.onNavyMuted }}>{c.blurb}</Text>
+                // The Link wraps the whole row, so the page number, title and
+                // blurb are all part of one generous tap target - fiddly
+                // text-sized hotspots are the usual reason PDF contents links
+                // go unused on a phone.
+                <Link
+                  key={c.title}
+                  src={`#${c.anchor}`}
+                  style={{ width: "50%", textDecoration: "none", marginBottom: 6, paddingRight: 12 }}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={{ fontSize: 8, color: C.teal, fontWeight: 700, width: 16 }}>{c.page}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 8.5, color: C.white, fontWeight: 700 }}>{c.title}</Text>
+                      <Text style={{ fontSize: 7, color: C.onNavyMuted }}>{c.blurb}</Text>
+                    </View>
                   </View>
-                </View>
+                </Link>
               ))}
             </View>
           </View>
@@ -1126,6 +1171,7 @@ export function BudgetReportDocument({
       {/* ── Page 2 - Cosmo: what happened & what to do ───────────── */}
       <Page size="A4" style={styles.page}>
         <PageHeader uri={logoDataUri} title="What Cosmo noticed" />
+        <SectionAnchor id="cosmo" />
         <Text style={styles.sectionTitle}>What your money did</Text>
         <View style={styles.insightCard}>
           {ins.coachParagraphs.map((p, i) => (
@@ -1197,7 +1243,21 @@ export function BudgetReportDocument({
                   <Text style={{ fontSize: 7.5, fontWeight: 700, color: C.teal }}>Impact: {a.impact}</Text>
                 )}
                 {a.lesson && (
-                  <Text style={{ fontSize: 7.5, color: C.textMuted }}>{`In the app: "${a.lesson.title}" lesson`}</Text>
+                  // No arrow glyph here: the built-in Helvetica the report uses
+                  // is WinAnsi-encoded and has no U+2192, so react-pdf silently
+                  // prints a stray quote mark instead. The underline is the
+                  // affordance.
+                  <Link
+                    src={lessonHref(a.lesson)}
+                    style={{
+                      fontSize: 7.5,
+                      fontWeight: 700,
+                      color: C.navy,
+                      textDecoration: "underline",
+                    }}
+                  >
+                    {`Open the "${a.lesson.title}" lesson`}
+                  </Link>
                 )}
               </View>
             )}
@@ -1210,11 +1270,16 @@ export function BudgetReportDocument({
       {/* ── Page 3 - Monthly performance ──────────────────────────────── */}
       <Page size="A4" style={styles.page}>
         <PageHeader uri={logoDataUri} title="Monthly performance" />
-        <SectionTitle ahead={0}>Budget vs actual (day-to-day, like-for-like)</SectionTitle>
+        <SectionAnchor id="monthly" />
+        <SectionTitle ahead={0}>What you planned vs what you spent</SectionTitle>
         <Text style={styles.sectionSub}>
-          Only day-to-day categories with a budget are compared here. Savings-vehicle contributions have their own plan below - putting more than planned into a stokvel is not overspending.
+          This compares like with like: only your everyday spending categories that have a budget. Money you put into savings or a stokvel is counted separately below - putting away more than you planned is a good thing, not overspending.
         </Text>
-        {model.budgetIsEstimate && <Text style={styles.badge}>Budget figures prorated for the partial month - estimate</Text>}
+        {model.budgetIsEstimate && (
+          <Text style={styles.badge}>
+            This month isn&apos;t finished, so we&apos;ve scaled the budgets down to match the days so far - rough estimate
+          </Text>
+        )}
         {model.dayToDayBudgetedCents > 0 ? (
           <>
           <View
@@ -1228,23 +1293,46 @@ export function BudgetReportDocument({
             }}
           >
             {[
-              { label: "Budgeted", value: zar(model.dayToDayBudgetedCents), color: C.text },
-              { label: "Spent (budgeted cats)", value: zar(model.budgetedActualCents), color: C.expense },
+              { label: "You planned", hint: "your budget", value: zar(model.dayToDayBudgetedCents), color: C.text },
               {
-                label: "Variance",
+                label: "You spent",
+                hint: "in those categories",
+                value: zar(model.budgetedActualCents),
+                color: C.expense,
+              },
+              {
+                label: "Difference",
+                hint: model.budgetVarianceCents > 0 ? "over your plan" : "left over",
                 value: zarSigned(model.budgetVarianceCents),
                 color: model.budgetVarianceCents > 0 ? C.expense : C.teal,
               },
-              { label: "% used", value: model.budgetUsedPct != null ? `${model.budgetUsedPct}%` : "-", color: C.navy },
               {
-                label: "Reliability",
+                label: "Budget used",
+                hint: "of what you planned",
+                value: model.budgetUsedPct != null ? `${model.budgetUsedPct}%` : "-",
+                color: C.navy,
+              },
+              {
+                label: "Useful budget?",
+                hint: "",
                 value: budgetReliability.label,
                 color: budgetReliability.color,
               },
             ].map((c) => (
-              <View key={c.label}>
-                <Text style={{ fontSize: 8, color: C.textMuted, textTransform: "uppercase", marginBottom: 4 }}>{c.label}</Text>
+              <View key={c.label} style={{ maxWidth: "20%", paddingRight: 6 }}>
+                {/* No hyphenation: react-pdf's default splits these short
+                    uppercase labels mid-word ("USE-FUL"), which reads as a typo
+                    on a stat card. */}
+                <Text
+                  hyphenationCallback={(word) => [word]}
+                  style={{ fontSize: 8, color: C.textMuted, textTransform: "uppercase", marginBottom: 4 }}
+                >
+                  {c.label}
+                </Text>
                 <Text style={{ fontSize: 13, fontWeight: 700, color: c.color }}>{c.value}</Text>
+                {c.hint !== "" && (
+                  <Text style={{ fontSize: 6.5, color: C.textMuted, marginTop: 2 }}>{c.hint}</Text>
+                )}
               </View>
             ))}
           </View>
@@ -1255,7 +1343,7 @@ export function BudgetReportDocument({
         ) : (
           <View style={styles.insightCard}>
             <Text style={{ fontSize: 9 }}>
-              {"No budgets are set yet, so there's nothing to compare against. Setting one limit per category turns this page into your monthly scoreboard."}
+              {"You haven't set any budgets yet, so there's nothing to compare against. Set a limit for each category and this page becomes your monthly scoreboard."}
             </Text>
           </View>
         )}
@@ -1263,19 +1351,19 @@ export function BudgetReportDocument({
           <ToneItem
             tone={model.unbudgetedActualCents > model.budgetedActualCents ? "bad" : "warn"}
             size={8.5}
-            text={`Reality check: budgets only manage ${zarWhole(model.budgetedActualCents)} of your ${zarWhole(model.consumptionCents)} day-to-day spending (${Math.round((model.budgetedActualCents / Math.max(model.consumptionCents, 1)) * 100)}%). ${zarWhole(model.unbudgetedActualCents)} across ${unbudgetedCount} ${unbudgetedCount === 1 ? "category" : "categories"} runs outside any budget - staying "under budget" says nothing about that money.`}
+            text={`Worth knowing: your budgets only watch ${zarWhole(model.budgetedActualCents)} of the ${zarWhole(model.consumptionCents)} you spend day to day (${Math.round((model.budgetedActualCents / Math.max(model.consumptionCents, 1)) * 100)}%). Another ${zarWhole(model.unbudgetedActualCents)} spread over ${unbudgetedCount} ${unbudgetedCount === 1 ? "category has" : "categories has"} no budget at all, so "under budget" tells you nothing about that money.`}
           />
         )}
         {model.setAsidePlannedCents > 0 && (
           <Text style={{ fontSize: 8, color: C.textMuted, marginBottom: 8 }}>
-            Set-aside plan: {zar(model.setAsidePlannedCents)} planned into savings vehicles · {zar(model.setAsideCents)} actually set aside
-            {model.setAsideCents >= model.setAsidePlannedCents ? " - plan beaten." : "."}
+            Savings plan: you meant to put away {zar(model.setAsidePlannedCents)} · you actually put away {zar(model.setAsideCents)}
+            {model.setAsideCents >= model.setAsidePlannedCents ? " - you beat your plan." : "."}
           </Text>
         )}
 
         {overspendSorted.filter((r) => r.varianceCents > 0).length > 0 && (
           <Keep>
-            <Text style={styles.sectionTitle}>Where the overspend came from</Text>
+            <Text style={styles.sectionTitle}>Where you went over</Text>
             <View style={{ marginBottom: 10 }}>
               {overspendSorted
                 .filter((r) => r.varianceCents > 0)
@@ -1284,7 +1372,7 @@ export function BudgetReportDocument({
                   <ToneItem
                     key={r.categoryId}
                     tone="bad"
-                    text={`${r.categoryName}: ${zarSigned(r.varianceCents)} (${r.variancePct}% of budget used)`}
+                    text={`${r.categoryName}: ${zarSigned(r.varianceCents)} over - you used ${r.variancePct}% of that budget`}
                   />
                 ))}
             </View>
@@ -1298,10 +1386,11 @@ export function BudgetReportDocument({
       {/* ── Page 4 - Where the money went: the picture ────────────────── */}
       <Page size="A4" style={styles.page}>
         <PageHeader uri={logoDataUri} title="Where the money went" />
+        <SectionAnchor id="where" />
         <Keep>
           <SectionTitle ahead={0}>Needs, wants &amp; goals</SectionTitle>
           <Text style={styles.sectionSub}>
-            The 50/30/20 guideline: about half on needs, under a third on wants, the rest to savings and debt payoff.
+            A common rule of thumb is 50/30/20: about half your money on things you must pay, under a third on things you choose, and the rest into savings and paying off debt.
           </Text>
           <View style={{ marginBottom: 14 }}>
             <GroupBar totals={model.groupTotals} totalCents={model.totalExpenseCents} />
@@ -1359,12 +1448,12 @@ export function BudgetReportDocument({
             six-row table being pushed onto a page of its own at the end of an
             already-full page. */}
         <Keep style={{ marginTop: 6 }}>
-          <Text style={styles.sectionTitle}>How you compare to common guidelines</Text>
+          <Text style={styles.sectionTitle}>How you compare to what&apos;s generally advised</Text>
           <View>
             <View style={styles.tableHeader}>
-              <Text style={{ width: "40%" }}>Measure</Text>
+              <Text style={{ width: "40%" }}>What we looked at</Text>
               <Text style={{ width: "30%", textAlign: "right" }}>You</Text>
-              <Text style={{ width: "30%", textAlign: "right" }}>Guideline</Text>
+              <Text style={{ width: "30%", textAlign: "right" }}>A good target</Text>
             </View>
             {ins.benchmarks.map((b, idx) => (
               <View key={b.label} style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}>
@@ -1381,7 +1470,7 @@ export function BudgetReportDocument({
           </View>
           {model.dataQuality.unclassifiedExpenseSharePct >= 20 && (
             <Text style={{ fontSize: 7.5, color: C.textMuted, marginTop: 5 }}>
-              Caveat: with {model.dataQuality.unclassifiedExpenseSharePct}% of spending unclassified, the true Needs and Wants shares are likely higher.
+              Keep in mind: {model.dataQuality.unclassifiedExpenseSharePct}% of your spending hasn&apos;t been sorted into a category yet, so your real Needs and Wants shares are probably higher than shown.
             </Text>
           )}
         </Keep>
@@ -1395,17 +1484,18 @@ export function BudgetReportDocument({
           otherwise blank. Given their own page they fit together, and long
           tables now break row-by-row instead of stranding a heading. */}
       <Page size="A4" style={styles.page}>
-        <PageHeader uri={logoDataUri} title="Where the money went" />
-        <SectionTitle ahead={0}>Expenses by category</SectionTitle>
+        <PageHeader uri={logoDataUri} title="Every category" />
+        <SectionAnchor id="categories" />
+        <SectionTitle ahead={0}>Everything you spent, by category</SectionTitle>
         <Text style={styles.sectionSub}>
-          Day-to-day spending only - money consumed, not money moved into savings. Sorted by share of spending.
+          Day-to-day spending only - money that&apos;s gone, not money you moved into savings. Biggest spend first. A plus sign in &quot;Difference&quot; means you spent more than you planned.
         </Text>
         <ExpenseTable rows={consumptionRows} shareScaleMax={shareScaleMax} />
         {setAsideRows.length > 0 && (
           <View style={{ marginTop: 14 }}>
-            <SectionTitle>Money set aside</SectionTitle>
+            <SectionTitle>Money you set aside</SectionTitle>
             <Text style={styles.sectionSub}>
-              Savings, stokvel and investment contributions - building assets, not consumption. A positive variance here means you set aside MORE than planned.
+              Savings, stokvel and investment payments - this money is still yours, it just moved. Here a plus sign in &quot;Difference&quot; is good news: you put away more than you planned.
             </Text>
             <ExpenseTable rows={setAsideRows} positiveIsGood shareScaleMax={shareScaleMax} />
           </View>
@@ -1416,6 +1506,7 @@ export function BudgetReportDocument({
       {/* ── Page 5 - Income & transactions ────────────────────────────── */}
       <Page size="A4" style={styles.page}>
         <PageHeader uri={logoDataUri} title="Income & transactions" />
+        <SectionAnchor id="income" />
         <SectionTitle ahead={0}>Income by source</SectionTitle>
         {model.incomeCategories.length === 0 ? (
           <Text style={{ fontSize: 9, color: C.textMuted, marginBottom: 16 }}>No income data for this period.</Text>
@@ -1549,9 +1640,11 @@ export function BudgetReportDocument({
 
         {redactedCount > 0 && (
           <Text style={{ fontSize: 7.5, color: C.textMuted, marginTop: -2, marginBottom: 6 }}>
-            {redactedCount} {redactedCount === 1 ? "counterparty is" : "counterparties are"} shown by category
-            instead of by name, so this report can be shared without naming people you pay. Amounts and totals
-            are unchanged. Names are always visible to you in the app.
+            {redactedCount === 1
+              ? "1 person you paid is shown"
+              : `${redactedCount} people you paid are shown`}{" "}
+            by category instead of by name, so you can share this report without naming them. The amounts and
+            totals are exactly the same. You can always see the names in the app.
           </Text>
         )}
 

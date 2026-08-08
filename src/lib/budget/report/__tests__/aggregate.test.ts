@@ -388,12 +388,12 @@ describe("buildReport", () => {
     );
     assertReportModel(model);
     expect(model.netCents).toBeLessThan(0);
-    const savings = model.insights.healthComponents.find((c) => c.label === "Savings habit")!;
+    const savings = model.insights.healthComponents.find((c) => c.label === "Saving habit")!;
     expect(savings.score).toBeLessThanOrEqual(12); // capped, not full marks
     expect(model.insights.healthBand).not.toBe("Strong");
     // Consumption (8000) was within income (10000) - shortfall is the choice to
     // set aside 3000. That should be reframed as an allocation win.
-    expect(model.insights.wins.some((w) => /allocation decision/.test(w))).toBe(true);
+    expect(model.insights.wins.some((w) => /deciding where your money goes/.test(w))).toBe(true);
   });
 
   it("produces a one-line verdict that leads with the period's story", () => {
@@ -420,7 +420,7 @@ describe("buildReport", () => {
       "2026-06-01",
       "2026-06-30"
     );
-    expect(dirty.insights.verdict).toMatch(/uncategorised|categoris/i);
+    expect(dirty.insights.verdict).toMatch(/categor/i);
   });
 
   it("reframes an allocation deficit instead of alarming, and flags loan-funded saving", () => {
@@ -449,7 +449,7 @@ describe("buildReport", () => {
     expect(first.tone).toBe("info");
     expect(first.text).toMatch(/saving|reserves|set aside/i);
     // Loan-funded saving is surfaced as the leading risk.
-    expect(model.insights.risks[0]).toMatch(/loan money|borrowing to save|debt cycle/i);
+    expect(model.insights.risks[0]).toMatch(/borrowed money|borrowing so you can save|keeps you in debt/i);
   });
 
   it("nets business income against business cost in the coach narrative", () => {
@@ -468,7 +468,9 @@ describe("buildReport", () => {
     );
     assertReportModel(model);
     // Business income 4000, cost 9000 -> net 5000 drain, mentioned in the coach.
-    expect(model.insights.coachParagraphs.some((p) => /side-hustle|net/i.test(p) && /drain/i.test(p))).toBe(true);
+    expect(
+      model.insights.coachParagraphs.some((p) => /side hustle/i.test(p) && /out of your pocket/i.test(p))
+    ).toBe(true);
   });
 
   it("does not celebrate a category used under half its budget (misaligned)", () => {
@@ -684,7 +686,7 @@ describe("buildReport", () => {
       );
     }
     const model = report(entries, [], "2026-01-01", "2026-03-31");
-    expect(model.insights.risks.some((r) => /identical spending totals/.test(r))).toBe(true);
+    expect(model.insights.risks.some((r) => /exactly the same spending total/.test(r))).toBe(true);
   });
 
   it("insights: health score is bounded and consistent", () => {

@@ -90,11 +90,11 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   const highlights: ReportHighlight[] = [];
   if (income > 0 || core.totalExpenseCents > 0) {
     if (core.netCents >= 0) {
-      highlights.push({ tone: "good", text: `You ended the period ${rand(core.netCents)} ahead.` });
+      highlights.push({ tone: "good", text: `You ended this period ${rand(core.netCents)} ahead.` });
     } else if (allocationDeficit) {
       highlights.push({
         tone: "info",
-        text: `Your day-to-day spending stayed within income. The ${rand(-core.netCents)} gap is because you set aside ${rand(core.setAsideCents)} - more than your ${rand(afterLivingCents)} surplus - so it came from savings/reserves, not overspending.`,
+        text: `Your day-to-day spending stayed inside your income. You're ${rand(-core.netCents)} short only because you put ${rand(core.setAsideCents)} away, which is more than the ${rand(afterLivingCents)} you had left over - so that money came from savings you already had, not from overspending.`,
       });
     } else {
       highlights.push({ tone: "bad", text: `You spent ${rand(-core.netCents)} more than you earned on day-to-day living.` });
@@ -103,23 +103,23 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   if (income > 0) {
     highlights.push(
       core.savingsRatePct >= GUIDELINES.savingsRatePct
-        ? { tone: "good", text: `You set aside ${core.savingsRatePct}% of income - at or above the ${GUIDELINES.savingsRatePct}% guideline.` }
-        : { tone: "warn", text: `You set aside ${core.savingsRatePct}% of income (${rand(core.setAsideCents)}); the common guideline is ${GUIDELINES.savingsRatePct}%.` }
+        ? { tone: "good", text: `You put away ${core.savingsRatePct}% of your income - that's at or above the ${GUIDELINES.savingsRatePct}% most people aim for.` }
+        : { tone: "warn", text: `You put away ${core.savingsRatePct}% of your income (${rand(core.setAsideCents)}). Most people aim for ${GUIDELINES.savingsRatePct}%.` }
     );
   }
   if (unclassifiedPct >= GUIDELINES.unclassifiedWarnPct) {
     highlights.push({
       tone: "warn",
-      text: `${unclassifiedPct}% of spending (${rand(core.groupTotals.unclassified)}) is unclassified - the picture below is blurry until it's categorised.`,
+      text: `${unclassifiedPct}% of your spending (${rand(core.groupTotals.unclassified)}) hasn't been sorted into a category, so the picture below is blurry until you sort it.`,
     });
   }
   if (debtSharePct >= 30) {
-    highlights.push({ tone: "bad", text: `Debt repayments took ${debtSharePct}% of your income (${rand(debt)}).` });
+    highlights.push({ tone: "bad", text: `Debt payments took ${debtSharePct}% of your income (${rand(debt)}).` });
   }
   if (core.totalBudgetedExpenseCents > 0 && core.budgetVarianceCents > 0 && highlights.length < 4) {
     highlights.push({
       tone: "warn",
-      text: `Budgeted categories ran ${rand(core.budgetVarianceCents)} over plan.`,
+      text: `You spent ${rand(core.budgetVarianceCents)} more than you planned in the categories that have a budget.`,
     });
   }
   // A genuine "under budget" win means you came in under a REALISTIC budget -
@@ -134,7 +134,7 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
     const w = realUnderBudget[0];
     highlights.push({
       tone: "good",
-      text: `${w.categoryName} came in ${rand(-w.varianceCents)} under budget - well controlled.`,
+      text: `You spent ${rand(-w.varianceCents)} less than you planned on ${w.categoryName} - nicely controlled.`,
     });
   }
 
@@ -143,14 +143,14 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   const risks: string[] = [];
 
   for (const r of realUnderBudget.slice(0, 2)) {
-    wins.push(`${r.categoryName}: ${rand(-r.varianceCents)} under budget (${r.variancePct}% used).`);
+    wins.push(`${r.categoryName}: ${rand(-r.varianceCents)} under budget - you used ${r.variancePct}% of it.`);
   }
   // Only celebrate the savings rate when it's real surplus, not deficit-funded.
   if (core.savingsRatePct >= GUIDELINES.savingsRatePct && core.netCents >= 0) {
-    wins.push(`Set aside ${rand(core.setAsideCents)} - a ${core.savingsRatePct}% savings rate, all from surplus.`);
+    wins.push(`You put away ${rand(core.setAsideCents)} - that's ${core.savingsRatePct}% of your income, all of it from money you had left over.`);
   }
   if (core.comparison?.setAsideDeltaPct != null && core.comparison.setAsideDeltaPct > 0 && core.netCents >= 0) {
-    wins.push(`Money set aside is up ${core.comparison.setAsideDeltaPct}% vs the previous period.`);
+    wins.push(`You put away ${core.comparison.setAsideDeltaPct}% more than you did last period.`);
   }
   // hasData, not just !isPartial: a complete month with no entries nets to
   // exactly zero, which counts as ">= 0" and was being celebrated as a month
@@ -159,15 +159,15 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   const positiveMonths = core.monthlySpend.filter((m) => !m.isPartial && m.hasData && m.netCents >= 0).length;
   const fullMonths = core.monthlySpend.filter((m) => !m.isPartial && m.hasData).length;
   if (fullMonths >= 2 && positiveMonths === fullMonths) {
-    wins.push(`Every complete month in this period ended in the green (${fullMonths}/${fullMonths}).`);
+    wins.push(`Every full month in this period ended with money left over (${fullMonths} out of ${fullMonths}).`);
   }
   if (core.incomeCategories.length >= 2 && core.incomeCategories[0].sharePct < 60) {
-    wins.push(`Income is spread across ${core.incomeCategories.length} sources - no single point of failure.`);
+    wins.push(`Your income comes from ${core.incomeCategories.length} different sources, so you're not relying on just one.`);
   }
   const goalsSharePct = pctOf(core.groupTotals.goals, core.totalExpenseCents);
   if (goalsSharePct >= 40 && core.netCents >= 0) {
     wins.push(
-      `${rand(core.groupTotals.goals)} (${goalsSharePct}%) of this period's money went toward building future wealth - savings, stokvel and debt payoff.`
+      `${rand(core.groupTotals.goals)} of your money this period (${goalsSharePct}%) went towards your future - savings, stokvel and paying off debt.`
     );
   }
 
@@ -177,18 +177,18 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
       // Consumption alone was within income - the shortfall is a deliberate
       // allocation choice, not overspending. Reframe it as such.
       wins.push(
-        `Your day-to-day spending stayed within income - the ${rand(-core.netCents)} shortfall came entirely from choosing to set aside ${rand(core.setAsideCents)}. That's an allocation decision, not overspending.`
+        `Your day-to-day spending stayed inside your income. The ${rand(-core.netCents)} you came up short is only because you chose to put ${rand(core.setAsideCents)} away. That's you deciding where your money goes, not overspending.`
       );
     } else {
       risks.push(
-        `You set aside ${rand(core.setAsideCents)} while running a ${rand(-core.netCents)} deficit - check you're not funding savings with debt or dwindling reserves.`
+        `You put away ${rand(core.setAsideCents)} while coming up ${rand(-core.netCents)} short overall. Check that you're not paying for your savings with debt or with money you'd already saved.`
       );
     }
   }
   if (misalignedBudget) {
     const timesBigger = Math.round(misalignedBudget.budgetedCents / Math.max(misalignedBudget.actualCents, 1));
     risks.push(
-      `Your ${misalignedBudget.categoryName} budget (${rand(misalignedBudget.budgetedCents)}) is about ${timesBigger}x your actual spend - it's too loose to catch anything.`
+      `Your ${misalignedBudget.categoryName} budget (${rand(misalignedBudget.budgetedCents)}) is about ${timesBigger} times what you actually spend, so it can never warn you about anything.`
     );
   }
   // Debt-funded saving: taking loans while contributing to savings/stokvel is a
@@ -196,30 +196,30 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   // important flag when it happens - lead the risks with it.
   if (loanIncomeCents > 0 && core.setAsideCents > 0) {
     risks.unshift(
-      `${rand(loanIncomeCents)} of your income this period is loan money, while you set aside ${rand(core.setAsideCents)}. Borrowing to save is a debt cycle - the savings aren't truly yours until the loan is repaid.`
+      `${rand(loanIncomeCents)} of what came in this period was borrowed money, and you put ${rand(core.setAsideCents)} into savings. Borrowing so you can save keeps you in debt - that money isn't really yours until the loan is paid back.`
     );
   }
 
   for (const r of core.topOverBudget.slice(0, 2)) {
-    risks.push(`${r.categoryName}: ${rand(r.varianceCents)} over budget (${r.variancePct}% used).`);
+    risks.push(`${r.categoryName}: ${rand(r.varianceCents)} over budget - you used ${r.variancePct}% of it.`);
   }
   if (unclassifiedPct >= GUIDELINES.unclassifiedWarnPct) {
-    risks.push(`${unclassifiedPct}% of spending is unclassified, hiding where money actually goes.`);
+    risks.push(`${unclassifiedPct}% of your spending hasn't been sorted into a category, so you can't see where it went.`);
   }
   if (debtSharePct >= 30) {
-    risks.push(`Debt repayments at ${debtSharePct}% of income leave little room for goals.`);
+    risks.push(`Debt payments take ${debtSharePct}% of your income, which leaves little room for your goals.`);
   }
   if (income > 0 && core.incomeCategories.length > 0 && core.incomeCategories[0].sharePct >= 80) {
-    risks.push(`${core.incomeCategories[0].sharePct}% of income comes from one source (${core.incomeCategories[0].categoryName}).`);
+    risks.push(`${core.incomeCategories[0].sharePct}% of your income comes from one place (${core.incomeCategories[0].categoryName}). If that stops, so does most of your money.`);
   }
   const negativeMonths = core.monthlySpend.filter((m) => !m.isPartial && m.netCents < 0);
   if (negativeMonths.length > 0) {
     risks.push(
-      `${negativeMonths.length} month${negativeMonths.length === 1 ? "" : "s"} ended in the red (${negativeMonths.map((m) => m.label).join(", ")}).`
+      `${negativeMonths.length} month${negativeMonths.length === 1 ? "" : "s"} ended with you spending more than you earned (${negativeMonths.map((m) => m.label).join(", ")}).`
     );
   }
   if (income > 0 && core.savingsRatePct < 5) {
-    risks.push(`At a ${core.savingsRatePct}% set-aside rate, an emergency cushion isn't building.`);
+    risks.push(`You're putting away ${core.savingsRatePct}% of your income, which isn't enough to build up an emergency fund.`);
   }
   const recurringDebt = core.recurringCommitments.filter(
     (r) => r.group === "goals" && /\b(loan|debt|repay)/i.test(`${r.description} ${r.categoryName}`)
@@ -227,7 +227,7 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   if (recurringDebt.length > 0) {
     const d = recurringDebt[0];
     risks.push(
-      `Recurring loan repayment detected: ${d.description} at ~${rand(d.typicalCents)}/month for ${d.monthsSeen} months running.`
+      `You've paid about ${rand(d.typicalCents)} a month towards ${d.description} for ${d.monthsSeen} months in a row. That looks like a loan you're still paying off.`
     );
   }
   // Volatility: big swings vs the previous period are the most important
@@ -240,7 +240,7 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
     if (exp != null && Math.abs(exp) >= 40) swings.push(`spending ${exp > 0 ? "up" : "down"} ${Math.abs(exp)}%`);
     if (swings.length > 0) {
       risks.push(
-        `Big swing vs the previous period: ${swings.join(", ")}. If that isn't expected (bonus, once-off, seasonal), it's worth understanding before trusting the trend.`
+        `Big change compared to last period: ${swings.join(", ")}. If you weren't expecting that (a bonus, a one-off, a seasonal thing), it's worth finding out why before you read too much into the trend.`
       );
     }
   }
@@ -254,7 +254,7 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   const identicalMonths = Math.max(0, ...totalsSeen.values());
   if (identicalMonths >= 3) {
     risks.push(
-      `${identicalMonths} months show identical spending totals to the cent - worth checking for duplicate or templated imports.`
+      `${identicalMonths} months have exactly the same spending total, down to the cent. That usually means the same transactions were imported twice - worth a check.`
     );
   }
 
@@ -265,8 +265,8 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
     actions.push({
       id: "recalibrate-budget",
       title: `Recalibrate your ${misalignedBudget.categoryName} budget`,
-      detail: `You budgeted ${rand(misalignedBudget.budgetedCents)} but spent ${rand(misalignedBudget.actualCents)} (${misalignedBudget.variancePct}% used). A budget you can't get near isn't a plan - set it closer to what you actually spend so variances mean something.`,
-      impact: "Your budget-vs-actual becomes a real signal, not noise",
+      detail: `You budgeted ${rand(misalignedBudget.budgetedCents)} but spent ${rand(misalignedBudget.actualCents)} - only ${misalignedBudget.variancePct}% of it. A budget you never come close to isn't really a plan. Set it near what you actually spend, and going over will start to mean something.`,
+      impact: "Your budget starts telling you something real",
       lesson: LESSONS.buildingBudget,
     });
   }
@@ -275,8 +275,8 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
     actions.push({
       id: "recategorise",
       title: "Recategorise your 'Other' transactions",
-      detail: `${rand(core.groupTotals.unclassified)} of spending has no real category. Sorting it takes minutes and is the single biggest accuracy win.`,
-      impact: `Your next report explains ${unclassifiedPct}% more of your money`,
+      detail: `${rand(core.groupTotals.unclassified)} of your spending isn't in a proper category yet. Sorting it takes a few minutes and does more for the accuracy of this report than anything else.`,
+      impact: `Your next report can explain ${unclassifiedPct}% more of your money`,
       lesson: LESSONS.trackingSpend,
     });
   }
@@ -285,7 +285,7 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
     actions.push({
       id: "first-budgets",
       title: "Set your first category budgets",
-      detail: "You're tracking spending but have no limits. A budget per category turns tracking into a plan.",
+      detail: "You're tracking what you spend, but you haven't set any limits. Putting a budget on each category turns tracking into a plan.",
       lesson: LESSONS.buildingBudget,
     });
   } else if (pctOf(core.unbudgetedActualCents, core.totalExpenseCents) >= 30) {
@@ -301,8 +301,8 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
       actions.push({
         id: "cover-unbudgeted",
         title: `Set budgets for ${unbudgeted.join(" and ")}`,
-        detail: `${rand(core.unbudgetedActualCents)} (${pctOf(core.unbudgetedActualCents, core.totalExpenseCents)}% of spending) sits in categories with no budget, so it never gets flagged.`,
-        impact: "Overspend alerts start working for your biggest categories",
+        detail: `${rand(core.unbudgetedActualCents)} of your spending (${pctOf(core.unbudgetedActualCents, core.totalExpenseCents)}%) is in categories with no budget, so nothing there ever gets flagged.`,
+        impact: "You'll get warned when your biggest categories run high",
         lesson: LESSONS.buildingBudget,
       });
     }
@@ -314,13 +314,13 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
     if (extraPerMonth > 0) {
       const surplusHint =
         core.netCents > extraPerMonth
-          ? ` Your ${rand(core.netCents)} surplus already covers it - it just needs a job.`
+          ? ` You already have ${rand(core.netCents)} left over each period, so the money is there - it just needs somewhere to go.`
           : "";
       actions.push({
         id: "payday-setaside",
         title: "Set aside a fixed amount on payday",
-        detail: `Moving money to savings first - before spending - is the habit that makes the rate stick.${surplusHint}`,
-        impact: `~ ${rand(extraPerMonth)}/month lifts your rate from ${core.savingsRatePct}% to ~${targetRate}% - about ${rand(extraPerMonth * 12)} extra set aside over 12 months`,
+        detail: `Move money into savings the day you get paid, before you spend any of it. Doing it in that order is what makes it stick.${surplusHint}`,
+        impact: `About ${rand(extraPerMonth)} a month takes you from ${core.savingsRatePct}% to ${targetRate}% - roughly ${rand(extraPerMonth * 12)} more saved over a year`,
         lesson: LESSONS.emergencyFund,
       });
     }
@@ -329,8 +329,8 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   if (debtSharePct >= 30) {
     actions.push({
       id: "map-debts",
-      title: "Map out your debts and pick a payoff order",
-      detail: `${rand(debt)} went to debt repayments this period. A structured method shrinks the total interest paid and the stress.`,
+      title: "List your debts and decide which to pay off first",
+      detail: `You paid ${rand(debt)} towards debt this period. Paying them off in a set order costs you less in interest overall, and it's easier to stay on top of.`,
       lesson: LESSONS.debtSnowball,
     });
   }
@@ -343,8 +343,8 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
       actions.push({
         id: `trim-${trimRow.categoryId}`,
         title: `Trim ${trimRow.categoryName} by 10%`,
-        detail: `${trimRow.categoryName} is your biggest flexible spending category at ${rand(trimRow.actualCents)} (${trimRow.sharePct}% of spending). One change here beats ten small ones elsewhere.`,
-        impact: `~ ${rand(monthlyCut)}/month freed - enough to reach a ~${newRate}% set-aside rate`,
+        detail: `${trimRow.categoryName} is the biggest thing you can actually cut back on - ${rand(trimRow.actualCents)}, or ${trimRow.sharePct}% of your spending. One change here does more than ten small ones elsewhere.`,
+        impact: `Frees up about ${rand(monthlyCut)} a month - enough to put away ${newRate}% of your income`,
         lesson: LESSONS.needsVsWants,
       });
     }
@@ -354,7 +354,7 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
     actions.push({
       id: "keep-streak",
       title: "Keep the streak going",
-      detail: "Cash flow is positive, budgets are holding and your data is clean. Consistency is the whole game now.",
+      detail: "You're earning more than you spend, your budgets are holding and your records are clean. Now it's just about keeping it up.",
     });
   }
   // Actions are already in priority order; the first is THE one to do.
@@ -365,18 +365,18 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   if (income > 0 || core.totalExpenseCents > 0) {
     const flow =
       core.netCents >= 0
-        ? `leaving you ${rand(core.netCents)} ahead`
+        ? `which left you ${rand(core.netCents)} ahead`
         : allocationDeficit
-          ? `leaving ${rand(afterLivingCents)} of surplus - you then set aside ${rand(core.setAsideCents)}, ${rand(-core.netCents)} more than that surplus, so the gap came from savings/reserves rather than overspending`
-          : `leaving a ${rand(-core.netCents)} shortfall - day-to-day spending was above income`;
+          ? `which left you ${rand(afterLivingCents)} over. You then put away ${rand(core.setAsideCents)} - ${rand(-core.netCents)} more than you had left - so that gap came out of savings you already had, not from overspending`
+          : `which left you ${rand(-core.netCents)} short - your day-to-day spending was more than you earned`;
     coachParagraphs.push(
-      `Over ${periodLabel} you earned ${rand(income)}, spent ${rand(core.consumptionCents)} on day-to-day living and set aside ${rand(core.setAsideCents)} (${core.savingsRatePct}% of income) into savings vehicles like a stokvel or savings account - ${flow}.`
+      `Over ${periodLabel} you earned ${rand(income)}, spent ${rand(core.consumptionCents)} on day-to-day living, and put ${rand(core.setAsideCents)} away into savings - a stokvel, a savings account or similar. That's ${core.savingsRatePct}% of your income, ${flow}.`
     );
   }
   // Net the business out so a big side-hustle doesn't just look like spending.
   if (core.groupTotals.business > 0 && businessIncomeCents > 0) {
     coachParagraphs.push(
-      `Your side-hustle brought in ${rand(businessIncomeCents)} and cost ${rand(core.groupTotals.business)} this period - a net ${businessNetCents >= 0 ? `${rand(businessNetCents)} contribution to` : `${rand(-businessNetCents)} drain on`} your money. ${businessNetCents >= 0 ? "It's paying its way." : "Worth checking whether the spend is investment that'll pay off, or a leak."}`
+      `Your side hustle brought in ${rand(businessIncomeCents)} and cost you ${rand(core.groupTotals.business)} this period, so overall it ${businessNetCents >= 0 ? `put ${rand(businessNetCents)} into` : `took ${rand(-businessNetCents)} out of`} your pocket. ${businessNetCents >= 0 ? "It's paying its way." : "Worth asking whether that money is buying something that'll pay off later, or just leaking away."}`
     );
   }
   const topSpendRow =
@@ -384,7 +384,7 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   if (topSpendRow) {
     const caveat =
       unclassifiedPct >= GUIDELINES.unclassifiedWarnPct
-        ? ` Note: ${unclassifiedPct}% of spending is still unclassified, so the true picture may shift once it's categorised.`
+        ? ` Bear in mind ${unclassifiedPct}% of your spending still isn't sorted into a category, so this could change once you sort it.`
         : "";
     coachParagraphs.push(
       `Your biggest day-to-day category was ${topSpendRow.categoryName} at ${rand(topSpendRow.actualCents)} (${topSpendRow.sharePct}% of all spending).${caveat}`
@@ -393,14 +393,14 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   if (core.projection.annualisedExpenseCents != null && core.projection.monthsUsed >= 2) {
     const wealthLine =
       income > 0 && core.savingsRatePct > 0 && core.savingsRatePct < GUIDELINES.savingsRatePct
-        ? ` Kept at today's ${core.savingsRatePct}% rate, you'd set aside ~${rand(avgMonthlyIncome * (core.savingsRatePct / 100) * 12)} over the next 12 months; at ${GUIDELINES.savingsRatePct}% it would be ~${rand(avgMonthlyIncome * (GUIDELINES.savingsRatePct / 100) * 12)}.`
+        ? ` If you keep putting away ${core.savingsRatePct}%, that's about ${rand(avgMonthlyIncome * (core.savingsRatePct / 100) * 12)} saved over the next year. At ${GUIDELINES.savingsRatePct}% it would be about ${rand(avgMonthlyIncome * (GUIDELINES.savingsRatePct / 100) * 12)}.`
         : "";
     // Pair spend with income so the projection isn't a lone (ominous-looking)
     // number - a rising spend against rising income is very different from one
     // against flat income.
     const annualIncome = Math.round(avgMonthlyIncome * 12);
     coachParagraphs.push(
-      `At your average pace you're on track to earn about ${rand(annualIncome)} and spend about ${rand(core.projection.annualisedExpenseCents)} this year (over ${core.projection.monthsUsed} complete months).${wealthLine}`
+      `If you carry on at this pace, you're on track to earn about ${rand(annualIncome)} and spend about ${rand(core.projection.annualisedExpenseCents)} this year. (Based on your ${core.projection.monthsUsed} complete months.)${wealthLine}`
     );
   }
 
@@ -417,33 +417,33 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   const toneFor = (ok: boolean, mid: boolean): InsightTone => (ok ? "good" : mid ? "warn" : "bad");
   const benchmarks: ReportBenchmark[] = [
     {
-      label: "Set-aside (savings) rate",
+      label: "How much of your income you save",
       value: `${core.savingsRatePct}%`,
       target: `${GUIDELINES.savingsRatePct}%+ of income`,
       tone: toneFor(core.savingsRatePct >= 20, core.savingsRatePct >= 10),
     },
     {
-      label: "Debt repayments",
+      label: "How much goes to debt",
       value: income > 0 ? `${debtSharePct}% of income` : "-",
       target: `below ${GUIDELINES.debtShareOfIncomePct}%`,
       tone: toneFor(debtSharePct < 20, debtSharePct <= GUIDELINES.debtShareOfIncomePct),
     },
     {
-      label: "Needs (essentials)",
+      label: "Needs - things you must pay",
       value: `${needsPct}${shareLabel}`,
-      target: `~${GUIDELINES.needsSharePct}% guideline`,
+      target: `about ${GUIDELINES.needsSharePct}%`,
       tone: needsPct <= 65 ? "good" : "warn",
     },
     {
-      label: "Wants (lifestyle)",
+      label: "Wants - things you choose",
       value: `${wantsPct}${shareLabel}`,
-      target: `~${GUIDELINES.wantsSharePct}% guideline`,
+      target: `about ${GUIDELINES.wantsSharePct}%`,
       tone: wantsPct <= GUIDELINES.wantsSharePct ? "good" : "warn",
     },
   ];
   if (core.budgetUsedPct != null) {
     benchmarks.push({
-      label: "Budget used (like-for-like)",
+      label: "How much of your budget you used",
       value: `${core.budgetUsedPct}%`,
       target: "100% or less",
       tone: toneFor(core.budgetUsedPct <= 100, core.budgetUsedPct <= 115),
@@ -452,32 +452,32 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
 
   const dataQualityAlert =
     unclassifiedPct >= GUIDELINES.unclassifiedWarnPct
-      ? `${unclassifiedPct}% of spending (${rand(core.groupTotals.unclassified)}) is sitting in "Other" or unknown categories. Until it's recategorised, every chart in this report understates where your money really goes.`
+      ? `${unclassifiedPct}% of your spending (${rand(core.groupTotals.unclassified)}) is sitting in "Other" or has no category at all. Until you sort it, every chart in this report is missing part of the story.`
       : null;
 
   // ── Verdict: the one sentence that answers "how did I do?" ───────────────
   // Leads with the dominant story, not a generic band label.
   const verdict = (() => {
-    if (income <= 0 && core.totalExpenseCents <= 0) return "No activity recorded for this period yet.";
+    if (income <= 0 && core.totalExpenseCents <= 0) return "Nothing recorded for this period yet.";
     if (unclassifiedPct >= 30) {
-      return `Too much (${unclassifiedPct}%) of your spending is still uncategorised to judge this period fairly - sorting it is the first move.`;
+      return `${unclassifiedPct}% of your spending still has no category, which is too much to judge this period fairly. Sorting it is your first move.`;
     }
     if (loanIncomeCents > 0 && core.setAsideCents > 0) {
-      return `Careful: you set money aside while taking on loan income - you may be borrowing to save, which quietly builds debt.`;
+      return `Careful: you put money away while also taking out a loan. If you're borrowing in order to save, your debt is quietly growing.`;
     }
     if (allocationDeficit) {
-      return `A disciplined period - your day-to-day spending stayed within income, and the shortfall was a deliberate choice to save ${core.savingsRatePct}% hard.`;
+      return `A disciplined period. Your day-to-day spending stayed inside your income, and you came up short only because you chose to save a hefty ${core.savingsRatePct}%.`;
     }
     if (core.netCents < 0) {
-      return `A tough period - you spent ${rand(-core.netCents)} more than you earned on day-to-day living. Reining that in is the priority.`;
+      return `A tough period. You spent ${rand(-core.netCents)} more than you earned on day-to-day living, and pulling that back is your first priority.`;
     }
     if (healthBand === "Strong" || healthScore >= 80) {
-      return `A strong period - you finished ${rand(core.netCents)} ahead and set aside ${core.savingsRatePct}% of income.`;
+      return `A strong period. You finished ${rand(core.netCents)} ahead and put away ${core.savingsRatePct}% of your income.`;
     }
     if (core.savingsRatePct >= GUIDELINES.savingsRatePct) {
-      return `A solid period - you're ahead and saving above the ${GUIDELINES.savingsRatePct}% guideline; a couple of tweaks would make it excellent.`;
+      return `A solid period. You're ahead and saving more than the ${GUIDELINES.savingsRatePct}% most people aim for - a couple of small changes would make it excellent.`;
     }
-    return `A steady period - you finished ahead, with room to lift your ${core.savingsRatePct}% savings rate toward the ${GUIDELINES.savingsRatePct}% guideline.`;
+    return `A steady period. You finished ahead, and there's room to push your saving from ${core.savingsRatePct}% up towards the ${GUIDELINES.savingsRatePct}% most people aim for.`;
   })();
 
   return {
