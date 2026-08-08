@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
+/** Written by the `setup` project; consumed by every browser project. */
+const AUTH_STATE = "e2e/.auth/user.json";
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false, // run sequentially so state builds correctly
@@ -42,17 +45,25 @@ export default defineConfig({
     navigationTimeout: 30_000,
   },
   projects: [
+    // Signs in once and writes e2e/.auth/user.json. See e2e/auth.setup.ts for
+    // why: Supabase rate-limits /auth/v1/token, and a per-test sign-in blows
+    // through that limit in a single CI run.
+    { name: "setup", testMatch: /auth\.setup\.ts/ },
+
     {
       name: "Desktop Chrome",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], storageState: AUTH_STATE },
+      dependencies: ["setup"],
     },
     {
       name: "Mobile Safari (iPhone 14)",
-      use: { ...devices["iPhone 14"] },
+      use: { ...devices["iPhone 14"], storageState: AUTH_STATE },
+      dependencies: ["setup"],
     },
     {
       name: "Mobile Chrome (Pixel 7)",
-      use: { ...devices["Pixel 7"] },
+      use: { ...devices["Pixel 7"], storageState: AUTH_STATE },
+      dependencies: ["setup"],
     },
   ],
   // Override to just run one browser during local dev

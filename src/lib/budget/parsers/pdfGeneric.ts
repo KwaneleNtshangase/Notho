@@ -1,6 +1,8 @@
 import { findDateToken, parseStatementDate, extractContextYear } from "./pdfDates";
 import {
+  amountFromBucket,
   amountInColumn,
+  bucketItemsToColumns,
   dateTokenInColumn,
   findAmountTokens,
   groupItemsIntoLines,
@@ -29,6 +31,18 @@ const SKIP_LINE =
 
 const FOOTER_LINE = /unique\s+document\s+no\.|page\s+\d+\s+of\s+\d+/i;
 const SUMMARY_BLOCK = /summary|scheduled\s+payments/i;
+
+/**
+ * Section boilerplate that must never be glued onto a transaction description.
+ *
+ * A dateless line is normally a wrapped continuation of the row above it, but
+ * only when the document is read in row order. PDF producers emit pages in
+ * either vertical direction, so on a bottom-to-top document the "continuation"
+ * sitting next to a row is actually the section heading ABOVE it - which is how
+ * an account number ended up appended to a grocery purchase.
+ */
+const SECTION_BOILERPLATE =
+  /account\s+(type|number|name)\b|\bstatement\s+(period|date)\b|interest\s+rate|vat\s+(reg|no)|fsp\s+number/i;
 
 function colRange(x: number, tolerance = 55): ColumnRange {
   return { x, tolerance };
@@ -106,13 +120,35 @@ function continuationGenericText(line: TextLine, cols: ColumnLayout): string {
     .trim();
 }
 
+/**
+ * Assign each money item on the row to at most ONE column, nearest anchor wins.
+ *
+ * Money used to be read with independent "first item within 55pt of the anchor"
+ * lookups, which is unsafe as soon as the money columns sit close together. On a
+ * Discovery certified statement the Balance column is 46pt from the Credit
+ * header anchor - inside tolerance - and the balance is the first such item in
+ * x order, so a row whose only movement was a R1,234.56 debit was read as
+ * R3,765.44 of INCOME: the running balance itself, imported as a credit.
+ *
+ * Exclusive nearest-wins assignment means an item can only ever be read as the
+ * column it is genuinely closest to.
+ */
+function moneyBuckets(line: TextLine, cols: ColumnLayout) {
+  return bucketItemsToColumns(line, {
+    moneyIn: cols.moneyIn ?? cols.credit,
+    moneyOut: cols.moneyOut ?? cols.debit,
+    balance: cols.balance,
+  });
+}
+
 function deriveAmountFromColumns(
   line: TextLine,
   cols: ColumnLayout,
   fallbackColumns: ReturnType<typeof inferAmountColumns>
 ): { amount: number | null; uncertain: boolean } {
-  const moneyIn = amountInColumn(line, cols.moneyIn) ?? amountInColumn(line, cols.credit);
-  const moneyOut = amountInColumn(line, cols.moneyOut) ?? amountInColumn(line, cols.debit);
+  const buckets = moneyBuckets(line, cols);
+  const moneyIn = amountFromBucket(buckets, "moneyIn");
+  const moneyOut = amountFromBucket(buckets, "moneyOut");
 
   if (moneyIn !== null && Math.abs(moneyIn) >= 0.01) {
     return { amount: Math.abs(moneyIn), uncertain: false };
@@ -123,8 +159,9 @@ function deriveAmountFromColumns(
   }
 
   if (fallbackColumns.debitX !== undefined && fallbackColumns.creditX !== undefined) {
-    const debitItem = nearestItem(line.items, fallbackColumns.debitX, 55);
-    const creditItem = nearestItem(line.items, fallbackColumns.creditX, 55);
+    const cw = fallbackColumns.charWidth;
+    const debitItem = nearestItem(line.items, fallbackColumns.debitX, 55, cw);
+    const creditItem = nearestItem(line.items, fallbackColumns.creditX, 55, cw);
     const debit = debitItem ? parseAmountToken(debitItem.text) : null;
     const credit = creditItem ? parseAmountToken(creditItem.text) : null;
     if (debit !== null && Math.abs(debit) >= 0.01 && (credit === null || Math.abs(credit) < 0.01)) {
@@ -151,17 +188,36 @@ function deriveAmountFromColumns(
 export function extractBalances(fullText: string, lines: TextLine[]): BalanceMeta {
   const meta: BalanceMeta = {};
 
-  const parseBal = (raw: string) => parseFnbAmountToken(raw) ?? parseAmountToken(raw);
+  /**
+   * Read the balance printed just after a label.
+   *
+   * fullText is every text item joined by spaces, so a hand-rolled character
+   * class like [\d\s.,]+ runs straight past the number and swallows whatever
+   * follows it - "Opening balance R 5,000.00 2026-05-04 ..." captured
+   * "5,000.00 2026" and parsed as nothing at all. Delegating to the shared
+   * tokenizer means the label lookup understands exactly the same amount
+   * formats as the row parser, currency prefix included.
+   */
+  const balanceAfterLabel = (label: RegExp): number | undefined => {
+    const m = fullText.match(label);
+    if (!m || m.index === undefined) return undefined;
+    const tail = fullText.slice(m.index + m[0].length, m.index + m[0].length + 40);
+    // FNB writes the direction as a Cr/Dr suffix rather than a sign.
+    const fnb = tail.match(/^[:\s]*([\d,]+(?:\.\d{2})?(?:Cr|Dr))\b/i);
+    if (fnb) {
+      const val = parseFnbAmountToken(fnb[1]);
+      if (val !== null) return val;
+    }
+    const amounts = findAmountTokens(tail);
+    return amounts.length > 0 ? amounts[0].value : undefined;
+  };
 
-  const openMatch = fullText.match(
-    /(?:opening\s+balance|balance\s+brought\s+forward|b\/f)[:\s]*([\d\s.,]+(?:Cr|Dr)?)/i
+  meta.openingBalance = balanceAfterLabel(
+    /(?:opening\s+balance|balance\s+brought\s+forward|b\/f)/i
   );
-  if (openMatch) meta.openingBalance = parseBal(openMatch[1].trim()) ?? undefined;
-
-  const closeMatch = fullText.match(
-    /(?:closing\s+balance|balance\s+carried\s+forward|c\/f)[:\s]*([\d\s.,]+(?:Cr|Dr)?)/i
+  meta.closingBalance = balanceAfterLabel(
+    /(?:closing\s+balance|balance\s+carried\s+forward|c\/f)/i
   );
-  if (closeMatch) meta.closingBalance = parseBal(closeMatch[1].trim()) ?? undefined;
 
   if (!meta.openingBalance) {
     for (const line of lines.slice(0, 20)) {
@@ -227,10 +283,10 @@ function parseRowFromLine(
   if (!iso) return null;
 
   const balanceAfter = headerCols
-    ? amountInColumn(line, headerCols.balance)
+    ? amountFromBucket(moneyBuckets(line, headerCols), "balance")
     : (() => {
         if (columns.balanceX !== undefined) {
-          const balItem = nearestItem(line.items, columns.balanceX);
+          const balItem = nearestItem(line.items, columns.balanceX, 55, columns.charWidth);
           return balItem ? parseAmountToken(balItem.text) : null;
         }
         const amounts = findAmountTokens(line.text);
@@ -274,8 +330,9 @@ function parseRowLegacy(
   dateToken: string
 ): { amount: number | null; uncertain: boolean } {
   if (columns.debitX !== undefined && columns.creditX !== undefined) {
-    const debitItem = nearestItem(line.items, columns.debitX, 55);
-    const creditItem = nearestItem(line.items, columns.creditX, 55);
+    const cw = columns.charWidth;
+    const debitItem = nearestItem(line.items, columns.debitX, 55, cw);
+    const creditItem = nearestItem(line.items, columns.creditX, 55, cw);
     const debit = debitItem ? parseAmountToken(debitItem.text) : null;
     const credit = creditItem ? parseAmountToken(creditItem.text) : null;
     if (debit !== null && Math.abs(debit) >= 0.01 && (credit === null || Math.abs(credit) < 0.01)) {
@@ -336,7 +393,7 @@ export function parseGenericPdfLayout(
 
     if (!dateToken && headerCols && rows.length > 0) {
       const balanceAfter = amountInColumn(line, headerCols.balance);
-      if (!balanceAfter) {
+      if (!balanceAfter && !SECTION_BOILERPLATE.test(line.text)) {
         const extra = continuationGenericText(line, headerCols);
         if (extra) {
           const last = rows[rows.length - 1];

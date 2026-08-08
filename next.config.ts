@@ -80,14 +80,21 @@ const nextConfig: NextConfig = {
   // client-side navigation — so the tab quietly picks up the new build rather
   // than reaching for a chunk that is gone.
   //
-  // Only VERCEL_DEPLOYMENT_ID is safe here. With Vercel's Skew Protection on,
-  // `?dpl=` is used to route the request to that exact deployment, so any other
-  // value (a git SHA, say) matches no deployment and 404s everything. Undefined
-  // off-Vercel, which leaves behaviour unchanged.
+  // This works on any Vercel plan: the mismatch check is Next's own, done
+  // against the x-nextjs-deployment-id response header. Vercel's paid Skew
+  // Protection adds a second layer we deliberately do not depend on — it keeps
+  // the *old* deployment's assets reachable, so a stale tab can carry on
+  // uninterrupted rather than reloading. We are happy to reload.
   //
-  // This is the framework half. The platform half — actually keeping the old
-  // deployment's assets reachable — is Vercel's Skew Protection setting under
-  // Settings → Advanced, and it needs a Pro plan.
+  // What we do not get, then, is protection for a chunk requested before the
+  // mismatch is noticed; that one still 404s. ErrorBoundary catches it and
+  // reloads (see src/lib/chunkErrors.ts), which is the same outcome a beat
+  // later.
+  //
+  // Only VERCEL_DEPLOYMENT_ID belongs here. A git SHA would look equivalent and
+  // is a trap: if Skew Protection is ever switched on, `?dpl=` starts routing
+  // to a deployment of that id, no deployment has one, and every asset 404s.
+  // Undefined off-Vercel, which leaves behaviour unchanged.
   deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
   // unpdf ships a serverless PDF.js build (no separate worker file) — keep it external so Vercel bundles it correctly for the import parse route.
   serverExternalPackages: ["unpdf"],

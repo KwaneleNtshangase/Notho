@@ -19,9 +19,247 @@ export const TEST_PASSWORD = process.env.TEST_PASSWORD ?? "FundiE2E_Test#2026";
 export const BASE_URL =
   process.env.BASE_URL ?? "https://www.notho.co.za";
 
-/** Sign in with email/password, wait for the app shell to appear */
+/**
+ * Refill the test account's hearts before the page boots.
+ *
+ * Why this is needed. A wrong answer costs a heart; five wrong answers and the
+ * lesson is replaced by an "You're out of hearts" gate that no amount of
+ * clicking gets past. The lesson-flow specs answer by clicking the first option
+ * every time, which on a four-option question is wrong about three times in
+ * four — so they reliably bankrupt themselves partway through a lesson.
+ *
+ * It is worse than per-test flakiness, because hearts are not local state.
+ * useNothoState syncs them to `user_progress` on the shared TEST_EMAIL account
+ * and they regenerate at one per hour. So a single bad run drained the account
+ * for the next five, and the three browser projects run against the same
+ * account: Desktop Chrome spent the hearts, Mobile Chrome and Mobile Safari
+ * started at zero. That is why every project failed together, every run, for
+ * days, while the app itself was fine.
+ *
+ * This is not a test-only backdoor. useNothoState merges local and remote with
+ * `Math.max(localEffective, remoteEffective)` and writes the winner back, so
+ * seeding localStorage to full is exactly the "this device has more hearts than
+ * the server knows about" case the app already handles. addInitScript runs
+ * before any page script, on every navigation, so it lands before the merge.
+ */
+export async function resetHearts(page: Page) {
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem("notho-hearts", "5");
+      // Clearing the timestamp matters: with it set and hearts below cap, the
+      // regen path recomputes from it and can undo the reset.
+      localStorage.removeItem("notho-last-heart-lost");
+    } catch {
+      // Private mode / storage disabled — the test will fail on its own merits.
+    }
+  });
+}
+
+/**
+ * Remembers the correct option for each question, keyed by question text.
+ * One per test — see answerCurrentQuestion for why this is necessary.
+ */
+export type AnswerMemory = {
+  /** question -> the option text the app revealed as correct */
+  answers: Map<string, string>;
+  /** question -> how many times it has come up (a re-queue shows as >1) */
+  seen: Map<string, number>;
+  /** how many times a remembered answer was successfully replayed */
+  replayed: number;
+};
+export const newAnswerMemory = (): AnswerMemory => ({
+  answers: new Map(),
+  seen: new Map(),
+  replayed: 0,
+});
+
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Answer the multiple-choice question on screen, correctly where possible.
+ *
+ * This exists because of one line in the lesson reducer:
+ *
+ *   steps: [...prev.steps, requeuedCopy(step)]      (lesson/[courseId]/[lessonId]/page.tsx)
+ *
+ * A wrong answer appends a re-queued copy of that question to the end of the
+ * lesson. The specs used to answer by clicking the first option, which on a
+ * four-option question is wrong about three times in four — so the lesson grew
+ * faster than the test consumed it and the loop could never terminate. That is
+ * not a budget problem and no iteration cap fixes it: stepIndex was observed
+ * climbing past 102 inside a single lesson.
+ *
+ * The strategy: click an option, then read the `.option-button.correct` the app
+ * reveals in its feedback, and remember it against the question. Because a
+ * missed question is re-queued verbatim, the second encounter is answered
+ * correctly. Each question is therefore missed at most once and the lesson
+ * converges — without coupling these tests to the shape of src/data.
+ *
+ * This covers true/false as well as multiple choice: both render their answers
+ * as `.option-button`, confirmed from a trace DOM snapshot —
+ *
+ *   <h2 class="step-title">True or False?</h2>
+ *   <div class="step-content"><p>A smartphone can be a need and a want…</p></div>
+ *   <button class="option-button …">True</button>
+ *   <button class="option-button …">False</button>
+ *
+ * — which is also why the key below must include `.step-content`. Keying on
+ * `.step-title` alone looks right for multiple choice, where the title *is* the
+ * question, but every true/false step shares the title "True or False?": that
+ * one string appeared 51 times in a single trace. All 51 questions collided on
+ * one memory entry, so the answer learned from one was replayed onto the next,
+ * which is worse than guessing — it is wrong every time after the first, and
+ * each wrong answer re-queues.
+ *
+ * Returns false if there is no answerable question on screen, so callers can
+ * fall through to the other step types.
+ */
+export async function answerCurrentQuestion(
+  page: Page,
+  memory: AnswerMemory
+): Promise<boolean> {
+  const opts = page.locator(".option-button:not([disabled])");
+  if ((await opts.count()) === 0) return false;
+
+  const textOf = async (sel: string) =>
+    (await page.locator(sel).first().textContent().catch(() => null))?.trim() ?? "";
+
+  // Title alone is not unique; content alone is not always present. Together
+  // they identify the question.
+  const question = [await textOf(".step-title"), await textOf(".step-content")]
+    .filter(Boolean)
+    .join(" :: ");
+
+  memory.seen.set(question, (memory.seen.get(question) ?? 0) + 1);
+
+  // Seen this one before (almost always because we got it wrong and it was
+  // re-queued) — answer it right this time.
+  const known = question ? memory.answers.get(question) : undefined;
+  if (known) {
+    const exact = opts.filter({ hasText: new RegExp(`^\\s*${escapeRegex(known)}\\s*$`) }).first();
+    if ((await exact.count()) > 0) {
+      await exact.click();
+      memory.replayed++;
+      return true;
+    }
+  }
+
+  await opts.first().click();
+
+  // Learn from the feedback. The app marks the right option regardless of
+  // whether we picked it, so this works on both a hit and a miss.
+  //
+  // 1200ms, not 3000. This fires on every answer, and on the steps where no
+  // `.correct` ever appears it waits out the full budget. At ~120 iterations a
+  // 3s wait is six minutes of pure waiting — more than the entire test timeout,
+  // which is what turned "budget exhausted" into "timed out at exactly 4.0m".
+  // Feedback renders in well under a second when it renders at all.
+  const correct = page.locator(".option-button.correct").first();
+  await correct.waitFor({ state: "visible", timeout: 1_200 }).catch(() => {});
+  const correctText = (await correct.textContent().catch(() => null))?.trim();
+  if (question && correctText) memory.answers.set(question, correctText);
+
+  return true;
+}
+
+/**
+ * Why the loop stopped, in a form you can act on.
+ *
+ * Every failure so far has said "budget exhausted" or "timed out", neither of
+ * which distinguishes "the memory is not converging" from "this lesson is
+ * genuinely long" from "one step is stuck". These three numbers do:
+ *
+ *   - distinct questions with answers learned, vs questions seen
+ *   - how many times an answer was successfully replayed
+ *   - the questions seen most often (a question seen 5+ times is not converging)
+ */
+export function describeAnswerMemory(memory: AnswerMemory): string {
+  const repeats = [...memory.seen.entries()]
+    .filter(([, n]) => n > 1)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([q, n]) => `${n}x "${q.slice(0, 60)}…"`);
+
+  return [
+    `questions seen: ${memory.seen.size}`,
+    `answers learned: ${memory.answers.size}`,
+    `answers replayed: ${memory.replayed}`,
+    repeats.length ? `most repeated: ${repeats.join(" | ")}` : "no question seen twice",
+  ].join(" · ");
+}
+
+/**
+ * Is the lesson-completion summary currently on screen?
+ *
+ * This must be checked immediately before any "Continue" click, not just once
+ * per loop iteration. LessonSummaryView's only button is labelled "Continue",
+ * which is the same label the loops use to advance a step. So a loop that
+ * clicks an answer and then a Continue in the same iteration will: answer the
+ * final question, watch the app render the summary, and then dismiss it with
+ * the very next click — all before the top-of-loop check runs again.
+ *
+ * The result is a lesson-completion test that never observes a lesson
+ * completing. It chains straight into the next lesson and keeps going until the
+ * iteration budget runs out, which is how stepIndex reached 102 across roughly
+ * 25 consecutive lessons.
+ */
+export async function atLessonSummary(page: Page): Promise<boolean> {
+  return page
+    .locator("text=XP Earned")
+    .first()
+    .isVisible()
+    .catch(() => false);
+}
+
+/**
+ * If the lesson has been replaced by the out-of-hearts gate, refill and resume.
+ *
+ * Seeding hearts at page load is not on its own enough. A wrong answer costs a
+ * heart and lets you continue, so a spec that answers by clicking option one
+ * will spend all five partway through a lesson of eight-plus questions and hit
+ * the gate again — same failure, later.
+ *
+ * The recovery uses the app's own guarantee. The gate says "your progress on
+ * this lesson is saved — come back and pick up exactly where you left off", so
+ * a reload re-runs the init script (hearts back to five) and returns to the
+ * same step. Nothing is faked and no state is skipped.
+ *
+ * Returns true if it recovered, so the caller can spend a loop iteration on it.
+ */
+export async function recoverIfOutOfHearts(page: Page): Promise<boolean> {
+  const gate = page.locator("text=You're out of hearts").first();
+  if (!(await gate.isVisible().catch(() => false))) return false;
+
+  await page.reload({ waitUntil: "domcontentloaded" });
+  // Wait for the lesson to re-render rather than sleeping a fixed amount.
+  await page
+    .locator(".option-button, button:has-text('Continue')")
+    .first()
+    .waitFor({ state: "visible", timeout: 20_000 })
+    .catch(() => {});
+  return true;
+}
+
+/** Where auth.setup.ts caches the signed-in session. Gitignored. */
+export const AUTH_STATE_PATH = "e2e/.auth/user.json";
+
+/**
+ * Sign in with email/password, wait for the app shell to appear.
+ *
+ * Now session-aware. With storageState restored by the setup project the app is
+ * already signed in on first paint, so this returns immediately instead of
+ * driving the login form again. That keeps every existing `await signIn(page)`
+ * call working untouched across all seven spec files while collapsing ~123
+ * sign-ins per run down to one.
+ */
 export async function signIn(page: Page) {
+  // Must precede goto: addInitScript only applies to navigations after it.
+  await resetHearts(page);
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 60_000 });
+
+  // Already authenticated via cached storageState? Nothing to do.
+  const shell = page.locator(".app-container").first();
+  if (await shell.isVisible({ timeout: 8_000 }).catch(() => false)) return;
   // Splash animation can take 20-25s on slow CI runners — wait for the landing page or form directly.
   const signInButton = page.locator('button', { hasText: /I Already Have an Account/i }).first();
   // Try to wait for the landing screen button; if visible, click it.

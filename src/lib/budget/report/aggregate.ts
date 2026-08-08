@@ -259,8 +259,12 @@ export function buildReport(
     let expenseCents = 0;
     let setAsideMonthCents = 0;
     let incomeCents = 0;
+    // Counted, not inferred from the totals: a month holding a single R0 entry
+    // has data, and a month of equal-and-opposite entries is not empty either.
+    let entryCount = 0;
     for (const entry of periodEntries) {
       if (entry.entry_date < slice.overlapStart || entry.entry_date > slice.overlapEnd) continue;
+      entryCount += 1;
       if (entry.type === "expense") {
         const cents = amountToCents(entry.amount);
         expenseCents += cents;
@@ -283,6 +287,7 @@ export function buildReport(
       isPartial: daysCovered < daysInMonth,
       daysCovered,
       daysInMonth,
+      hasData: entryCount > 0,
     };
   });
 

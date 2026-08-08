@@ -1,0 +1,36 @@
+{
+  "_comment": "2-row statement with a running balance. The balance chain audit in pdf.ts requires >= 3 rows with balances, so this statement gets NO sign audit at all. If column geometry assigns the wrong sign (e.g. due to a short amount overlapping a neighbouring column), nothing catches it. Row 1 is a debit (purchase), Row 2 is a credit (salary). Balance: 5000 → 4500 → 17500. The generic parser should assign the right signs from column geometry, but with no audit, a geometry error is silently trusted.",
+  "headerText": "Discovery Bank Limited FSP number 48657 Statement Account type: Transaction Account Account number: 15675225482",
+  "openingBalance": 5000.00,
+  "closingBalance": 17500.00,
+  "expectedCount": 2,
+  "lines": [
+    { "y": 700, "items": [
+      { "x": 61, "text": "Date" },
+      { "x": 170, "text": "Description" },
+      { "x": 380, "text": "Debit" },
+      { "x": 450, "text": "Credit" },
+      { "x": 520, "text": "Balance" }
+    ] },
+    { "y": 680, "items": [
+      { "x": 170, "text": "Opening balance" },
+      { "x": 505, "text": "R 5,000.00" }
+    ] },
+    { "y": 660, "items": [
+      { "x": 61, "text": "2026-06-01" },
+      { "x": 170, "text": "Checkers Claremont" },
+      { "x": 385, "text": "R 500.00" },
+      { "x": 505, "text": "R 4,500.00" }
+    ] },
+    { "y": 640, "items": [
+      { "x": 61, "text": "2026-06-15" },
+      { "x": 170, "text": "Salary Notho Pty Ltd" },
+      { "x": 429, "text": "R 13,000.00" },
+      { "x": 491, "text": "R 17,500.00" }
+    ] },
+    { "y": 620, "items": [
+      { "x": 170, "text": "Closing balance" },
+      { "x": 505, "text": "R 17,500.00" }
+    ] }
+  ]
+}

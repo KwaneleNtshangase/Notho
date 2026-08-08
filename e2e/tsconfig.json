@@ -9,7 +9,11 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "lib": ["ES2017"]
+    // DOM is required, not optional: page.evaluate() and page.addInitScript()
+    // take callbacks that run *in the browser*, so they legitimately reference
+    // document, localStorage and getComputedStyle. Without it those specs threw
+    // "Cannot find name 'document'" and the e2e types never actually checked.
+    "lib": ["ES2017", "DOM"]
   },
   "include": ["./**/*.ts"]
 }

@@ -71,3 +71,4 @@ prod.log
 /print_errors.js
 /test-budget.sh
 /*.py
+e2e/.auth/

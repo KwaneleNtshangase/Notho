@@ -1,0 +1,79 @@
+{
+  "_comment": "Discovery Bank CERTIFIED statement (bug RF8BPO). Different layout from pdf-discovery.layout.json: Date|Description|Debit|Credit|Balance with a per-row running balance, ISO dates, and R-prefixed amounts emitted as a single text item. Column x values are RIGHT-ALIGNED and reproduce the geometry in the RF8BPO fingerprint (debit right edge 414, credit 476, balance 538, charWidth ~4.25) - note the debit on 2026-05-11 starts at x=380 and the credit on 2026-05-15 at x=442, exactly as observed in the wild.",
+  "headerText": "Discovery Bank Limited FSP number 48657 Certified statement Account type: Transaction Account Account number: 15675225482",
+  "openingBalance": 5000.00,
+  "closingBalance": 22416.43,
+  "expectedCount": 6,
+  "lines": [
+    { "y": 700, "items": [
+      { "x": 55, "text": "Account Type" },
+      { "x": 267, "text": "Account Number" },
+      { "x": 497, "text": "Balance" }
+    ] },
+    { "y": 680, "items": [
+      { "x": 55, "text": "Gold Transaction Account" },
+      { "x": 267, "text": "15675225482" },
+      { "x": 491, "text": "R 22,416.43" }
+    ] },
+    { "y": 640, "items": [
+      { "x": 61, "text": "Account type: Transaction Account Account number: 15675225482" }
+    ] },
+    { "y": 620, "items": [
+      { "x": 61, "text": "Date" },
+      { "x": 119, "text": "Description" },
+      { "x": 393, "text": "Debit" },
+      { "x": 450, "text": "Credit" },
+      { "x": 508, "text": "Balance" }
+    ] },
+    { "y": 600, "items": [
+      { "x": 119, "text": "Opening balance" },
+      { "x": 496, "text": "R 5,000.00" }
+    ] },
+    { "y": 580, "items": [
+      { "x": 61, "text": "2026-05-04" },
+      { "x": 119, "text": "Card purchase Checkers Hyper Claremont" },
+      { "x": 372, "text": "R 1,234.56" },
+      { "x": 496, "text": "R 3,765.44" }
+    ] },
+    { "y": 560, "items": [
+      { "x": 61, "text": "2026-05-06" },
+      { "x": 119, "text": "Salary Notho Pty Ltd" },
+      { "x": 429, "text": "R 18,500.00" },
+      { "x": 491, "text": "R 22,265.44" }
+    ] },
+    { "y": 540, "items": [
+      { "x": 61, "text": "2026-05-07" },
+      { "x": 119, "text": "Monthly account fee" },
+      { "x": 389, "text": "R 9.99" },
+      { "x": 491, "text": "R 22,255.45" }
+    ] },
+    { "y": 520, "items": [
+      { "x": 61, "text": "2026-05-11" },
+      { "x": 119, "text": "Netflix subscription" },
+      { "x": 380, "text": "R 199.00" },
+      { "x": 491, "text": "R 22,056.45" }
+    ] },
+    { "y": 500, "items": [
+      { "x": 61, "text": "2026-05-15" },
+      { "x": 119, "text": "Refund Takealot order 90210" },
+      { "x": 442, "text": "R 349.99" },
+      { "x": 491, "text": "R 22,406.44" }
+    ] },
+    { "y": 480, "items": [
+      { "x": 61, "text": "2026-05-31" },
+      { "x": 119, "text": "Interest earned at 2.50%" },
+      { "x": 451, "text": "R 9.99" },
+      { "x": 491, "text": "R 22,416.43" }
+    ] },
+    { "y": 460, "items": [
+      { "x": 119, "text": "Closing balance" },
+      { "x": 491, "text": "R 22,416.43" }
+    ] },
+    { "y": 440, "items": [
+      { "x": 61, "text": "Your interest rate is 2.50% per annum" }
+    ] },
+    { "y": 420, "items": [
+      { "x": 61, "text": "Page 1 of 13" }
+    ] }
+  ]
+}

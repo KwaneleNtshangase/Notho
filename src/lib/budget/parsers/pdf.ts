@@ -1,5 +1,10 @@
 import type { NormalizedTxn, ParsePdfResult } from "../types";
-import { reconcileBalanceChain, reconcileTransactions } from "../reconciliation";
+import {
+  orientByBalanceChain,
+  reconcileBalanceChain,
+  reconcileTransactions,
+  verifySignsAgainstBalanceChain,
+} from "../reconciliation";
 import { extractPdfText } from "./pdfText";
 import { groupItemsIntoLines } from "./pdfLayout";
 import { extractContextYear } from "./pdfDates";
@@ -83,8 +88,8 @@ export async function parsePdfStatement(
     };
   }
 
-  // Discovery has no per-row running balance - pull opening/closing from the
-  // account summary so the signed-sum reconciliation can still run.
+  // The Discovery in-app layout has no per-row running balance - pull
+  // opening/closing from the account summary so reconciliation can still run.
   if (bankId === "discovery") {
     const dbal = extractDiscoveryBalances(lines);
     if (dbal.openingBalance !== undefined) generic.balances.openingBalance = dbal.openingBalance;
@@ -92,6 +97,41 @@ export async function parsePdfStatement(
   }
 
   const accountLabel = accountLabelFromBank(bankId ?? detectBankFromText(fullText), options?.fileName);
+
+  // Where the statement prints a running balance, let it audit our column
+  // reading: put the rows in the direction the chain agrees with, then check
+  // every sign against the bank's own arithmetic. Geometry proposes, the
+  // document disposes.
+  const hasRunningBalance = rows.filter((r) => r.balanceAfter !== undefined).length >= 3;
+  let signWarning: string | undefined;
+  if (hasRunningBalance) {
+    const oriented = orientByBalanceChain(rows);
+    const checked = verifySignsAgainstBalanceChain(
+      oriented.rows,
+      generic.balances.openingBalance
+    );
+    rows = checked.rows;
+    if (checked.corrected > 0) {
+      signWarning = `${checked.corrected} row${checked.corrected === 1 ? "" : "s"} had their in/out direction corrected against the statement's own running balance.`;
+    } else if (checked.unverified > checked.verified) {
+      signWarning =
+        "Most rows could not be checked against the running balance - review the in/out direction on each before importing.";
+    }
+  }
+
+  // Statements covering several accounts restart their balance chain at each
+  // account, so a single opening/closing pair does not describe the document.
+  //
+  // Counted by DISTINCT account number rather than by how often the words
+  // appear: "Account Number" is also a column heading in the summary table at
+  // the top, so counting occurrences flags an ordinary single-account statement.
+  const accountNumbers = new Set(
+    [...fullText.matchAll(/account\s+(?:number|no\.?)\s*:?\s*(\d[\d\s-]{5,})/gi)].map((m) =>
+      m[1].replace(/[\s-]/g, "")
+    )
+  );
+  const accountSections = accountNumbers.size;
+  const multiAccount = accountSections > 1;
 
   const transactions: NormalizedTxn[] = rows.map((r) => ({
     date: r.date,
@@ -114,27 +154,45 @@ export async function parsePdfStatement(
   const hasBalanceMeta =
     generic.balances.openingBalance !== undefined && closingBalance !== undefined;
   // A last-resort parse is low confidence by definition: we recognised neither
-  // the bank nor the column layout, so the user must eyeball every row.
-  const lowConfidence = !hasBalanceMeta || usedLastResort;
+  // the bank nor the column layout, so the user must eyeball every row. A
+  // multi-account statement is low confidence for a different reason: the rows
+  // may be right, but nothing in the document verifies them end to end.
+  // When fewer than 3 rows carry a running balance, the chain audit could not
+  // run, so the sign assignment from column geometry is untested — low
+  // confidence even if the opening/closing arithmetic checks out.
+  const lowConfidence = !hasBalanceMeta || usedLastResort || multiAccount || !hasRunningBalance;
 
-  let reconciliation =
-    (bankId === "capitec" || bankId === "fnb" || bankId === "standard-bank") &&
+  // Chaining running balances is the strongest check available, but it only
+  // describes ONE account - a statement covering several restarts the chain at
+  // each, so asserting a single opening/closing pair over the whole document
+  // would report a break that is not there (or, worse, a false "reconciles").
+  const canChainBalances =
+    (bankId === "capitec" ||
+      bankId === "fnb" ||
+      bankId === "standard-bank" ||
+      (bankId === "discovery" && hasRunningBalance)) &&
+    !multiAccount &&
     generic.balances.openingBalance !== undefined &&
-    closingBalance !== undefined
-      ? reconcileBalanceChain(
-          transactions,
-          generic.balances.openingBalance,
-          closingBalance
-        )
-      : reconcileTransactions(transactions, {
-          openingBalance: generic.balances.openingBalance,
-          closingBalance,
-        });
+    closingBalance !== undefined;
 
-  // Discovery reconciles on the signed sum (opening + sum = closing), since it
-  // prints no per-row balance to chain.
+  let reconciliation = canChainBalances
+    ? reconcileBalanceChain(
+        transactions,
+        generic.balances.openingBalance!,
+        closingBalance!
+      )
+    : reconcileTransactions(transactions, {
+        openingBalance: multiAccount ? undefined : generic.balances.openingBalance,
+        closingBalance: multiAccount ? undefined : closingBalance,
+      });
+
+  // The Discovery in-app layout prints no per-row balance, so it reconciles on
+  // the signed sum instead (opening + sum = closing). The certified layout does
+  // print one and is chained above.
   if (
     bankId === "discovery" &&
+    !hasRunningBalance &&
+    !multiAccount &&
     generic.balances.openingBalance !== undefined &&
     closingBalance !== undefined
   ) {
@@ -143,6 +201,13 @@ export async function parsePdfStatement(
       closingBalance,
     });
   }
+
+  if (multiAccount) {
+    reconciliation.warnings.push(
+      `This statement covers ${accountSections} accounts, so there is no single balance to reconcile against. Check the totals per account before importing.`
+    );
+  }
+  if (signWarning) reconciliation.warnings.push(signWarning);
 
   if (usedLastResort) {
     reconciliation.warnings.push(

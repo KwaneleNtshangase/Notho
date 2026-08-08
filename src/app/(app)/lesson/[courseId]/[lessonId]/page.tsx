@@ -1,5 +1,6 @@
 "use client";
 
+import { isScorableStep } from "@/lib/lessonScoring";
 import React, { use } from "react";
 import { LessonView } from "@/components/views/LessonView";
 import { LessonSummaryView } from "@/components/views/LessonSummaryView";
@@ -296,6 +297,16 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       const step = prev.steps[prev.stepIndex] as WorkingStep;
       const qid = step?.__qid;
       const answers = { ...prev.answers, [prev.stepIndex]: answerValue };
+
+      // Ungraded steps record the interaction and stop there. An action step is
+      // self-reported completion, not a question with a right answer, so it must
+      // not touch correctCount, mistakes, hearts or the re-queue. Before this,
+      // "Done - I did it!" fell through to the wrong-answer branch below and the
+      // step re-queued itself forever — see src/lib/lessonScoring.ts.
+      if (!isScorableStep(step?.type)) {
+        return { ...prev, answers };
+      }
+
       if (isCorrect) {
         const masteredQids =
           qid !== undefined && !prev.masteredQids.includes(qid)

@@ -108,6 +108,13 @@ export type MonthlySpend = {
   isPartial: boolean;
   daysCovered: number;
   daysInMonth: number;
+  /**
+   * False when the month carries no entries at all - not yet reached, not yet
+   * imported, or genuinely untracked. Distinct from a month that really did
+   * total zero, and never plotted as a data point: a line falling to R0 reads
+   * as "spending collapsed" when the truth is "we don't know yet".
+   */
+  hasData: boolean;
 };
 
 /** Comparison against the immediately preceding period of equal length. */

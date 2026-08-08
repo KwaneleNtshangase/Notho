@@ -152,8 +152,12 @@ export function computeReportInsights(core: ReportCore): ReportInsights {
   if (core.comparison?.setAsideDeltaPct != null && core.comparison.setAsideDeltaPct > 0 && core.netCents >= 0) {
     wins.push(`Money set aside is up ${core.comparison.setAsideDeltaPct}% vs the previous period.`);
   }
-  const positiveMonths = core.monthlySpend.filter((m) => !m.isPartial && m.netCents >= 0).length;
-  const fullMonths = core.monthlySpend.filter((m) => !m.isPartial).length;
+  // hasData, not just !isPartial: a complete month with no entries nets to
+  // exactly zero, which counts as ">= 0" and was being celebrated as a month
+  // ended in the green. A user two months into the year got told every month
+  // was positive, including the months they had not lived yet.
+  const positiveMonths = core.monthlySpend.filter((m) => !m.isPartial && m.hasData && m.netCents >= 0).length;
+  const fullMonths = core.monthlySpend.filter((m) => !m.isPartial && m.hasData).length;
   if (fullMonths >= 2 && positiveMonths === fullMonths) {
     wins.push(`Every complete month in this period ended in the green (${fullMonths}/${fullMonths}).`);
   }

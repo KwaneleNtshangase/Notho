@@ -430,19 +430,37 @@ function SunburstChart({
 }
 
 /**
- * Income vs Expenses line chart. Partial months are drawn with dashed
- * connectors and hollow points so a mid-month cut-off never reads as a
- * "spending collapsed" trend.
+ * Income vs Expenses line chart.
+ *
+ * Two kinds of month get special handling, because both otherwise read as a
+ * cliff the user did not fall off:
+ *   - PARTIAL months (period cuts mid-month) draw with dashed connectors and
+ *     hollow points, so a mid-month cut-off isn't a "spending collapsed" trend.
+ *   - EMPTY months (no entries at all - not reached yet, or not imported) are
+ *     not plotted at all. Plotting them at R0 drew a line diving to the floor,
+ *     which is the single most alarming thing the chart could say, and it isn't
+ *     true: the value is unknown, not zero. Their axis label is kept and greyed
+ *     so the time axis stays honest about the gap.
  */
 function LineChart({ data, width = 515, height = 124 }: { data: MonthlySpend[]; width?: number; height?: number }) {
   const leftPad = 42;
   const plotW = width - leftPad - 8;
   const plotH = height;
-  const max = Math.max(...data.flatMap((d) => [d.incomeCents, d.expenseCents]), 1);
+  // Scale off plotted months only - an empty month must not drag the axis.
+  const plotted = data.filter((d) => d.hasData);
+  const max = Math.max(...plotted.flatMap((d) => [d.incomeCents, d.expenseCents]), 1);
   const n = data.length;
   const xAt = (i: number) => (n <= 1 ? plotW / 2 : (i / (n - 1)) * plotW);
   const yAt = (v: number) => plotH - (v / max) * plotH;
-  const hasPartial = data.some((d) => d.isPartial);
+  const hasPartial = data.some((d) => d.isPartial && d.hasData);
+  const emptyMonths = data.filter((d) => !d.hasData);
+
+  // Connect consecutive plotted months only; a gap leaves a visible break
+  // rather than a stroke sloping to zero and back.
+  const segments: { from: number; to: number }[] = [];
+  for (let i = 0; i < data.length - 1; i++) {
+    if (data[i].hasData && data[i + 1].hasData) segments.push({ from: i, to: i + 1 });
+  }
 
   const series: { key: "incomeCents" | "expenseCents"; color: string }[] = [
     { key: "expenseCents", color: C.expense },
@@ -478,16 +496,15 @@ function LineChart({ data, width = 515, height = 124 }: { data: MonthlySpend[]; 
           <Line x1={0} y1={plotH - 1} x2={plotW} y2={plotH - 1} stroke={C.border} strokeWidth={1} />
           {series.map((s) => (
             <G key={s.key}>
-              {data.slice(1).map((d, i) => {
-                const prev = data[i];
-                const dashed = d.isPartial || prev.isPartial;
+              {segments.map(({ from, to }) => {
+                const dashed = data[from].isPartial || data[to].isPartial;
                 return (
                   <Line
-                    key={i}
-                    x1={xAt(i)}
-                    y1={yAt(prev[s.key])}
-                    x2={xAt(i + 1)}
-                    y2={yAt(d[s.key])}
+                    key={`${from}-${to}`}
+                    x1={xAt(from)}
+                    y1={yAt(data[from][s.key])}
+                    x2={xAt(to)}
+                    y2={yAt(data[to][s.key])}
                     stroke={s.color}
                     strokeWidth={1.6}
                     strokeDasharray={dashed ? "3 3" : undefined}
@@ -495,7 +512,7 @@ function LineChart({ data, width = 515, height = 124 }: { data: MonthlySpend[]; 
                 );
               })}
               {data.map((d, i) =>
-                d.isPartial ? (
+                !d.hasData ? null : d.isPartial ? (
                   <Circle key={i} cx={xAt(i)} cy={yAt(d[s.key])} r={2.4} fill={C.white} stroke={s.color} strokeWidth={1.2} />
                 ) : (
                   <Circle key={i} cx={xAt(i)} cy={yAt(d[s.key])} r={2} fill={s.color} />
@@ -507,17 +524,32 @@ function LineChart({ data, width = 515, height = 124 }: { data: MonthlySpend[]; 
       </View>
       <View style={{ flexDirection: "row", paddingLeft: leftPad, marginTop: 4 }}>
         {data.map((d, i) => (
-          <Text key={i} style={{ fontSize: 7, color: C.textMuted, width: plotW / Math.max(n, 1), textAlign: "center" }}>
-            {d.isPartial ? `${d.label}*` : d.label}
+          <Text
+            key={i}
+            style={{
+              fontSize: 7,
+              // Empty months stay on the axis but recede, so the gap in the
+              // line is legible as "nothing recorded", not a rendering fault.
+              color: d.hasData ? C.textMuted : C.border,
+              width: plotW / Math.max(n, 1),
+              textAlign: "center",
+            }}
+          >
+            {d.hasData && d.isPartial ? `${d.label}*` : d.label}
           </Text>
         ))}
       </View>
       {hasPartial && (
         <Text style={{ fontSize: 7, color: C.textMuted, marginTop: 3, paddingLeft: leftPad }}>
           {`* ${data
-            .filter((d) => d.isPartial)
+            .filter((d) => d.isPartial && d.hasData)
             .map((d) => `${d.label}: ${d.daysCovered} of ${d.daysInMonth} days`)
             .join(" · ")} - shown for reference, not a trend.`}
+        </Text>
+      )}
+      {emptyMonths.length > 0 && (
+        <Text style={{ fontSize: 7, color: C.textMuted, marginTop: 3, paddingLeft: leftPad }}>
+          {`${emptyMonths.map((d) => d.label).join(", ")}: nothing recorded yet - not plotted, so the line stops rather than dropping to zero.`}
         </Text>
       )}
     </View>
@@ -607,10 +639,18 @@ function DeltaText({ deltaPct, goodWhenUp }: { deltaPct: number | null; goodWhen
 function ExpenseTable({
   rows,
   positiveIsGood = false,
+  shareScaleMax,
 }: {
   rows: ExpenseCategoryRow[];
   /** For savings vehicles: contributing MORE than planned is good (teal). */
   positiveIsGood?: boolean;
+  /**
+   * Largest share across EVERY table on the page, so a bar means the same
+   * length in the set-aside table as in the spending table. Scaled per-table,
+   * the biggest row of each is full-width and a 30% row looks the same as a
+   * 51% one.
+   */
+  shareScaleMax: number;
 }) {
   if (rows.length === 0) return <Text style={{ fontSize: 9, color: C.textMuted }}>No expense data for this period.</Text>;
   const varColor = (r: ExpenseCategoryRow) => {
@@ -624,12 +664,12 @@ function ExpenseTable({
       {/* Header reserves room for itself + ~4 rows, so a table never starts
           with its header stranded at the foot of a page. */}
       <View style={styles.tableHeader} minPresenceAhead={80}>
-        <Text style={{ width: "28%" }}>Category</Text>
-        <Text style={{ width: "16%", textAlign: "right" }}>Budgeted</Text>
-        <Text style={{ width: "16%", textAlign: "right" }}>Actual</Text>
+        <Text style={{ width: "24%" }}>Category</Text>
+        <Text style={{ width: "15%", textAlign: "right" }}>Budgeted</Text>
+        <Text style={{ width: "15%", textAlign: "right" }}>Actual</Text>
         <Text style={{ width: "16%", textAlign: "right" }}>Variance</Text>
-        <Text style={{ width: "12%", textAlign: "right" }}>Var %</Text>
-        <Text style={{ width: "12%", textAlign: "right" }}>Share</Text>
+        <Text style={{ width: "11%", textAlign: "right" }}>Var %</Text>
+        <Text style={{ width: "19%", textAlign: "right" }}>Share</Text>
       </View>
       {rows.map((r, idx) => (
         <View
@@ -637,23 +677,46 @@ function ExpenseTable({
           wrap={false}
           style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}
         >
-          <View style={{ width: "28%", flexDirection: "row", alignItems: "center" }}>
+          <View style={{ width: "24%", flexDirection: "row", alignItems: "center" }}>
             <View style={[styles.dot, { backgroundColor: r.color }]} />
             <Text>{r.categoryName}</Text>
           </View>
           {r.hasBudget ? (
-            <Text style={{ width: "16%", textAlign: "right" }}>{zar(r.budgetedCents)}</Text>
+            <Text style={{ width: "15%", textAlign: "right" }}>{zar(r.budgetedCents)}</Text>
           ) : (
-            <Text style={{ width: "16%", textAlign: "right", fontSize: 7, color: C.textMuted }}>No budget</Text>
+            <Text style={{ width: "15%", textAlign: "right", fontSize: 7, color: C.textMuted }}>No budget</Text>
           )}
-          <Text style={{ width: "16%", textAlign: "right" }}>{zar(r.actualCents)}</Text>
+          <Text style={{ width: "15%", textAlign: "right" }}>{zar(r.actualCents)}</Text>
           <Text style={{ width: "16%", textAlign: "right", color: varColor(r) }}>
             {r.hasBudget ? zarSigned(r.varianceCents) : "-"}
           </Text>
-          <Text style={{ width: "12%", textAlign: "right", color: varColor(r) }}>
+          <Text style={{ width: "11%", textAlign: "right", color: varColor(r) }}>
             {r.variancePct != null ? `${r.variancePct}%` : "-"}
           </Text>
-          <Text style={{ width: "12%", textAlign: "right" }}>{r.sharePct}%</Text>
+          {/* Share as a bar plus the number. A 51% row and a 0.7% row are two
+              similar-looking strings; as bars, the shape of someone's spending
+              - and whether one category swamps the rest - lands in a single
+              pass down the column. */}
+          <View style={{ width: "19%", flexDirection: "row", alignItems: "center", paddingLeft: 8 }}>
+            {/* Track uses border grey, not rowAlt: on the striped rows rowAlt
+                matches the row background and the track vanishes, so every
+                other row lost its scale. */}
+            <View style={{ flex: 1, height: 4, backgroundColor: C.border, borderRadius: 2, marginRight: 6 }}>
+              <View
+                style={{
+                  // Floor of 3% keeps a sub-1% category as a visible stub
+                  // instead of vanishing, without implying it is meaningful.
+                  width: `${Math.min(100, Math.max(3, Math.round((r.sharePct / shareScaleMax) * 100)))}%`,
+                  height: 4,
+                  backgroundColor: r.color,
+                  borderRadius: 2,
+                }}
+              />
+            </View>
+            {/* 30 not 24: a one-decimal share like "30.3%" wrapped to a second
+                line at the narrower width. */}
+            <Text style={{ width: 30, textAlign: "right" }}>{r.sharePct}%</Text>
+          </View>
         </View>
       ))}
     </View>
@@ -676,29 +739,46 @@ function MonthTable({ months }: { months: MonthlySpend[] }) {
         {anySetAside && <Text style={{ width: w.set, textAlign: "right" }}>Set aside</Text>}
         <Text style={{ width: w.net, textAlign: "right" }}>Net</Text>
       </View>
-      {months.map((m, idx) => (
-        <View
-          key={m.monthYear}
-          wrap={false}
-          style={[styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}]}
-        >
-          <View style={{ width: w.month, flexDirection: "row", alignItems: "center" }}>
-            <View style={[styles.dot, { width: 7, height: 7, backgroundColor: m.netCents >= 0 ? C.teal : C.expense }]} />
-            <Text>
-              {m.label} {m.monthYear.slice(0, 4)}
-              {m.isPartial ? ` (1-${m.daysCovered})` : ""}
+      {months.map((m, idx) => {
+        const rowStyle = [styles.tableRow, idx % 2 === 1 ? { backgroundColor: C.rowAlt } : {}];
+        // A month with no entries has no numbers to show. Printing R0 and
+        // "+R0.00" claimed a balanced month that never happened - and read as
+        // the user having stopped earning. Say what's actually true instead.
+        if (!m.hasData) {
+          return (
+            <View key={m.monthYear} wrap={false} style={rowStyle}>
+              <View style={{ width: w.month, flexDirection: "row", alignItems: "center" }}>
+                <View style={[styles.dot, { width: 7, height: 7, backgroundColor: C.border }]} />
+                <Text style={{ color: C.textMuted }}>
+                  {m.label} {m.monthYear.slice(0, 4)}
+                </Text>
+              </View>
+              <Text style={{ width: "100%", textAlign: "right", fontSize: 8, color: C.textMuted }}>
+                Nothing recorded yet
+              </Text>
+            </View>
+          );
+        }
+        return (
+          <View key={m.monthYear} wrap={false} style={rowStyle}>
+            <View style={{ width: w.month, flexDirection: "row", alignItems: "center" }}>
+              <View style={[styles.dot, { width: 7, height: 7, backgroundColor: m.netCents >= 0 ? C.teal : C.expense }]} />
+              <Text>
+                {m.label} {m.monthYear.slice(0, 4)}
+                {m.isPartial ? ` (1-${m.daysCovered})` : ""}
+              </Text>
+            </View>
+            <Text style={{ width: w.inc, textAlign: "right" }}>{zarWhole(m.incomeCents)}</Text>
+            <Text style={{ width: w.day, textAlign: "right" }}>{zarWhole(m.consumptionCents)}</Text>
+            {anySetAside && (
+              <Text style={{ width: w.set, textAlign: "right", color: C.gold }}>{zarWhole(m.setAsideCents)}</Text>
+            )}
+            <Text style={{ width: w.net, textAlign: "right", fontWeight: 700, color: m.netCents >= 0 ? C.teal : C.expense }}>
+              {zarSigned(m.netCents)}
             </Text>
           </View>
-          <Text style={{ width: w.inc, textAlign: "right" }}>{zarWhole(m.incomeCents)}</Text>
-          <Text style={{ width: w.day, textAlign: "right" }}>{zarWhole(m.consumptionCents)}</Text>
-          {anySetAside && (
-            <Text style={{ width: w.set, textAlign: "right", color: C.gold }}>{zarWhole(m.setAsideCents)}</Text>
-          )}
-          <Text style={{ width: w.net, textAlign: "right", fontWeight: 700, color: m.netCents >= 0 ? C.teal : C.expense }}>
-            {zarSigned(m.netCents)}
-          </Text>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 }
@@ -772,6 +852,8 @@ export function BudgetReportDocument({
 
   const consumptionRows = model.expenseCategories.filter((r) => !r.isSavingsVehicle && r.actualCents > 0);
   const setAsideRows = model.expenseCategories.filter((r) => r.isSavingsVehicle && r.actualCents > 0);
+  /** One bar scale shared by both category tables - see ExpenseTable. */
+  const shareScaleMax = Math.max(...consumptionRows.concat(setAsideRows).map((r) => r.sharePct), 1);
   const burstShades = sunburstShades(model.expenseCategories);
   // One-line story for the sunburst: biggest group + what drives it.
   const topGroup = SUNBURST_ORDER.filter((g) => model.groupTotals[g] > 0).sort(
@@ -826,6 +908,74 @@ export function BudgetReportDocument({
   const overspendSorted = [...model.expenseCategories]
     .filter((r) => r.hasBudget && !r.isSavingsVehicle)
     .sort((a, b) => b.varianceCents - a.varianceCents);
+
+  /**
+   * Is this budget actually a plan, or just a number?
+   *
+   * The four stats above are honest but read backwards: a huge favourable
+   * variance and "27% used" look like a triumph, when the real cause is a
+   * budget set so high nothing could ever breach it. A budget you cannot get
+   * near is not a budget - it can never trigger a warning, so it manages
+   * nothing. Two things decide the verdict: how close spending runs to plan,
+   * and how much of real spending the plan covers at all.
+   */
+  const budgetReliability = (() => {
+    const used = model.budgetUsedPct;
+    const coverage =
+      model.consumptionCents > 0
+        ? Math.round((model.budgetedActualCents / model.consumptionCents) * 100)
+        : 0;
+    // The "Reality check" line below already spells out coverage in rands and
+    // categories. When it renders, the verdict here stays a verdict rather
+    // than repeating the same percentage one line above it.
+    const coverageExplainedBelow = model.unbudgetedActualCents > 0 && model.dayToDayBudgetedCents > 0;
+    if (used == null) {
+      return { label: "-", color: C.textMuted, tone: "info" as InsightTone, note: "" };
+    }
+    // Unreliable in BOTH directions. A limit you can never reach and a limit
+    // you clear many times over are the same failure: neither can tell you
+    // anything the day you cross it.
+    if (used < 50) {
+      return {
+        label: "Poor",
+        color: C.expense,
+        tone: "bad" as InsightTone,
+        note: `This budget isn't doing any work: you used only ${used}% of it, so nothing you spent could ever have been flagged. Set limits near what you actually spend and the variances start meaning something.`,
+      };
+    }
+    if (used > 300) {
+      return {
+        label: "Poor",
+        color: C.expense,
+        tone: "bad" as InsightTone,
+        note: `Spending ran ${(used / 100).toFixed(1)}x the plan. Limits this far below reality flag everything, which is the same as flagging nothing - rebuild them from what you actually spend.`,
+      };
+    }
+    if (used > 110) {
+      return {
+        label: "Fair",
+        color: C.goldSoft,
+        tone: "warn" as InsightTone,
+        note: `You went past plan by ${used - 100}%. The limits are roughly the right shape but set a little tighter than you can hold.`,
+      };
+    }
+    if (coverage < 60) {
+      return {
+        label: "Fair",
+        color: C.goldSoft,
+        tone: "warn" as InsightTone,
+        note: coverageExplainedBelow
+          ? ""
+          : `Limits are realistic where they exist, but they only cover ${coverage}% of your day-to-day spending - the rest runs unwatched.`,
+      };
+    }
+    return {
+      label: "Good",
+      color: C.teal,
+      tone: "good" as InsightTone,
+      note: `Spending tracked plan closely (${used}% used across ${coverage}% of day-to-day spending), so these variances are a real signal.`,
+    };
+  })();
 
   const unbudgetedCount = model.expenseCategories.filter(
     (r) => !r.hasBudget && !r.isSavingsVehicle && r.actualCents > 0
@@ -1066,13 +1216,14 @@ export function BudgetReportDocument({
         </Text>
         {model.budgetIsEstimate && <Text style={styles.badge}>Budget figures prorated for the partial month - estimate</Text>}
         {model.dayToDayBudgetedCents > 0 ? (
+          <>
           <View
             style={{
               flexDirection: "row",
               backgroundColor: C.rowAlt,
               borderRadius: 8,
               padding: 14,
-              marginBottom: 8,
+              marginBottom: 6,
               justifyContent: "space-between",
             }}
           >
@@ -1085,6 +1236,11 @@ export function BudgetReportDocument({
                 color: model.budgetVarianceCents > 0 ? C.expense : C.teal,
               },
               { label: "% used", value: model.budgetUsedPct != null ? `${model.budgetUsedPct}%` : "-", color: C.navy },
+              {
+                label: "Reliability",
+                value: budgetReliability.label,
+                color: budgetReliability.color,
+              },
             ].map((c) => (
               <View key={c.label}>
                 <Text style={{ fontSize: 8, color: C.textMuted, textTransform: "uppercase", marginBottom: 4 }}>{c.label}</Text>
@@ -1092,6 +1248,10 @@ export function BudgetReportDocument({
               </View>
             ))}
           </View>
+          {budgetReliability.note !== "" && (
+            <ToneItem tone={budgetReliability.tone} size={8.5} text={budgetReliability.note} />
+          )}
+          </>
         ) : (
           <View style={styles.insightCard}>
             <Text style={{ fontSize: 9 }}>
@@ -1240,14 +1400,14 @@ export function BudgetReportDocument({
         <Text style={styles.sectionSub}>
           Day-to-day spending only - money consumed, not money moved into savings. Sorted by share of spending.
         </Text>
-        <ExpenseTable rows={consumptionRows} />
+        <ExpenseTable rows={consumptionRows} shareScaleMax={shareScaleMax} />
         {setAsideRows.length > 0 && (
           <View style={{ marginTop: 14 }}>
             <SectionTitle>Money set aside</SectionTitle>
             <Text style={styles.sectionSub}>
               Savings, stokvel and investment contributions - building assets, not consumption. A positive variance here means you set aside MORE than planned.
             </Text>
-            <ExpenseTable rows={setAsideRows} positiveIsGood />
+            <ExpenseTable rows={setAsideRows} positiveIsGood shareScaleMax={shareScaleMax} />
           </View>
         )}
         <Footer />

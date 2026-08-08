@@ -115,9 +115,22 @@ function scoreCashFlow(input: ScoreInput): HealthComponent {
     return { label: "Cash flow", score: 25, max, tone: "good", note: `Ended ${rand(input.netCents)} ahead` };
   if (ratio >= 0)
     return { label: "Cash flow", score: 16, max, tone: "good", note: `Slightly ahead (${rand(input.netCents)})` };
+
+  // A negative net does NOT always mean overspending. If day-to-day living
+  // stayed inside income and the gap only appears after set-aside, the user
+  // chose to move more into savings than the surplus covered - a deliberate
+  // allocation, not a hole. Calling that "spent more than earned" contradicted
+  // the rest of the report, which explains it correctly two pages later, and
+  // told someone saving 32% of income that they had overspent.
+  const afterLivingCents = input.totalIncomeCents - input.consumptionCents;
+  const isAllocationGap = afterLivingCents >= 0;
+  const note = isAllocationGap
+    ? `Living costs stayed within income - the ${rand(-input.netCents)} gap came from setting aside more than the surplus`
+    : `Spent ${rand(-input.netCents)} more than earned`;
+
   if (ratio >= -0.1)
-    return { label: "Cash flow", score: 6, max, tone: "warn", note: `Spent ${rand(-input.netCents)} more than earned` };
-  return { label: "Cash flow", score: 0, max, tone: "bad", note: `Spent ${rand(-input.netCents)} more than earned` };
+    return { label: "Cash flow", score: 6, max, tone: isAllocationGap ? "info" : "warn", note };
+  return { label: "Cash flow", score: 0, max, tone: isAllocationGap ? "warn" : "bad", note };
 }
 
 function scoreSavingsHabit(input: ScoreInput): HealthComponent {
@@ -129,12 +142,19 @@ function scoreSavingsHabit(input: ScoreInput): HealthComponent {
   // score at half and flag it, rather than rewarding a possibly-borrowed habit.
   if (input.netCents < 0 && r > 0) {
     const capped = Math.min(r >= 15 ? 12 : r >= 5 ? 8 : 4, 12);
+    // The cap is right either way - money set aside beyond the surplus did come
+    // from reserves. Only the wording splits: calling an allocation choice a
+    // "deficit" contradicted the same report telling the user, correctly, that
+    // they had not overspent.
+    const livedWithinIncome = input.totalIncomeCents - input.consumptionCents >= 0;
     return {
       label: "Savings habit",
       score: capped,
       max,
       tone: "warn",
-      note: `${r}% set aside, but you ran a ${rand(-input.netCents)} deficit - saving on borrowed/reserve money doesn't fully count`,
+      note: livedWithinIncome
+        ? `${r}% set aside, but ${rand(-input.netCents)} of it came from reserves rather than this period's surplus - that part isn't newly saved`
+        : `${r}% set aside, but you ran a ${rand(-input.netCents)} deficit - saving on borrowed/reserve money doesn't fully count`,
     };
   }
   if (r >= 20) return { label: "Savings habit", score: 25, max, tone: "good", note };

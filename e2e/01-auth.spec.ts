@@ -6,6 +6,11 @@ import { test, expect } from "@playwright/test";
 import { signIn, goToTab, BASE_URL } from "./helpers";
 
 test.describe("Authentication", () => {
+  // Opt out of the cached session from the `setup` project. This suite is
+  // testing sign-in itself, so it needs a genuinely signed-out browser —
+  // starting it pre-authenticated would make 1.2, 1.3 and 1.4 assert nothing.
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   test("1.1 — Splash screen appears on first load", async ({ page }) => {
     await page.goto(BASE_URL);
     // Splash should show briefly

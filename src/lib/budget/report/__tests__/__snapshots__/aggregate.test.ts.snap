@@ -239,6 +239,7 @@ exports[`buildReport > fixed fixture snapshot 1`] = `
       "daysCovered": 30,
       "daysInMonth": 30,
       "expenseCents": 750000,
+      "hasData": true,
       "incomeCents": 2500000,
       "isPartial": false,
       "label": "Jun",

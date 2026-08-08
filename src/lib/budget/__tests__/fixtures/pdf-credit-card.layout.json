@@ -1,0 +1,48 @@
+{
+  "_comment": "Credit-card statement: purchases INCREASE the outstanding balance, payments DECREASE it. This is the inverse of a cheque/savings account. A R500 purchase should be -500 (expense) but the balance goes UP by 500, so a naive chain audit sees delta=+500 and 'corrects' the parser's -500 to +500. Column layout: Date | Description | Amount | Balance, with header-anchored generic parser. Balance chain: 10000 → 10500 (purchase +500 to balance) → 10650 (purchase +150) → 10450 (payment -200 reduces balance) → 10799.99 (purchase +349.99).",
+  "headerText": "Discovery Bank Limited FSP number 48657 Credit Card Statement Account type: Discovery Credit Card Account Account number: 45001234567",
+  "openingBalance": 10000.00,
+  "closingBalance": 10799.99,
+  "expectedCount": 4,
+  "lines": [
+    { "y": 700, "items": [
+      { "x": 61, "text": "Date" },
+      { "x": 170, "text": "Description" },
+      { "x": 380, "text": "Debit" },
+      { "x": 450, "text": "Credit" },
+      { "x": 520, "text": "Balance" }
+    ] },
+    { "y": 680, "items": [
+      { "x": 170, "text": "Opening balance" },
+      { "x": 505, "text": "R 10,000.00" }
+    ] },
+    { "y": 660, "items": [
+      { "x": 61, "text": "2026-06-01" },
+      { "x": 170, "text": "Woolworths Claremont" },
+      { "x": 385, "text": "R 500.00" },
+      { "x": 505, "text": "R 10,500.00" }
+    ] },
+    { "y": 640, "items": [
+      { "x": 61, "text": "2026-06-03" },
+      { "x": 170, "text": "Uber trip Cape Town" },
+      { "x": 385, "text": "R 150.00" },
+      { "x": 505, "text": "R 10,650.00" }
+    ] },
+    { "y": 620, "items": [
+      { "x": 61, "text": "2026-06-10" },
+      { "x": 170, "text": "Payment received thank you" },
+      { "x": 447, "text": "R 200.00" },
+      { "x": 505, "text": "R 10,450.00" }
+    ] },
+    { "y": 600, "items": [
+      { "x": 61, "text": "2026-06-15" },
+      { "x": 170, "text": "Netflix subscription" },
+      { "x": 385, "text": "R 349.99" },
+      { "x": 505, "text": "R 10,799.99" }
+    ] },
+    { "y": 580, "items": [
+      { "x": 170, "text": "Closing balance" },
+      { "x": 505, "text": "R 10,799.99" }
+    ] }
+  ]
+}
