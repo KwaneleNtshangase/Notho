@@ -132,6 +132,34 @@ export type DropoffRow = {
   avg_quit_pct: number | null;
 };
 
+/**
+ * One reason, at one exit door, over the window. See exit_feedback.
+ * `reason` is the literal string 'skipped' when the person declined to answer -
+ * counted, never silently dropped, because a high skip rate is itself a finding.
+ */
+export type ChurnRow = {
+  exit_type: "account_deletion" | "email_unsubscribe" | "inactive_survey";
+  reason: string;
+  /** Everyone who answered, including those the save offer kept. */
+  n: number;
+  /** Of those, the ones who actually went. Never equal to n when an offer worked. */
+  n_left: number;
+  n_skipped: number;
+  n_offer_shown: number;
+  n_offer_taken: number;
+  avg_days_tenure: number | null;
+  avg_lessons: number | null;
+};
+
+export type VerbatimRow = {
+  created_at: string;
+  exit_type: string;
+  reason: string | null;
+  detail: string;
+  days_since_signup: number | null;
+  lessons_completed: number | null;
+};
+
 export type UserDetail = {
   profile: {
     userId: string;

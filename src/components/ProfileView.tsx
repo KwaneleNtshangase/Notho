@@ -21,7 +21,6 @@ import {
   Cell,
 } from "recharts";
 import {
-  AlertTriangle,
   ArrowLeft,
   Award,
   BarChart2,
@@ -55,6 +54,7 @@ import {
 } from "@/components/icons/NothoIcons";
 // Lucide's "Home" export is aliased below
 import { Home as HomeIcon } from "@/components/icons/NothoIcons";
+import { ExitSurveyModal } from "@/components/churn/ExitSurvey";
 import {
   GOAL_OPTIONS,
   ONBOARDING_GOAL_OPTIONS,
@@ -97,7 +97,10 @@ const NOTHO_FAQ = [
     section: "Account & Data",
     items: [
       { q: "How do I change my name?", a: "Go to Profile, tap Edit Profile, update your first and last name, then tap Save." },
-      { q: "How do I delete my account?", a: "Email us at privacy@notho.co.za with subject 'Account Deletion Request'. We'll process it within 7 working days and permanently delete all your data." },
+      // Was "email us and wait 7 days", which is both wrong and worse than what
+      // the app actually does - self-service deletion has existed for a while.
+      { q: "How do I delete my account?", a: "Go to Settings and tap 'Delete My Data'. We'll ask why you're leaving, which is optional and skippable, then your account and all your data are erased immediately. You can also export a copy of everything first from the same screen. If you'd rather we did it for you, email privacy@notho.co.za." },
+      { q: "How do I stop the emails without deleting my account?", a: "Tap the unsubscribe link at the bottom of any Notho email. You can choose fewer emails (one a week), pause everything for 30 days, or stop them altogether - your account, XP and streak stay exactly as they are." },
       { q: "What data does Notho collect?", a: "We collect the email address you register with, your learning progress (lessons completed, XP, streaks), and anonymised budget data for benchmarking. See our Privacy Policy for full details." },
       { q: "Is my budget data shared?", a: "Budget data is aggregated and anonymised before being used for the community benchmarking feature. Individual entries are never shared with other users. We require at least 3 users in a category before showing any comparison." },
     ],
@@ -311,7 +314,7 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
 
       {page === "privacy" && (
         <div style={{ fontSize: 14, lineHeight: 1.7, color: "var(--color-text-primary)" }}>
-          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 20 }}>Last revised: 5 April 2026</p>
+          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 20 }}>Last revised: 9 August 2026</p>
           {[
             { title: "1. General", body: "Notho (\"we\", \"us\") cares about your personal information. This Privacy Policy explains how we collect, use, and protect it when you use the Notho app and related services. By using the service, you agree to the practices described here." },
             { title: "2. Information We Collect", body: "We collect: (a) your email address and display name when you register; (b) your learning progress including lessons completed, XP earned, and streaks; (c) budget entries you create - these are stored securely and only accessible to you; (d) anonymised, aggregated budget data for the community benchmarking feature; (e) app usage data such as which lessons you viewed and how long you spent." },
@@ -319,6 +322,7 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
             { title: "4. Sharing Your Information", body: "We do not sell your personal information. We may share it with trusted service providers (Supabase for database hosting, PostHog for anonymised analytics) who are contractually bound to protect it. Budget data is only used in aggregate form with a minimum of 3 users before any comparison is shown." },
             { title: "5. Your Rights", body: "You have the right to: access the personal data we hold about you; correct inaccurate information; request deletion of your account and associated data; object to certain processing; export your data. To exercise any of these rights, email privacy@notho.co.za." },
             { title: "6. Data Retention", body: "We retain your data for as long as your account is active. When you delete your account, we delete your personal data within 30 days, except where retention is required by law." },
+            { title: "6a. Exit Feedback", body: "If you tell us why you are leaving - when you delete your account, unsubscribe from emails, or reply to a \"what happened?\" email - we keep that answer after your account is gone, because it is the only way we can learn what to fix. It is anonymous: the reason you picked, any comment you wrote, and general context like how long you had been signed up. It is not linked to your name, email, or account, and your account identifier is replaced with a one-way code that cannot be reversed. Answering is always optional and there is always a Skip button. To have a comment you wrote removed, email privacy@notho.co.za." },
             { title: "7. Children", body: "Notho is not directed at children under the age of 13. We do not knowingly collect data from children. If we become aware that a child has provided personal information, we will delete it promptly." },
             { title: "8. Cookies & Analytics", body: "We use analytics tools (PostHog) to understand how users engage with the app. Data collected is anonymised and used only to improve the product. We do not use third-party advertising cookies." },
             { title: "9. Contact", body: "For all privacy enquiries, contact our team at privacy@notho.co.za." },
@@ -383,7 +387,7 @@ export function ProfileView({
 }: {
   userData: UserData;
   onSignOut: () => void;
-  onDeleteAccount?: () => Promise<void>;
+  onDeleteAccount?: (exitId?: string | null) => Promise<void>;
   onDownloadData?: () => Promise<void>;
   currentUser: any;
   dailyGoal: number;
@@ -401,7 +405,6 @@ export function ProfileView({
   perfectLessons?: number;
 }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState<null | {
     name: string; desc: string; icon: React.ReactNode;
   }>(null);
@@ -1173,28 +1176,13 @@ export function ProfileView({
         )}
       </div>
 
-      {/* Delete confirmation modal */}
-      {showDeleteModal && (
-        <div onClick={() => !deleting && setShowDeleteModal(false)}
-          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div onClick={(e) => e.stopPropagation()}
-            style={{ background: "var(--color-surface)", borderRadius: 20, padding: "28px 24px 24px", width: "100%", maxWidth: 380, textAlign: "center" }}>
-            <AlertTriangle size={40} style={{ color: "#E03C31", marginBottom: 12, display: "block", margin: "0 auto 12px" }} />
-            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: "var(--color-text-primary)" }}>Delete All My Data?</div>
-            <p style={{ color: "var(--color-text-secondary)", fontSize: 14, marginBottom: 20, lineHeight: 1.5 }}>
-              This permanently deletes your account, XP, progress, and all personal data from Notho. This cannot be undone.
-            </p>
-            <button type="button" disabled={deleting} onClick={async () => { setDeleting(true); try { if (onDeleteAccount) await onDeleteAccount(); } finally { setDeleting(false); } }}
-              style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "#E03C31", color: "#fff", fontWeight: 700, fontSize: 15, cursor: deleting ? "not-allowed" : "pointer", opacity: deleting ? 0.6 : 1, marginBottom: 10 }}>
-              {deleting ? "Deleting..." : "Yes, Delete Everything"}
-            </button>
-            <button type="button" disabled={deleting} onClick={() => setShowDeleteModal(false)}
-              style={{ width: "100%", padding: "10px", borderRadius: 12, border: "1px solid var(--color-border)", background: "transparent", color: "var(--color-text-primary)", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Delete flow. Same three-step exit survey as Settings - see ExitSurvey.tsx. */}
+      <ExitSurveyModal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDeleteAccount={async (exitId) => { if (onDeleteAccount) await onDeleteAccount(exitId); }}
+        getAccessToken={async () => (await supabase.auth.getSession()).data.session?.access_token ?? null}
+      />
 
       {/* Feedback modal */}
       <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />

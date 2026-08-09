@@ -4,11 +4,14 @@ import {
   buildD1,
   buildMilestone,
   buildWelcome,
+  buildWinback,
   nameFromAuthMetadata,
   sendEmail,
   type EmailProfile,
 } from "@/lib/emails/lifecycle";
 import { sendSignupAlert } from "@/lib/emails/signupAlert";
+import { canSend, loadEmailPrefs } from "@/lib/emails/suppression";
+import { unsubscribeUrl } from "@/lib/churn/unsubscribeToken";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -50,7 +53,7 @@ export async function GET(req: NextRequest) {
 
   const admin = createServiceSupabase();
   const now = Date.now();
-  const summary = { welcome: 0, d1: 0, d7: 0, d14: 0, d30: 0, failed: 0 };
+  const summary = { welcome: 0, d1: 0, d7: 0, d14: 0, d30: 0, winback: 0, suppressed: 0, failed: 0 };
 
   // ── D+1 re-engagement: last lesson 20-48h ago, not yet nudged ──────────────
   try {
@@ -61,9 +64,15 @@ export async function GET(req: NextRequest) {
       .lt("last_lesson_at", new Date(now - 20 * 60 * 60 * 1000).toISOString())
       .gt("last_lesson_at", new Date(now - 48 * 60 * 60 * 1000).toISOString());
 
+    // One query for the whole batch rather than one per user. See suppression.ts.
+    const prefs = await loadEmailPrefs(admin, (rows ?? []).map((r) => r.user_id as string));
+
     for (const row of rows ?? []) {
       const userId = row.user_id as string;
       const streak = (row.streak as number) ?? 0;
+      // Checked before any other work: someone who opted out costs us nothing
+      // to skip, and must cost them nothing either.
+      if (!canSend("lifecycle", prefs.get(userId))) { summary.suppressed++; continue; }
       const { data: profile } = await admin
         .from("profiles")
         .select("retention_fired, username, full_name, goal")
@@ -74,7 +83,10 @@ export async function GET(req: NextRequest) {
       const { data: authUser } = await admin.auth.admin.getUserById(userId);
       const email = authUser?.user?.email;
       if (!email) continue;
-      const built = buildD1((profile ?? {}) as EmailProfile, streak);
+      const built = buildD1(
+        { ...((profile ?? {}) as EmailProfile), unsubscribeUrl: unsubscribeUrl(userId) },
+        streak,
+      );
       const res = await sendEmail(resendKey, email, built);
       if (res.ok) {
         await admin.from("profiles").update({ retention_fired: [...fired, "d1"].join(",") }).eq("user_id", userId);
@@ -89,6 +101,10 @@ export async function GET(req: NextRequest) {
 
   const { data: list } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const users = list?.users ?? [];
+  // Loaded once and shared by the welcome backstop, the milestones and the
+  // win-back pass below. Three sections each doing their own per-user lookup
+  // would triple the query count for no benefit.
+  const allPrefs = await loadEmailPrefs(admin, users.map((u) => u.id));
   // Counted once for the whole run rather than per user: the backstop can send
   // a burst, and re-counting for each would be pointless load.
   const confirmedCount = users.filter(
@@ -114,6 +130,7 @@ export async function GET(req: NextRequest) {
     for (const u of users) {
       if (!u.email || !u.email_confirmed_at) continue;
       if (new Date(u.email_confirmed_at).getTime() > now - 60 * 60 * 1000) continue;
+      if (!canSend("lifecycle", allPrefs.get(u.id))) { summary.suppressed++; continue; }
 
       const { data: profile } = await admin
         .from("profiles")
@@ -125,7 +142,11 @@ export async function GET(req: NextRequest) {
 
       const p = (profile ?? {}) as EmailProfile;
       const metaName = nameFromAuthMetadata(u.user_metadata);
-      const built = buildWelcome({ ...p, full_name: p.full_name || metaName });
+      const built = buildWelcome({
+        ...p,
+        full_name: p.full_name || metaName,
+        unsubscribeUrl: unsubscribeUrl(u.id),
+      });
       const res = await sendEmail(resendKey, u.email, built);
       if (res.ok) {
         // Founder alert rides the same trigger, so someone who confirms and
@@ -169,6 +190,7 @@ export async function GET(req: NextRequest) {
       return t >= minDate && t <= maxDate;
     });
     for (const u of targets) {
+      if (!canSend("lifecycle", allPrefs.get(u.id))) { summary.suppressed++; continue; }
       const { data: profile } = await admin
         .from("profiles")
         .select("retention_fired, username, full_name, goal")
@@ -182,7 +204,11 @@ export async function GET(req: NextRequest) {
         .eq("user_id", u.id)
         .maybeSingle();
       const streak = ((progress?.streak as number) ?? 0);
-      const built = buildMilestone(m.key, (profile ?? {}) as EmailProfile, streak);
+      const built = buildMilestone(
+        m.key,
+        { ...((profile ?? {}) as EmailProfile), unsubscribeUrl: unsubscribeUrl(u.id) },
+        streak,
+      );
       const res = await sendEmail(resendKey, u.email!, built);
       if (res.ok) {
         await admin.from("profiles").update({ retention_fired: [...fired, m.key].join(",") }).eq("user_id", u.id);
@@ -191,6 +217,74 @@ export async function GET(req: NextRequest) {
         summary.failed++;
       }
     }
+  }
+
+  // ── Win-back: the silent-churn survey ──────────────────────────────────────
+  //
+  // The people this targets are the whole reason the churn feature exists.
+  // Someone who deletes their account at least tells us they are going. The
+  // much larger group just stops opening the app, and until now left no trace
+  // and no explanation.
+  //
+  // The window is 21 to 45 days since last activity, and it matters at both
+  // ends. Earlier than 21 days and we are asking "why did you leave?" of
+  // someone who was on holiday, which is both wrong and annoying. Later than
+  // 45 and they have genuinely forgotten us, so the answer is worthless even
+  // if they bother to give one.
+  //
+  // Sent once ever, enforced by winback_send_log. Best-effort throughout: this
+  // runs last precisely so a failure here cannot cost anyone their milestone.
+  try {
+    const cutoffRecent = new Date(now - 21 * DAY).toISOString().slice(0, 10);
+    const cutoffOld = new Date(now - 45 * DAY).toISOString().slice(0, 10);
+
+    const { data: lapsed } = await admin
+      .from("user_progress")
+      .select("user_id, completed_lessons, last_activity_date")
+      .not("last_activity_date", "is", null)
+      .lt("last_activity_date", cutoffRecent)
+      .gt("last_activity_date", cutoffOld);
+
+    // One query for everyone already asked, rather than one per candidate.
+    const { data: alreadySent } = await admin.from("winback_send_log").select("user_id");
+    const asked = new Set((alreadySent ?? []).map((r) => r.user_id as string));
+
+    for (const row of lapsed ?? []) {
+      const userId = row.user_id as string;
+      if (asked.has(userId)) continue;
+      if (!canSend("winback", allPrefs.get(userId))) { summary.suppressed++; continue; }
+
+      const u = users.find((x) => x.id === userId);
+      if (!u?.email) continue;
+
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("username, full_name, goal")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      const lessons = Array.isArray(row.completed_lessons) ? row.completed_lessons.length : 0;
+      const built = buildWinback(
+        {
+          ...((profile ?? {}) as EmailProfile),
+          full_name: (profile?.full_name as string | null) || nameFromAuthMetadata(u.user_metadata),
+          unsubscribeUrl: unsubscribeUrl(userId),
+        },
+        lessons,
+      );
+
+      const res = await sendEmail(resendKey, u.email, built);
+      if (res.ok) {
+        // Written only on a confirmed send. Recording it first would mean a
+        // Resend outage permanently marks people as asked when they never were.
+        await admin.from("winback_send_log").upsert({ user_id: userId }, { onConflict: "user_id" });
+        summary.winback++;
+      } else {
+        summary.failed++;
+      }
+    }
+  } catch {
+    /* win-back is best-effort and runs last, so nothing above is affected */
   }
 
   return NextResponse.json({ ok: true, ...summary });

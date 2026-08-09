@@ -69,8 +69,13 @@ export function useProfileHandlers() {
    *
    * The modal is the confirmation. One deliberate, well-worded confirmation
    * beats two, and the second one was the one that broke.
+   *
+   * `exitId` is the exit_feedback row written by the survey step just before
+   * this runs. It is passed through so the delete route can mark that row
+   * completed at the very end - after this call returns there is no session
+   * left to write with, so it is now or never.
    */
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = async (exitId?: string | null) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -78,7 +83,8 @@ export function useProfileHandlers() {
 
       const res = await fetch("/api/account/delete", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ exitId: exitId ?? null }),
       });
 
       if (!res.ok) {

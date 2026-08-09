@@ -82,10 +82,32 @@ async function requireAdmin(req: NextRequest, admin: SupabaseClient) {
   return user;
 }
 
-/** Enumerate every confirmed auth user's email, de-duplicated. */
+/**
+ * Enumerate every confirmed auth user's email, de-duplicated.
+ *
+ * Anyone who has opted out of product email is excluded here, at the source,
+ * rather than filtered later. A broadcast is the single easiest place to email
+ * somebody who asked us not to - it is a manual action, run rarely, by a human
+ * choosing a recipient list - so the suppression has to live inside the
+ * function that builds the list, where it cannot be forgotten.
+ */
 async function listAllEmails(admin: SupabaseClient): Promise<string[]> {
   const seen = new Set<string>();
   const perPage = 1000;
+  const optedOutIds = new Set<string>();
+
+  // One read of everyone who has turned product email off. Small table, and
+  // the alternative is a lookup per user across every page.
+  const { data: prefRows } = await admin
+    .from("email_preferences")
+    .select("user_id, unsubscribed_all, product_emails, paused_until");
+  for (const r of prefRows ?? []) {
+    const paused = r.paused_until && new Date(r.paused_until as string).getTime() > Date.now();
+    if (r.unsubscribed_all || r.product_emails === false || paused) {
+      optedOutIds.add(r.user_id as string);
+    }
+  }
+
   for (let page = 1; page <= 200; page++) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
     if (error) throw new Error(error.message);
@@ -97,6 +119,7 @@ async function listAllEmails(admin: SupabaseClient): Promise<string[]> {
       if (!u.email_confirmed_at && !u.confirmed_at) continue;
       const banned = (u as { banned_until?: string | null }).banned_until;
       if (banned && new Date(banned).getTime() > Date.now()) continue;
+      if (optedOutIds.has(u.id)) continue;
       seen.add(email);
     }
     if (users.length < perPage) break;

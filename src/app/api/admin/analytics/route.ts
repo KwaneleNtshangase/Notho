@@ -56,6 +56,8 @@ const VIEWS: Record<string, string> = {
   concepts: "admin_concept_difficulty",
   courses: "admin_course_engagement",
   dropoff: "admin_dropoff",
+  churn: "admin_churn_reasons",
+  churnVerbatims: "admin_churn_verbatims",
 };
 
 function clampDays(raw: string | null, fallback: number): number {
@@ -108,6 +110,8 @@ export async function GET(req: NextRequest) {
     args = { p_user_id: id };
   } else if (view === "content") {
     args = { p_days: days, p_min_att: 5 };
+  } else if (view === "churnVerbatims") {
+    args = { p_days: days, p_limit: Math.min(Math.max(Number(url.searchParams.get("limit") ?? 100), 1), 500) };
   }
 
   const { data, error } = await admin.rpc(fn, args);

@@ -4,12 +4,16 @@ on:
   push:
     branches: [main]
   schedule:
-    # Every 30 minutes. Was every 6 hours, which meant an outage starting just
-    # after a run went unnoticed for most of a working day. Free on public
-    # repos. GitHub deprioritises scheduled runs under load, so treat this as
-    # "about every 30 minutes", not a guarantee — the external uptime monitor
-    # in docs/MONITORING.md is what gives you a hard floor on detection time.
-    - cron: "*/30 * * * *"
+    # Hourly. Was every 6 hours (an outage could hide most of a working day),
+    # then */30, which was too aggressive: runs overlapped and GitHub cancelled
+    # them, producing "All jobs were cancelled" emails that read as failures and
+    # were pure noise. Hourly is 24 runs a day with no overlap.
+    #
+    # This is not the floor on detection time and is not meant to be. GitHub
+    # deprioritises scheduled runs under load, so treat it as "about hourly".
+    # The external uptime monitor in docs/MONITORING.md checks every 5 minutes
+    # and is the only layer that does not depend on GitHub Actions.
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 jobs:

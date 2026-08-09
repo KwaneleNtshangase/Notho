@@ -5,7 +5,6 @@ import { supabase } from "@/lib/supabaseClient";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import type { UserData } from "@/app/pageViews.types";
 import {
-  AlertTriangle,
   ArrowLeft,
   Bell,
   Bug,
@@ -20,6 +19,7 @@ import {
   Zap,
 } from "@/components/icons/NothoIcons";
 import { LegalPage, FeedbackModal } from "@/components/ProfileView";
+import { ExitSurveyModal } from "@/components/churn/ExitSurvey";
 import { isAdminEmail } from "@/lib/admin";
 
 function SettingsAccountSection() {
@@ -107,13 +107,12 @@ export function SettingsView({
   resetProgress: () => void;
   userSettings: ReturnType<typeof useUserSettings>;
   onSignOut?: () => void;
-  onDeleteAccount?: () => Promise<void>;
+  onDeleteAccount?: (exitId?: string | null) => Promise<void>;
   onDownloadData?: () => void;
 }) {
   const [showLegalPage, setShowLegalPage] = useState<"faq" | "privacy" | "terms" | null>(null);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -366,28 +365,18 @@ export function SettingsView({
         </button>
       )}
 
-      {/* Delete confirmation modal */}
-      {showDeleteModal && (
-        <div onClick={() => !deleting && setShowDeleteModal(false)}
-          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div onClick={(e) => e.stopPropagation()}
-            style={{ background: "var(--color-surface)", borderRadius: 20, padding: "28px 24px 24px", width: "100%", maxWidth: 380, textAlign: "center" }}>
-            <AlertTriangle size={40} style={{ color: "#E03C31", marginBottom: 12, display: "block", margin: "0 auto 12px" }} />
-            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: "var(--color-text-primary)" }}>Delete All My Data?</div>
-            <p style={{ color: "var(--color-text-secondary)", fontSize: 14, marginBottom: 20, lineHeight: 1.5 }}>
-              This permanently deletes your account, XP, progress, and all personal data from Notho. This cannot be undone.
-            </p>
-            <button type="button" disabled={deleting} onClick={async () => { setDeleting(true); try { if (onDeleteAccount) await onDeleteAccount(); } finally { setDeleting(false); } }}
-              style={{ width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "#E03C31", color: "#fff", fontWeight: 700, fontSize: 15, cursor: deleting ? "not-allowed" : "pointer", opacity: deleting ? 0.6 : 1, marginBottom: 10 }}>
-              {deleting ? "Deleting..." : "Yes, Delete Everything"}
-            </button>
-            <button type="button" disabled={deleting} onClick={() => setShowDeleteModal(false)}
-              style={{ width: "100%", padding: "10px", borderRadius: 12, border: "1px solid var(--color-border)", background: "transparent", color: "var(--color-text-primary)", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      {/*
+        Delete flow. The bare confirm dialog that used to live here is now the
+        last of three steps inside ExitSurveyModal: ask why, offer the relevant
+        alternative, then confirm. Skip is on the first step, so nobody is made
+        to answer to get out.
+      */}
+      <ExitSurveyModal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDeleteAccount={async (exitId) => { if (onDeleteAccount) await onDeleteAccount(exitId); }}
+        getAccessToken={async () => (await supabase.auth.getSession()).data.session?.access_token ?? null}
+      />
 
       {/* Feedback modal */}
       <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />

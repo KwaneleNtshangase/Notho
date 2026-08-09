@@ -19,6 +19,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { C, fetchView } from "./lib";
 import { Button, Card, ErrorNote, Loading, SegmentedControl } from "./components";
 import {
+  ChurnPanel,
   ContentPanel,
   FeaturesPanel,
   OverviewPanel,
@@ -26,12 +27,15 @@ import {
   UsersPanel,
 } from "./panels";
 
-type Tab = "overview" | "features" | "retention" | "content" | "users";
+type Tab = "overview" | "features" | "retention" | "churn" | "content" | "users";
 
 const TABS: { value: Tab; label: string; blurb: string }[] = [
   { value: "overview", label: "Overview", blurb: "The headline numbers — users, time, growth." },
   { value: "features", label: "Features", blurb: "Which parts of the app people actually use." },
   { value: "retention", label: "Retention", blurb: "Do they come back, and where do they give up?" },
+  // Sits next to Retention on purpose: that tab shows how many left, this one
+  // shows why. Reading either alone is how you end up guessing.
+  { value: "churn", label: "Churn", blurb: "Why the ones who left, left — in their own words." },
   { value: "content", label: "Content", blurb: "Which lessons are too hard, too easy, or just right." },
   { value: "users", label: "Users", blurb: "Every user, searchable, with a full drill-down." },
 ];
@@ -228,6 +232,7 @@ export default function AdminAnalyticsPage() {
       {tab === "overview" && <OverviewPanel days={numDays} nonce={nonce} />}
       {tab === "features" && <FeaturesPanel days={numDays} nonce={nonce} />}
       {tab === "retention" && <RetentionPanel days={numDays} nonce={nonce} />}
+      {tab === "churn" && <ChurnPanel days={numDays} nonce={nonce} />}
       {tab === "content" && <ContentPanel nonce={nonce} />}
       {tab === "users" && <UsersPanel nonce={nonce} />}
 

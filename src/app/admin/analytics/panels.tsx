@@ -24,10 +24,12 @@ import {
 import {
   ago,
   C,
+  ChurnRow,
   ContentRow,
   CourseRow,
   DailyRow,
   DropoffRow,
+  VerbatimRow,
   FeatureRow,
   FeatureTimeRow,
   featureLabel,
@@ -987,5 +989,264 @@ function UserDetailPanel({ userId, onClose }: { userId: string; onClose: () => v
         )}
       </div>
     </div>
+  );
+}
+
+// ── Churn ────────────────────────────────────────────────────────────────────
+
+/**
+ * Why people leave, in their own words, from all three exit doors.
+ *
+ * The panel is built around one rule: never show a reason count without the
+ * skip rate next to it. If 70% of people skipped the question, the remaining
+ * 30% are not a sample of your churn, they are a sample of the people willing
+ * to fill in a form on their way out, which is a different and much more
+ * opinionated group. Reading the first number without the second is how teams
+ * confidently fix the wrong thing.
+ */
+
+const EXIT_LABELS: Record<string, string> = {
+  account_deletion: "Deleted account",
+  email_unsubscribe: "Unsubscribed",
+  inactive_survey: "Went quiet",
+};
+
+const REASON_LABELS: Record<string, string> = {
+  too_many_emails: "Too many emails",
+  not_useful: "Content not useful",
+  too_hard: "Too hard / confusing",
+  too_easy: "Already knew it",
+  no_time: "No time",
+  technical: "Bugs or slowness",
+  privacy: "Data privacy worry",
+  found_alternative: "Using something else",
+  other: "Something else",
+  skipped: "Declined to say",
+};
+
+export function ChurnPanel({ days, nonce }: { days: number; nonce: number }) {
+  const c = useView<ChurnRow[]>("churn", { days }, nonce);
+  const v = useView<VerbatimRow[]>("churnVerbatims", { days, limit: 100 }, nonce);
+  const [showWords, setShowWords] = useState(false);
+
+  const rows = useMemo(() => c.data ?? [], [c.data]);
+
+  const totals = useMemo(() => {
+    // `responses` and `left` are counted separately on purpose. Someone who
+    // gave a reason and then took the save offer is a response but not a
+    // departure, and folding them together would both overstate churn and hide
+    // the only evidence that the offers do anything.
+    const t = { responses: 0, left: 0, skipped: 0, offered: 0, taken: 0 };
+    for (const r of rows) {
+      t.responses += r.n;
+      t.left += r.n_left;
+      if (r.reason === "skipped") t.skipped += r.n;
+      t.offered += r.n_offer_shown;
+      t.taken += r.n_offer_taken;
+    }
+    return t;
+  }, [rows]);
+
+  /** Reasons rolled up across doors - the view most decisions actually need. */
+  const byReason = useMemo(() => {
+    const m = new Map<string, { reason: string; n: number; tenure: number[]; taken: number; offered: number }>();
+    for (const r of rows) {
+      const e = m.get(r.reason) ?? { reason: r.reason, n: 0, tenure: [], taken: 0, offered: 0 };
+      e.n += r.n;
+      e.taken += r.n_offer_taken;
+      e.offered += r.n_offer_shown;
+      if (r.avg_days_tenure != null) e.tenure.push(r.avg_days_tenure);
+      m.set(r.reason, e);
+    }
+    return [...m.values()]
+      .map((e) => ({
+        ...e,
+        avgTenure: e.tenure.length ? e.tenure.reduce((a, b) => a + b, 0) / e.tenure.length : null,
+      }))
+      .sort((a, b) => b.n - a.n);
+  }, [rows]);
+
+  const answered = totals.responses - totals.skipped;
+  const answerRate = totals.responses > 0 ? Math.round((answered / totals.responses) * 100) : 0;
+  const saveRate = totals.offered > 0 ? Math.round((totals.taken / totals.offered) * 100) : 0;
+
+  const columns: Column<ChurnRow>[] = [
+    { key: "door", label: "Exit", width: "22%", render: (r) => EXIT_LABELS[r.exit_type] ?? r.exit_type },
+    {
+      key: "reason",
+      label: "Reason",
+      render: (r) =>
+        r.reason === "skipped" ? (
+          <Tag tone="neutral">{REASON_LABELS.skipped}</Tag>
+        ) : (
+          REASON_LABELS[r.reason] ?? r.reason
+        ),
+    },
+    { key: "n", label: "Said this", numeric: true, render: (r) => fmt(r.n) },
+    {
+      key: "left",
+      label: "Left anyway",
+      numeric: true,
+      render: (r) => (r.n_left < r.n ? <Tag tone="good">{fmt(r.n_left)}</Tag> : fmt(r.n_left)),
+    },
+    {
+      key: "tenure",
+      label: "Avg days signed up",
+      numeric: true,
+      render: (r) => (r.avg_days_tenure == null ? "—" : fmt(r.avg_days_tenure)),
+    },
+    {
+      key: "lessons",
+      label: "Avg lessons done",
+      numeric: true,
+      render: (r) => (r.avg_lessons == null ? "—" : fmt(r.avg_lessons)),
+    },
+    {
+      key: "saved",
+      label: "Offer taken",
+      numeric: true,
+      render: (r) =>
+        r.n_offer_shown === 0 ? (
+          "—"
+        ) : (
+          <Tag tone={r.n_offer_taken > 0 ? "good" : "neutral"}>
+            {r.n_offer_taken} / {r.n_offer_shown}
+          </Tag>
+        ),
+    },
+  ];
+
+  return (
+    <>
+      <KpiGrid>
+        <Kpi
+          label="Actually left"
+          value={fmt(totals.left)}
+          hint="Completed the exit. Excludes anyone who opened the dialog and backed out, and anyone the save offer kept."
+          accent={C.red}
+        />
+        <Kpi
+          label="Gave a reason"
+          value={fmt(answered)}
+          hint={`${answerRate}% of ${fmt(totals.responses)} responses named a reason rather than skipping.`}
+          accent={C.teal}
+        />
+        <Kpi
+          label="Declined to say"
+          value={fmt(totals.skipped)}
+          hint="Skipping is always one click, by design. A high number here is a finding, not a bug."
+          accent={C.muted}
+        />
+        <Kpi
+          label="Save offers shown"
+          value={fmt(totals.offered)}
+          hint="Alternatives matched to the reason given, e.g. weekly email instead of none."
+          accent={C.gold}
+        />
+        <Kpi
+          label="Offers accepted"
+          value={fmt(totals.taken)}
+          hint={`${saveRate}% take-up. This is the number that decides whether the offers are worth keeping.`}
+          accent={saveRate > 0 ? C.green : C.muted}
+        />
+      </KpiGrid>
+
+      <Panel
+        title="Why people leave"
+        subtitle="Every reason given at every exit, rolled up. Read the bars against the skip count above: if most people skipped, this chart describes the ones who talked, not the ones who left."
+        action={rows.length > 0 && <Button onClick={() => downloadCsv("churn-reasons", rows)}>Export CSV</Button>}
+      >
+        {c.error ? (
+          <ErrorNote message={c.error} />
+        ) : c.loading && !c.data ? (
+          <Loading />
+        ) : byReason.length === 0 ? (
+          <Empty
+            title="Nobody has left through the survey yet"
+            detail="Reasons appear here once someone deletes their account, unsubscribes, or answers the win-back email."
+          />
+        ) : (
+          <>
+            <ResponsiveContainer width="100%" height={Math.max(200, byReason.length * 38)}>
+              <BarChart data={byReason} layout="vertical" margin={{ top: 4, right: 16, left: 96, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={C.line} horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 11, fill: C.muted }} allowDecimals={false} />
+                <YAxis
+                  type="category"
+                  dataKey="reason"
+                  width={150}
+                  tick={{ fontSize: 11.5, fill: C.body }}
+                  tickFormatter={(r: string) => REASON_LABELS[r] ?? r}
+                />
+                <Tooltip
+                  {...tooltipStyle()}
+                  formatter={valueFormatter((n) => `${fmt(n)} people`, "Count")}
+                  labelFormatter={labelFormatter((r) => REASON_LABELS[r] ?? r)}
+                />
+                <Bar dataKey="n" radius={[0, 5, 5, 0]}>
+                  {byReason.map((r) => (
+                    // Skips are greyed: they are context for the other bars,
+                    // not a reason competing with them.
+                    <Cell key={r.reason} fill={r.reason === "skipped" ? C.line : C.teal} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <div style={{ marginTop: 16 }}>
+              <DataTable columns={columns} rows={rows} emptyLabel="No exits recorded in this window." />
+            </div>
+          </>
+        )}
+      </Panel>
+
+      <Panel
+        title="What they actually wrote"
+        subtitle="Free-text comments, newest first. Hidden until you ask for them - these are people's own words, and there is no reason for them to be on screen by default."
+        action={
+          <Button onClick={() => setShowWords((s) => !s)}>{showWords ? "Hide comments" : "Show comments"}</Button>
+        }
+      >
+        {!showWords ? (
+          <Explainer>
+            {(v.data?.length ?? 0) > 0
+              ? `${v.data?.length} written comment${v.data?.length === 1 ? "" : "s"} in the last ${days} days.`
+              : "No written comments yet."}
+          </Explainer>
+        ) : v.error ? (
+          <ErrorNote message={v.error} />
+        ) : v.loading && !v.data ? (
+          <Loading />
+        ) : (v.data?.length ?? 0) === 0 ? (
+          <Empty title="No comments yet" detail="The free-text box is optional, so most exits will not have one." />
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {(v.data ?? []).map((row, i) => (
+              <div
+                key={i}
+                style={{
+                  border: `1px solid ${C.line}`,
+                  borderRadius: 10,
+                  padding: "12px 14px",
+                  background: "#FBFCFD",
+                }}
+              >
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 7 }}>
+                  <Tag tone="neutral">{EXIT_LABELS[row.exit_type] ?? row.exit_type}</Tag>
+                  {row.reason && <Tag tone="warn">{REASON_LABELS[row.reason] ?? row.reason}</Tag>}
+                  <span style={{ fontSize: 11.5, color: C.muted }}>
+                    {ago(row.created_at)}
+                    {row.days_since_signup != null && ` · ${row.days_since_signup} days signed up`}
+                    {row.lessons_completed != null && ` · ${row.lessons_completed} lessons`}
+                  </span>
+                </div>
+                <div style={{ fontSize: 13.5, color: C.ink, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
+                  {row.detail}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
+    </>
   );
 }

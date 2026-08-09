@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 /** Written by the `setup` project; consumed by every browser project. */
 const AUTH_STATE = "e2e/.auth/user.json";
+/** Matched by the setup project, ignored by every other project. */
+const SETUP_FILE = /auth\.setup\.ts/;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -48,20 +50,27 @@ export default defineConfig({
     // Signs in once and writes e2e/.auth/user.json. See e2e/auth.setup.ts for
     // why: Supabase rate-limits /auth/v1/token, and a per-test sign-in blows
     // through that limit in a single CI run.
-    { name: "setup", testMatch: /auth\.setup\.ts/ },
+    { name: "setup", testMatch: SETUP_FILE },
 
+    // testIgnore is not optional. testDir picks up every spec in ./e2e, so
+    // without it auth.setup.ts runs a second time inside each browser project —
+    // four sign-ins instead of one, and the setup file executing with
+    // storageState already applied, which is not what it was written for.
     {
       name: "Desktop Chrome",
+      testIgnore: SETUP_FILE,
       use: { ...devices["Desktop Chrome"], storageState: AUTH_STATE },
       dependencies: ["setup"],
     },
     {
       name: "Mobile Safari (iPhone 14)",
+      testIgnore: SETUP_FILE,
       use: { ...devices["iPhone 14"], storageState: AUTH_STATE },
       dependencies: ["setup"],
     },
     {
       name: "Mobile Chrome (Pixel 7)",
+      testIgnore: SETUP_FILE,
       use: { ...devices["Pixel 7"], storageState: AUTH_STATE },
       dependencies: ["setup"],
     },

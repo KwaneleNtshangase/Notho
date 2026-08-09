@@ -291,6 +291,29 @@ export default function PrivacyPage() {
             personally) may be retained indefinitely for product-improvement
             purposes.
           </p>
+          <p>
+            <strong>Exit feedback.</strong> If you choose to tell us why you are
+            leaving - when you delete your account, unsubscribe from our emails,
+            or reply to a &ldquo;what happened?&rdquo; email - we keep that
+            answer after your account is gone. This is the only way we can learn
+            what to fix, since by definition we can no longer ask you.
+          </p>
+          <p>
+            What we keep is deliberately anonymous: the reason you selected, any
+            comment you chose to write, and general context such as how many days
+            you had been signed up and how many lessons you had finished. It is{" "}
+            <strong>
+              not linked to your name, email address, or account
+            </strong>{" "}
+            - your account identifier is replaced with a one-way code that cannot
+            be reversed to identify you. Answering is always optional, and you can
+            skip the question entirely without it affecting your deletion request
+            in any way. If you wrote a comment and would like it removed, email{" "}
+            <a href="mailto:privacy@notho.co.za" style={{ color: "#049DA7" }}>
+              privacy@notho.co.za
+            </a>
+            .
+          </p>
         </Section>
 
         <Section title="6. Cookies, sessions, and where your data lives">
@@ -373,11 +396,14 @@ export default function PrivacyPage() {
               Open <strong>Settings</strong> in the app.
             </li>
             <li>
-              Tap <strong>Delete account</strong> and confirm.
+              Tap <strong>Delete My Data</strong>. We will ask why you are
+              leaving - this is <strong>optional</strong>, there is a{" "}
+              <strong>Skip</strong> button, and skipping does not delay or affect
+              your deletion in any way.
             </li>
             <li>
-              Your account and every piece of data attached to it - budget
-              entries, imported transactions, learning progress, XP, coach
+              Confirm. Your account and every piece of data attached to it -
+              budget entries, imported transactions, learning progress, XP, coach
               conversations, and notification subscriptions - are erased
               immediately. This cannot be undone.
             </li>
@@ -425,6 +451,12 @@ export default function PrivacyPage() {
           <p>
             After deletion you will lose all learning progress, XP, and
             account history permanently. This action cannot be undone.
+          </p>
+          <p>
+            The one thing that is not erased is the anonymous exit feedback
+            described in <strong>Section 5</strong>, if you chose to give any. It
+            carries no name, email address, or account identifier, so it cannot
+            be traced back to you or used to rebuild your account.
           </p>
         </Section>
 

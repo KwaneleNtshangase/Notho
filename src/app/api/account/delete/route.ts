@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { createServiceSupabase } from "@/lib/supabaseServer";
+import { userRef } from "@/lib/churn/unsubscribeToken";
 
 export const runtime = "nodejs";
 
@@ -60,14 +61,37 @@ const USER_TABLES = [
   // are dropped the loop skips them as "missing" and this block can go.
   "stokvel_contributions",
   "stokvel_members",
+  // Email opt-outs and the win-back ledger. Both are squarely about a live
+  // user, so both go.
+  "email_preferences",
+  "winback_send_log",
   // Identity last.
   "user_progress",
   "profiles",
 ] as const;
 
+/**
+ * exit_feedback is deliberately absent from the list above, and must stay that
+ * way. It is the record of WHY this person left, written moments ago by the
+ * survey step. Deleting it here would erase the answer at the exact instant we
+ * finally have it, which defeats the entire point of asking.
+ *
+ * It is safe to keep because it holds no identity: no user_id, no email, no FK
+ * to auth.users - only a one-way peppered hash, cohort numbers, and whatever
+ * the person chose to type. See the migration header for the POPIA reasoning.
+ */
+
 export async function POST(req: NextRequest) {
   const user = await getUserFromRequest(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // The exit_feedback row id from the survey, if they answered. Optional: the
+  // body may be empty (older clients, or a caller that skipped the survey), and
+  // a missing id must never stop a deletion.
+  const body = await req.json().catch(() => ({}));
+  const exitId = typeof (body as { exitId?: unknown }).exitId === "string"
+    ? (body as { exitId: string }).exitId
+    : null;
 
   const admin = createServiceSupabase();
   const failed: string[] = [];
@@ -105,6 +129,20 @@ export async function POST(req: NextRequest) {
       },
       { status: 500 }
     );
+  }
+
+  // Mark the exit as a real departure, not an abandoned dialog. This has to
+  // happen BEFORE deleteUser: once the auth user is gone there is no session
+  // and no second chance. Scoped by user_ref so a forged id cannot flip
+  // somebody else's row.
+  if (exitId) {
+    const { error: exitErr } = await admin
+      .from("exit_feedback")
+      .update({ completed: true })
+      .eq("id", exitId)
+      .eq("user_ref", userRef(user.id));
+    // Analytics never blocks an erasure. Log and carry on.
+    if (exitErr) console.error("[account-delete] could not mark exit complete", exitErr.message);
   }
 
   const { error } = await admin.auth.admin.deleteUser(user.id);

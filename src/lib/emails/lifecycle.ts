@@ -28,6 +28,16 @@ export type EmailProfile = {
   username?: string | null;
   full_name?: string | null;
   goal?: string | null;
+  /**
+   * Per-recipient unsubscribe link, built by the caller with
+   * unsubscribeUrl(userId) from lib/churn/unsubscribeToken.
+   *
+   * Optional only because the one-off broadcast builders are sometimes called
+   * with no user in hand (previews, tests). Every real send must set it: an
+   * email with no way out is what turns a lapsed user into a spam complaint,
+   * and enough of those take the sending domain down for everyone.
+   */
+  unsubscribeUrl?: string | null;
 };
 
 export type BuiltEmail = { subject: string; html: string; text: string };
@@ -76,8 +86,22 @@ function goalInfo(goal?: string | null) {
   return GOAL_LINES[goal ?? ""] ?? { label: "Build financial confidence", line: "Knowledge is the best investment you can make." };
 }
 
-/** The shared branded shell. `bodyRows` is the inner HTML of the white box. */
-function shell(bodyRows: string): string {
+/**
+ * The shared branded shell. `bodyRows` is the inner HTML of the white box.
+ *
+ * `unsub` is the recipient's own signed unsubscribe link. When present it
+ * replaces the plain footer line with a real, one-tap way out. Gmail and Yahoo
+ * both weight a visible unsubscribe link in their bulk-sender reputation, and
+ * more importantly it is the difference between someone opting out and someone
+ * hitting the spam button.
+ */
+function shell(bodyRows: string, unsub?: string | null): string {
+  const footer = unsub
+    ? `You're getting this because you have a Notho account.<br/>
+       <a href="${unsub}" style="color:#9AA0A6;text-decoration:underline">Unsubscribe or get fewer emails</a><br/>
+       Educational content only, not financial advice.`
+    : `You're getting this because you have a Notho account.<br/>
+       Educational content only, not financial advice.`;
   return `
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;margin:0;padding:0">
     <tr><td align="center" style="padding:24px 12px">
@@ -97,8 +121,7 @@ function shell(bodyRows: string): string {
           ${bodyRows}
         </td></tr>
         <tr><td style="padding:16px 28px 0;text-align:center;font-size:11px;color:#9AA0A6;line-height:1.6">
-          You're getting this because you have a Notho account.<br/>
-          Educational content only, not financial advice.
+          ${footer}
         </td></tr>
       </table>
     </td></tr>
@@ -131,7 +154,7 @@ export function buildWelcome(p: EmailProfile): BuiltEmail {
     ${goalChip(p.goal)}
     ${cta("Start your first lesson")}
     <p style="margin:22px 0 0;font-size:15px;color:#374151">Small steps, real progress.<br/>Team Notho</p>
-  `);
+  `, p?.unsubscribeUrl);
   const text = `Welcome to Notho, ${name}.\n\nYou're in. One short lesson a day is all it takes to get a real grip on your money, and you can start right now.\n\nStart your first lesson: ${APP_URL}\n\nSmall steps, real progress.\nTeam Notho`;
   return { subject: `Welcome to Notho, ${name}`, html, text };
 }
@@ -149,7 +172,7 @@ export function buildD1(p: EmailProfile, streak: number): BuiltEmail {
     ${goalChip(p.goal)}
     ${cta("Continue learning")}
     <p style="margin:22px 0 0;font-size:15px;color:#374151">You've got this.<br/>Team Notho</p>
-  `);
+  `, p?.unsubscribeUrl);
   const text = `${name}, your next lesson is waiting.\n\n${line}\n\nContinue learning: ${APP_URL}\n\nYou've got this.\nTeam Notho`;
   const subject = streak > 0 ? `${name}, keep your ${streak}-day streak going` : `${name}, your next lesson is waiting`;
   return { subject, html, text };
@@ -189,9 +212,73 @@ export function buildMilestone(kind: MilestoneKind, p: EmailProfile, streak: num
     ${goalChip(p.goal)}
     ${cta(m.cta)}
     <p style="margin:22px 0 0;font-size:15px;color:#374151">Proud of you.<br/>Team Notho</p>
-  `);
+  `, p?.unsubscribeUrl);
   const text = `${m.headline}\n\nHi ${name}, ${m.body}\n\n${m.cta}: ${APP_URL}\n\nProud of you.\nTeam Notho`;
   return { subject: m.subject(name, streak), html, text };
+}
+
+/** ── Win-back: sent once, to people who quietly stopped ────────────────────
+ *
+ * Silent churn is the biggest bucket and the only one nobody ever explains. A
+ * person who deletes their account tells us something; a person who just stops
+ * opening the app tells us nothing, and there are far more of them.
+ *
+ * This email exists to ask them, once. Three things make it work:
+ *
+ *   1. It asks a question instead of selling. "Come back, we miss you" gets
+ *      deleted. "What got in the way?" gets answered, because it reads as
+ *      someone wanting to know rather than someone wanting a metric.
+ *   2. The answers are tappable links, not a form. Every extra step between the
+ *      inbox and the answer halves the response rate. One tap records the
+ *      reason; the landing page then offers the box for detail, which is where
+ *      the people who actually want to talk will write.
+ *   3. It admits the app might be the problem. Two of the four options blame
+ *      us. An exit survey that only offers flattering reasons produces
+ *      flattering data and nothing else.
+ *
+ * Sent once per user ever - winback_send_log enforces that. A "we miss you"
+ * email arriving monthly is just spam with a sad face on it.
+ */
+const WINBACK_OPTIONS: { code: string; label: string }[] = [
+  { code: "no_time", label: "I got busy, no time" },
+  { code: "too_hard", label: "The lessons were confusing" },
+  { code: "not_useful", label: "It wasn't what I needed" },
+  { code: "too_many_emails", label: "Too many emails" },
+];
+
+export function buildWinback(p: EmailProfile, lessons: number): BuiltEmail {
+  const name = resolveName(p);
+  const base = p.unsubscribeUrl ? `${p.unsubscribeUrl}&ctx=inactive` : "";
+
+  // Acknowledge what they did do. Someone who finished eleven lessons and
+  // stopped is a different conversation from someone who never started, and
+  // pretending otherwise is the fastest way to sound automated.
+  const opener = lessons > 0
+    ? `You finished ${lessons} lesson${lessons === 1 ? "" : "s"} on Notho and then stopped. That's completely fine, life happens.`
+    : `You signed up for Notho and never really got going. That's completely fine, life happens.`;
+
+  const buttons = base
+    ? WINBACK_OPTIONS.map((o) => `
+        <tr><td style="padding:0 0 8px">
+          <a href="${base}&r=${o.code}" style="display:block;padding:12px 16px;border:1.5px solid #d8dbe0;border-radius:10px;color:#111827;text-decoration:none;font-size:14.5px;font-weight:600">${o.label}</a>
+        </td></tr>`).join("")
+    : "";
+
+  const html = shell(`
+    <h1 style="margin:0 0 14px;font-size:22px;font-weight:800">${name}, what got in the way?</h1>
+    <p style="margin:0 0 16px;font-size:15px;color:#374151">${opener}</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#374151">We're not going to nag you. We would just like to know what stopped you, because if it was something we did, we would rather fix it than keep doing it. One tap is enough.</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 22px">${buttons}</table>
+    <p style="margin:0 0 16px;font-size:15px;color:#374151">And if you do want to pick it up again, everything is exactly where you left it.</p>
+    ${cta("Open Notho")}
+    <p style="margin:22px 0 0;font-size:15px;color:#374151">Either way, thank you for giving us a go.<br/>Team Notho</p>
+  `, p?.unsubscribeUrl);
+
+  const text = `${name}, what got in the way?\n\n${opener}\n\nWe're not going to nag you. We would just like to know what stopped you.\n\n` +
+    (base ? WINBACK_OPTIONS.map((o) => `${o.label}: ${base}&r=${o.code}`).join("\n") + "\n\n" : "") +
+    `If you want to pick it up again, everything is where you left it: ${APP_URL}\n\nEither way, thank you for giving us a go.\nTeam Notho`;
+
+  return { subject: `${name}, what got in the way?`, html, text };
 }
 
 /** ── Cosmo announcement (one-off broadcast) ────────────────────────────────
@@ -241,7 +328,7 @@ export function buildCosmoAnnouncement(p?: EmailProfile | null): BuiltEmail {
     ${cta("Say hi to Cosmo")}
 
     <p style="margin:22px 0 0;font-size:15px;color:#374151">Let us know what you think.<br/>Team Notho</p>
-  `);
+  `, p?.unsubscribeUrl);
 
   const text = `Meet Cosmo
 
@@ -303,7 +390,7 @@ export function buildRebrandAnnouncement(p?: EmailProfile | null): BuiltEmail {
     ${cta("Open Notho")}
 
     <p style="margin:22px 0 0;font-size:15px;color:#374151">Thanks for being here since the Fundi days.<br/>Team Notho</p>
-  `);
+  `, p?.unsubscribeUrl);
   const text = `We're now called Notho
 
 Hi ${name}, a quick heads up. Fundi Finance is now Notho. Same app, same team, same lessons. Only the name and the look have changed.

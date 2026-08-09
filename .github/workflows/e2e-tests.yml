@@ -1,10 +1,32 @@
 name: E2E Tests — Notho
 
+# MANUAL ONLY, as of 9 Aug 2026. Deliberately no `push` and no `schedule`.
+#
+# This suite has not produced a green run. Left on every push it emailed a
+# failure for each one, which is how an alert stops being an alert — the same
+# reason the dependency audit was made advisory and the health-check issues were
+# collapsed into one rolling incident.
+#
+# It has earned its place: it found the action-step scoring bug that made "Done
+# - I did it!" cost users a heart and re-queue the step forever, and it found
+# the crawler-filter gap. But it also produced six defects in its own design,
+# and a permanently red check gives no signal about the app while masking the
+# moment something real breaks.
+#
+# So it runs on demand, not on a timer:
+#   gh workflow run "E2E Tests — Notho"
+#   or the "Run workflow" button on the Actions tab.
+#
+# To put it back on push, restore the two keys below — but only once a manual
+# run has been green twice in a row:
+#   push:
+#     branches: [main]
+#   schedule:
+#     - cron: "0 5 * * *"
+#
+# Coverage did not vanish with it. 440 unit tests gate every push in ci.yml, and
+# the health check exercises the deployed app every 30 minutes.
 on:
-  push:
-    branches: [main]
-  schedule:
-    - cron: "0 5 * * *"
   workflow_dispatch:
 
 jobs:
