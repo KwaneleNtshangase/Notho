@@ -4,16 +4,12 @@ import { createHash } from 'crypto';
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getUserFromRequest } from "@/lib/apiAuth";
+import { escapeHtml, isAutomatedUserAgent } from "@/lib/errorReportGuards";
 
-/** Escapes characters that are special in HTML to prevent XSS in email bodies. */
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+// escapeHtml and the automation check live in @/lib/errorReportGuards so they
+// have one definition and a test. They were duplicated here and in
+// errorReporting.ts, and the copies drifted: the bot list matched vendor names
+// as whole words, so AhrefsBot and SemrushBot were never filtered.
 
 /** Extract the real client IP from Vercel / proxy forwarding headers. */
 function clientIp(req: NextRequest): string {
@@ -96,11 +92,7 @@ export async function POST(req: NextRequest) {
   // endpoint is public. Dropping it here keeps the feedback table clean too,
   // not just the inbox.
   const reportedUa = String(body.userAgent ?? "");
-  const AUTOMATED =
-    /\b(bot|crawler|spider|crawling|slurp|googlebot|bingbot|yandex|baidu|duckduckbot|facebookexternalhit|ia_archiver|semrush|ahrefs|mj12bot|dotbot|petalbot|headless|phantomjs|puppeteer|playwright|lighthouse|gtmetrix|pingdom|uptimerobot|curl|wget|python-requests|axios|node-fetch)\b/i;
-  // Chrome/N.0.0.0 - real Chrome ships a build number, automation sends zeros.
-  const SPOOFED_CHROME = /Chrome\/\d+\.0\.0\.0\b/;
-  if (AUTOMATED.test(reportedUa) || SPOOFED_CHROME.test(reportedUa)) {
+  if (isAutomatedUserAgent(reportedUa)) {
     // 200, not an error: the caller is misbehaving but there is nothing for it
     // to retry, and a failure response would just invite one.
     return NextResponse.json({ ok: true, skipped: "automated-client" });

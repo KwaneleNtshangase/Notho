@@ -9,37 +9,26 @@
 const seen = new Set<string>();
 let installed = false;
 
-/**
- * Declared crawlers and headless automation.
- *
- * Bots are not users, and reporting their errors is worse than useless: it
- * fills the inbox with failures nobody experienced, which is how real reports
- * get missed. Googlebot alone hit /learn and failed service-worker
- * registration three times in one morning.
- */
-const BOT_UA =
-  /\b(bot|crawler|spider|crawling|slurp|googlebot|bingbot|yandex|baidu|duckduckbot|facebookexternalhit|ia_archiver|semrush|ahrefs|mj12bot|dotbot|petalbot|headless|phantomjs|puppeteer|playwright|lighthouse|gtmetrix|pingdom|uptimerobot|curl|wget|python-requests|axios|node-fetch)\b/i;
+import { isAutomatedUserAgent } from "./errorReportGuards";
 
 /**
- * A Chrome build number of exactly N.0.0.0.
+ * True when this looks like automation rather than a person.
  *
- * Real Chrome ships a specific build, like 109.0.5414.87. A user agent whose
- * version collapses to zeros is a simplified or spoofed string, which is what
- * scraping stacks and automation frameworks send by default. Not conclusive on
- * its own, but combined with "never signed in" it is reliable enough, and the
- * cost of being wrong is one missed report from an anonymous visitor.
+ * The user-agent patterns live in ./errorReportGuards so the client and the
+ * /api/errors/report route share one definition with one test. They used to be
+ * duplicated, and the copies were both wrong in the same way: vendor names were
+ * matched as whole words, so `AhrefsBot` and `SemrushBot` slipped through —
+ * in "AhrefsBot" the `s` is followed by `B`, so `\bahrefs\b` never matched and
+ * neither did `\bbot\b`.
+ *
+ * The webdriver check stays here because it reads a browser API the server
+ * cannot see.
  */
-const SPOOFED_CHROME = /Chrome\/\d+\.0\.0\.0\b/;
-
-/** True when this looks like automation rather than a person. */
 function looksAutomated(): boolean {
   if (typeof navigator === "undefined") return false;
   // Set by Puppeteer, Playwright, Selenium and friends.
   if ((navigator as { webdriver?: boolean }).webdriver === true) return true;
-  const ua = navigator.userAgent || "";
-  if (BOT_UA.test(ua)) return true;
-  if (SPOOFED_CHROME.test(ua)) return true;
-  return false;
+  return isAutomatedUserAgent(navigator.userAgent);
 }
 
 export async function reportClientError(
