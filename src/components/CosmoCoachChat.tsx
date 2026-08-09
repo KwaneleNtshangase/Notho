@@ -229,6 +229,22 @@ export function CosmoCoachChat() {
         <div className="notho-chat-panel" role="dialog" aria-label="Ask Cosmo, your money coach">
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
             <span style={{ fontSize: 15, fontWeight: 800 }}>💬 Ask Cosmo</span>
+            {/* Persistent "this is AI" marker. Apple and Google both require a
+                user-facing disclosure wherever generative AI output appears,
+                not only behind the one-time consent step. */}
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                color: "var(--color-primary)",
+                border: "1px solid var(--color-primary)",
+                borderRadius: 6,
+                padding: "1px 5px",
+              }}
+            >
+              AI
+            </span>
             {state.kind === "chat" && remaining !== null && (
               <span style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>
                 {remaining} left today
@@ -270,9 +286,22 @@ export function CosmoCoachChat() {
           {state.kind === "consent" && (
             <div>
               <p style={{ fontSize: 13, color: "var(--color-text-primary)", margin: "0 0 8px" }}>
-                Ask Cosmo questions about your month. Only anonymised category
-                totals are shared with the AI. Your name, transactions, and
-                account details are never shared.
+                Cosmo is an <strong>AI assistant</strong>, powered by Google
+                Gemini. Ask it questions about your month. Only anonymised
+                category totals are shared with the AI. Your name,
+                transactions, and account details are never shared.
+              </p>
+              <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "0 0 10px" }}>
+                AI can get things wrong. Cosmo explains, it does not advise, and
+                it is not a financial adviser.{" "}
+                <a
+                  href="/privacy#ai-coach"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "var(--color-primary)", fontWeight: 600 }}
+                >
+                  How this works
+                </a>
               </p>
               <button
                 type="button"
@@ -372,7 +401,8 @@ export function CosmoCoachChat() {
               </form>
 
               <p style={{ fontSize: 10, color: "var(--color-text-secondary)", margin: "8px 0 0" }}>
-                Educational information, not financial advice.
+                AI-generated. Cosmo can make mistakes - check anything
+                important. Educational information, not financial advice.
               </p>
             </div>
           )}

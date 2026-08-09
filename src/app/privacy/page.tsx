@@ -54,7 +54,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p style={{ color: "#a0a0a0", fontSize: "15px", margin: 0 }}>
-            Last updated: July 2026 &nbsp;·&nbsp; The Solution Org (Pty) Ltd
+            Last updated: August 2026 &nbsp;·&nbsp; The Solution Org (Pty) Ltd
           </p>
         </div>
 
@@ -146,14 +146,34 @@ export default function PrivacyPage() {
               and financial goals you enter voluntarily within the app.
             </li>
             <li>
+              <strong>Imported bank transactions</strong> - if you choose to
+              upload a bank statement, the transaction rows we extract from it
+              (date, amount, description, category). See Section 4a for how the
+              file itself is handled.
+            </li>
+            <li>
+              <strong>Coach conversations</strong> - the questions you ask
+              Cosmo, our optional AI money coach, and its replies. Only stored
+              if you switch Cosmo on. See Section 9.
+            </li>
+            <li>
+              <strong>Notification subscriptions</strong> - if you opt in to
+              push notifications. See Section 4b.
+            </li>
+            <li>
               <strong>Usage data</strong> - features you interact with,
               session timestamps, and device/browser type, collected for
               analytics and app improvement.
             </li>
+            <li>
+              <strong>Diagnostics</strong> - crash reports and error logs, so we
+              can find and fix what breaks.
+            </li>
           </ul>
           <p>
             We do <strong>not</strong> collect payment card details, bank
-            account numbers, or South African ID numbers.
+            account numbers, banking login credentials, South African ID
+            numbers, or your location.
           </p>
         </Section>
 
@@ -192,11 +212,70 @@ export default function PrivacyPage() {
               OAuth sign-in; we receive only the account profile data you
               authorise during the login flow.
             </li>
+            <li>
+              <strong>Google (Gemini API)</strong> - powers Cosmo, our optional
+              AI money coach. Cosmo is switched off until you turn it on. When
+              you do, we send Google only an{" "}
+              <strong>anonymised summary</strong> of your budget: category
+              totals and monthly income. We never send your name, email,
+              merchant names, transaction descriptions, or any other
+              identifying detail. See Section 9 for the full explanation.
+            </li>
+            <li>
+              <strong>PostHog</strong> - product analytics, so we can see which
+              features are used and where the app breaks. Used for aggregate
+              measurement only; we do not use it to track you across other apps
+              or websites, and we do not run advertising.
+            </li>
+            <li>
+              <strong>Resend</strong> - sends our transactional email (welcome
+              messages, budget alerts, and replies to your requests). Receives
+              your email address and the contents of that message only.
+            </li>
           </ul>
           <p>
             These providers are contractually prohibited from using your data
-            for their own purposes. We do not share data with any other third
-            party except as required by South African law or a court order.
+            for their own purposes. We do not sell your personal information,
+            we do not share it with advertisers, and we do not share it with
+            any other third party except as required by South African law or a
+            court order.
+          </p>
+        </Section>
+
+        <Section title="4a. Bank statements you upload">
+          <p>
+            Notho never connects to your bank. We do not ask for your banking
+            username, password, PIN, or one-time PIN, and we have no ability to
+            log into your account or move money. The only way your transactions
+            reach Notho is if <strong>you</strong> export a statement from your
+            bank and upload it yourself.
+          </p>
+          <p>
+            When you upload a statement, the file is read on our server{" "}
+            <strong>in memory only</strong> in order to extract the transaction
+            rows. The file itself is never written to disk and never stored.
+            What we keep is the extracted transaction data - date, amount,
+            description, and the category it was sorted into - saved against
+            your account so your budget works across devices.
+          </p>
+          <p>
+            You can delete any imported batch from within the Budget screen, or
+            erase everything at once by deleting your account (Section 8).
+          </p>
+        </Section>
+
+        <Section title="4b. Push notifications">
+          <p>
+            If you opt in to notifications, we store a{" "}
+            <strong>push subscription</strong> for your device - an endpoint URL
+            and the encryption keys your browser generates. This lets us send
+            reminders about your streak, budget alerts, and new content. It
+            contains no personal information and cannot be used to identify you
+            outside the app.
+          </p>
+          <p>
+            You can turn notifications off at any time in Settings, or in your
+            browser or device settings. Doing so deletes the subscription.
           </p>
         </Section>
 
@@ -287,7 +366,28 @@ export default function PrivacyPage() {
             all associated personal data at any time.
           </p>
           <p>
-            <strong>How to delete your data:</strong>
+            <strong>The fastest way - delete it yourself, instantly:</strong>
+          </p>
+          <ol style={{ paddingLeft: "20px", lineHeight: 1.8 }}>
+            <li>
+              Open <strong>Settings</strong> in the app.
+            </li>
+            <li>
+              Tap <strong>Delete account</strong> and confirm.
+            </li>
+            <li>
+              Your account and every piece of data attached to it - budget
+              entries, imported transactions, learning progress, XP, coach
+              conversations, and notification subscriptions - are erased
+              immediately. This cannot be undone.
+            </li>
+          </ol>
+          <p>
+            You can also <strong>export everything we hold on you</strong> from
+            the same Settings screen before you delete, if you want a copy.
+          </p>
+          <p>
+            <strong>Or request deletion by email:</strong>
           </p>
           <ol style={{ paddingLeft: "20px", lineHeight: 1.8 }}>
             <li>
@@ -328,7 +428,52 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
-        <Section title="9. Contact Us">
+        <Section title="9. Cosmo, our AI money coach" id="ai-coach">
+          <p>
+            Cosmo is an optional AI assistant inside Notho that answers
+            questions about your own budget in plain language. It is powered by{" "}
+            <strong>Google&apos;s Gemini</strong> model. Cosmo is{" "}
+            <strong>switched off by default</strong> and sends nothing until you
+            explicitly turn it on.
+          </p>
+          <p>
+            <strong>What Cosmo is sent.</strong> Only an anonymised summary of
+            your budget: totals per spending category, your monthly income
+            figure, and the question you typed. That is all.
+          </p>
+          <p>
+            <strong>What Cosmo is never sent.</strong> Your name, email address,
+            user ID, merchant names, individual transaction descriptions,
+            account numbers, or anything else that could identify you or where
+            you shop.
+          </p>
+          <p>
+            <strong>Limits and safeguards.</strong> Cosmo is restricted to
+            financial education. It is instructed never to recommend or name
+            specific financial products, providers, funds, shares, or
+            cryptocurrencies, and to point you to a registered financial adviser
+            for anything product-related. Usage is capped at 10 messages per day
+            per person. Conversations are logged on our servers so we can review
+            for abuse and improve safety, and they are deleted along with the
+            rest of your data if you delete your account.
+          </p>
+          <p>
+            <strong>AI makes mistakes.</strong> Cosmo can be wrong, and it is
+            not a financial adviser. Treat its answers as a starting point for
+            your own thinking, never as advice to act on. If a response looks
+            wrong or inappropriate, please report it to{" "}
+            <a href="mailto:support@notho.co.za" style={{ color: "#007A85" }}>
+              support@notho.co.za
+            </a>
+            .
+          </p>
+          <p>
+            You can withdraw consent at any time in Settings. Cosmo stops
+            immediately, and no further data is sent to Google.
+          </p>
+        </Section>
+
+        <Section title="10. Contact Us">
           <p>
             If you have questions about this Privacy Policy or our data
             practices, please contact us:
