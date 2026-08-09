@@ -27,8 +27,8 @@ const l1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Present bias explains why people:",
           options: [
-            "Prefer smaller rewards now over larger rewards later",
-            "Always make rational financial decisions",
+            "Prefer smaller rewards now",
+            "Always make rational decisions",
             "Save too much and spend too little",
             "Are afraid of all financial risk",
           ],
@@ -88,8 +88,8 @@ const l1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The most reliable way to beat present bias is to:",
           options: [
-            "Automate the decision so it happens before you can spend",
-            "Rely on willpower each day",
+            "Automate it before you can spend",
+            "Rely on sheer willpower every day",
             "Wait until you earn more",
             "Avoid budgeting altogether",
           ],
@@ -184,7 +184,7 @@ const l1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which is an example of present bias working against your long-term interest?",
           options: [
-            "Skipping a savings transfer to buy takeaways you'll soon forget",
+            "Skipping savings for takeaways",
             "Setting up a retirement annuity",
             "Building an emergency fund",
             "Comparing prices before buying",
@@ -214,10 +214,10 @@ const l1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A shop offers 'take it home today, first payment in 3 months'. Why is this tempting even when it costs more overall?",
           options: [
-            "It gives you the reward now and pushes the pain to later",
-            "It is always the cheapest option",
+            "Reward now, pain pushed to later",
+            "It is always the cheapest option available",
             "It builds your credit score for free",
-            "It is legally required to be interest-free",
+            "It must legally be interest-free always",
           ],
           correct: 0,
           feedback: {
@@ -337,7 +337,7 @@ const l2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A salary negotiation opens with a deliberately low first offer. Why does that first number matter so much?",
           options: [
-            "It anchors the whole range the rest of the negotiation moves around",
+            "It anchors the whole range",
             "It is legally binding once stated",
             "It sets the tax you'll pay",
             "It has no real effect on the outcome",
@@ -361,7 +361,7 @@ const l2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You paid R8 000 for concert tickets. The day before, you get sick and also get a better offer for that evening. What's the rational move?",
           options: [
-            "The R8 000 is gone. Choose tonight's best option regardless",
+            "The R8 000 is gone",
             "Attend anyway, since the money is already spent",
             "Attend briefly so the spend is partly justified",
             "Demand a refund on the basis of illness",
@@ -379,7 +379,7 @@ const l2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The sunk cost fallacy is:",
           options: [
-            "Sticking with something because of money already spent",
+            "Sticking with it for past spending",
             "Following what the crowd is buying",
             "Fearing losses more than valuing gains",
             "Anchoring to the first price you saw",
@@ -433,9 +433,9 @@ const l2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which is the sunk cost fallacy at work?",
           options: [
-            "Keeping a failing project going because you've 'invested too much to stop'",
-            "Cancelling a subscription you no longer use",
-            "Selling a share whose outlook has turned poor",
+            "Continuing because of past spending",
+            "Cancelling a subscription you never use",
+            "Selling a share whose outlook has turned",
             "Comparing costs before committing",
           ],
           correct: 0,
@@ -518,7 +518,7 @@ const l3Slots: QuestionSlot[] = [
         step: {
           type: "scenario",
           question: "A coin is all over your feed and friends are buying; you feel you'll miss out if you don't. That feeling is:",
-          options: ["FOMO driving herd behaviour", "Careful analysis", "Loss aversion", "Anchoring"],
+          options: ["FOMO driving herd behaviour", "Careful independent analysis", "Simple loss aversion", "Anchoring to a price"],
           correct: 0,
           feedback: {
             correct: "Right. Fear of missing out is the emotional engine that pushes people into the herd.",
@@ -568,10 +568,10 @@ const l3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Which question best protects you from herd-driven losses?",
           options: [
-            "'Would I buy this if no one was talking about it?'",
-            "'How many people have already bought?'",
-            "'How fast is the price rising?'",
-            "'How much did my friends make?'",
+            "Would I buy this unprompted?",
+            "How many people have bought?",
+            "How fast is the price rising?",
+            "How much did my friends make?",
           ],
           correct: 0,
           feedback: {
@@ -604,7 +604,7 @@ const l3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The danger of arriving with the herd is that:",
           options: [
-            "You often buy near the top, just as early buyers are selling",
+            "You often buy near the top",
             "You always lose money, guaranteed",
             "You pay no transaction fees",
             "Prices are certain to keep rising",
@@ -622,8 +622,8 @@ const l3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Friends made money early on a hyped asset and urge you to join now. Why is 'they already made money' a weak reason to buy?",
           options: [
-            "Their past gains don't make it a sound buy at today's higher price",
-            "It guarantees you'll make money too",
+            "Past gains don't justify today's price",
+            "It guarantees that you'll make money too",
             "It lowers your risk",
             "It sets a fair price for you",
           ],
@@ -676,7 +676,7 @@ const l3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "An 'investment group' says spots close tonight and friends are joining fast. Best response?",
           options: [
-            "Slow down and verify it independently. Urgency is the pressure tactic",
+            "Slow down and verify it independently",
             "Join before it closes so you don't miss out",
             "Ask how much others put in and match it",
             "Recruit others to get in with you",
@@ -720,10 +720,10 @@ const l4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Loss aversion means:",
           options: [
-            "A loss feels about twice as painful as an equal gain feels good",
+            "A loss hurts about twice as much",
             "Gains and losses feel equally intense",
-            "Losing money feels good",
-            "You actively enjoy taking risks",
+            "Losing money actually feels quite good",
+            "You actively enjoy taking big risks",
           ],
           correct: 0,
           feedback: {
@@ -853,10 +853,10 @@ const l4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Markets fall 30% and the pain is intense. Historically, selling everything at that point tends to:",
           options: [
-            "Lock in losses at the worst possible moment",
-            "Reliably protect your wealth",
+            "Lock in losses at the worst moment",
+            "Reliably protect your total wealth",
             "Beat inflation over time",
-            "Remove all risk safely",
+            "Remove all of your risk safely",
           ],
           correct: 0,
           feedback: {
@@ -907,7 +907,7 @@ const l4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You'd never buy this share today, yet you hold it only because selling means admitting a loss. What does that reveal?",
           options: [
-            "Loss aversion, not analysis, is driving the decision",
+            "Loss aversion, not analysis",
             "A sound long-term strategy",
             "Strong investing discipline",
             "A well-diversified portfolio",
@@ -1013,10 +1013,10 @@ const l5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "A practical rule for beating lifestyle inflation when you get a raise is to:",
           options: [
-            "Save at least half the increase before upgrading anything",
-            "Upgrade your car first, then see what's left",
+            "Save at least half the increase",
+            "Upgrade your car first, then see",
             "Spend it all, you earned it",
-            "Wait and let the money sit in your account",
+            "Let the money sit in your account",
           ],
           correct: 0,
           feedback: {
@@ -1049,8 +1049,8 @@ const l5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which is a sign of lifestyle inflation?",
           options: [
-            "Every promotion is followed by bigger fixed expenses while savings stay flat",
-            "Your savings rate rises as your income grows",
+            "Every raise brings bigger fixed costs",
+            "Your savings rate rises as income grows",
             "You pay off debt faster each year",
             "You track your net worth monthly",
           ],
@@ -1098,8 +1098,8 @@ const l5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why are upgraded FIXED costs (a bigger car repayment, a pricier flat) especially risky?",
           options: [
-            "They lock in high spending every month and are hard to reverse",
-            "They are always cheaper in the long run",
+            "They lock in high spending monthly",
+            "They are cheaper in the long run",
             "They automatically build your savings",
             "They reduce the tax you owe",
           ],
@@ -1184,7 +1184,7 @@ const l6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Someone's visible spending on social media tells you:",
           options: [
-            "Little about their real finances. It's often debt-funded",
+            "Little about their real finances",
             "That they are definitely wealthy",
             "Their exact net worth",
             "A strategy you should copy",
@@ -1202,7 +1202,7 @@ const l6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "An influencer flaunts designer clothes and a new car every week. What's a realistic read?",
           options: [
-            "It may be free product, credit, or finance, not proof of wealth",
+            "It may be free product or credit",
             "They are clearly financially secure",
             "You should try to match their lifestyle",
             "They must have saved very carefully",
@@ -1256,7 +1256,7 @@ const l6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A colleague posts a new car and you suddenly feel behind. What's the most financially sound response?",
           options: [
-            "Refocus on your own goals and net-worth progress",
+            "Refocus on your own goals",
             "Finance a similar car to keep up",
             "Assume they're broke and feel smug",
             "Copy their spending to match them",
@@ -1280,9 +1280,9 @@ const l6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which habit best reduces social-media-driven overspending?",
           options: [
-            "Mute accounts that trigger buying and use a 72-hour wait on non-essentials",
+            "Mute triggers and wait 72 hours",
             "Shop right when you feel the FOMO",
-            "Follow more luxury accounts for 'inspiration'",
+            "Follow more luxury accounts for ideas",
             "Buy things to match your feed",
           ],
           correct: 0,
@@ -1310,10 +1310,10 @@ const l6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You feel a strong urge to buy something you saw online ten minutes ago. A good rule is to:",
           options: [
-            "Wait 72 hours before buying non-essentials over a set amount",
-            "Buy now before it sells out",
-            "Ask your feed whether to buy it",
-            "Put it on credit to decide later",
+            "Wait 72 hours before non-essentials",
+            "Buy it right now before it all sells out",
+            "Ask your feed whether you should buy it",
+            "Put it on credit and decide later on",
           ],
           correct: 0,
           feedback: {
@@ -1334,8 +1334,8 @@ const l6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why is matching a friend's visible lifestyle on credit especially dangerous?",
           options: [
-            "You take on real debt to imitate spending that may itself be debt",
-            "It always pays off in the end",
+            "You take real debt to copy debt",
+            "It always pays off well in the end",
             "It reliably builds your wealth",
             "Credit for lifestyle is free",
           ],
@@ -1364,7 +1364,7 @@ const l6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "To 'keep up', Andile finances a car matching his colleague's. Six months later he's stretched thin. The lesson?",
           options: [
-            "Visible consumption is a poor guide. Spend against your own plan, not others' displays",
+            "Visible consumption is a poor guide",
             "He should have bought the car sooner",
             "Social proof is a reliable financial signal",
             "Taking on the debt was harmless",

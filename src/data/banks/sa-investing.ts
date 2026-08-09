@@ -135,8 +135,8 @@ const lesson1Slots: QuestionSlot[] = [
           question: "Contributing the full R46 000 every year, roughly how long until you reach the R500 000 lifetime limit?",
           options: [
             "About 11 years",
-            "About 5 years",
-            "About 25 years",
+            "About 5 years or so",
+            "About 25 years or so",
             "You never reach it",
           ],
           correct: 0,
@@ -377,7 +377,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Many people use a TFSA AND a normal taxable account. Why?",
           options: [
-            "TFSA for long-term tax-free wealth; taxable account for money beyond the limits or that they may need flexibly",
+            "TFSA for long-term tax-free wealth",
             "Because TFSAs are a scam",
             "To confuse SARS",
             "There's never a reason to use both",
@@ -401,8 +401,8 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What kind of money is a TFSA best suited for?",
           options: [
-            "Long-term money you can leave to grow tax-free for years",
-            "Next month's rent",
+            "Money left to grow",
+            "Next month's rent money",
             "Day-to-day spending money",
             "Money you'll need next week",
           ],
@@ -431,10 +431,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa starts her TFSA at 25 instead of 35, contributing the same each year. Why does the 10-year head start matter so much?",
           options: [
-            "Ten extra years of tax-free compounding dramatically increases the final amount",
+            "Ten extra years of compounding",
             "It makes no difference at all",
             "Starting later is actually better",
-            "Only the total contributed matters, not the timing",
+            "Only the total contributed matters",
           ],
           correct: 0,
           feedback: {
@@ -628,8 +628,8 @@ const lesson3Slots: QuestionSlot[] = [
           options: [
             "A licensed bank, LISP or investment platform",
             "Whichever social-media account promises the most",
-            "A stranger's WhatsApp 'investment club'",
-            "Anywhere that skips paperwork",
+            "A stranger's WhatsApp 'investment club' group",
+            "Anywhere at all that skips all of the paperwork",
           ],
           correct: 0,
           feedback: {
@@ -701,7 +701,7 @@ const lesson4Slots: QuestionSlot[] = [
           question: "What is a Retirement Annuity (RA)?",
           options: [
             "A long-term investment for retirement",
-            "A short-term savings account you can dip into anytime",
+            "A short-term savings account",
             "A type of car insurance",
             "A government grant",
           ],
@@ -733,7 +733,7 @@ const lesson4Slots: QuestionSlot[] = [
             "Open a Retirement Annuity and contribute himself",
             "He can't. Retirement tax breaks are only for employees",
             "Only through UIF",
-            "Only by buying property",
+            "Only by buying investment property and renting it out",
           ],
           correct: 0,
           feedback: {
@@ -828,9 +828,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato is tempted to put most of her savings into an RA for the tax deduction, but might need cash within a year. What's wise?",
           options: [
-            "Keep an accessible emergency buffer first; only commit what she can lock away long-term",
-            "Lock it all in the RA for the biggest deduction",
-            "Borrow on a credit card to fund the RA",
+            "Keep an accessible buffer first",
+            "Lock it all in for the deduction",
+            "Borrow on a credit card to fund it",
             "Hide income from SARS instead",
           ],
           correct: 0,
@@ -852,10 +852,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Who benefits most from an RA (versus relying only on an employer pension)?",
           options: [
-            "The self-employed, and anyone wanting to save beyond their employer fund",
-            "Only people over 60",
-            "Only people who earn under R5 000",
-            "Nobody. RAs have no purpose",
+            "The self-employed, mainly",
+            "Only people over the age of 60",
+            "Only people earning under R5 000",
+            "Nobody, RAs have no purpose",
           ],
           correct: 0,
           feedback: {
@@ -926,10 +926,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the headline tax benefit of an RA for many working South Africans?",
           options: [
-            "Qualifying contributions can be deducted from taxable income, within limits",
-            "No tax ever on anything, worldwide, automatically",
-            "You can withdraw cash any week, no questions",
-            "Exemption from FICA",
+            "Contributions are tax-deductible",
+            "No tax ever, anywhere, automatically",
+            "You can withdraw the cash any week",
+            "Full exemption from all FICA rules",
           ],
           correct: 0,
           feedback: {
@@ -956,9 +956,9 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Priya earns R42 000 taxable a month and contributes R4 000 to an RA. What broadly happens at tax time?",
           options: [
-            "Her taxable income drops by the deductible contribution, lowering her tax. Exact saving depends on her bracket",
+            "Her taxable income drops",
             "She pays more tax as a penalty",
-            "Nothing changes",
+            "Nothing changes at all",
             "She's exempt from all tax forever",
           ],
           correct: 0,
@@ -1028,7 +1028,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How should you treat the RA tax deduction?",
           options: [
-            "As a nudge to save. Plan cash flow so living costs stay covered after the debit order",
+            "As a nudge to save",
             "As free money to spend elsewhere",
             "As a reason to borrow to contribute more",
             "As a way to access cash any time",
@@ -1112,8 +1112,8 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Given the lock-in and penalties, what money is right for an RA?",
           options: [
-            "Long-term money you're comfortable not touching until retirement",
-            "Your emergency fund",
+            "Money you won't touch",
+            "Your emergency fund money",
             "Next year's holiday savings",
             "This month's grocery money",
           ],
@@ -1156,10 +1156,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What is a unit trust?",
           options: [
-            "A pool of many investors' money invested in a basket chosen by a manager",
-            "A single share in one company",
-            "A type of bank account",
-            "A government bond",
+            "A manager-run basket of assets",
+            "A single share in just one company",
+            "A special type of savings account",
+            "A bond issued by the government",
           ],
           correct: 0,
           feedback: {
@@ -1210,9 +1210,9 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which statement is most accurate for a beginner comparing ETFs and active unit trusts?",
           options: [
-            "ETFs often track an index passively; many unit trusts try to beat a benchmark with higher fees",
+            "ETFs often track an index passively",
             "ETFs always beat every unit trust, forever",
-            "Unit trusts can't charge fees",
+            "Unit trusts are not allowed to charge fees",
             "Neither needs a mandate document",
           ],
           correct: 0,
@@ -1240,7 +1240,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "An active unit trust charges much higher fees than a similar index ETF, promising to 'beat the market'. What should a beginner remember?",
           options: [
-            "Higher fees are guaranteed; beating the market isn't, many active funds don't",
+            "Higher fees are guaranteed",
             "Higher fees guarantee higher returns",
             "Active funds never charge fees",
             "The market can't be tracked",

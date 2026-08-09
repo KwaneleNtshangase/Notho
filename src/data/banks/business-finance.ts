@@ -26,10 +26,10 @@ const separateSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Why should you keep separate business and personal bank accounts from day one?",
           options: [
-            "To see if the business is profitable and keep clean records for SARS and lenders",
-            "Because banks pay higher interest on business accounts",
+            "To see if it's actually profitable",
+            "Banks pay more on business accounts",
             "To avoid paying any tax",
-            "Because it's legally required for every side hustle",
+            "It's legally required for side hustles",
           ],
           correct: 0,
           feedback: {
@@ -56,8 +56,8 @@ const separateSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Lindi runs everything through her personal account and can't tell whether her business makes money. What's the fix?",
           options: [
-            "Open a separate business account and pay herself a set salary from it",
-            "Try harder to remember which spend was which",
+            "Open a business account",
+            "Try harder to remember which was which",
             "Only ever use cash",
             "Stop tracking and hope for the best",
           ],
@@ -92,10 +92,10 @@ const separateSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Business profit becomes yours to spend when:",
           options: [
-            "It's properly paid out as a salary or dividend",
+            "When paid as salary or dividend",
             "The moment it lands in the account",
             "Automatically at year-end",
-            "Never. You can't take money out",
+            "Never, you can't take money out",
           ],
           correct: 0,
           feedback: {
@@ -110,10 +110,10 @@ const separateSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Why is randomly 'dipping into' the business account a problem?",
           options: [
-            "It creates tax complications and hides whether the business is actually profitable",
+            "It hides real profitability",
             "It's a criminal offence",
             "Banks automatically block it",
-            "It increases the VAT rate you pay",
+            "It increases the VAT rate",
           ],
           correct: 0,
           feedback: {
@@ -133,7 +133,7 @@ const separateSlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "At what annual taxable turnover must a South African business register for VAT?",
-          options: ["R1 000 000", "R500 000", "R5 000 000", "Any business that makes a sale"],
+          options: ["R1 000 000", "R500 000", "R5 000 000", "Any seller"],
           correct: 0,
           feedback: {
             correct: "Right. Registration is compulsory above R1 000 000 turnover in a 12-month period (voluntary registration is possible from R50 000).",
@@ -203,9 +203,9 @@ const separateSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo earns R80 000/month consulting, spends it all, and gets a R280 000 SARS bill at year-end. What should he have done?",
           options: [
-            "Set aside ~30% monthly and paid provisional tax twice a year",
-            "Nothing, SARS shouldn't tax the self-employed",
-            "Registered a company purely to avoid tax",
+            "Set aside 30% each month",
+            "Nothing, SARS shouldn't tax him",
+            "Registered a company to avoid tax",
             "Kept his earnings artificially low",
           ],
           correct: 0,

@@ -22,10 +22,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which factor matters most when choosing a bank account for everyday use?",
           options: [
-            "Total monthly fees and transaction costs",
+            "Total monthly fees and costs",
             "The colour of the card",
             "How many branches the bank has",
-            "Whether your friends use the same bank",
+            "Whether your friends use it",
           ],
           correct: 0,
           feedback: {
@@ -44,7 +44,7 @@ const lesson1Slots: QuestionSlot[] = [
             "Lerato draws cash from an ATM three times a week. When comparing accounts, what should she look at hardest?",
           options: [
             "The cost per ATM withdrawal",
-            "The card design",
+            "The design printed on the card",
             "The bank's TV adverts",
             "Whether the branch has nice chairs",
           ],
@@ -99,7 +99,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why can digital-first banks charge so much less than traditional banks?",
           options: [
-            "They don't run expensive branch networks",
+            "They run no branch networks",
             "They aren't properly regulated",
             "They pay their staff nothing",
             "They secretly charge you elsewhere",
@@ -158,7 +158,7 @@ const lesson1Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Switching from a R150/month account to a R0/month account saves you about:",
-          options: ["R1 800 a year", "R150 a year", "R18 a year", "Nothing"],
+          options: ["R1 800 a year", "R150 a year", "R18 a year", "Nothing at all"],
           correct: 0,
           feedback: {
             correct: "Right. R150 × 12 = R1 800 a year: for the same everyday banking.",
@@ -193,10 +193,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What makes an account 'the best' one?",
           options: [
-            "It's the cheapest for the way you actually bank",
-            "It's the one with the most adverts",
-            "It's the most expensive, so it must be premium",
-            "It's whichever your parents use",
+            "The cheapest for how you bank",
+            "The one with the most adverts",
+            "The most expensive, so premium",
+            "Whichever your parents use",
           ],
           correct: 0,
           feedback: {
@@ -214,10 +214,10 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "Nomsa gets paid in cash and deposits it, then withdraws small amounts often. Which cost should she weigh most?",
           options: [
-            "Cash deposit and ATM withdrawal fees",
+            "Cash deposit and ATM fees",
             "International forex rates",
             "The overdraft interest rate",
-            "The cost of a replacement card",
+            "The replacement card cost",
           ],
           correct: 0,
           feedback: {
@@ -275,7 +275,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which habit tends to increase your bank fees the most?",
           options: [
-            "Withdrawing small amounts frequently from ATMs",
+            "Frequent small ATM withdrawals",
             "Using tap-to-pay at the till",
             "Having your salary paid in",
             "Checking your balance in the app",
@@ -296,7 +296,7 @@ const lesson2Slots: QuestionSlot[] = [
           question:
             "Lungile draws R200 from an ATM five times a week at R10 a time instead of one weekly withdrawal. What's the fix?",
           options: [
-            "Withdraw once a week in one larger amount to pay one fee, not five",
+            "Withdraw once a week in one amount",
             "Stop using her account",
             "Switch to withdrawing R50 ten times",
             "Only bank at branches",
@@ -392,8 +392,8 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's a simple way to cut your monthly bank fees?",
           options: [
-            "Tap to pay and withdraw cash less often, in bigger amounts",
-            "Withdraw small amounts several times a day",
+            "Tap to pay and draw cash less often",
+            "Withdraw small amounts several times",
             "Use the teller for everything",
             "Ignore your fee schedule",
           ],
@@ -426,9 +426,9 @@ const lesson2Slots: QuestionSlot[] = [
           question:
             "Priya's bank gives free card swipes but charges for ATM cash. To pay less in fees, she should:",
           options: [
-            "Tap her card wherever she can and draw cash rarely",
-            "Draw all her salary as cash on payday",
-            "Pay everyone in cash",
+            "Tap her card and draw cash rarely",
+            "Draw all of her salary as cash on payday",
+            "Pay for absolutely everything in cash",
             "Use the ATM for every purchase",
           ],
           correct: 0,
@@ -481,9 +481,9 @@ const lesson2Slots: QuestionSlot[] = [
           question:
             "Thabo spots a R59 'account feature' fee he never uses on his statement. Best move?",
           options: [
-            "Query it with the bank and downgrade or remove the feature",
-            "Ignore it. It's only R59",
-            "Close his account immediately",
+            "Query it and remove the feature",
+            "Ignore it, it's only R59",
+            "Close his bank account immediately",
             "Assume he must be using it",
           ],
           correct: 0,
@@ -547,7 +547,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question:
             "Lungile switches from a traditional bank (R160/month) to TymeBank (R0/month). Over 5 years, roughly what does she save in fees?",
-          options: ["About R9 600", "About R1 920", "About R800", "Nothing. Fees are the same"],
+          options: ["About R9 600", "About R1 920", "About R800", "Nothing"],
           correct: 0,
           feedback: {
             correct:
@@ -585,10 +585,10 @@ const lesson3Slots: QuestionSlot[] = [
           question:
             "Since 2024, are your bank deposits protected by a formal insurance scheme in South Africa?",
           options: [
-            "Yes. CODI covers qualifying deposits up to R100 000 per depositor per bank",
-            "No, there's no deposit protection at all",
-            "Only deposits above R1 million are covered",
-            "Only accounts at the big four banks are covered",
+            "Yes, CODI covers up to R100 000",
+            "No, there's no deposit protection",
+            "Only deposits above R1 million",
+            "Only accounts at the big four banks",
           ],
           correct: 0,
           feedback: {
@@ -621,7 +621,7 @@ const lesson3Slots: QuestionSlot[] = [
           question:
             "Given CODI covers up to R100 000 per depositor per bank, what does that imply for very large savings?",
           options: [
-            "Spreading large balances across more than one bank keeps more of it within the guarantee",
+            "Spread large balances across banks",
             "Keep everything in one account, always",
             "It means a bank can never fail",
             "Any amount is fully guaranteed anyway",
@@ -660,10 +660,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "You could save R100/month by switching banks, but it takes an afternoon to move your debit orders. Worth it?",
           options: [
-            "Usually yes. R100/month is R1 200/year for a one-time afternoon",
-            "Never. Switching is always a scam",
-            "Only if you save R1 000+/month",
-            "No. Banks all cost the same",
+            "Usually yes, R1 200 a year",
+            "Never, switching is always a scam",
+            "Only if you save R1 000 a month",
+            "No, banks all cost the same",
           ],
           correct: 0,
           feedback: {
@@ -701,8 +701,8 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Beyond fees, what's genuinely worth checking before choosing a digital bank?",
           options: [
-            "App reliability and how easy it is to get help when something goes wrong",
-            "The brightness of the logo",
+            "App reliability and getting help",
+            "The brightness of the bank's logo",
             "How many adverts they run",
             "Whether the CEO is famous",
           ],
@@ -737,10 +737,10 @@ const lesson3Slots: QuestionSlot[] = [
           question:
             "Ayesha wants low fees but also needs to deposit cash from her side hustle weekly. What should she confirm?",
           options: [
-            "Where and how she can deposit cash cheaply with that digital bank",
-            "The colour options for the card",
+            "How cheaply she can deposit cash",
+            "The colour options for her new card",
             "Whether the app has a game",
-            "How big the bank's head office is",
+            "How big the head office is",
           ],
           correct: 0,
           feedback: {
@@ -783,10 +783,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What is a debit order?",
           options: [
-            "A pre-authorised instruction letting a company deduct money on a fixed date",
-            "A once-off payment you make manually each month",
+            "A pre-authorised recurring deduction",
+            "A once-off payment you make manually",
             "A type of savings account",
-            "A fee the bank charges for using your card",
+            "A fee for using your card",
           ],
           correct: 0,
           feedback: {
@@ -803,10 +803,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which of these is typically paid by debit order?",
           options: [
-            "Your monthly insurance premium",
-            "A once-off cash tip",
-            "Buying bread at the spaza",
-            "A friend paying you back",
+            "A monthly insurance premium",
+            "A once-off tip paid to a waiter",
+            "Buying bread at the local spaza",
+            "A friend paying you back later",
           ],
           correct: 0,
           feedback: {
@@ -858,8 +858,8 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the best way to avoid bounced-debit-order fees?",
           options: [
-            "Make sure enough money is in the account before the debit dates",
-            "Cancel all your debit orders",
+            "Keep enough in the account",
+            "Cancel all of your debit orders",
             "Keep the account empty on purpose",
             "Ignore the debit dates entirely",
           ],
@@ -879,9 +879,9 @@ const lesson4Slots: QuestionSlot[] = [
           question:
             "Thabo is paid on the 25th but three debit orders run on the 1st, when he's low. What should he try?",
           options: [
-            "Ask the companies to move the debit dates to just after the 25th",
+            "Move the debit dates after the 25th",
             "Let them bounce every month",
-            "Close his account each month-end",
+            "Close his account at each month-end",
             "Withdraw all his cash on the 24th",
           ],
           correct: 0,
@@ -905,9 +905,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What makes a DebiCheck debit order different from an old-style one?",
           options: [
-            "You must approve the mandate digitally upfront",
-            "It can never be cancelled",
-            "It's always cheaper",
+            "You approve the mandate upfront",
+            "It can never be cancelled at all",
+            "It is always cheaper to run",
             "It only works at ATMs",
           ],
           correct: 0,
@@ -940,9 +940,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which system gives you the most say before money leaves your account?",
           options: [
-            "DebiCheck, because you approve the mandate first",
+            "DebiCheck, approved upfront",
             "Old-style early debit orders",
-            "Cash withdrawals",
+            "Cash withdrawals at an ATM",
             "A declined transaction",
           ],
           correct: 0,
@@ -982,10 +982,10 @@ const lesson4Slots: QuestionSlot[] = [
           question:
             "Nomsa reviews her debit orders and finds three streaming services she forgot she had, at R99 each. What has the review just done?",
           options: [
-            "Surfaced ~R297/month she can stop wasting",
+            "R297 a month she can stop",
             "Cost her money",
-            "Damaged her credit score",
-            "Nothing useful",
+            "Damaged her credit score badly",
+            "Nothing that is useful at all",
           ],
           correct: 0,
           feedback: {
@@ -1002,9 +1002,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Where can you see and manage your debit orders?",
           options: [
-            "In your banking app's Debit Orders / Mandates section",
+            "In your app's Debit Orders section",
             "Only by visiting a branch in person",
-            "You can't. They're hidden",
+            "You can't, they're hidden",
             "Only by phoning each company",
           ],
           correct: 0,
@@ -1048,10 +1048,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the most important thing to do BEFORE stopping a legitimate debit order?",
           options: [
-            "Cancel the underlying contract or debt with the company",
-            "Get a lawyer to send a letter",
-            "Close your bank account",
-            "Wait 60 days for it to expire on its own",
+            "Cancel the underlying contract",
+            "Get a lawyer to send them a letter",
+            "Close down your entire bank account",
+            "Wait a full 60 days for it to expire",
           ],
           correct: 0,
           feedback: {
@@ -1069,10 +1069,10 @@ const lesson5Slots: QuestionSlot[] = [
           question:
             "Priya's gym has been deducting R699/month for 6 months she hasn't attended. What does she need to do to fully stop it?",
           options: [
-            "Stop the debit order in her app AND formally cancel the gym contract",
-            "Just stop the debit order and forget about it",
-            "Only cancel the contract, leave the debit order",
-            "Nothing. It'll stop by itself",
+            "Stop the debit and the contract",
+            "Just stop the debit order",
+            "Only cancel the contract",
+            "Nothing, it'll stop by itself",
           ],
           correct: 0,
           feedback: {
@@ -1125,10 +1125,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How do you stop a debit order yourself in South Africa?",
           options: [
-            "In your banking app's Debit Orders / Mandates section, following the prompts",
-            "By ignoring your statements",
-            "By emailing SARS",
-            "You can't. Only a lawyer can",
+            "In your app's Debit Orders section",
+            "By simply ignoring your statements",
+            "By emailing SARS about it",
+            "You can't, only a lawyer can",
           ],
           correct: 0,
           feedback: {
@@ -1146,10 +1146,10 @@ const lesson5Slots: QuestionSlot[] = [
           question:
             "Sipho wants to cancel a DebiCheck mandate he approved earlier. What happens when he cancels it in the app?",
           options: [
-            "The bank sends a cancellation to the company and blocks future collections",
-            "Nothing. DebiCheck can never be cancelled",
+            "The bank blocks future collections",
+            "Nothing, DebiCheck can't be cancelled",
             "His whole account is frozen",
-            "He's charged R500",
+            "He is charged a R500 fee",
           ],
           correct: 0,
           feedback: {
@@ -1187,7 +1187,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why is DebiCheck's upfront approval good for consumers?",
           options: [
-            "Nothing can be collected unless you authenticated it first",
+            "Nothing goes without approval",
             "It makes debit orders free",
             "It removes the need to budget",
             "It guarantees higher interest",
@@ -1208,9 +1208,9 @@ const lesson5Slots: QuestionSlot[] = [
           question:
             "Lerato gets a DebiCheck approval request on her app for a loan she never took. What should she do?",
           options: [
-            "Decline it. Approving would authorise a debit order she never agreed to",
-            "Approve it to be safe",
-            "Ignore the request and hope",
+            "Decline it, she never agreed",
+            "Approve it to be on the safe side",
+            "Ignore the request and simply hope",
             "Approve it and dispute later",
           ],
           correct: 0,
@@ -1263,7 +1263,7 @@ const lesson5Slots: QuestionSlot[] = [
           question: "You decide to cancel a subscription you no longer use. The cleanest order of steps is:",
           options: [
             "Cancel the contract with the company",
-            "Only stop the debit order and never contact the company",
+            "Only stop the debit order",
             "Close your bank account",
             "Do nothing and hope it stops",
           ],
@@ -1371,9 +1371,9 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "When should you escalate to the National Financial Ombud (NFO)?",
           options: [
-            "When your bank won't resolve a dispute fairly and you've hit a dead end with them",
-            "Immediately, before contacting your bank at all",
-            "Never. It costs too much",
+            "When the bank won't resolve it fairly",
+            "Immediately, before contacting the bank",
+            "Never, it costs too much",
             "Only for amounts over R100 000",
           ],
           correct: 0,
@@ -1392,9 +1392,9 @@ const lesson6Slots: QuestionSlot[] = [
           question:
             "A company keeps re-debiting Zanele even after her bank reversed the charge. What's her free next step?",
           options: [
-            "Escalate to the National Financial Ombud at no cost",
+            "Escalate to the Ombud, free",
             "Pay it to make it stop",
-            "Hire an expensive attorney immediately",
+            "Hire an attorney immediately",
             "Close her account and open a new one",
           ],
           correct: 0,
@@ -1418,7 +1418,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which is a classic warning sign of a subscription-scam debit?",
           options: [
-            "Small recurring amounts like R19, R49 or R99 you don't recognise",
+            "Small recurring unknown amounts",
             "Your salary being paid in",
             "A large once-off purchase you made",
             "A free balance notification",
@@ -1454,8 +1454,8 @@ const lesson6Slots: QuestionSlot[] = [
           question:
             "Thabo notices an unfamiliar R49 debit on his statement, small but monthly. What's the smart move?",
           options: [
-            "Screenshot it, dispute it with the bank within 60 days, and watch for repeats",
-            "Ignore it. R49 is nothing",
+            "Dispute it with the bank",
+            "Ignore it, R49 is nothing",
             "Assume he must have signed up",
             "Wait a year to see if it grows",
           ],
@@ -1480,10 +1480,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How do you start a dispute for an unauthorised debit?",
           options: [
-            "Contact your bank and formally dispute it as unauthorised",
-            "Contact SARS",
+            "Formally dispute it with your bank",
+            "Contact SARS to complain about the debit",
             "Post about it on social media and wait",
-            "Do nothing. The bank will notice for you",
+            "Do nothing, the bank will notice",
           ],
           correct: 0,
           feedback: {
@@ -1515,9 +1515,9 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What makes disputing a debit far easier?",
           options: [
-            "Screenshots and reference numbers kept from the start",
+            "Screenshots and reference numbers",
             "Deleting the transaction from your app",
-            "Waiting past the 60-day window",
+            "Waiting until past the 60-day window",
             "Never checking your statement",
           ],
           correct: 0,

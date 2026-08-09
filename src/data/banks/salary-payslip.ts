@@ -23,10 +23,10 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "Your offer letter says R25 000, but only R18 500 lands in your account. What is the R25 000 called?",
           options: [
-            "Your gross salary, the figure before deductions",
-            "Your net salary",
+            "Your gross salary",
+            "Your net take-home salary",
             "Your annual bonus",
-            "A payroll error you should query",
+            "A payroll error to query",
           ],
           correct: 0,
           feedback: {
@@ -84,10 +84,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why does South Africa use a progressive tax system?",
           options: [
-            "So those who earn more contribute a bigger share to public services",
+            "Higher earners contribute more",
             "To punish people for earning well",
-            "To make everyone end up with the same income",
-            "Because it's the easiest system to calculate",
+            "To equalise everyone's income",
+            "Because it's easiest to calculate",
           ],
           correct: 0,
           feedback: {
@@ -105,10 +105,10 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "Sipho gets a raise that pushes him into a higher tax bracket and panics that his whole salary is now taxed more. Is he right?",
           options: [
-            "No. Only the rands inside the higher bracket are taxed at the higher rate",
-            "Yes. His entire salary jumps to the new rate",
-            "Yes. He'll now take home less than before the raise",
-            "No. Raises are never taxed at all",
+            "No, only the rands in the higher band",
+            "Yes, his whole salary jumps",
+            "Yes, he'll take home less than before",
+            "No, raises are never taxed",
           ],
           correct: 0,
           feedback: {
@@ -146,10 +146,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What is the UIF deduction on your payslip actually for?",
           options: [
-            "Income if you lose your job, go on maternity leave, or can't work due to illness",
+            "Income if you lose your job",
             "A second retirement savings pot",
             "A top-up for your medical aid",
-            "A monthly bank fee",
+            "A monthly bank service fee",
           ],
           correct: 0,
           feedback: {
@@ -286,7 +286,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What is PAYE?",
           options: [
-            "Income tax your employer deducts from each payslip and pays to SARS",
+            "Income tax off each payslip",
             "A retirement fund your employer runs",
             "A repayment on a staff loan",
             "A levy that funds your medical aid",
@@ -322,8 +322,8 @@ const lesson2Slots: QuestionSlot[] = [
           question:
             "Thabo is annoyed that PAYE comes off every single month. Why is monthly deduction actually in his favour?",
           options: [
-            "He pays his tax in small monthly bites instead of one frightening lump sum",
-            "It reduces the total tax he owes for the year",
+            "He pays in small monthly bites",
+            "It reduces the total tax he owes",
             "It means he pays no tax at all",
             "SARS pays him interest on it",
           ],
@@ -348,7 +348,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How can you legally reduce the amount of PAYE you pay?",
           options: [
-            "Contribute to a Retirement Annuity (RA)",
+            "Contribute to an RA",
             "Work fewer hours each month",
             "Ask your employer nicely",
             "Move to a different province",
@@ -384,9 +384,9 @@ const lesson2Slots: QuestionSlot[] = [
           question:
             "Ayesha earns R40 000/month and starts putting R3 000/month into an RA. What happens to her PAYE?",
           options: [
-            "It drops. The R3 000 is deducted before her tax is worked out",
-            "It rises because she now earns 'extra'",
-            "Nothing changes",
+            "It drops",
+            "It rises, she now earns extra",
+            "Nothing changes at all",
             "She stops paying tax entirely",
           ],
           correct: 0,
@@ -446,9 +446,9 @@ const lesson2Slots: QuestionSlot[] = [
           question:
             "A small employer offers Nomsa 'the full amount, no PAYE, you sort out your own tax'. What's the risk?",
           options: [
-            "It's not legal, and Nomsa could face a large tax bill plus penalties later",
-            "It's a great deal with no downside",
-            "SARS doesn't tax employees of small businesses",
+            "It's illegal, she'd owe SARS",
+            "A great deal with no downside",
+            "SARS doesn't tax small-business staff",
             "She'll simply pay less tax overall",
           ],
           correct: 0,
@@ -472,10 +472,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Your 'marginal rate' is:",
           options: [
-            "The rate on your next (or last) rand earned",
-            "The average rate across all your income",
-            "A flat 27.5% for everyone",
-            "The same thing as your UIF rate",
+            "The rate on your next rand",
+            "The average across your income",
+            "A flat 27.5% rate for everyone",
+            "The same as your UIF contribution rate",
           ],
           correct: 0,
           feedback: {
@@ -553,7 +553,7 @@ const lesson3Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "An employee earns R20 000/month. UIF is 1%, but capped at earnings of R17 712. What's their monthly UIF?",
-          options: ["R177.12", "R200", "R100", "R400"],
+          options: ["R177.12", "About R200", "R100", "R400 exactly"],
           correct: 0,
           feedback: {
             correct: "Right. Above the R17 712 ceiling, UIF stops rising: 1% × R17 712 = R177.12. The most either side pays.",
@@ -633,9 +633,9 @@ const lesson3Slots: QuestionSlot[] = [
           question:
             "Zanele, earning R15 000/month, is retrenched. Roughly what can UIF pay her while she job-hunts?",
           options: [
-            "A portion of her salary for a limited period",
+            "Part of her salary for a while",
             "Her full salary, indefinitely",
-            "Nothing. UIF is only for pensioners",
+            "Nothing, UIF is for pensioners",
             "A once-off payment of R500",
           ],
           correct: 0,
@@ -659,10 +659,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Who pays the Skills Development Levy (SDL)?",
           options: [
-            "The employer only. It's not deducted from your pay",
+            "The employer only",
             "The employee only",
-            "Both employee and employer equally",
-            "SARS deducts it from your bank account",
+            "Both, split equally",
+            "SARS takes it from your account",
           ],
           correct: 0,
           feedback: {
@@ -693,7 +693,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does SDL fund?",
           options: [
-            "Workplace training and learnerships, via the SETAs",
+            "Workplace training",
             "Your retirement pension",
             "The UIF payout pool",
             "Municipal rates and taxes",
@@ -719,7 +719,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the honest reason to actually understand the UIF line on your payslip?",
           options: [
-            "It's money you can claim when you're out of work. It's your safety net",
+            "It's a safety net you can claim",
             "It's a scam you should dispute",
             "It secretly increases your salary",
             "It's completely voluntary",
@@ -740,9 +740,9 @@ const lesson3Slots: QuestionSlot[] = [
           question:
             "Thabo earns R15 000. His UIF is R150 and his employer adds R150. Why does this matter to him personally?",
           options: [
-            "If he's retrenched, he can claim from that fund while he looks for work",
-            "It doesn't. It's just money gone",
-            "It's a loan he has to repay later",
+            "He can claim it if retrenched",
+            "It doesn't matter, it's money gone",
+            "It's a loan that he repays later",
             "It's actually his pension",
           ],
           correct: 0,
@@ -800,7 +800,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question:
             "What is the maximum percentage of taxable income you can deduct for retirement contributions?",
-          options: ["27.5%", "15%", "20%", "33%"],
+          options: ["27.5%", "15%", "20%", "33.3%"],
           correct: 0,
           feedback: {
             correct:
@@ -832,7 +832,7 @@ const lesson4Slots: QuestionSlot[] = [
           question:
             "Sipho earns R30 000/month and puts R3 000/month into an RA. Roughly what does he gain at tax time?",
           options: [
-            "A tax saving. His contribution cuts taxable income, often putting hundreds of rands a month back in his pocket",
+            "A tax saving",
             "Nothing. RAs give no tax benefit",
             "He ends up paying more tax",
             "SARS blocks the contribution",
@@ -858,10 +858,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which retirement vehicle do you open yourself, independent of any employer?",
           options: [
-            "A Retirement Annuity (RA)",
+            "A retirement annuity",
             "A workplace pension fund",
-            "UIF",
-            "A medical aid",
+            "The national UIF fund",
+            "A private medical aid scheme",
           ],
           correct: 0,
           feedback: {
@@ -893,9 +893,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the main advantage of an RA over a workplace pension fund?",
           options: [
-            "It's portable. It stays yours through job changes and self-employment",
-            "It guarantees higher investment returns",
-            "You can withdraw from it anytime, tax-free",
+            "It's portable across jobs",
+            "It guarantees higher returns",
+            "You can withdraw anytime, tax-free",
             "It requires no paperwork at all",
           ],
           correct: 0,
@@ -934,9 +934,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Under the Two-Pot System, how are new contributions split?",
           options: [
-            "1/3 to an accessible Savings Pot, 2/3 to a locked Retirement Pot",
-            "Half accessible, half locked",
-            "All accessible any time",
+            "One third savings, two thirds locked",
+            "Half accessible and half locked away",
+            "All accessible at any time",
             "All locked until age 65",
           ],
           correct: 0,
@@ -944,7 +944,7 @@ const lesson4Slots: QuestionSlot[] = [
             correct:
               "Right. One third goes to the Savings Pot (reachable in emergencies), two thirds to the Retirement Pot (locked for later).",
             incorrect:
-              "It's a 1/3 – 2/3 split: a third to the accessible Savings Pot, two thirds to the locked Retirement Pot.",
+              "It's a one third / two thirds split: a third to the accessible Savings Pot, two thirds to the locked Retirement Pot.",
           },
         },
       },
@@ -955,7 +955,7 @@ const lesson4Slots: QuestionSlot[] = [
           question:
             "Nomsa wants to cash in her whole retirement fund to buy a car. Under the two-pot rules, what can she actually touch?",
           options: [
-            "Only her Savings Pot , once per tax year",
+            "Only her Savings Pot",
             "All of it, whenever she likes",
             "None of it, ever",
             "Only her employer's share",

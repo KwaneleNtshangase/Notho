@@ -111,7 +111,7 @@ const structSlots: QuestionSlot[] = [
           question: "Zanele earns R1.2 million through her Pty Ltd, almost all from just two clients for her own services. Likely SARS classification?",
           options: [
             "A Personal Service Provider",
-            "A Small Business Corporation at reduced rates",
+            "A Small Business Corp",
             "A standard Pty Ltd at 27%",
             "A non-profit company",
           ],
@@ -593,8 +593,8 @@ const valSlots: QuestionSlot[] = [
           options: [
             "Net Asset Value",
             "EBITDA multiple only",
-            "Number of staff",
-            "Revenue × 100",
+            "The number of staff",
+            "Revenue times 100",
           ],
           correct: 0,
           feedback: {

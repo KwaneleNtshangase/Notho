@@ -111,8 +111,8 @@ const whatIsCryptoSlots: QuestionSlot[] = [
           type: "scenario",
           question: "A friend says, 'Crypto just crashed 50%, so it must be a scam.' What's the most accurate response?",
           options: [
-            "Big drawdowns are normal for crypto's volatility, a crash alone isn't proof of fraud",
-            "Yes, sell everything immediately",
+            "Big drawdowns are normal",
+            "Yes, sell everything now",
             "All cryptocurrencies are fake",
             "The blockchain must have broken",
           ],
@@ -192,7 +192,7 @@ const whatIsCryptoSlots: QuestionSlot[] = [
             "Almost certainly a Ponzi scheme",
             "A legitimate arbitrage desk",
             "High risk but probably real",
-            "Fine, as long as the payments look real",
+            "Fine if payments look real",
           ],
           correct: 0,
           feedback: {

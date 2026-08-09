@@ -72,10 +72,10 @@ export const CONCEPTS: Concept[] = [
       question:
         "Why does tracking your spending for a few weeks beat guessing from memory?",
       options: [
-        "People underestimate small, frequent purchases that add up",
-        "Banks report spending incorrectly",
+        "People underestimate small purchases",
+        "Banks report your spending incorrectly",
         "SARS requires proof of every expense",
-        "Memory is more accurate than bank statements",
+        "Memory beats bank statements for accuracy",
       ],
       correct: 0,
       explanation:
@@ -109,10 +109,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Who pays the Skills Development Levy (SDL)?",
       options: [
-        "The employer only. It's not deducted from your pay",
+        "The employer only",
         "The employee only",
-        "Both employee and employer equally",
-        "SARS deducts it from your account",
+        "Both, split equally",
+        "SARS takes it from your account",
       ],
       correct: 0,
       explanation:
@@ -127,7 +127,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Which habit tends to increase your bank fees the most?",
       options: [
-        "Withdrawing small amounts frequently from ATMs",
+        "Frequent small ATM withdrawals",
         "Tapping your card to pay",
         "Getting your salary paid in",
         "Checking your balance in the app",
@@ -146,7 +146,7 @@ export const CONCEPTS: Concept[] = [
       question:
         "Does cancelling a debit order at your bank also cancel the underlying contract or debt?",
       options: [
-        "No. It only stops the payment; the contract remains",
+        "No. It only stops the payment",
         "Yes. Both end together",
         "Yes, but only for gym contracts",
         "No. You can't cancel debit orders yourself",
@@ -179,10 +179,10 @@ export const CONCEPTS: Concept[] = [
       question:
         "Does paying your full credit card balance by the due date usually avoid interest on new purchases?",
       options: [
-        "Yes. That's the interest-free grace period",
-        "No. Interest always applies regardless",
+        "Yes, that is the grace period",
+        "No, interest always applies",
         "Yes, but only on store cards",
-        "No. Paying the minimum is enough",
+        "No, paying the minimum is enough",
       ],
       correct: 0,
       explanation:
@@ -199,8 +199,8 @@ export const CONCEPTS: Concept[] = [
       options: [
         "The one with the smallest balance",
         "The one with the highest interest rate",
-        "The oldest one",
-        "The largest one",
+        "The oldest account you happen to hold",
+        "The one with the largest total balance",
       ],
       correct: 0,
       explanation:
@@ -215,8 +215,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What's the biggest risk of debt consolidation for most people?",
       options: [
-        "Clearing the cards with the loan, then running them up again",
-        "It's illegal in South Africa",
+        "Running the cards back up again",
+        "It is illegal in South Africa",
         "The new loan is always at a higher rate",
         "Banks always refuse the application",
       ],
@@ -233,10 +233,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Which example is mainly 'income risk'?",
       options: [
-        "Your employer announces retrenchments in your division",
-        "A unit trust's price moves up and down",
-        "Inflation slowly rising over a decade",
-        "You pick the wrong paint colour",
+        "Retrenchments in your division",
+        "A unit trust price moving around",
+        "Inflation rising over a decade",
+        "Picking the wrong paint colour",
       ],
       correct: 0,
       explanation:
@@ -269,10 +269,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "When does a dread disease (critical illness) policy pay out?",
       options: [
-        "On diagnosis of a covered condition, whether you survive or not",
+        "On diagnosis of a covered condition",
         "Only when you die from the illness",
-        "Only if you're permanently disabled",
-        "At retirement age",
+        "Only if you are permanently disabled",
+        "At your normal retirement age",
       ],
       correct: 0,
       explanation:
@@ -287,7 +287,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What does 'third-party' car insurance cover?",
       options: [
-        "Damage you cause to other people's property or vehicles",
+        "Damage you cause to other people",
         "Damage to your own car only",
         "Medical bills for your passengers",
         "Theft of items inside your car",
@@ -307,7 +307,7 @@ export const CONCEPTS: Concept[] = [
       options: [
         "Buildings insurance",
         "Contents insurance",
-        "Car insurance",
+        "Motor vehicle insurance",
         "Life insurance",
       ],
       correct: 0,
@@ -323,10 +323,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You need money in 11 months for school fees. Which stance fits best?",
       options: [
-        "Emphasise capital you can access without severe loss: controlled risk",
-        "100% in speculative trades because 'markets bounce back'",
+        "Keep it accessible, low risk",
+        "Put it all in speculative trades",
         "Borrow the full amount on a microloan",
-        "Keep it all as cash under a mattress",
+        "Keep it as cash under a mattress",
       ],
       correct: 0,
       explanation:
@@ -341,10 +341,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "In simple terms, someone who holds a bond is mostly:",
       options: [
-        "A lender to the issuer, expecting interest and their money back",
+        "A lender expecting interest back",
         "A part-owner with voting rights",
-        "Guaranteed to beat inflation every year",
-        "Insured against all losses by the Reserve Bank",
+        "Guaranteed to beat inflation yearly",
+        "Insured against all losses by the SARB",
       ],
       correct: 0,
       explanation:
@@ -359,10 +359,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What is a unit trust?",
       options: [
-        "A pool of many investors' money invested in a manager-chosen basket",
+        "A pooled, manager-run basket",
         "A single share in one company",
-        "A type of bank account",
-        "A government bond",
+        "A type of bank savings account",
+        "A bond issued by government",
       ],
       correct: 0,
       explanation:
@@ -390,10 +390,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You earn more than R30 000 a year from non-salary sources (freelance, rental). What must you do?",
       options: [
-        "Register as a provisional taxpayer and submit estimates twice a year",
-        "Nothing. Side income is tax-free",
-        "File only every second year",
-        "Pay 45% immediately",
+        "Register as a provisional taxpayer",
+        "Nothing at all, side income is tax-free",
+        "File a return only every second year",
+        "Pay 45% of the extra income immediately",
       ],
       correct: 0,
       explanation:
@@ -408,10 +408,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Do medical scheme (medical aid) credits reduce your taxable income, or your tax bill directly?",
       options: [
-        "Your tax bill directly, a rand-for-rand credit",
+        "Your tax bill, rand for rand",
         "Your taxable income",
-        "Neither. They do nothing",
-        "They increase your tax",
+        "Neither, they do nothing",
+        "They increase the tax you pay",
       ],
       correct: 0,
       explanation:
@@ -439,10 +439,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "An email from 'fnb-security@gmail.com' says your account is frozen. What do you do?",
       options: [
-        "Call FNB on a number from their official site. Don't click the link",
+        "Call FNB on a number from their site",
         "Click the link to unfreeze it",
-        "Reply with your ID number to verify",
-        "Forward it to your contacts",
+        "Reply with your ID number",
+        "Forward it to all your contacts",
       ],
       correct: 0,
       explanation:
@@ -457,9 +457,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Your phone suddenly shows 'No Service' on a normal day. What should you do first?",
       options: [
-        "Call your network immediately from another phone",
-        "Wait for it to come back on its own",
-        "Restart your phone a few times",
+        "Call your network from another phone",
+        "Wait for the signal to come back on its own",
+        "Restart your phone several times over",
         "Post about it on social media",
       ],
       correct: 0,
@@ -475,7 +475,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What should make you pause before sending money to an 'investment club'?",
       options: [
-        "Guaranteed weekly returns and pressure to recruit friends",
+        "Guaranteed returns and recruiting",
         "A verifiable registered business name",
         "Clearly explained fees",
         "Plenty of time to think it over",
@@ -493,7 +493,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Someone you've never met in person, after weeks of messages, has an 'emergency' and needs a fee. What is this?",
       options: [
-        "A classic romance-scam script. Don't send money",
+        "A classic romance-scam script",
         "True love being tested",
         "A genuine emergency you must fund",
         "A sign to send more to prove you care",
@@ -511,10 +511,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You notice money has left your account. What's the first practical step?",
       options: [
-        "Contact your bank's fraud department immediately to block affected channels",
+        "Call your bank's fraud line at once",
         "Delete your banking app to hide it",
-        "Send more money to 'reverse' it",
-        "Ignore it for 30 days",
+        "Send more money to reverse the first",
+        "Ignore it for at least 30 days",
       ],
       correct: 0,
       explanation:
@@ -528,7 +528,7 @@ export const CONCEPTS: Concept[] = [
     category: "Money & Economics",
     reviewCard: {
       question: "Inflation is 6% per year. You leave R1 000 under your mattress. After one year, what happens to its buying power?",
-      options: ["It grows to R1 060", "It stays exactly R1 000", "It can buy roughly R943 worth of goods", "Nothing changes"],
+      options: ["It grows to R1 060", "It stays worth exactly R1 000", "It buys about R943 of goods", "Nothing at all changes"],
       correct: 2,
       explanation: "Inflation erodes purchasing power. At 6%, R1 000 buys only ~R943 worth of goods a year later - cash loses value when it earns no interest.",
     },
@@ -587,10 +587,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "The US Federal Reserve raises interest rates sharply. What typically happens to the rand?",
       options: [
-        "It weakens, capital flows to the US dollar for better yields",
-        "It strengthens. US growth is good for SA trade",
-        "Nothing. Exchange rates are independent of interest rates",
-        "It strengthens: investors seek diversification",
+        "It weakens, capital flows to the dollar",
+        "It strengthens, US growth helps SA trade",
+        "Nothing, the two are unrelated",
+        "It strengthens, investors diversify",
       ],
       correct: 0,
       explanation:
@@ -605,8 +605,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You hold R100 000 in a global (offshore) equity ETF. The rand weakens from R18/$ to R20/$ while the shares themselves don't move. Roughly what happens to your investment in rand?",
       options: [
-        "It rises to about R111 000. The currency move alone adds value",
-        "It stays at R100 000",
+        "It rises to about R111 000",
+        "It stays at exactly R100 000",
         "It falls to about R90 000",
         "It becomes worthless",
       ],
@@ -637,7 +637,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What does PAYE stand for and who collects it?",
       options: [
-        "Pay As You Earn - collected by your employer and paid to SARS",
+        "Pay As You Earn",
         "Pay After Year End - you pay it yourself in February",
         "Personal Annual Yearly Expense - kept by your employer",
         "Pension And Year-end Earnings - paid to your retirement fund",
@@ -667,7 +667,7 @@ export const CONCEPTS: Concept[] = [
       question: "SA uses a progressive tax system. What does 'progressive' mean?",
       options: [
         "Everyone pays the same flat percentage",
-        "Higher income earners pay a higher percentage on each additional rand earned",
+        "Higher earners pay more on extra rands",
         "Only people over 40 pay tax",
         "Tax increases automatically every January",
       ],
@@ -684,7 +684,7 @@ export const CONCEPTS: Concept[] = [
     category: "Banking",
     reviewCard: {
       question: "Which account type typically earns the highest interest on your balance?",
-      options: ["Cheque/current account", "Credit card account", "Money market / savings account", "Transmission account"],
+      options: ["A cheque or current account", "A credit card facility account", "A money market account", "A basic transmission account"],
       correct: 2,
       explanation: "Savings and money market accounts earn interest on your balance. Cheque accounts focus on transactions. Always move idle cash to an account that earns interest.",
     },
@@ -711,9 +711,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Which behaviour HURTS your credit score the most?",
       options: [
-        "Paying your account on time every month",
-        "Missing payments or paying late consistently",
-        "Closing an old account you no longer use",
+        "Paying your account on time monthly",
+        "Missing payments or paying late",
+        "Closing an old account you never use",
         "Applying for a store card once",
       ],
       correct: 1,
@@ -729,7 +729,7 @@ export const CONCEPTS: Concept[] = [
       question: "You borrow R10 000 on a credit card at 22% interest and only pay the minimum each month. What happens?",
       options: [
         "You pay it off quickly with small fees",
-        "You could end up paying back R20 000 or more over many years",
+        "You could repay R20 000 or more",
         "The interest rate drops as you pay",
         "The bank waives interest after 6 months",
       ],
@@ -745,10 +745,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Which is the best example of 'good debt'?",
       options: [
-        "A clothing account for new shoes",
+        "A clothing account for a pair of new shoes",
         "A payday loan to cover groceries",
-        "A student loan for a qualification that increases your earning potential",
-        "Buying a TV on a 24-month plan at 24% interest",
+        "A student loan for a qualification",
+        "A TV on a 24-month plan at 24%",
       ],
       correct: 2,
       explanation: "Good debt builds future wealth or increases your income. A qualification, a home bond, or a business loan can be good debt. Consumer debt (clothing accounts, payday loans) is almost always bad debt.",
@@ -763,7 +763,7 @@ export const CONCEPTS: Concept[] = [
     category: "Savings",
     reviewCard: {
       question: "Financial experts recommend your emergency fund should cover how many months of expenses?",
-      options: ["1 week", "1 month", "3 to 6 months", "2 years"],
+      options: ["1 week", "1 month", "3 to 6 months", "At least 2 years"],
       correct: 2,
       explanation: "3-6 months of living expenses gives you a buffer for job loss, medical emergencies, or car repairs without going into debt. Keep it in an accessible, interest-bearing account.",
     },
@@ -777,9 +777,9 @@ export const CONCEPTS: Concept[] = [
       question: "What is the key advantage of a TFSA in South Africa?",
       options: [
         "Your employer contributes to it",
-        "Interest, dividends, and capital gains earned inside it are tax-free",
+        "Growth inside it is entirely tax-free",
         "It earns a guaranteed 15% return",
-        "You can withdraw it tax-free only after age 65",
+        "Withdrawals are tax-free only after 65",
       ],
       correct: 1,
       explanation: "With a TFSA, all growth (interest, dividends, capital gains) inside the account is 100% tax-free. The annual contribution limit is R46 000 (2026/27 tax year) and the lifetime limit is R500 000.",
@@ -812,10 +812,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Why is it important to diversify your investments?",
       options: [
-        "It guarantees higher returns",
-        "It eliminates all investment risk",
-        "It spreads risk so one bad investment doesn't wipe you out",
-        "It is required by SARS",
+        "It guarantees consistently higher returns",
+        "It eliminates all investment risk entirely",
+        "It spreads risk across investments",
+        "It is required by SARS rules",
       ],
       correct: 2,
       explanation: "Diversification means spreading money across different assets (shares, bonds, property, cash). If one investment drops, others may hold steady or rise, reducing your overall loss.",
@@ -831,7 +831,7 @@ export const CONCEPTS: Concept[] = [
       options: [
         "You lend money to a company",
         "You become a part-owner of that company",
-        "You are guaranteed a fixed return",
+        "You are guaranteed a fixed annual return",
         "You open a savings account with that company",
       ],
       correct: 1,
@@ -846,10 +846,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What is an ETF and why is it good for beginner investors?",
       options: [
-        "A single company share - high risk, high reward",
-        "A basket of many shares that tracks an index, offering instant diversification at low cost",
-        "A bank savings product guaranteed by government",
-        "A loan product for investing in property",
+        "A single company share, high risk",
+        "A basket of shares tracking an index",
+        "A savings product guaranteed by government",
+        "A loan product for buying up property",
       ],
       correct: 1,
       explanation: "An ETF tracks an index (e.g. Top 40 JSE companies) and holds many shares at once. Buying one ETF instantly diversifies your portfolio at very low fees - ideal for beginners.",
@@ -863,9 +863,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "An investment promises a guaranteed 40% return per year with zero risk. What should you think?",
       options: [
-        "Invest immediately - this is a great opportunity",
+        "Invest immediately",
         "Ask your bank for the same deal",
-        "This is almost certainly a scam - high return always comes with high risk",
+        "This is almost certainly a scam",
         "It must be a government bond",
       ],
       correct: 2,
@@ -884,7 +884,7 @@ export const CONCEPTS: Concept[] = [
       options: [
         "Sipho, because he earns more by then",
         "They end up with the same amount",
-        "Themba, by a huge margin - compound interest rewards starting early",
+        "Themba, by a huge margin",
         "It depends entirely on the market",
       ],
       correct: 2,
@@ -899,7 +899,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You want R25 000/month in retirement. Using the 4% rule, roughly how much capital do you need?",
       options: [
-        "About R7.5 million (R300 000/year ÷ 4%)",
+        "About R7.5 million",
         "About R300 000",
         "About R1.2 million",
         "About R25 million",
@@ -934,10 +934,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What is the main tax benefit of contributing to a Retirement Annuity (RA)?",
       options: [
-        "Your contributions are exempt from VAT",
-        "Contributions up to 27.5% of income are tax-deductible (reducing your tax bill now)",
+        "Your contributions are exempt from VAT and PAYE",
+        "Contributions up to 27.5% are tax-deductible",
         "All returns inside an RA are taxed at 0%",
-        "There is no tax benefit - RAs are purely for safety",
+        "There is no tax benefit, only safety",
       ],
       correct: 1,
       explanation: "SARS allows you to deduct RA contributions (up to 27.5% of taxable income, max R430k/year) from your taxable income. This reduces your tax bill now while building your retirement nest egg.",
@@ -954,7 +954,7 @@ export const CONCEPTS: Concept[] = [
       question: "What is the core purpose of insurance?",
       options: [
         "To make money for the insurer",
-        "To transfer financial risk from you to the insurer in exchange for a premium",
+        "To transfer your risk to the insurer",
         "To guarantee you never have accidents",
         "To replace your savings account",
       ],
@@ -970,10 +970,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Who needs life insurance the MOST?",
       options: [
-        "Single person with no dependants and no debt",
-        "A person with a spouse, children, and a home loan who are financially dependent on their income",
-        "A retiree with no debt",
-        "A student with no income",
+        "A single person with no dependants or debt",
+        "A parent with dependants and a home loan",
+        "A retiree with no debt at all",
+        "A student with no income yet",
       ],
       correct: 1,
       explanation: "Life insurance matters most when other people depend on your income. If you die, your life cover pays out so your family can cover the bond, school fees, and living costs. Those with no dependants have little need for it.",
@@ -990,8 +990,8 @@ export const CONCEPTS: Concept[] = [
       question: "In the 50/30/20 budget rule, what does the 20% represent?",
       options: [
         "Entertainment and eating out",
-        "Housing and transport (needs)",
-        "Savings, investments, and debt repayment",
+        "Housing and transport needs",
+        "Savings and debt repayment",
         "Groceries and clothing",
       ],
       correct: 2,
@@ -1006,10 +1006,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Which is the most effective strategy to avoid impulse purchases?",
       options: [
-        "Never go to the shops",
-        "Wait 24-48 hours before buying anything not on your list",
-        "Only use cash (never a card)",
-        "Set a R50 spending limit on everything",
+        "Never go to the shops at all",
+        "Wait 24-48 hours before buying",
+        "Only ever use cash, never a card",
+        "Set a R50 limit on everything",
       ],
       correct: 1,
       explanation: "The 24-48 hour rule breaks the emotional trigger of impulse buying. Most impulse urges fade within a day. If you still want it 48 hours later, it was probably a considered decision.",
@@ -1024,9 +1024,9 @@ export const CONCEPTS: Concept[] = [
       question: "What is a stokvel?",
       options: [
         "A type of JSE-listed share",
-        "A community savings club where members contribute regularly and take turns receiving a lump sum",
+        "A rotating community savings club",
         "A government savings product",
-        "A type of bank account for groups",
+        "A bank account designed for groups",
       ],
       correct: 1,
       explanation: "A stokvel is a traditional SA rotating savings club. Members contribute a fixed amount each month, and each member receives the full pot in rotation. It builds saving discipline and community trust.",
@@ -1040,10 +1040,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Which is a classic warning sign of a financial scam?",
       options: [
-        "A product registered and licensed by the FSCA",
+        "A product properly licensed by the FSCA",
         "A bank with physical branches",
-        "Guaranteed high returns with no risk and pressure to invest immediately",
-        "Investing in an index-tracking ETF",
+        "Guaranteed high returns with no risk",
+        "An index-tracking ETF from a big provider",
       ],
       correct: 2,
       explanation: "Scams always promise guaranteed high returns with zero risk and create urgency ('invest NOW or miss out'). Real investments involve risk. Always check if a product is FSCA-licensed before investing.",
@@ -1059,10 +1059,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You can buy a R1.2M home with a R12 000/month bond or rent the same home for R9 500/month. What hidden costs make buying MORE expensive than the bond repayment alone?",
       options: [
-        "There are no hidden costs, bond and rent are the only costs",
-        "Only transfer duties apply once",
-        "Rates, levies, maintenance, transfer duties, and bond initiation fees all add to the true cost of buying",
-        "VAT on the purchase price",
+        "There are no hidden costs at all",
+        "Only the transfer duty, paid once upfront",
+        "Rates, levies and maintenance",
+        "VAT charged on the purchase price",
       ],
       correct: 2,
       explanation: "Buying a home costs more than just the bond. Add: rates & taxes (~R800-R2 000/month), levy (R1 000+), maintenance (~1% of value/year), transfer duty (only above R1.21M), and bond registration/attorney fees. These can add R3 000-R5 000/month on top of the bond repayment.",
@@ -1088,10 +1088,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A property costs R1 000 000. The bank lends R900 000. What is the LTV ratio, and what does a lower LTV mean for you?",
       options: [
-        "LTV = 90%; lower LTV means higher monthly repayments",
-        "LTV = 90%; lower LTV means less risk for the bank → better interest rate for you",
-        "LTV = 10%; the bank only cares about the deposit",
-        "LTV = 100% whenever the bank approves the loan",
+        "LTV = 90%, so repayments are higher",
+        "LTV = 90%, lower LTV means a better rate",
+        "LTV = 10%, the bank only sees the deposit",
+        "LTV = 100% whenever the bank approves",
       ],
       correct: 1,
       explanation: "LTV = loan ÷ property value = 90%. The lower your LTV (bigger deposit), the less risk for the bank, they reward this with a lower interest rate. A 90% LTV vs 80% LTV can mean 0.5-1% difference in your rate, saving thousands over 20 years.",
@@ -1106,7 +1106,7 @@ export const CONCEPTS: Concept[] = [
     category: "Income & Tax",
     reviewCard: {
       question: "You sell shares for R200 000 that you bought for R120 000. After the R50 000 annual exclusion, how much of your gain is included in taxable income?",
-      options: ["R12 000 (40% of the R30 000 net gain)", "R30 000", "R80 000", "R200 000"],
+      options: ["R12 000", "R30 000", "R80 000", "R200 000"],
       correct: 0,
       explanation: "Gain = R80 000. Less the R50 000 annual exclusion = R30 000 net. Only 40% is included: R30 000 × 40% = R12 000 added to taxable income (taxed at your marginal rate). A primary residence has a R3 000 000 exclusion.",
     },
@@ -1119,9 +1119,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A Pty Ltd owner in the top bracket extracts profit. Roughly how does taking a dividend compare with taking a salary?",
       options: [
-        "Dividend ≈41.6% total (27% company + 20% dividends tax); salary up to 45%, the dividend edges ahead at the top",
-        "Salary is always tax-free to the owner",
-        "Dividends are never taxed",
+        "Dividend about 41.6%, salary up to 45%",
+        "A salary is always tax-free to the owner",
+        "Dividends are never taxed at all",
         "They are identical in every case",
       ],
       correct: 0,
@@ -1137,7 +1137,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "How is income that is retained inside a South African trust taxed?",
       options: [
-        "At a flat 45%, with no rebates or exclusions",
+        "At a flat 45%",
         "It is tax-free",
         "At a flat 18% always",
         "At the company rate of 27%",
@@ -1155,7 +1155,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You're a South African tax resident who earns some income abroad. How does SARS treat it?",
       options: [
-        "SA taxes residents on worldwide income, with credits for foreign tax paid to avoid double taxation",
+        "Worldwide income, with foreign tax credits",
         "Foreign income is always tax-free in SA",
         "Only income earned inside SA is ever taxed",
         "You always pay full tax twice, with no relief",
@@ -1173,8 +1173,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What happens to your estate if you die without a valid will (intestate)?",
       options: [
-        "The Intestate Succession Act decides who inherits, not your wishes, and cohabiting partners get nothing automatically",
-        "The government keeps everything",
+        "The Intestate Succession Act decides",
+        "The government keeps the whole estate",
         "Your closest friend inherits by default",
         "Nothing can ever be distributed",
       ],
@@ -1191,8 +1191,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "How does South African estate duty work?",
       options: [
-        "20% up to R30m and 25% above, after a R3.5m abatement; bequests to a spouse are exempt",
-        "A flat 40% on everything you own",
+        "20% to R30m, 25% above, after R3.5m",
+        "A flat 40% on everything that you own",
         "There is no tax on estates in SA",
         "25% on every rand from the first",
       ],
@@ -1209,10 +1209,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Your retirement-fund nomination names your ex-spouse, but your will leaves everything to your children. Who gets the retirement fund?",
       options: [
-        "It's decided outside your will, for retirement funds, trustees allocate to financial dependants (s37C); a will can't override it",
-        "Your children. The will always wins",
-        "It's split equally by law",
-        "The state takes it",
+        "The fund trustees decide under s37C",
+        "Your children, because the will always wins",
+        "It is split equally by law",
+        "The state takes the whole fund instead",
       ],
       correct: 0,
       explanation:
@@ -1227,10 +1227,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A 'value' factor tilt means systematically overweighting which stocks?",
       options: [
-        "Cheap ones: low price-to-earnings and price-to-book relative to peers",
+        "Cheap ones on low P/E and P/B",
         "Whatever rose most in the last 12 months",
-        "Growth stocks with the highest future expectations",
-        "Whatever the fund manager fancies that day",
+        "Growth stocks with the highest expectations",
+        "Whatever the manager fancies that day",
       ],
       correct: 0,
       explanation:
@@ -1245,7 +1245,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "How much of a South African retirement fund (Regulation 28) may be invested offshore?",
       options: [
-        "Up to 45% offshore; TFSAs and discretionary investments have no offshore limit",
+        "Up to 45% offshore",
         "0%. Retirement funds must stay fully local",
         "100%. There's no limit anywhere",
         "Exactly 30%",
@@ -1263,10 +1263,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Two retirees average the same 10% return over 20 years, but one gets bad returns early and good later. What happens?",
       options: [
-        "The one with bad returns early can run out of money years sooner. The ORDER of returns matters",
-        "They end identically. Only the average matters",
-        "The one with bad returns early always ends richer",
-        "Sequence of returns is irrelevant once you retire",
+        "Bad returns early can drain it years sooner",
+        "They end identically, only the average matters",
+        "The one with bad returns early ends richer",
+        "Sequence of returns is irrelevant in retirement",
       ],
       correct: 0,
       explanation:
@@ -1281,10 +1281,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What's the key tax and liability difference between a sole proprietor and a Pty Ltd?",
       options: [
-        "Sole prop: profit taxed in your hands (up to 45%), unlimited liability. Pty Ltd: separate entity, 27% tax, limited liability",
-        "They are taxed identically",
+        "Sole prop: your rate, unlimited liability",
+        "They are taxed in exactly the same way",
         "A sole prop pays 27%, a Pty Ltd pays 45%",
-        "Both give full limited liability",
+        "Both give the owner full limited liability",
       ],
       correct: 0,
       explanation:
@@ -1317,10 +1317,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What's the most common way to value a small operating business?",
       options: [
-        "EBITDA × an industry multiple (SA SMEs often 2-5×)",
-        "Revenue × 100",
+        "EBITDA times an industry multiple",
+        "Revenue times one hundred",
         "The number of employees",
-        "Whatever the owner feels it's worth",
+        "Whatever the owner feels it is worth",
       ],
       correct: 0,
       explanation:
@@ -1335,10 +1335,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What's the core trade-off between debt and equity funding?",
       options: [
-        "Debt costs interest but keeps your ownership; equity avoids repayments but gives up a share of the business",
-        "They are identical",
+        "Debt costs interest, equity costs ownership",
+        "They are identical in every practical respect",
         "Debt is always cheaper and better",
-        "Equity funding is free",
+        "Equity funding is completely free",
       ],
       correct: 0,
       explanation:
@@ -1353,9 +1353,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Who is required to pay provisional tax in South Africa?",
       options: [
-        "Only employees earning more than R1M per year",
-        "Everyone, it replaces PAYE for all taxpayers",
-        "People who earn income other than a salary (freelancers, rental income, investment income above R30 000)",
+        "Only employees earning over R1 million a year",
+        "Everyone, since it replaces PAYE entirely",
+        "People with income other than a salary",
         "Only registered companies",
       ],
       correct: 2,
@@ -1389,10 +1389,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Your business made R80 000 profit this month but has R0 in the bank account. How is this possible?",
       options: [
-        "It's impossible, profit always equals cash",
-        "You recorded sales but customers haven't paid yet (debtors), while you've already paid your suppliers",
+        "Impossible, profit always equals cash",
+        "Customers haven't paid you yet",
         "SARS took all the profit in VAT",
-        "The accountant made an error",
+        "The accountant has made an error",
       ],
       correct: 1,
       explanation: "Profit is accounting income (revenue minus costs). Cash flow is actual money in your bank. A business can be profitable but cash-poor when customers pay late (long debtor days) while you pay suppliers upfront. Many profitable businesses go insolvent because of cash flow problems.",
@@ -1417,7 +1417,7 @@ export const CONCEPTS: Concept[] = [
     category: "Business Finance",
     reviewCard: {
       question: "At what annual turnover must a South African business register for VAT?",
-      options: ["R500 000", "R1 000 000", "R5 000 000", "Any business that sells products"],
+      options: ["R500 000", "R1 000 000", "R5 000 000", "Any seller"],
       correct: 1,
       explanation: "SARS requires VAT registration once your annual taxable supplies exceed R1 000 000. Voluntary registration is possible from R50 000. Registered businesses charge 15% VAT on sales and can claim VAT back on business purchases, keeping the records straight is critical.",
     },
@@ -1430,9 +1430,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Why should an entrepreneur keep separate business and personal bank accounts from day one?",
       options: [
-        "So you can see if the business is truly profitable and keep clean records for SARS and lenders",
-        "It's a legal requirement for every side hustle",
-        "Banks pay higher interest on business accounts",
+        "So you can see if it is truly profitable",
+        "It is a legal requirement for side hustles",
+        "Banks pay more interest on business accounts",
         "It lets you avoid paying any tax",
       ],
       correct: 0,
@@ -1451,7 +1451,7 @@ export const CONCEPTS: Concept[] = [
       question: "You paid R15 000 for a course that turns out to be useless. You've completed 30%. Should the R15 000 already spent influence your decision to continue?",
       options: [
         "Yes, you must finish to get value from your R15 000",
-        "No, the R15 000 is gone regardless; your decision should be based on future value, not past spend",
+        "No, the R15 000 is gone regardless",
         "Yes, quitting means admitting a mistake",
         "No, but only if you can get a refund",
       ],
@@ -1468,7 +1468,7 @@ export const CONCEPTS: Concept[] = [
       question: "A shop marks a jacket 'WAS R3 000, NOW R1 500'. You weren't planning to buy a jacket. What cognitive bias makes R1 500 feel like a bargain?",
       options: [
         "Loss aversion, you fear missing the sale",
-        "Anchoring, your brain anchors to the R3 000 'original' price as the reference point",
+        "Anchoring to the R3 000 original price",
         "Confirmation bias, you believe jackets cost R3 000",
         "Herding, everyone else is buying jackets",
       ],
@@ -1484,10 +1484,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You know you should save R500 this month, but you spend it on something you'll barely remember. Which bias best explains this?",
       options: [
-        "Present bias, overvaluing a reward now over a bigger reward later",
-        "Anchoring: fixating on the first price you saw",
-        "Sunk cost, refusing to abandon money already spent",
-        "Herd mentality. Copying what others do",
+        "Present bias, a reward now beats later",
+        "Anchoring, fixating on the first price",
+        "Sunk cost, refusing to abandon spending",
+        "Herd mentality, copying what others do",
       ],
       correct: 0,
       explanation:
@@ -1502,10 +1502,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Everyone in your group chat is buying a coin that's 'about to explode', and you feel you'll miss out. What's the disciplined move?",
       options: [
-        "Research it independently and only act if you understand how it makes money",
-        "Buy quickly before the price rises further",
-        "Buy the same amount as your friends to keep up",
-        "Ask how much they've made and match it",
+        "Research it independently first",
+        "Buy quickly before the price rises",
+        "Buy the same amount as your friends",
+        "Ask how much they made and match it",
       ],
       correct: 0,
       explanation:
@@ -1520,10 +1520,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A share you paid R10 000 for is now worth R4 000 and the outlook is poor, but selling feels unbearable. What bias is at work?",
       options: [
-        "Loss aversion. The pain of a loss feels far stronger than an equal gain",
-        "Present bias: you want a reward now",
-        "Confirmation bias, you seek agreeing opinions",
-        "Anchoring to a sale price",
+        "Loss aversion, the loss hurts more",
+        "Present bias, you want a reward now",
+        "Confirmation bias, you seek agreement",
+        "Anchoring to the original sale price",
       ],
       correct: 0,
       explanation:
@@ -1538,7 +1538,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Sipho's salary jumps from R20k to R30k. He upgrades his flat, car and subscriptions, and still saves only R1k a month. What happened?",
       options: [
-        "Lifestyle inflation. Spending rose to match the raise, so wealth didn't grow",
+        "Lifestyle inflation ate the raise",
         "Loss aversion made him hold cash",
         "Anchoring to his old salary",
         "Present bias about a future reward",
@@ -1556,10 +1556,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A colleague posts a new car and luxury holidays. What does their visible spending actually tell you about their finances?",
       options: [
-        "Very little. Visible consumption is often funded by debt, not wealth",
+        "Very little, it is often funded by debt",
         "They are clearly financially secure",
         "You should finance a similar car to keep up",
-        "They must have a strategy worth copying exactly",
+        "They have a strategy worth copying exactly",
       ],
       correct: 0,
       explanation:
@@ -1588,8 +1588,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Fuel prices spike 30% due to global oil supply cuts. SA inflation rises. What type of inflation is this?",
       options: [
-        "Demand-pull inflation, consumers are buying too much",
-        "Cost-push inflation, production costs rise and are passed to consumers",
+        "Demand-pull, consumers are buying too much",
+        "Cost-push, production costs are passed on",
         "Hyperinflation, caused by money printing",
         "Core inflation, excludes food and energy",
       ],
@@ -1607,10 +1607,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Proverbs 28:20 says 'a faithful man will be richly blessed, but one eager to get rich will not go unpunished.' What financial principle does this echo?",
       options: [
-        "Never invest, all wealth is sinful",
-        "Get-rich-quick schemes and greed carry serious risk; patient, faithful stewardship builds lasting wealth",
-        "Only tithe once a year",
-        "Avoid all debt including a home loan",
+        "Never invest, because all wealth is sinful",
+        "Patient stewardship beats getting rich quick",
+        "Tithe once a year and nothing more",
+        "Avoid every kind of debt including a home loan",
       ],
       correct: 1,
       explanation: "The Bible consistently warns against the love of money and shortcuts to wealth. Financially this maps to avoiding Ponzi schemes, gambling, and high-risk speculation. Patient, consistent saving and investing aligns with the biblical principle of diligent, faithful stewardship.",
@@ -1625,7 +1625,7 @@ export const CONCEPTS: Concept[] = [
       question: "Romans 13:8 says 'Owe no one anything except to love each other.' What does a Biblical approach to debt emphasise?",
       options: [
         "Never borrow money under any circumstances",
-        "Pay your debts faithfully, avoid unnecessary debt, and work toward financial freedom",
+        "Pay debts faithfully and avoid unnecessary debt",
         "Only debt owed to family is acceptable",
         "Declare insolvency if debt becomes unmanageable",
       ],
@@ -1641,10 +1641,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Psalm 24:1 says 'The earth is the Lord's, and everything in it.' What does this mean for how you handle money?",
       options: [
-        "You're a manager of God's resources, accountable for how you use them",
+        "You manage God's resources, accountably",
         "Money is evil and should be avoided",
-        "You can spend however you like since it's all God's anyway",
-        "Only church offerings count as God's money",
+        "You can spend as you like, it is all God's",
+        "Only church offerings count as God's",
       ],
       correct: 0,
       explanation:
@@ -1659,9 +1659,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Proverbs 21:20 contrasts the wise, who 'have wealth and luxury', with fools, who 'spend whatever they get.' What's the principle?",
       options: [
-        "Save and store up reserves rather than consuming everything you earn",
-        "Wealth proves God's favour and poverty proves sin",
-        "Spend freely because God will always provide",
+        "Store up reserves rather than consuming all",
+        "Wealth proves favour and poverty proves sin",
+        "Spend freely because God will provide",
         "Keep all your money in cash at home",
       ],
       correct: 0,
@@ -1677,10 +1677,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Proverbs 3:9 says to honour God with 'the best part of everything you produce.' What does 'firstfruits' giving mean?",
       options: [
-        "Give off the top first, not from whatever is left over",
-        "Give only after all bills and savings are covered",
-        "Give exactly 10%, no more and no less",
-        "Give only to members of your own family",
+        "Give off the top first",
+        "Give after all bills and savings",
+        "Give exactly 10%, no more or less",
+        "Give only to your own family members",
       ],
       correct: 0,
       explanation:
@@ -1698,7 +1698,7 @@ export const CONCEPTS: Concept[] = [
       question: "What makes cryptocurrency fundamentally different from the rand?",
       options: [
         "Crypto earns guaranteed interest",
-        "Crypto is decentralised - no government or central bank controls it",
+        "Crypto is decentralised",
         "Crypto is backed by gold",
         "Crypto is only used in South Africa",
       ],
@@ -1714,10 +1714,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You buy Bitcoin on a SA exchange, hold it a year, then sell at a profit. How does SARS treat that gain?",
       options: [
-        "It's taxable. Capital gains tax applies, and the exchange shares your data with SARS",
-        "It's completely tax-free",
+        "Taxable, capital gains tax applies",
+        "It is completely tax-free",
         "Crypto is anonymous, so SARS can't see it",
-        "Only foreign crypto is taxed",
+        "Only crypto held offshore gets taxed",
       ],
       correct: 0,
       explanation:
@@ -1734,10 +1734,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What does the FAIS Act regulate?",
       options: [
-        "The conduct of people who give financial advice or intermediary services",
+        "The conduct of financial advisers",
         "The performance of financial products",
-        "Interest rates on loans",
-        "Only long-term insurance",
+        "Interest rates charged on loans",
+        "Only long-term insurance products",
       ],
       correct: 0,
       explanation:
@@ -1752,10 +1752,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Under FAIS, what turns an interaction into 'advice'?",
       options: [
-        "A recommendation, guidance or proposal about a financial product",
-        "Any mention of a product at all",
-        "Only a completed sale",
-        "Handing over a brochure",
+        "A recommendation, guidance or proposal",
+        "Any mention of a financial product at all",
+        "Only a sale that has been completed",
+        "Handing over a product brochure",
       ],
       correct: 0,
       explanation:
@@ -1769,7 +1769,7 @@ export const CONCEPTS: Concept[] = [
     category: "RE5 / FAIS",
     reviewCard: {
       question: "An FSP that makes buy/sell decisions on a client's portfolio without approving each trade needs which licence category?",
-      options: ["Category II (discretionary FSP)", "Category I", "Category III", "Category IV"],
+      options: ["Category II", "Category I", "Category III", "Category IV"],
       correct: 0,
       explanation:
         "Category I = advice and/or intermediary services (ordinary advisers). Category II = discretionary FSPs. Category IIA = hedge funds. Category III = administrative FSPs (LISPs). Category IV = assistance business. A licence only covers the categories and product subcategories approved, and you may not act as an FSP without one.",
@@ -1783,10 +1783,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "When may the FSCA suspend or withdraw an FSP's licence?",
       options: [
-        "When the FSP no longer meets fit & proper, got the licence by fraud, or seriously contravened the Act",
-        "Only if the FSP agrees",
-        "Never. Licences are permanent",
-        "Only after a criminal conviction",
+        "When the FSP is no longer fit and proper",
+        "Only if the FSP agrees to it",
+        "Never, licences are permanent",
+        "Only after a criminal conviction in court",
       ],
       correct: 0,
       explanation:
@@ -1814,7 +1814,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Can an FSP debar a representative by quietly removing them from the register without telling them?",
       options: [
-        "No. Debarment needs notice, reasons and a chance to respond",
+        "No, it needs notice and a hearing",
         "Yes, the FSP controls its own register",
         "Yes, if the FSCA is told within 15 days",
         "Yes, if the rep already resigned",
@@ -1832,9 +1832,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Which is NOT a fit & proper pillar under FAIS?",
       options: [
-        "Guaranteed investment returns for clients",
+        "Guaranteed investment returns",
         "Honesty, integrity and good standing",
-        "Competence",
+        "Competence and formal qualifications",
         "Financial soundness",
       ],
       correct: 0,
@@ -1850,10 +1850,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "When does the CPD cycle run, and does product-specific training count toward it?",
       options: [
-        "1 June to 31 May; product-specific training does NOT count as CPD",
-        "1 January to 31 December; all training counts",
-        "1 March to 28 Feb; only product training counts",
-        "There is no CPD cycle",
+        "1 June to 31 May, and product training does not count",
+        "1 January to 31 December, and all training counts",
+        "1 March to 28 February, and only product training counts",
+        "There is no CPD cycle at all",
       ],
       correct: 0,
       explanation:
@@ -1868,10 +1868,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What is the overarching standard in the General Code of Conduct?",
       options: [
-        "Act honestly, fairly, with due skill, care and diligence, in clients' interests",
+        "Act honestly, fairly and with due care",
         "Maximise commission income",
-        "Always present products favourably",
-        "Prioritise the product supplier",
+        "Always present the products favourably",
+        "Put the product supplier first",
       ],
       correct: 0,
       explanation:
@@ -1886,8 +1886,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A representative doesn't mention the commission they'll earn, saying 'the client only cares about the product'. What's breached?",
       options: [
-        "The duty to disclose remuneration and manage the conflict of interest",
-        "Nothing. Commission is confidential",
+        "The duty to disclose remuneration",
+        "Nothing, commission is confidential",
         "The record-keeping rule",
         "The financial soundness pillar",
       ],
@@ -1904,10 +1904,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A client insists, after being warned, on a high-risk product that doesn't match their conservative profile. What must the provider do?",
       options: [
-        "Proceed only if it records the instruction and the warnings given",
-        "Secretly change the risk profile so it 'fits'",
+        "Proceed, recording the instruction",
+        "Secretly change the risk profile to fit",
         "Refuse, the Code bans the sale outright",
-        "Proceed and say nothing",
+        "Proceed and say nothing at all",
       ],
       correct: 0,
       explanation:
@@ -1935,10 +1935,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "TCF Outcome 6 is about ensuring customers:",
       options: [
-        "Face no unreasonable post-sale barriers to switch, claim or complain",
-        "Are guaranteed product returns",
-        "Generate maximum commission",
-        "Never complain at all",
+        "Face no post-sale barriers",
+        "Are guaranteed their product returns",
+        "Generate the maximum commission",
+        "Never complain about anything",
       ],
       correct: 0,
       explanation:
@@ -1953,10 +1953,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What is the FAIS Ombud's maximum award for a single complaint?",
       options: [
-        "R3.5 million (raised from R800 000 on 1 July 2024)",
+        "R3.5 million",
         "R800 000",
         "R1 million",
-        "Unlimited",
+        "No limit",
       ],
       correct: 0,
       explanation:
@@ -1971,8 +1971,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You suspect a client's cash deposits are the proceeds of crime. Under FICA you must:",
       options: [
-        "File a suspicious transaction report with the FIC, and not tip off the client",
-        "Ask the client to explain first",
+        "File a suspicious transaction report",
+        "Ask the client to explain it first",
         "Report it to the FSCA instead",
         "Close the account and delete the records",
       ],
@@ -1991,9 +1991,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "In zero-based budgeting, what should income minus all your allocations equal?",
       options: [
-        "Exactly R0. Every rand is assigned a job, including savings",
-        "Whatever's left over as spending money",
-        "At least R500 as a buffer",
+        "Exactly R0, every rand is assigned",
+        "Whatever is left as spending money",
+        "At least R500 left over as a buffer",
         "A negative number you cover with credit",
       ],
       correct: 0,
@@ -2009,10 +2009,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A person earning R180 000/month spends R185 000/month. What's their cash flow?",
       options: [
-        "Negative. They're going backwards despite a high income",
-        "Strongly positive because they earn a lot",
+        "Negative, they go backwards",
+        "Strongly positive, they earn a lot",
         "Zero, and perfectly fine",
-        "Irrelevant at high incomes",
+        "Irrelevant at these high incomes",
       ],
       correct: 0,
       explanation:
@@ -2027,8 +2027,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You're offered R45 000 but market rate for the role is R52 000–R58 000. Best move?",
       options: [
-        "Present your market research and propose about R54 000",
-        "Accept quietly. You're lucky to be offered",
+        "Show market research, propose R54 000",
+        "Accept quietly, you are lucky to be offered",
         "Demand R70 000 as a shock anchor",
         "Wait until after you start to raise it",
       ],
@@ -2045,10 +2045,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Which is the best-written financial goal?",
       options: [
-        "Invest R1 500/month into a JSE ETF for 5 years to fund my MBA by 2029",
-        "Save more money this year",
-        "Get rich by 40",
-        "Stop wasting money",
+        "Invest R1 500/month for 5 years to fund my MBA",
+        "Save as much money as I possibly can during this year",
+        "Get rich enough to retire early one day",
+        "Stop wasting money on things that I don't really need",
       ],
       correct: 0,
       explanation:
@@ -2063,9 +2063,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "For a qualified professional, which side income has the highest margin and lowest startup cost?",
       options: [
-        "Freelancing in your existing professional skill",
-        "Opening a physical retail store",
-        "Reselling at flea markets",
+        "Freelancing in your existing skill",
+        "Opening a physical retail storefront",
+        "Reselling at weekend flea markets",
         "Renting out a delivery vehicle",
       ],
       correct: 0,
@@ -2081,10 +2081,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You're getting married and discover your partner has R80 000 of undisclosed credit-card debt. Best approach?",
       options: [
-        "Full disclosure of income, debts and assets, with a joint plan to tackle it",
+        "Full disclosure and a joint plan",
         "Deal with it quietly after the wedding",
-        "Secretly pay it off as a gift",
-        "Ignore it. Money is private",
+        "Secretly pay it off as a wedding gift",
+        "Ignore it, money is private",
       ],
       correct: 0,
       explanation:
@@ -2101,7 +2101,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Your December bonus is R30 000 and your marginal rate is 31%. What should your allocation plan be built on?",
       options: [
-        "About R20 700, the amount left after PAYE",
+        "About R20 700, after PAYE",
         "The full R30 000",
         "R30 000 plus your normal salary",
         "Whatever is left in January",
@@ -2119,10 +2119,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A job offer says 'CTC R480 000 per year'. What does that figure represent?",
       options: [
-        "The employer's total annual cost, including employer pension, medical aid, UIF and SDL",
-        "The cash that lands in your account each year",
+        "The employer's total annual cost",
+        "The cash that lands in your account",
         "Your gross salary before PAYE only",
-        "Your take-home pay after all deductions",
+        "Your take-home pay after deductions",
       ],
       correct: 0,
       explanation:
@@ -2137,10 +2137,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Your employer deducts R2 000 for a damaged company laptop without asking you. Is that lawful?",
       options: [
-        "No. The BCEA requires written consent or a court order for damage deductions",
-        "Yes, employers may recover company losses from salaries",
+        "No, the BCEA requires written consent",
+        "Yes, employers may recover their losses",
         "Yes, if the deduction is under R5 000",
-        "Only if you have been employed for over a year",
+        "Only after a year of employment",
       ],
       correct: 0,
       explanation:
@@ -2183,9 +2183,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What is the only way to use a credit card without paying interest?",
       options: [
-        "Settle the full outstanding balance by the due date every month",
-        "Pay the minimum each month",
-        "Keep utilisation below 50%",
+        "Settle the full balance each month",
+        "Pay the minimum amount each month",
+        "Keep your utilisation below 50%",
         "Use it only for purchases under R500",
       ],
       correct: 0,
@@ -2201,10 +2201,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "How long should you keep your old bank account open after switching?",
       options: [
-        "About two months, until every debit order has migrated",
+        "About two months",
         "Close it the same day",
-        "One week",
-        "At least a year",
+        "About one week",
+        "At least a full year",
       ],
       correct: 0,
       explanation:
@@ -2219,10 +2219,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You reach into your overdraft from the 20th of every month until payday. What does that pattern tell you?",
       options: [
-        "Your expenses exceed your income for part of every month",
+        "Your expenses exceed your income",
         "You are managing cash flow well",
         "Your overdraft limit is too low",
-        "Nothing. It is normal",
+        "Nothing, it is completely normal",
       ],
       correct: 0,
       explanation:
@@ -2237,7 +2237,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "How much can an adult South African transfer offshore each calendar year without SARS clearance?",
       options: [
-        "R2 million, under the Single Discretionary Allowance",
+        "R2 million",
         "R100 000",
         "Nothing without clearance",
         "R10 million",
@@ -2257,10 +2257,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You have a card at 22%, a personal loan at 17% and car finance at 12.75%. Where does every spare rand go?",
       options: [
-        "The 22% card, while paying minimums on the rest",
-        "The car finance, because it is the largest",
+        "The 22% card, minimums on the rest",
+        "The car finance, it is the largest",
         "Split evenly across all three",
-        "The oldest account",
+        "The oldest account first",
       ],
       correct: 0,
       explanation:
@@ -2276,7 +2276,7 @@ export const CONCEPTS: Concept[] = [
       question: "You owe R16 000 on a credit card with a R20 000 limit. What does that signal to a lender?",
       options: [
         "80% utilisation, which reads as financial stress",
-        "80% utilisation, which is fine because you are under the limit",
+        "80% utilisation, which is fine",
         "20% utilisation, which is healthy",
         "Nothing. Utilisation is not scored",
       ],
@@ -2295,7 +2295,7 @@ export const CONCEPTS: Concept[] = [
       options: [
         "The National Credit Regulator",
         "SARS",
-        "The Reserve Bank",
+        "The South African Reserve Bank",
         "The JSE",
       ],
       correct: 0,
@@ -2311,10 +2311,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Under the NCA, when is credit 'reckless'?",
       options: [
-        "When the provider grants it without properly assessing affordability",
-        "When the interest rate feels high to the borrower",
+        "When affordability was not assessed",
+        "When the rate feels high to the borrower",
         "When the borrower has no credit history",
-        "When the loan is approved on the same day",
+        "When the loan is approved the same day",
       ],
       correct: 0,
       explanation:
@@ -2329,8 +2329,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What does a balloon (residual) payment on car finance actually do?",
       options: [
-        "Defers 20–30% of the debt to the end of the term, where it still has to be paid",
-        "Reduces the total amount you owe",
+        "Defers 20-30% of the debt to the end",
+        "Reduces the total amount that you owe",
         "Covers your final year of instalments",
         "Is written off when the term ends",
       ],
@@ -2347,7 +2347,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You have a bond at 11% and a savings account paying 7%. Where should a R20 000 windfall go?",
       options: [
-        "Into the bond, where it saves 11% tax-free",
+        "Into the bond",
         "Into savings, for flexibility",
         "Split evenly between them",
         "Into a new store account",
@@ -2364,7 +2364,7 @@ export const CONCEPTS: Concept[] = [
     category: "Credit & Debt",
     reviewCard: {
       question: "You have four BNPL commitments running at R300, R450, R250 and R600 a month. What have you added to your budget?",
-      options: ["R1 600 a month", "R1 200 a month", "R800 a month", "Nothing. BNPL is not debt"],
+      options: ["R1 600 a month", "R1 200 a month", "R800 a month", "Nothing at all"],
       correct: 0,
       explanation:
         "BNPL is 0% only while you pay on time; miss an instalment and late fees arrive. The real danger is stacking. Each commitment feels small alone but they add up to a monthly obligation you never budgeted. SA providers increasingly report to credit bureaux, so missed payments hit your record and live commitments reduce what a bond assessor says you can afford.",
@@ -2378,8 +2378,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A company offers to 'remove your blacklisting' for R2 500. What is really going on?",
       options: [
-        "Accurate adverse information cannot be removed on request. Only errors can be disputed, free",
-        "They have a legal channel consumers do not",
+        "Accurate listings cannot be removed",
+        "They have a legal channel you do not",
         "It works, but takes about six months",
         "It is legal, but only for judgments",
       ],
@@ -2397,7 +2397,7 @@ export const CONCEPTS: Concept[] = [
     category: "Investing",
     reviewCard: {
       question: "You invest R200 000. Fund A charges a 0.2% TER, Fund B charges 2%. What is the fee difference in year one?",
-      options: ["R3 600", "R400", "R40", "R200"],
+      options: ["R3 600", "R400", "R40", "R20 000"],
       correct: 0,
       explanation:
         "R200 000 × 1.8% = R3 600 in the first year, and the gap compounds because money paid in fees never grows for you. Over 30 years a 1% annual fee can consume roughly a fifth of your final value. Returns are uncertain but fees are contractual. Under the FAIS General Code they must be disclosed in writing, so ask for the total effective annual cost in both percent and rands.",
@@ -2411,7 +2411,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "The JSE drops 30% in month four of your R2 000-a-month ETF plan. What is the right move?",
       options: [
-        "Keep the debit order running. You are buying the same units cheaper",
+        "Keep the debit order running",
         "Stop until markets recover",
         "Sell everything to prevent further losses",
         "Switch to whatever went up last month",
@@ -2442,10 +2442,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "The SARB cuts the repo rate unexpectedly. What typically happens to the price of existing bonds?",
       options: [
-        "They rise, because their older higher coupons are now more attractive",
-        "They fall",
-        "They are unaffected",
-        "They stop paying interest",
+        "They rise, older coupons look better",
+        "They fall in value immediately",
+        "They are completely unaffected",
+        "They stop paying any interest at all",
       ],
       correct: 0,
       explanation:
@@ -2460,10 +2460,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What should mainly decide how much equity you hold?",
       options: [
-        "How long until you need the money, and the volatility you can actually tolerate",
+        "Your time horizon and risk tolerance",
         "Last year's best-performing asset class",
         "What your colleagues are buying",
-        "The size of your account",
+        "The size of your account balance",
       ],
       correct: 0,
       explanation:
@@ -2478,10 +2478,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Your target is 70% equities and 30% bonds. After a strong equity year you are at 80/20. What should you do?",
       options: [
-        "Rebalance back to 70/30, ideally by directing new contributions to bonds",
-        "Leave it. The winners are working",
-        "Sell all your bonds",
-        "Move everything to cash",
+        "Rebalance back to 70/30",
+        "Leave it, the winners are working",
+        "Sell all of your bonds",
+        "Move everything into cash",
       ],
       correct: 0,
       explanation:
@@ -2498,7 +2498,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You donate R200 000 to your adult son. How is it taxed?",
       options: [
-        "The first R100 000 is exempt; the remaining R100 000 attracts 20% donations tax",
+        "The first R100 000 is exempt",
         "The full R200 000 is exempt",
         "The full R200 000 is taxed at 20%",
         "Your son pays income tax on it",
@@ -2529,9 +2529,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What should you do before accepting a SARS auto-assessment?",
       options: [
-        "Check it against your IRP5, IT3s and any deduction SARS was not told about",
-        "Accept it immediately so the refund arrives sooner",
-        "Wait for the deadline to pass",
+        "Check it against your IRP5 and IT3s",
+        "Accept it immediately for a faster refund",
+        "Wait for the filing deadline to pass",
         "Phone SARS to confirm it is genuine",
       ],
       correct: 0,
@@ -2549,7 +2549,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "An email says you have won $500 000 in a lottery you never entered, but you must pay R2 500 in 'release fees'. What is it?",
       options: [
-        "Advance fee fraud. The fee is the entire point",
+        "Advance fee fraud",
         "A legitimate international lottery",
         "A tax requirement on foreign winnings",
         "A refundable processing charge",
@@ -2567,8 +2567,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A caller from 'the bank's fraud department' asks for your OTP so they can block a fraudulent transaction. What should you do?",
       options: [
-        "Hang up and call the bank on the number from your card or app",
-        "Give the OTP so the transaction is blocked",
+        "Hang up and call your bank yourself",
+        "Give them the OTP so they can block it",
         "Give only the first three digits",
         "Ask them to confirm by SMS first",
       ],
@@ -2585,8 +2585,8 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "An unknown number messages: 'It's Lungelo from varsity, I'm stranded and lost my wallet, please EFT R1 500.' Best response?",
       options: [
-        "Call the real Lungelo on the number you already have",
-        "Send the money. He is a friend in trouble",
+        "Call Lungelo on the number you have",
+        "Send the money, he is a friend",
         "Reply asking for his banking details",
         "Ask a security question by message",
       ],
@@ -2605,10 +2605,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Proverbs 24:27 says 'Do your planning and prepare your fields before building your house.' What does that apply to today?",
       options: [
-        "Securing your income before committing to a large lifestyle expense",
-        "Buying property before renting",
-        "Building a house before starting a business",
-        "Avoiding agriculture",
+        "Secure your income before big commitments",
+        "Buy property before ever renting",
+        "Build a house before you start a business",
+        "Avoid agriculture altogether",
       ],
       correct: 0,
       explanation:
@@ -2623,10 +2623,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Colossians 3:23 says to 'work willingly at whatever you do, as though you were working for the Lord rather than for people.' What does that imply?",
       options: [
-        "The quality of your work matters regardless of who is watching or what the job is",
+        "Work quality matters whoever is watching",
         "Only ministry work counts spiritually",
         "You should work unpaid overtime indefinitely",
-        "Career ambition is wrong",
+        "Career ambition is always wrong",
       ],
       correct: 0,
       explanation:
@@ -2641,10 +2641,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A friend asks you to co-sign their car loan. What does Proverbs teach, and what does SA law say?",
       options: [
-        "Proverbs warns against surety, and co-signing makes you jointly and severally liable for the full debt",
-        "Proverbs commends it as generosity, and liability is shared equally",
-        "Scripture is neutral, and the lender must sue the borrower first",
-        "It is required of family members, and liability is limited to half",
+        "Proverbs warns against it, and you are jointly liable",
+        "Proverbs commends it, and liability is shared equally",
+        "Scripture is neutral, and the lender must sue first",
+        "It is required of family, and liability is halved",
       ],
       correct: 0,
       explanation:
@@ -2672,10 +2672,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Matthew 6:19-21 contrasts treasure on earth with treasure in heaven. What is the central claim?",
       options: [
-        "Where your treasure is, your heart follows",
-        "Saving money is sinful",
+        "Your heart follows your treasure",
+        "Saving money is sinful in every case",
         "Wealth should be destroyed",
-        "Only the poor please God",
+        "Only the poor can please God",
       ],
       correct: 0,
       explanation:
@@ -2690,10 +2690,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Proverbs 11:1 says the Lord detests dishonest scales but delights in accurate weights. What does that cover today?",
       options: [
-        "Honest pricing, accurate invoices and truthful declarations",
-        "Only literal weighing equipment",
-        "Bank interest rates",
-        "Currency exchange",
+        "Honest pricing and accurate invoices",
+        "Only literal scales and weighing equipment",
+        "Bank interest rates only",
+        "Currency exchange rates and nothing else",
       ],
       correct: 0,
       explanation:
@@ -2710,9 +2710,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You upgrade your phone every year and each one feels ordinary within two months. What is happening?",
       options: [
-        "Hedonic adaptation, your baseline resets, so the same upgrade is needed again",
-        "The phones are getting worse",
-        "You are choosing the wrong brand",
+        "Hedonic adaptation, your baseline resets",
+        "The phones are genuinely getting worse each year",
+        "You are simply choosing the wrong phone brand",
         "You need a more expensive model",
       ],
       correct: 0,
@@ -2728,10 +2728,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You budget your salary carefully but spend an R8 000 bonus within a week. What is driving that?",
       options: [
-        "Mental accounting. The bonus is labelled 'extra' rather than income",
-        "The bonus is genuinely different money",
+        "Mental accounting, it feels like extra",
+        "The bonus really is a different kind of money",
         "You are bad with money generally",
-        "Bonuses cannot be budgeted",
+        "Bonuses simply cannot be budgeted at all",
       ],
       correct: 0,
       explanation:
@@ -2746,10 +2746,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "After buying a share, you follow five accounts that are bullish on it and mute the critics. What is the effect?",
       options: [
-        "You have built an environment where you will never see the warning signs",
-        "You are filtering out noise",
+        "You will never see the warning signs",
+        "You are filtering out useless noise",
         "You are diversifying your information",
-        "You are reducing your risk",
+        "You are reducing your overall risk",
       ],
       correct: 0,
       explanation:
@@ -2764,10 +2764,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "You made money on three trades and now believe you have a knack for it. What is the risk?",
       options: [
-        "Three outcomes cannot distinguish skill from luck, but they can justify much bigger bets",
-        "You should trade more to confirm it",
+        "Three trades cannot prove skill",
+        "You should trade more to confirm the knack",
         "You have proven your ability",
-        "You should teach others",
+        "You should start teaching others",
       ],
       correct: 0,
       explanation:
@@ -2784,10 +2784,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Your employer pension has high fees but the employer contributes 7.5%. Should you opt out and use an RA instead?",
       options: [
-        "No. The employer contribution usually outweighs the fee difference; run an RA alongside it",
+        "No, the employer contribution wins",
         "Yes, fees always matter more",
         "Yes, RAs always outperform",
-        "It makes no difference either way",
+        "It makes no real difference either way",
       ],
       correct: 0,
       explanation:
@@ -2802,10 +2802,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Why does retiring ten years earlier require substantially more capital?",
       options: [
-        "Fewer years of contributions and growth, and more years of withdrawals",
+        "Less growth and more withdrawals",
         "Tax rates are higher for early retirees",
-        "Annuities cost more before 60",
-        "Medical aid doubles",
+        "Annuities cost more before age 60",
+        "Medical aid premiums double",
       ],
       correct: 0,
       explanation:
@@ -2820,10 +2820,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Which type of annuity removes the risk of outliving your money?",
       options: [
-        "A guaranteed (life) annuity, which pays for as long as you live",
-        "A living annuity",
-        "A unit trust",
-        "A fixed deposit",
+        "A guaranteed life annuity",
+        "A standard living annuity product",
+        "A managed unit trust portfolio",
+        "A five-year bank fixed deposit",
       ],
       correct: 0,
       explanation:
@@ -2838,10 +2838,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Can most retirees safely drop medical aid to save money once they stop working?",
       options: [
-        "No. Rejoining brings waiting periods and a permanent late-joiner penalty",
+        "No, a late-joiner penalty applies",
         "Yes, healthcare needs fall in retirement",
-        "Yes, provided they have savings",
-        "Yes, the state covers retirees",
+        "Yes, provided they have enough savings",
+        "Yes, the state covers all retirees",
       ],
       correct: 0,
       explanation:
@@ -2858,10 +2858,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Does investing offshore through a JSE-listed global ETF require SARS tax clearance?",
       options: [
-        "No. It is a rand-denominated local purchase, so no money leaves the country",
-        "Yes, for any offshore exposure",
-        "Yes, above R100 000",
-        "Only for retirement funds",
+        "No, it is a local rand purchase",
+        "Yes, for any offshore exposure at all",
+        "Yes, above R100 000 a year",
+        "Only for retirement fund money offshore",
       ],
       correct: 0,
       explanation:
@@ -2876,7 +2876,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Is the Basic Fuel Price the only cost component of South African petrol?",
       options: [
-        "No. The fuel levy, RAF levy, margins and transport all sit on top",
+        "No, levies and margins sit on top",
         "Yes, the BFP is the full price",
         "No, but the rest is only VAT",
         "Yes, apart from the retailer's profit",
@@ -2894,10 +2894,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Does the SARB manage the rand by setting an official exchange rate?",
       options: [
-        "No. The rand floats freely and the SARB targets inflation",
+        "No, the rand floats freely",
         "Yes, it sets a daily rate",
         "Yes, the rand is pegged to the dollar",
-        "Only during a crisis",
+        "Only during a currency crisis",
       ],
       correct: 0,
       explanation:
@@ -2912,10 +2912,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Does a stronger rand make South African exports more competitive globally?",
       options: [
-        "No. It makes SA goods more expensive abroad, though imports get cheaper",
-        "Yes, exports become cheaper",
+        "No, SA goods get more expensive abroad",
+        "Yes, exports become cheaper for buyers",
         "It has no effect on exports",
-        "Only for commodity exports",
+        "Only for commodity exporters",
       ],
       correct: 0,
       explanation:
@@ -2930,10 +2930,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What is the SARB's inflation target?",
       options: [
-        "3%, with a tolerance band of one percentage point either side",
-        "Between 3% and 6%",
-        "Below 10%",
-        "There is no target",
+        "3%, plus or minus one point",
+        "Somewhere between 3% and 6% a year",
+        "Below 10% at absolutely all times",
+        "There is no formal target at all",
       ],
       correct: 0,
       explanation:
@@ -2950,9 +2950,9 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Are all blockchain transactions completely anonymous?",
       options: [
-        "No. They are pseudonymous, and the public ledger makes them unusually traceable",
+        "No, they are pseudonymous and traceable",
         "Yes, that is the whole point",
-        "Yes, for Bitcoin but not other coins",
+        "Yes for Bitcoin, but not for other coins",
         "Only for amounts under R10 000",
       ],
       correct: 0,
@@ -2968,10 +2968,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "What does 'not your keys, not your coins' mean?",
       options: [
-        "Crypto held on an exchange is a claim against that company, not a holding you control",
-        "Exchanges charge for storing keys",
-        "You need a password to trade",
-        "Private keys expire annually",
+        "Coins on an exchange are only a claim",
+        "Exchanges charge a fee for storing your keys",
+        "You need a password in order to trade",
+        "Private keys expire once every single year",
       ],
       correct: 0,
       explanation:
@@ -2986,10 +2986,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A DeFi platform promises 40% a year on stablecoins. What is the most important first question?",
       options: [
-        "Where does the yield come from, and who is paying it?",
-        "Which wallet should I use?",
-        "Can I withdraw daily?",
-        "Is the app well designed?",
+        "Where does the yield come from?",
+        "Which wallet should I connect it to?",
+        "Can I withdraw my money out daily?",
+        "Is the app nicely designed overall?",
       ],
       correct: 0,
       explanation:
@@ -3006,10 +3006,10 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "Is charging interest on overdue invoices illegal in South Africa?",
       options: [
-        "No. It is lawful when your agreed terms provide for it",
-        "Yes, always",
+        "No, if your agreed terms allow it",
+        "Yes, it is always unlawful",
         "Yes, unless a court orders it",
-        "Only registered credit providers may do it",
+        "Only registered credit providers may",
       ],
       correct: 0,
       explanation:
@@ -3024,7 +3024,7 @@ export const CONCEPTS: Concept[] = [
     reviewCard: {
       question: "A client trips over a cable in your office and sues you for R600 000. Which cover responds?",
       options: [
-        "Public liability insurance",
+        "Public liability cover",
         "Professional indemnity",
         "Business interruption",
         "Key person cover",

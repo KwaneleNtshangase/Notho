@@ -26,10 +26,10 @@ const whyWeakensSlots: QuestionSlot[] = [
           type: "mcq",
           question: "The US Federal Reserve raises interest rates sharply. What typically happens to the rand?",
           options: [
-            "It weakens: capital flows to the US dollar for better yields",
-            "It strengthens. US growth is good for SA trade",
-            "No effect. Exchange rates are independent of rates",
-            "It strengthens, investors seek diversification",
+            "It weakens, capital flows to the dollar",
+            "It strengthens, US growth helps SA trade",
+            "Nothing, the two are unrelated",
+            "It strengthens, investors diversify",
           ],
           correct: 0,
           feedback: {
@@ -56,9 +56,9 @@ const whyWeakensSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Which of these is a driver of rand WEAKNESS?",
           options: [
-            "Severe load shedding denting SA's growth forecasts",
+            "Severe load shedding denting growth",
             "A large trade surplus",
-            "Rising foreign investor confidence in SA",
+            "Rising foreign investor confidence",
             "Falling US interest rates on their own",
           ],
           correct: 0,
@@ -105,7 +105,7 @@ const whyWeakensSlots: QuestionSlot[] = [
           type: "scenario",
           question: "The rand weakens sharply against the dollar. Who tends to BENEFIT?",
           options: [
-            "Exporters like miners, who earn dollars but pay costs in rand",
+            "Exporters earning dollars",
             "Consumers filling up with petrol",
             "Importers of electronics",
             "Travellers heading overseas",
@@ -178,10 +178,10 @@ const whyWeakensSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Which gives an ordinary investor the best protection against rand depreciation?",
           options: [
-            "A global (offshore) equity ETF",
+            "A global equity ETF",
             "An SA bank fixed deposit",
             "RSA Retail Savings Bonds",
-            "SA listed property",
+            "SA listed property shares",
           ],
           correct: 0,
           feedback: {
@@ -208,8 +208,8 @@ const whyWeakensSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato worries the rand will keep weakening over the years. The most accessible way to hedge is to:",
           options: [
-            "Hold some global equities via an offshore ETF",
-            "Keep everything in a rand savings account",
+            "Hold global equities via an ETF",
+            "Keep it in rand savings",
             "Buy only SA government bonds",
             "Hold more cash at home",
           ],

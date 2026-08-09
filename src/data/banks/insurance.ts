@@ -25,7 +25,7 @@ const lesson1Slots: QuestionSlot[] = [
           options: [
             "A parent of three with a home loan",
             "A single 22-year-old with no dependants",
-            "A retiree with R5 million saved",
+            "A retiree with R5 million already saved",
             "A student with no income",
           ],
           correct: 0,
@@ -53,10 +53,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho didn't need life cover at 23. At 33 he's married with a baby and a bond. What changed?",
           options: [
-            "People now depend on his income and there's debt. His need for cover jumped",
-            "Nothing. His cover needs are fixed for life",
+            "People now depend on his income",
+            "Nothing, his cover needs are fixed",
             "He needs less cover now",
-            "Only his age matters",
+            "Only his age really matters",
           ],
           correct: 0,
           feedback: {
@@ -89,10 +89,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato relies only on her employer's life cover. She's about to resign for a new role. What's the risk?",
           options: [
-            "Her cover likely ends with the old job, possibly leaving a gap before new cover starts",
-            "Group cover automatically follows her forever",
+            "Cover ends with the old job",
+            "Group cover follows her forever",
             "There's no risk at all",
-            "Her cover doubles when she resigns",
+            "Her cover doubles on resigning",
           ],
           correct: 0,
           feedback: {
@@ -107,10 +107,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the sensible way to think about employer group life cover?",
           options: [
-            "A helpful base to top up with your own personal policy",
+            "A base to top up yourself",
             "All the cover you'll ever need",
-            "A reason to skip life cover entirely",
-            "Something that follows you between all jobs",
+            "A reason to skip life cover",
+            "Something that follows you everywhere",
           ],
           correct: 0,
           feedback: {
@@ -133,8 +133,8 @@ const lesson1Slots: QuestionSlot[] = [
           options: [
             "Pays a lump sum to your family if you die",
             "Pays you a monthly pension while you're alive",
-            "Covers your car in an accident",
-            "Pays your medical bills",
+            "Covers your car in any road accident at all",
+            "Pays all of your medical bills every month",
           ],
           correct: 0,
           feedback: {
@@ -161,10 +161,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A life policy pays out R2 million to a family after the breadwinner dies. What is it typically used for?",
           options: [
-            "Settling the bond, covering living costs and the children's schooling",
+            "The bond and living costs",
             "A luxury holiday only",
             "Buying shares on a tip",
-            "Nothing. It must be returned",
+            "Nothing, it must be returned",
           ],
           correct: 0,
           feedback: {
@@ -197,7 +197,7 @@ const lesson1Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Using the 10× rule, someone earning R20 000/month should aim for roughly:",
-          options: ["R2.4 million", "R240 000", "R20 million", "R200 000"],
+          options: ["R2.4 million", "R240 000", "R20 million", "About R200 000"],
           correct: 0,
           feedback: {
             correct: "Right: R20 000 × 12 = R240 000 a year, × 10 = R2.4 million. A benchmark to start from and refine.",
@@ -262,10 +262,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo is booked off work for eight months after a serious injury. Which cover keeps money coming in monthly?",
           options: [
-            "Income protection, it replaces a share of his salary while he recovers",
-            "Life insurance. It pays out now",
-            "His car insurance",
-            "Nothing can help",
+            "Income protection cover",
+            "Life insurance, paying now",
+            "His car insurance policy",
+            "Nothing can really help",
           ],
           correct: 0,
           feedback: {
@@ -310,10 +310,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "For most working people, what is realistically their biggest financial asset?",
           options: [
-            "Their ability to earn an income",
-            "Their car",
-            "Their phone",
-            "Their furniture",
+            "Their earning ability",
+            "Their main family vehicle",
+            "Their expensive mobile phone",
+            "Their household furniture",
           ],
           correct: 0,
           feedback: {
@@ -328,10 +328,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Ayesha has life cover but no disability cover. Which risk is she leaving unprotected?",
           options: [
-            "An injury or illness that stops her earning while she's still alive",
-            "Her death",
+            "Illness stopping her earning",
+            "Her death, which is covered",
             "Her car being scratched",
-            "None. Life cover handles everything",
+            "None, life cover handles it all",
           ],
           correct: 0,
           feedback: {
@@ -406,10 +406,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why is protecting your income considered a foundation of financial planning?",
           options: [
-            "Almost every other goal depends on your income continuing",
-            "Because insurers say so",
+            "Every goal depends on income",
+            "Because the insurers say so",
             "It improves your credit score",
-            "It's legally required",
+            "It is legally required",
           ],
           correct: 0,
           feedback: {
@@ -436,10 +436,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa thinks her savings alone would carry her through a long disability. What's the flaw?",
           options: [
-            "Savings can run out fast against years of lost income and extra costs",
-            "Savings are always more than enough",
+            "Savings run out against years",
+            "Savings are always enough",
             "Disability never lasts long",
-            "Nothing: savings fully replace insurance",
+            "Savings fully replace insurance",
           ],
           correct: 0,
           feedback: {
@@ -480,10 +480,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "When does a dread disease (critical illness) policy pay out?",
           options: [
-            "When you're diagnosed with a covered condition, whether you survive or not",
+            "On diagnosis, alive or not",
             "Only if you die from the illness",
-            "Only if you're permanently disabled",
-            "At retirement age regardless of illness",
+            "Only if permanently disabled",
+            "At retirement age regardless",
           ],
           correct: 0,
           feedback: {
@@ -510,7 +510,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How is dread disease cover different from life insurance?",
           options: [
-            "It pays on diagnosis of a serious illness, while you're alive; life cover pays on death",
+            "It pays on diagnosis, while alive",
             "They are exactly the same product",
             "It only covers car accidents",
             "It pays monthly like a salary",
@@ -546,10 +546,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why is the tax-free nature of a dread disease payout an advantage?",
           options: [
-            "You keep the full amount, unlike drawing down taxable savings or investments",
-            "Because it earns interest automatically",
-            "Because it's guaranteed to grow",
-            "It isn't an advantage",
+            "You keep the full amount",
+            "It earns interest automatically",
+            "It's guaranteed to grow",
+            "It isn't really an advantage",
           ],
           correct: 0,
           feedback: {
@@ -564,10 +564,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Facing big treatment costs, why might a tax-free R1 million payout beat withdrawing R1 million from investments?",
           options: [
-            "The payout arrives whole, while selling investments can trigger tax and lock in losses",
+            "It arrives whole, untaxed",
             "Investments are always tax-free too",
             "The payout must be repaid",
-            "There's no difference",
+            "There's no real difference",
           ],
           correct: 0,
           feedback: {
@@ -588,7 +588,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "A dread disease payout is a lump sum. What does that let you do?",
           options: [
-            "Decide how to use it, medical bills, debt, income replacement, or home changes",
+            "Decide how to use it yourself",
             "Only pay the hospital directly",
             "Only replace your salary monthly",
             "Nothing, the insurer chooses",
@@ -618,10 +618,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa's dread disease policy pays R1.5 million tax-free after a serious diagnosis. A sensible way to use it is:",
           options: [
-            "Cover treatment gaps, take needed time off, and reduce debt like her bond",
-            "Spend it all on a new car immediately",
+            "Cover gaps and reduce debt",
+            "Spend it on a new car at once",
             "Invest it in a risky share tip",
-            "Ignore it and take on debt instead",
+            "Ignore it and take on debt",
           ],
           correct: 0,
           feedback: {
@@ -642,10 +642,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why does dread disease cover matter even for people who have medical aid?",
           options: [
-            "Medical aid may not cover every cost, and there's still lost income during treatment",
-            "Medical aid covers absolutely everything",
+            "Lost income during treatment",
+            "Medical aid covers everything",
             "Dread disease replaces medical aid",
-            "It doesn't matter if you have medical aid",
+            "It doesn't matter with medical aid",
           ],
           correct: 0,
           feedback: {
@@ -672,9 +672,9 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How does dread disease cover differ from medical aid?",
           options: [
-            "Medical aid pays healthcare providers; dread disease pays YOU a lump sum to use freely",
+            "Medical aid pays healthcare providers",
             "They are the same thing",
-            "Dread disease pays the hospital directly only",
+            "Dread disease pays hospitals",
             "Medical aid gives you a lump sum",
           ],
           correct: 0,
@@ -760,10 +760,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "A more precise way to size your life cover is to add up:",
           options: [
-            "Outstanding debt, children's education, years of income to replace, and final costs",
+            "Debt, education and income",
             "Only your monthly grocery bill",
             "The value of your phone",
-            "Your favourite number",
+            "Your favourite lucky number",
           ],
           correct: 0,
           feedback: {
@@ -790,10 +790,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato has two young children. Why does that raise her life cover need?",
           options: [
-            "Years of living costs and education for the children would need funding if her income stopped",
-            "Children reduce how much cover you need",
+            "Their costs would need funding",
+            "Children reduce the cover needed",
             "Children have no effect on cover",
-            "Only her car matters",
+            "Only her car really matters",
           ],
           correct: 0,
           feedback: {
@@ -888,10 +888,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho set his cover at 25 when he was single. He's now 35, married with a bond and a child. What should he do?",
           options: [
-            "Review and almost certainly increase his cover to match his new responsibilities",
-            "Leave it. The old amount is fine",
-            "Cancel it entirely",
-            "Reduce it",
+            "Review and increase the cover",
+            "Leave it, the old amount is fine",
+            "Cancel it entirely now",
+            "Reduce it to save money",
           ],
           correct: 0,
           feedback: {
@@ -932,10 +932,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does 'third-party' car insurance cover?",
           options: [
-            "Damage you cause to other people's property or vehicles",
+            "Damage you cause to others",
             "Damage to your own car only",
-            "Medical bills for your passengers",
-            "Theft of items inside your car",
+            "Medical bills for passengers",
+            "Theft of items in your car",
           ],
           correct: 0,
           feedback: {
@@ -950,10 +950,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You have third-party-only cover and cause a crash that writes off your own car. Who pays to replace it?",
           options: [
-            "You do. Third-party doesn't fix your own vehicle",
+            "You do, it won't fix yours",
             "The insurer replaces it fully",
             "The other driver always pays",
-            "SARS refunds you",
+            "SARS refunds you the money",
           ],
           correct: 0,
           feedback: {
@@ -1004,10 +1004,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which tier sits in the middle, covering others, plus fire and theft of your own car?",
           options: [
-            "Third-party, fire & theft",
-            "Comprehensive",
-            "Third-party only",
-            "Buildings insurance",
+            "Third-party, fire, theft",
+            "Comprehensive motor cover",
+            "Third-party only cover",
+            "Buildings insurance cover",
           ],
           correct: 0,
           feedback: {
@@ -1040,10 +1040,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa just financed a brand-new car she still owes a lot on. Which cover usually fits best?",
           options: [
-            "Comprehensive. A write-off shouldn't leave her owing on a car she can't drive",
-            "Third-party only",
-            "No insurance",
-            "Only fire cover",
+            "Comprehensive cover",
+            "Third-party only cover",
+            "No insurance at all",
+            "Only fire and theft cover",
           ],
           correct: 0,
           feedback: {
@@ -1094,9 +1094,9 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The 'excess' on a car insurance policy is:",
           options: [
-            "The amount you pay yourself towards a claim before the insurer covers the rest",
+            "What you pay towards a claim",
             "A bonus the insurer pays you",
-            "The monthly premium",
+            "Your monthly premium",
             "The value of your car",
           ],
           correct: 0,
@@ -1124,10 +1124,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Ayesha picks a very high excess to get a cheap premium, but has little savings. What's the risk?",
           options: [
-            "If she claims, she may not afford the excess and can't get the repair done",
-            "There's no risk. High excess is always best",
+            "She may not afford the excess",
+            "No risk, high excess is best",
             "Her premium will rise instantly",
-            "The insurer pays her excess for her",
+            "The insurer pays her excess",
           ],
           correct: 0,
           feedback: {
@@ -1167,7 +1167,7 @@ const lesson6Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Which insurance covers the physical structure of your home: walls, roof, fitted kitchen?",
-          options: ["Buildings insurance", "Contents insurance", "Car insurance", "Life insurance"],
+          options: ["Buildings insurance", "Household contents insurance", "Motor vehicle insurance", "Personal life insurance"],
           correct: 0,
           feedback: {
             correct: "Right. Buildings insurance rebuilds or repairs the structure after events like fire, storm or a burst geyser. If you have a bond, your bank usually requires it.",
@@ -1213,7 +1213,7 @@ const lesson6Slots: QuestionSlot[] = [
           question: "If you own a sectional-title flat, which insurance does the body corporate usually provide?",
           options: [
             "Buildings insurance for the structure",
-            "Contents insurance for everyone",
+            "Contents insurance for every single owner",
             "Both buildings and contents for all owners",
             "No insurance at all",
           ],
@@ -1242,10 +1242,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato buys a townhouse in a sectional-title complex. What should she check about insurance?",
           options: [
-            "Exactly what the body corporate policy covers",
-            "Nothing. She's fully covered automatically",
-            "Only her car insurance",
-            "That the complex has a nice garden",
+            "What the body corporate covers",
+            "Nothing, she's covered automatically",
+            "Only her own car insurance policy",
+            "That the complex has a garden",
           ],
           correct: 0,
           feedback: {
@@ -1281,7 +1281,7 @@ const lesson6Slots: QuestionSlot[] = [
             "A sudden burst pipe flooding a room",
             "A tap that's been dripping for two years",
             "Paint fading over a decade",
-            "A roof slowly wearing out from age",
+            "A roof slowly wearing out with age over time",
           ],
           correct: 0,
           feedback: {
@@ -1296,7 +1296,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo ignored a slow leak for months; now there's major damage. Why might his claim be rejected?",
           options: [
-            "Insurers exclude gradual damage from neglected maintenance. It's not sudden or unexpected",
+            "Gradual damage is excluded",
             "Because he has too much cover",
             "Insurers always pay everything",
             "Because leaks are never a problem",
@@ -1320,10 +1320,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Geysers are a major SA insurance claim. What's typically the case?",
           options: [
-            "A sudden burst or leak is usually covered, but age-related rust may be excluded",
-            "Geysers are never covered at all",
-            "Only brand-new geysers are excluded",
-            "Insurers cover geysers with no conditions",
+            "Sudden bursts yes, rust no",
+            "Geysers are never covered",
+            "Only new geysers are excluded",
+            "Insurers cover them unconditionally",
           ],
           correct: 0,
           feedback: {
@@ -1350,8 +1350,8 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa's geyser is 12 years old. What's the smart insurance move?",
           options: [
-            "Check her policy's geyser terms and consider replacing an old geyser before it fails",
-            "Assume any burst is automatically covered",
+            "Check the geyser terms",
+            "Assume any burst is covered",
             "Cancel her home insurance",
             "Wait for it to burst and hope",
           ],

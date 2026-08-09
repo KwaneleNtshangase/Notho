@@ -47,7 +47,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A friend says a scheme pays a 'guaranteed 8% every week'. What should you conclude?",
           options: [
-            "It's a red flag. That's Ponzi-scheme territory, not real investing",
+            "It's a red flag",
             "It's a great deal, invest immediately",
             "It's a normal savings account",
             "The Reserve Bank backs it",
@@ -140,9 +140,9 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho keeps his entire long-term savings in a 0%-interest account 'to be safe'. Over 10 years at 6% inflation, what happens?",
           options: [
-            "Its buying power roughly halves, 'safe' from crashes, not from inflation",
-            "It doubles automatically",
-            "Nothing changes at all",
+            "Its buying power roughly halves",
+            "It doubles automatically over time",
+            "Nothing at all changes over time",
             "It's fully protected from inflation",
           ],
           correct: 0,
@@ -194,7 +194,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa (25) is investing for retirement 35 years away. How should her horizon shape her risk?",
           options: [
-            "She can take more market risk now. Decades give dips time to recover",
+            "She can take more market risk now",
             "She should avoid all growth assets to be safe",
             "She should keep everything in cash forever",
             "Her horizon makes no difference",
@@ -287,7 +287,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does 'compound interest' actually mean?",
           options: [
-            "You earn interest on your interest, not just your original amount",
+            "You earn interest on your interest",
             "The bank charges you a fee each month",
             "Interest that never changes",
             "A once-off bonus payment",
@@ -349,10 +349,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Over a long investment, most of the final value often comes from:",
           options: [
-            "Growth compounding on top of your contributions",
-            "Only the money you put in",
+            "Compounding on your contributions",
+            "Only the money that you put in",
             "A single lucky year",
-            "Bank fees",
+            "The bank fees you managed to avoid",
           ],
           correct: 0,
           feedback: {
@@ -415,7 +415,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo keeps waiting to invest until he can 'afford R2 000/month'. Meanwhile he could start R400/month now. What's the cost of waiting?",
           options: [
-            "Lost years of compounding. The one thing he can never get back",
+            "Lost years of compounding",
             "Nothing. Waiting is always better",
             "He saves on fees by waiting",
             "There's no difference",
@@ -471,7 +471,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho owns five bank shares and thinks he's diversified. What's the flaw?",
           options: [
-            "They're all in one sector. A banking downturn would hit all five at once",
+            "They're all in one sector",
             "Nothing. Five shares is always diversified",
             "He owns too few shares to matter",
             "Banks never lose value",
@@ -507,7 +507,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does diversification mean?",
           options: [
-            "Spreading investments across different assets so one loss can't wipe you out",
+            "Spreading money across different assets",
             "Putting everything into one great share",
             "Only investing in your own company",
             "Keeping all your money in cash",
@@ -537,7 +537,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Instead of picking three shares, Nomsa buys one broad ETF holding hundreds of companies. How does that help?",
           options: [
-            "One company doing badly barely dents her. The risk is spread across many",
+            "One company barely dents her",
             "It guarantees she'll make money",
             "It removes all risk entirely",
             "It's worse than owning three shares",
@@ -561,8 +561,8 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Beyond owning many shares, a well-diversified portfolio also spreads across:",
           options: [
-            "Different asset classes, shares, bonds, property, cash",
-            "Only technology shares",
+            "Shares, bonds, property and cash",
+            "Only technology shares on the JSE",
             "Only one bank's products",
             "Only cryptocurrencies",
           ],
@@ -591,9 +591,9 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which looks most like a diversified portfolio?",
           options: [
-            "A mix of local and global share ETFs, some bonds, property and cash",
-            "All your money in one SA share",
-            "Ten shares, all in mining",
+            "ETFs, bonds, property and cash",
+            "All of your money in one SA share",
+            "Ten shares, all of them mining",
             "Only cash under the mattress",
           ],
           correct: 0,
@@ -645,8 +645,8 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato is disappointed her diversified portfolio didn't match the one share her friend got lucky on. What's she missing?",
           options: [
-            "Diversification trades away lottery-style upside for protection from being wiped out",
-            "She should put everything in that one share now",
+            "It trades lottery upside for protection",
+            "She should put everything in that share",
             "Diversification never works",
             "Her friend's luck is repeatable",
           ],
@@ -690,7 +690,7 @@ const lesson4Slots: QuestionSlot[] = [
           question: "You need funds in 11 months for school fees. Which stance fits best?",
           options: [
             "Emphasise capital you can access without severe loss",
-            "Put 100% in speculative trades because 'markets always bounce back'",
+            "Put it all in speculative trades",
             "Borrow the full amount on a microloan",
             "Keep it all as cash under a mattress",
           ],
@@ -707,10 +707,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Anele needs R40 000 in nine months for a car deposit. Where should it sit?",
           options: [
-            "In a stable notice or money market account, not volatile single shares",
+            "In a notice or money market account",
             "In one small-cap share for maximum growth",
             "In a friend's crypto scheme",
-            "Spent now, hoping for a bonus later",
+            "Spent now, while hoping for a bonus later",
           ],
           correct: 0,
           feedback: {
@@ -755,10 +755,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the danger of putting short-term money in volatile investments?",
           options: [
-            "You may be forced to sell low right before prices recover",
+            "You may be forced to sell low",
             "You'll definitely lose everything",
-            "There's no danger at all",
-            "The bank will freeze it",
+            "There's really no danger at all",
+            "The bank will simply freeze it",
           ],
           correct: 0,
           feedback: {
@@ -773,7 +773,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo puts his rent money for next month into shares 'to grow it a bit'. Why is that risky?",
           options: [
-            "If shares drop this month, he might not have his rent. Wrong tool for a one-month need",
+            "Shares can fall before rent is due",
             "Shares always rise in a month",
             "It's a perfectly safe plan",
             "Rent money grows fastest in shares",
@@ -799,7 +799,7 @@ const lesson4Slots: QuestionSlot[] = [
           options: [
             "The 20-year friend",
             "The 4-year friend",
-            "Neither should ever buy shares",
+            "Neither of them",
             "Only high earners",
           ],
           correct: 0,
@@ -827,10 +827,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "For a long-term investor, the biggest risk in a market crash is often:",
           options: [
-            "Panic-selling and locking in the loss instead of waiting for recovery",
+            "Panic-selling and locking in the loss",
             "The market never recovering, guaranteed",
             "Being charged tax on the dip",
-            "Nothing. Crashes don't matter long-term",
+            "Nothing, crashes don't matter",
           ],
           correct: 0,
           feedback: {
@@ -851,10 +851,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What is your 'time horizon' for a goal?",
           options: [
-            "The gap between today and when you'll need to spend the money",
-            "How risky you feel today",
+            "How long until you need the money",
+            "How risky you happen to feel today",
             "The current interest rate",
-            "Your age exactly",
+            "Your age exactly in years",
           ],
           correct: 0,
           feedback: {
@@ -955,8 +955,8 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "The company Sipho owns shares in grows profits for years and pays dividends. How might he benefit?",
           options: [
-            "From both a rising share price and the dividend payments",
-            "Only if he sells immediately",
+            "From a rising price and dividends",
+            "Only if he sells them immediately",
             "He can't benefit from shares",
             "Only through his salary",
           ],
@@ -1094,7 +1094,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's a realistic expectation when investing in shares?",
           options: [
-            "Values go up AND down; the aim is growth over the long run, not every month",
+            "Values go up AND down",
             "The price only ever goes up",
             "You'll double your money each year",
             "There's no risk if you buy good companies",
@@ -1156,10 +1156,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "In simple terms, someone who holds a bond is mostly:",
           options: [
-            "A lender to the issuer, expecting scheduled interest and their money back",
-            "A part-owner with voting rights like a CEO",
-            "Guaranteed to beat inflation every year",
-            "Insured against all losses by the Reserve Bank",
+            "A lender expecting interest back",
+            "A part-owner with voting rights",
+            "Guaranteed to beat inflation yearly",
+            "Insured against all losses by the SARB",
           ],
           correct: 0,
           feedback: {
@@ -1258,9 +1258,9 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What role do bonds often play in a portfolio?",
           options: [
-            "They can steady the ride when shares fall, usually with lower long-term returns",
-            "They always outperform shares",
-            "They remove all risk",
+            "They steady the ride when shares fall",
+            "They always outperform shares over time",
+            "They remove all of the risk",
             "They replace the need to save",
           ],
           correct: 0,
@@ -1288,8 +1288,8 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa wants less drama than pure shares but can still wait several years. A sensible option to research first is:",
           options: [
-            "A balanced or multi-asset fund that mixes bonds and shares within set rules",
-            "An all-in leveraged currency trade from WhatsApp",
+            "A balanced fund mixing bonds and shares",
+            "A leveraged currency trade from WhatsApp",
             "Cash under the bed forever",
             "Borrowing to buy jewellery",
           ],
@@ -1342,8 +1342,8 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho wants to compare bond and savings options. Where should he get the numbers?",
           options: [
-            "Official provider sites or apps , not screenshots from strangers",
-            "Whatever a WhatsApp group forwards him",
+            "Official provider sites or apps",
+            "Whatever a WhatsApp group forwards",
             "A random social media tip",
             "He shouldn't compare at all",
           ],

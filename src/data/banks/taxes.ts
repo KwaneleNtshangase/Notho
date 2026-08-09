@@ -40,10 +40,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Under SA's marginal tax system, when you move into a higher bracket, the higher rate applies to:",
           options: [
-            "Only the income above that bracket's threshold",
-            "Your entire salary",
-            "All income from the previous year too",
-            "Nothing. Brackets don't exist",
+            "Only income above the threshold",
+            "Your entire salary for the year",
+            "All income from last year too",
+            "Nothing, brackets don't exist",
           ],
           correct: 0,
           feedback: {
@@ -58,9 +58,9 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho turns down a raise, fearing it'll push him into a higher bracket and cut his take-home. Good idea?",
           options: [
-            "No. A raise always increases take-home; only the extra rands are taxed higher",
+            "No. A raise always increases take-home",
             "Yes. Higher brackets reduce your whole salary",
-            "Yes. Raises are usually a trap",
+            "Yes. Raises are usually a hidden tax trap",
             "Only if he earns over R1 million",
           ],
           correct: 0,
@@ -82,10 +82,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "If you earn R90 000 a year, how much income tax do you pay (2026/27, under 65)?",
           options: [
-            "Zero. You're below the tax threshold",
-            "About R16 000",
-            "Exactly 18% of R90 000",
-            "About R8 000",
+            "Zero, below the threshold",
+            "About R16 000 a year",
+            "Exactly 18% of the R90 000",
+            "About R8 000 a year",
           ],
           correct: 0,
           feedback: {
@@ -156,7 +156,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Your 'effective' (average) tax rate compared with your top marginal rate is usually:",
           options: [
-            "Lower, because your lower income slices are taxed at lower rates",
+            "Lower",
             "Higher",
             "Exactly the same",
             "Always zero",
@@ -180,10 +180,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why do many South African employees overpay tax?",
           options: [
-            "They don't claim legal deductions like RA contributions and medical credits",
+            "They don't claim legal deductions",
             "SARS charges them extra for no reason",
             "PAYE is calculated wrong on purpose",
-            "They earn too little",
+            "They simply earn too little",
           ],
           correct: 0,
           feedback: {
@@ -210,10 +210,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Ayesha contributes to an RA all year but never mentions it on her tax return. What's likely?",
           options: [
-            "She overpays tax by not claiming the deduction she's entitled to",
+            "She overpays by not claiming it",
             "SARS adds it for her automatically",
-            "Her RA is cancelled",
-            "Nothing. RAs give no tax benefit",
+            "Her RA gets cancelled",
+            "Nothing, RAs give no benefit",
           ],
           correct: 0,
           feedback: {
@@ -254,9 +254,9 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which of these means you almost certainly need to file a tax return?",
           options: [
-            "You're self-employed, or want to claim deductions like an RA",
-            "You have a single employer and no other income",
-            "You earn below the tax threshold",
+            "You're self-employed or claiming an RA",
+            "You have one employer, no other income",
+            "You earn below the threshold",
             "You have a bank account",
           ],
           correct: 0,
@@ -272,8 +272,8 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo earns R450 000 from one employer, has no other income and claims no deductions. Must he file?",
           options: [
-            "Often not. SARS may auto-assess him; he files if SARS asks or his situation changes",
-            "Yes, every South African must file every year",
+            "Often not. SARS may auto-assess him",
+            "Yes, everyone must file",
             "Only if he earns over R1 million",
             "Yes, but only every second year",
           ],
@@ -338,10 +338,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa has a salary AND earns R60 000 a year from freelance design. What does the freelance income mean for tax?",
           options: [
-            "She should register for provisional tax on the freelance income",
-            "It's tax-free because she already pays PAYE",
+            "Register for provisional tax",
+            "It's tax-free, she pays PAYE",
             "Nothing, side income isn't taxed",
-            "She must stop freelancing",
+            "She must stop freelancing entirely",
           ],
           correct: 0,
           feedback: {
@@ -374,10 +374,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho is scared of his tax return so he ignores it for months. What's the risk?",
           options: [
-            "Monthly penalties and interest pile up. Ignoring it is the most expensive option",
+            "Penalties and interest pile up",
             "Nothing, SARS forgets about it",
             "He gets a discount for waiting",
-            "His tax disappears",
+            "His tax simply disappears",
           ],
           correct: 0,
           feedback: {
@@ -392,10 +392,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the cheapest way to handle your tax obligations?",
           options: [
-            "File correctly and on time, even if it's a simple or nil return",
-            "Ignore SARS until they chase you",
-            "Only file if you're getting a refund",
-            "Wait several years then file everything at once",
+            "File correctly and on time",
+            "Ignore SARS until they chase",
+            "Only file if getting a refund",
+            "Wait years, then file it all",
           ],
           correct: 0,
           feedback: {
@@ -416,8 +416,8 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Where do most individuals submit their tax returns in South Africa?",
           options: [
-            "SARS eFiling (online) or the SARS MobiApp",
-            "By posting a paper form to any bank",
+            "SARS eFiling or the MobiApp",
+            "By posting a form to a bank",
             "Through their employer only",
             "You can't submit returns in SA",
           ],
@@ -446,10 +446,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato's tax situation is complex (freelance income, RA, some rental). What's sensible?",
           options: [
-            "Use a registered tax practitioner to file correctly",
-            "Guess and hope for the best",
+            "Use a registered tax practitioner",
+            "Guess the numbers and hope for the best",
             "Never file at all",
-            "Copy a friend's return",
+            "Copy a friend's completed tax return",
           ],
           correct: 0,
           feedback: {
@@ -491,9 +491,9 @@ const lesson3Slots: QuestionSlot[] = [
           question: "What's the single biggest legal tax deduction available to most South Africans?",
           options: [
             "Retirement fund contributions",
-            "Buying a new car",
-            "Eating out",
-            "A gym membership",
+            "Buying a brand new car",
+            "Eating out at nice restaurants",
+            "A monthly gym membership",
           ],
           correct: 0,
           feedback: {
@@ -608,9 +608,9 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo works from home in a spare room used only for a corner of his desk, sometimes. Can he claim a home-office deduction?",
           options: [
-            "Only if the room is used exclusively and regularly for work, and specifically equipped for it",
-            "Yes, any home worker can claim it automatically",
-            "No, home offices are never deductible",
+            "Only if used exclusively for work",
+            "Yes, any home worker can claim it",
+            "No, home offices never qualify",
             "Only if he owns the home",
           ],
           correct: 0,
@@ -700,7 +700,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does your IRP5 (IT3(a)) certificate show?",
           options: [
-            "Your salary, deductions, and the PAYE your employer deducted",
+            "Your salary and PAYE deducted",
             "Interest earned on your savings",
             "Capital gains from your shares",
             "Your medical history",
@@ -730,9 +730,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa hasn't received her IRP5 by April. What should she do?",
           options: [
-            "Follow up with her employer's HR/payroll, and escalate to SARS if it's still not provided",
+            "Chase payroll, then SARS",
             "Just guess her salary numbers",
-            "Skip filing entirely",
+            "Skip filing entirely this year",
             "Wait a year and hope it arrives",
           ],
           correct: 0,
@@ -780,9 +780,9 @@ const lesson4Slots: QuestionSlot[] = [
           question: "Who issues your IT3(b) interest certificate?",
           options: [
             "Your bank or investment provider",
-            "Your employer",
+            "Your current or previous employer",
             "You write it yourself",
-            "The municipality",
+            "The local municipality",
           ],
           correct: 0,
           feedback: {
@@ -828,8 +828,8 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "On eFiling, Sipho imports his certificates and the system pre-fills his return. What should he still do?",
           options: [
-            "Check that what imported matches the certificates he actually received",
-            "Assume it's perfect and submit instantly",
+            "Check it against his certificates",
+            "Assume it's perfect and submit",
             "Delete everything and start blank",
             "Ignore his certificates",
           ],
@@ -864,10 +864,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Roughly how long should you keep your tax records?",
           options: [
-            "At least five years, in case SARS reviews a return",
+            "At least five years",
             "Throw them away after filing",
-            "One week",
-            "Forever is legally required for everyone",
+            "About one week",
+            "Forever, it's legally required",
           ],
           correct: 0,
           feedback: {
@@ -882,9 +882,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "How can Ayesha keep her tax documents safe and findable?",
           options: [
-            "Save digital copies in a clearly-named folder, backed up, each tax year",
-            "Keep the only copy on a random loose paper",
-            "Rely on remembering the numbers",
+            "Named digital folders, backed up",
+            "One loose paper copy and nothing else",
+            "Rely on remembering all the numbers",
             "Delete them to save space",
           ],
           correct: 0,
@@ -995,10 +995,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa buys maize meal, milk and eggs. How much VAT is on those staples?",
           options: [
-            "R0. They're zero-rated basic foods",
+            "R0, they're zero-rated",
             "15% on all of them",
             "15% on the milk only",
-            "A special 5% rate",
+            "A special 5% rate applies",
           ],
           correct: 0,
           feedback: {
@@ -1031,10 +1031,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "A business turning over R800 000 a year: must it register for VAT?",
           options: [
-            "No. It's below the R1 000 000 compulsory threshold",
-            "Yes. All businesses must register",
-            "Yes. Over R500 000 you must register",
-            "No. Businesses never register for VAT",
+            "No, it's below R1 000 000",
+            "Yes, all businesses must",
+            "Yes, over R500 000 you must",
+            "No, businesses never register",
           ],
           correct: 0,
           feedback: {
@@ -1049,8 +1049,8 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho's bakery turns over R1 200 000/year. What must he do about VAT?",
           options: [
-            "Register, charge 15% on his products, and submit VAT returns to SARS",
-            "Ignore VAT. Bakeries are exempt",
+            "Register and charge 15% VAT",
+            "Ignore VAT, bakeries are exempt",
             "Charge 15% but keep it",
             "Only register if he wants to",
           ],
@@ -1074,9 +1074,9 @@ const lesson5Slots: QuestionSlot[] = [
           question: "Which of these is VAT-exempt (not just zero-rated) in South Africa?",
           options: [
             "Residential rental",
-            "Brown bread",
+            "Brown bread from a shop",
             "A cooldrink",
-            "A laptop",
+            "A new laptop computer",
           ],
           correct: 0,
           feedback: {
@@ -1103,10 +1103,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "For an everyday consumer, why is it useful to know what's zero-rated or exempt?",
           options: [
-            "It shows why some essentials cost less and helps you understand your till slip",
+            "It explains your till slip",
             "It lets you avoid all tax",
             "It has no practical use",
-            "It doubles your VAT",
+            "It doubles the VAT you pay",
           ],
           correct: 0,
           feedback: {
@@ -1251,7 +1251,7 @@ const lesson6Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "How much of the capital gain on your primary residence is excluded from CGT (2026/27)?",
-          options: ["R3 000 000", "R50 000", "R500 000", "Nothing. Homes are fully taxed"],
+          options: ["R3 000 000", "R50 000", "R500 000", "Nothing"],
           correct: 0,
           feedback: {
             correct: "Right. The primary-residence exclusion is R3 000 000 (raised from R2 million). Most homeowners' gains fall under this, so they pay no CGT on their home.",
@@ -1265,9 +1265,9 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo sells the home he lived in for a R900 000 gain. Does he pay CGT?",
           options: [
-            "No. R900 000 is well under the R3 000 000 primary-residence exclusion",
-            "Yes, on the full R900 000",
-            "Yes, at 45%",
+            "No, under the R3m exclusion",
+            "Yes, on the full R900 000 gain",
+            "Yes, at a flat 45%",
             "Only if he's under 65",
           ],
           correct: 0,
@@ -1290,7 +1290,7 @@ const lesson6Slots: QuestionSlot[] = [
           question: "CGT is triggered when you:",
           options: [
             "Sell an asset for more than you paid",
-            "Simply hold an investment that has risen in value",
+            "Hold an investment that rises",
             "Earn your monthly salary",
             "Open a savings account",
           ],
@@ -1319,10 +1319,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato holds her shares inside a TFSA and sells at a gain. Does she pay CGT?",
           options: [
-            "No. Growth inside a TFSA, including capital gains, is tax-free",
+            "No, TFSA growth is tax-free",
             "Yes, 40% inclusion applies",
             "Yes, at her full marginal rate",
-            "Only above R50 000",
+            "Only above R50 000 of gain",
           ],
           correct: 0,
           feedback: {

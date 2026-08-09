@@ -52,9 +52,9 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The 30% housing figure should cover:",
           options: [
-            "Bond repayment PLUS rates, levies and insurance",
+            "Bond plus rates and levies",
             "Only the bond repayment",
-            "Only the deposit",
+            "Only the deposit amount",
             "Just the estate agent's fee",
           ],
           correct: 0,
@@ -88,7 +88,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Before committing to a bond, what should you stress-test the repayment against?",
           options: [
-            "Interest-rate increases and a drop in your income",
+            "Rate rises and income drops",
             "Only today's best-case month",
             "The colour of the house",
             "What your friends think",
@@ -106,10 +106,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "The bank approves Thabo for a R14 000/month bond, but that leaves almost nothing after his other costs. What's wise?",
           options: [
-            "Buy something cheaper that leaves a comfortable buffer",
-            "Take the full R14 000 bond, the bank knows best",
+            "Buy something cheaper",
+            "Take the full R14 000 bond",
             "Skip insurance to afford it",
-            "Stop saving entirely to cover it",
+            "Stop saving entirely for it",
           ],
           correct: 0,
           feedback: {
@@ -130,10 +130,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which of these is part of your monthly housing cost beyond the bond repayment?",
           options: [
-            "Municipal rates, levies and home insurance",
-            "Your car's petrol",
+            "Rates, levies and insurance",
+            "Your car's monthly petrol bill",
             "Your phone contract",
-            "Groceries",
+            "The weekly groceries",
           ],
           correct: 0,
           feedback: {
@@ -160,10 +160,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa budgets only her R11 000 bond, forgetting R2 000 in rates and levies. What happens?",
           options: [
-            "Her real housing cost is R13 000. She's over her 30% budget",
+            "Her real housing cost is R13 000",
             "Nothing. Rates and levies are optional",
             "The bank pays her rates",
-            "Her bond automatically shrinks",
+            "Her bond repayment automatically shrinks",
           ],
           correct: 0,
           feedback: {
@@ -196,10 +196,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's a common emotional trap when buying a first home?",
           options: [
-            "Stretching to the maximum bond for a 'dream' house you can't comfortably afford",
-            "Leaving a comfortable buffer below your maximum approved bond",
-            "Getting bond pre-approval before you start viewing homes",
-            "Budgeting for transfer and bond costs up front",
+            "Stretching to the maximum bond",
+            "Leaving a comfortable buffer below it",
+            "Getting bond pre-approval up front",
+            "Budgeting for transfer costs",
           ],
           correct: 0,
           feedback: {
@@ -214,10 +214,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato can afford a R12 000 bond but is shown a beautiful R16 000 one she 'loves'. Best move?",
           options: [
-            "Stay within her R12 000 budget, love fades faster than a 20-year bond",
-            "Take the R16 000 bond and cut essentials",
-            "Borrow more to cover the gap each month",
-            "Skip the deposit to afford it",
+            "Stay within her R12 000 budget",
+            "Take the R16 000 and cut essentials",
+            "Borrow more to cover the gap",
+            "Skip the deposit in order to afford it",
           ],
           correct: 0,
           feedback: {
@@ -258,8 +258,8 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does LTV (Loan-to-Value) measure on a home loan?",
           options: [
-            "The ratio of your loan amount to the property's value",
-            "How long until the loan is paid off",
+            "Loan against value",
+            "How long until the loan is paid",
             "Your monthly repayment",
             "The bank's interest rate",
           ],
@@ -307,7 +307,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How does a bigger deposit usually affect your home-loan interest rate?",
           options: [
-            "It tends to earn a better rate",
+            "It tends to improve it",
             "It makes the rate worse",
             "It has no effect on the rate",
             "It removes interest entirely",
@@ -338,7 +338,7 @@ const lesson2Slots: QuestionSlot[] = [
           question: "Sipho can put down 20% instead of 5%. Beyond a smaller loan, what's a likely benefit?",
           options: [
             "A better interest rate",
-            "The bank charges him more for the privilege",
+            "He is charged more",
             "No difference at all",
             "He loses his deposit",
           ],
@@ -361,7 +361,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The 'prime rate' your bond is priced off is set by:",
           options: [
-            "The South African Reserve Bank",
+            "The Reserve Bank",
             "Each estate agent",
             "SARS",
             "The seller of the house",
@@ -409,9 +409,9 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "First Home Finance (the government subsidy formerly called FLISP) is available to:",
           options: [
-            "First-time buyers earning gross R3 501–R22 000/month",
-            "Anyone buying any property, at any income",
-            "Only people earning over R50 000/month",
+            "First-time buyers only",
+            "Anyone buying at any income",
+            "Only people over R50 000 a month",
             "Only cash buyers",
           ],
           correct: 0,
@@ -439,7 +439,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa is a first-time buyer earning R12 000/month. How could First Home Finance help her?",
           options: [
-            "A once-off subsidy that reduces her bond amount, on a sliding scale by income",
+            "A once-off subsidy",
             "It pays her whole bond forever",
             "It gives her a free second property",
             "It has no effect on her bond",
@@ -483,9 +483,9 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What deposit do most SA banks typically want on a home loan?",
           options: [
-            "Around 10–20% of the purchase price",
-            "Exactly 50%",
-            "Nothing, ever",
+            "Around 10 to 20%",
+            "Exactly 50% of it",
+            "Nothing at all, ever",
             "The full price in cash",
           ],
           correct: 0,
@@ -532,8 +532,8 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which is a benefit of putting down a bigger deposit?",
           options: [
-            "A smaller loan, lower monthly repayment and often a better rate",
-            "A larger loan and higher repayment",
+            "A smaller loan and better rate",
+            "A larger loan, higher repayment",
             "You lose the deposit money",
             "The bank charges you extra",
           ],
@@ -550,10 +550,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Where should Lerato save a house deposit she'll use in about two years?",
           options: [
-            "A separate accessible account , automated on payday",
-            "In volatile single shares",
-            "Under her mattress",
-            "Spent slowly 'to enjoy it'",
+            "A separate accessible account",
+            "In volatile single company shares",
+            "Hidden under her bedroom mattress",
+            "Spent slowly, just to enjoy it",
           ],
           correct: 0,
           feedback: {
@@ -598,9 +598,9 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why is getting an AIP before house-hunting useful?",
           options: [
-            "It shows what you can afford and makes your offer more credible to sellers",
+            "It shows what you can afford",
             "It removes the need for a deposit",
-            "It locks your interest rate for life",
+            "It locks in your rate for life",
             "It's a legal contract to buy",
           ],
           correct: 0,
@@ -646,10 +646,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo qualifies for a 100% bond but could save 10% first. Purely on cost, which is usually cheaper long-term?",
           options: [
-            "Saving a deposit first, smaller loan and a likely better rate",
+            "Saving a deposit first",
             "The 100% bond, always",
             "They cost exactly the same",
-            "Neither. Renting forever is the only option",
+            "Neither, renting forever",
           ],
           correct: 0,
           feedback: {
@@ -664,8 +664,8 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "When might a 100% bond still make sense despite the higher rate?",
           options: [
-            "When waiting to save a deposit would cost more in rent and rising prices than the rate premium",
-            "Always. Deposits are pointless",
+            "When waiting costs more",
+            "Always, deposits are pointless",
             "Never, under any circumstances",
             "Only for luxury homes",
           ],
@@ -719,7 +719,7 @@ const lesson4Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Below what purchase price is a property exempt from transfer duty (2026/27)?",
-          options: ["R1 210 000", "R500 000", "R2 000 000", "There's no exemption"],
+          options: ["R1 210 000", "R500 000", "R2 000 000", "None"],
           correct: 0,
           feedback: {
             correct: "Right. Buy at R1 210 000 or less and you pay zero transfer duty. Only the amount above the threshold is taxed.",
@@ -836,9 +836,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa saved exactly a 10% deposit and nothing more. What has she likely forgotten?",
           options: [
-            "The once-off transfer and bond-registration costs",
-            "Nothing. The deposit covers everything",
-            "That she needs to pay the seller's rates",
+            "The transfer and bond costs",
+            "Nothing, the deposit covers it",
+            "That she pays the seller's rates",
             "That deposits are refundable",
           ],
           correct: 0,
@@ -885,10 +885,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo budgets his bond, rates and insurance but nothing for maintenance. What's the risk?",
           options: [
-            "A big repair lands on credit at high interest",
-            "Nothing. Homes never need repairs",
+            "A big repair lands on credit",
+            "Nothing, homes never need repairs",
             "The bank pays for repairs",
-            "Maintenance is always free",
+            "Maintenance is always entirely free",
           ],
           correct: 0,
           feedback: {
@@ -941,9 +941,9 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What real value does renting provide?",
           options: [
-            "Housing, flexibility, no maintenance bills, and freed-up capital to invest",
-            "Nothing at all",
-            "Guaranteed wealth",
+            "Flexibility",
+            "Nothing at all of value",
+            "Guaranteed wealth building",
             "Ownership of the property",
           ],
           correct: 0,
@@ -977,10 +977,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the main financial risk of buying a home you plan to sell within about two years?",
           options: [
-            "Transaction costs may exceed any price growth",
-            "Property values always fall over two years",
+            "Costs may exceed growth",
+            "Values always fall over two years",
             "You can never rent it out",
-            "Bond rates are fixed so you overpay",
+            "Bond rates are fixed, you overpay",
           ],
           correct: 0,
           feedback: {
@@ -1007,10 +1007,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Ayesha expects to move cities for work within two years. Rent or buy?",
           options: [
-            "Rent. She'd likely lose money on transaction costs if she buys and sells quickly",
-            "Buy. Always buy",
-            "Buy two properties",
-            "Buy and leave it empty",
+            "Rent, costs won't be recovered",
+            "Buy, always buy property",
+            "Buy two properties instead",
+            "Buy and leave it standing empty",
           ],
           correct: 0,
           feedback: {
@@ -1031,10 +1031,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What is the 'opportunity cost' of tying up a big deposit in a home?",
           options: [
-            "The return that money could have earned if invested elsewhere",
+            "The forgone investment return",
             "The estate agent's fee",
             "The cost of moving boxes",
-            "Nothing. A deposit has no opportunity cost",
+            "Nothing, deposits have no cost",
           ],
           correct: 0,
           feedback: {
@@ -1049,10 +1049,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "R200 000 could be a deposit, or invested in a diversified equity fund. What's the honest way to decide?",
           options: [
-            "Compare which use is likely to build more wealth for your situation and timeline",
+            "Compare the two uses",
             "Always use it as a deposit",
             "Always invest it, never buy",
-            "Spend it now",
+            "Spend it now while you can",
           ],
           correct: 0,
           feedback: {
@@ -1085,7 +1085,7 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which is a genuine advantage of renting over owning?",
           options: [
-            "Flexibility to move easily for work, relationships or lifestyle",
+            "Flexibility to move easily",
             "Building equity in the property",
             "Freedom to renovate structurally",
             "Immunity to rent increases",
@@ -1115,9 +1115,9 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Buying would leave Sipho dangerously stretched, with no emergency buffer. What's the sensible call for now?",
           options: [
-            "Rent within budget and keep building savings until buying is comfortable",
-            "Buy anyway and hope nothing goes wrong",
-            "Buy with a 100% bond and no buffer",
+            "Rent and keep building savings",
+            "Buy anyway and hope for the best",
+            "Buy with a 100% bond, no buffer",
             "Never consider buying again",
           ],
           correct: 0,
@@ -1159,9 +1159,9 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What key assumption makes the 'buying is always better' argument work?",
           options: [
-            "That the renter spends the monthly saving rather than investing it",
+            "That the renter spends it",
             "That interest rates always fall",
-            "That property always grows 10%+ a year",
+            "That property grows 10% a year",
             "That rent never increases",
           ],
           correct: 0,
@@ -1189,7 +1189,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato rents for R9 500 instead of a R18 000 all-in bond, but spends the R8 500 difference each month. How does she end up?",
           options: [
-            "Worse off, she got renting's flexibility but built no wealth from the saving",
+            "Worse off, she built no wealth",
             "Automatically richer than a buyer",
             "Exactly the same as a buyer",
             "She owns the flat after a year",
@@ -1225,8 +1225,8 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "If shares have historically returned more than property, why do people still buy homes?",
           options: [
-            "Leverage, lifestyle, security and a place to live, not just raw return",
-            "Because property always beats shares",
+            "Leverage, security and a home",
+            "Property always beats shares",
             "Because shares are illegal",
             "There's no reason to buy a home",
           ],
@@ -1261,10 +1261,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the honest conclusion of a rent-vs-buy comparison?",
           options: [
-            "Neither is universally right. It depends on your city, returns, timeline and discipline",
-            "Buying always wins",
+            "It depends on the situation",
+            "Buying always wins in the end",
             "Renting always wins",
-            "It's impossible to compare",
+            "It's impossible to compare fairly",
           ],
           correct: 0,
           feedback: {
@@ -1279,10 +1279,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo plans to settle in one town for 20+ years and isn't a disciplined investor. What likely suits him?",
           options: [
-            "Buying. A long stay recovers transaction costs, and the bond forces saving",
+            "Buying, he'll stay long",
             "Renting forever, definitely",
-            "Moving every year",
-            "Never having a home",
+            "Moving house every year",
+            "Never having a home at all",
           ],
           correct: 0,
           feedback: {
@@ -1327,9 +1327,9 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What is 'negative equity' on a home?",
           options: [
-            "When you owe more on the bond than the property is worth",
+            "Owing more than it's worth",
             "When your home is fully paid off",
-            "When rates fall",
+            "When interest rates fall",
             "When you have a big deposit",
           ],
           correct: 0,
@@ -1345,10 +1345,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Given leverage cuts both ways, how does a buyer reduce the downside risk?",
           options: [
-            "Put down a meaningful deposit and don't over-pay for the property",
-            "Take the biggest possible 100% bond",
-            "Buy at the very top of their budget",
-            "Skip insurance",
+            "Put down a decent deposit",
+            "Take the biggest 100% bond",
+            "Buy at the top of their budget",
+            "Skip insurance to save",
           ],
           correct: 0,
           feedback: {

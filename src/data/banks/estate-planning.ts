@@ -315,7 +315,7 @@ const dutySlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Net estate R8m, R2m left to the spouse, R3.5m abatement. How much estate duty is owed?",
-          options: ["R500 000", "R1.6 million", "R0", "R700 000"],
+          options: ["R500 000", "R1.6 million", "Exactly R0", "About R700 000"],
           correct: 0,
           feedback: {
             correct: "Right: dutiable amount R2.5m × 20% = R500 000.",
@@ -505,8 +505,8 @@ const beneSlots: QuestionSlot[] = [
           type: "scenario",
           question: "After her divorce, Nomsa updates her will but forgets her pension nomination still names her ex-husband. If she dies, what's the risk?",
           options: [
-            "Her pension could be steered toward the ex. The stale nomination",
-            "Nothing, the divorce cancels the nomination automatically",
+            "Her pension could be steered toward the ex",
+            "Nothing, the divorce cancels it",
             "Her will fixes it regardless",
             "The pension is frozen forever",
           ],

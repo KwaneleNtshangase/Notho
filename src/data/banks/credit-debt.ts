@@ -21,7 +21,7 @@ const lesson1Slots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "What has the BIGGEST impact on your credit score?",
-          options: ["Your payment history", "How many bank accounts you have", "How much you earn", "Your age"],
+          options: ["Your payment history", "Your bank count", "How much you earn", "Your age"],
           correct: 0,
           feedback: {
             correct: "Right. Payment history is the single biggest factor. Pay on time, every time. One missed payment can drop your score sharply.",
@@ -35,9 +35,9 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho earns well but has missed three loan payments this year. What will lenders likely conclude?",
           options: [
-            "He's a repayment risk, regardless of his salary",
+            "He's a repayment risk despite the salary",
             "He's low risk because he earns a lot",
-            "His income cancels out the missed payments",
+            "His income cancels the missed payments",
             "Missed payments don't show on his record",
           ],
           correct: 0,
@@ -83,10 +83,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which of these can lower your score slightly?",
           options: [
-            "Applying for lots of new credit in a short time",
+            "Lots of new credit applications",
             "Checking your own score",
             "Reading your credit report",
-            "Budgeting your salary",
+            "Budgeting your salary each month",
           ],
           correct: 0,
           feedback: {
@@ -119,10 +119,10 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does your credit score actually tell a lender?",
           options: [
-            "How likely you are to repay what you borrow",
-            "How much money you have in savings",
+            "How likely you are to repay",
+            "How much you have in savings",
             "Whether you're a good person",
-            "Your monthly salary exactly",
+            "Your exact monthly salary",
           ],
           correct: 0,
           feedback: {
@@ -151,8 +151,8 @@ const lesson1Slots: QuestionSlot[] = [
           options: [
             "Lenders see you as lower risk",
             "You're forced to borrow more",
-            "You pay higher interest",
-            "Nothing changes",
+            "You pay higher interest rates",
+            "Nothing changes at all",
           ],
           correct: 0,
           feedback: {
@@ -173,7 +173,7 @@ const lesson1Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why is a good credit score worth real money over a lifetime?",
           options: [
-            "It earns you lower interest on every loan, saving tens of thousands over the years",
+            "It earns you lower interest on loans",
             "The bureaus pay you for a high score",
             "It increases your salary",
             "It removes the need to budget",
@@ -191,9 +191,9 @@ const lesson1Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Two people take the same home loan; one has a strong score and gets a lower rate. Over 20 years, the difference is:",
           options: [
-            "Potentially tens of thousands of rands in interest",
+            "Tens of thousands of rands in interest",
             "A few rands only",
-            "Nothing. Rates are the same for everyone",
+            "Nothing, rates are the same for everyone",
             "Only relevant in the first month",
           ],
           correct: 0,
@@ -247,7 +247,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "You owe R5 000 on a store card at 24% interest and pay only the R150 minimum each month. What happens?",
           options: [
-            "The balance barely moves, interest eats most of your payment",
+            "The balance barely moves",
             "You clear it in a few months",
             "The interest pauses while you pay",
             "The store writes it off after two years",
@@ -309,8 +309,8 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does interest really represent?",
           options: [
-            "The price you pay for spending money you don't yet have",
-            "A reward the bank gives you",
+            "The price of spending money early",
+            "A reward the bank gives back to you",
             "A once-off admin fee",
             "A tax that goes to SARS",
           ],
@@ -327,10 +327,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa can put a R4 000 fridge on a 25% store card or save two months and pay cash. Purely on cost, which is cheaper?",
           options: [
-            "Saving and paying cash, she avoids the interest entirely",
-            "The store card, because she gets it now",
+            "Saving and paying cash",
+            "The store card, she gets it now",
             "They cost exactly the same",
-            "The store card, because interest is free",
+            "The store card, interest is free",
           ],
           correct: 0,
           feedback: {
@@ -351,10 +351,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Interest on a loan or card is usually quoted as an APR. What does that mean?",
           options: [
-            "The annual percentage rate. The yearly cost of borrowing",
+            "The yearly cost of borrowing",
             "A monthly membership fee",
             "The amount you can borrow",
-            "A discount on purchases",
+            "A discount on your purchases",
           ],
           correct: 0,
           feedback: {
@@ -417,10 +417,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Priya has a small windfall of R2 000. Her card is at 22%. What gives the best guaranteed 'return'?",
           options: [
-            "Paying R2 000 off the 22% card, a guaranteed 22% saving",
+            "Paying off the 22% card",
             "Leaving it in a 5% savings account",
             "Buying a lottery ticket",
-            "Spending it before it 'disappears'",
+            "Spending it before it disappears",
           ],
           correct: 0,
           feedback: {
@@ -435,7 +435,7 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "If you have spare cash and expensive debt, the smart move is usually to:",
           options: [
-            "Put it toward the highest-interest debt first",
+            "Put it toward the priciest debt",
             "Keep the debt and spend the cash",
             "Split it evenly across every account",
             "Ignore the debt entirely",
@@ -479,9 +479,9 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which usually behaves most like 'bad debt' for a household?",
           options: [
-            "A revolving clothing account at a high rate for non-essential fashion",
+            "A high-rate clothing account",
             "An affordable home loan under 30% of stable income",
-            "A study loan for a scarce skill with a clear repayment plan",
+            "A study loan for a scarce skill with a clear plan",
             "A modest car loan for getting to a night-shift job",
           ],
           correct: 0,
@@ -497,10 +497,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What tends to make a debt 'bad'?",
           options: [
-            "High interest for something that loses value and isn't essential",
+            "High interest on something that loses value",
             "Any debt at all, always",
             "A low interest rate",
-            "Borrowing to buy an appreciating asset you can afford",
+            "Borrowing for an appreciating asset",
           ],
           correct: 0,
           feedback: {
@@ -545,10 +545,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo can just afford a car repayment today. Before signing, what should he ask?",
           options: [
-            "Could I still pay this if rates rose or my income dropped for a few months?",
-            "Does the car match my curtains?",
+            "Could I still pay if rates rose?",
+            "Does the colour match my curtains?",
             "Will my friends be impressed?",
-            "Is the showroom nice?",
+            "Is the showroom a nice one?",
           ],
           correct: 0,
           feedback: {
@@ -581,10 +581,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "You can do one thing this month: (A) take an 18% loan for a holiday, or (B) throw extra at a 24% store card until it's gone. Which improves your finances?",
           options: [
-            "B. Attack the higher-rate debt you already have",
-            "A. Memories are priceless",
-            "Neither. The maths is too scary",
-            "Open a third card to 'balance' things",
+            "B, attack the higher-rate debt",
+            "A, memories are priceless",
+            "Neither, the maths is too scary",
+            "Open a third card to balance things",
           ],
           correct: 0,
           feedback: {
@@ -635,9 +635,9 @@ const lesson3Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A R3 000 lounge suite on a store account can end up costing about R7 000 paid over years. What lesson does that teach?",
           options: [
-            "Annualise the true cost before signing. The sticker price isn't what you pay",
+            "Annualise the cost before signing",
             "Furniture is always a scam",
-            "Never buy anything on credit, ever",
+            "Never buy anything at all on credit",
             "Store accounts are interest-free",
           ],
           correct: 0,
@@ -665,10 +665,10 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The honest question to ask before buying something on credit is:",
           options: [
-            "Would I still want this at its true, total, interest-included price?",
-            "Can I get approved today?",
-            "Does the store have a sale on?",
-            "Will it arrive quickly?",
+            "Would I want it at the total price?",
+            "Can I get approved for this today?",
+            "Does the store have a sale on now?",
+            "Will it arrive quickly enough for me?",
           ],
           correct: 0,
           feedback: {
@@ -721,9 +721,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "A credit card only helps your finances when you:",
           options: [
-            "Clear the full balance every month",
+            "Clear the full balance monthly",
             "Pay just the minimum",
-            "Max it out for rewards points",
+            "Max it out to earn rewards points",
             "Use it for cash withdrawals",
           ],
           correct: 0,
@@ -739,9 +739,9 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato pays her card in full most months, then one month pays only the minimum. What changes?",
           options: [
-            "She starts paying interest, and often loses the grace period on new purchases too",
-            "Nothing. One month doesn't matter",
-            "Her interest rate drops as a reward",
+            "She starts paying interest",
+            "Nothing, one month doesn't matter",
+            "Her rate drops as a reward",
             "The bank clears her balance",
           ],
           correct: 0,
@@ -763,10 +763,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Before signing a store card at the till, what should you check first?",
           options: [
-            "The interest rate or monthly fees, arrears penalties, and whether you already carry similar debt",
+            "The rate, fees and arrears penalties",
             "Only the free gift on the desk",
             "Whether the card matches your phone cover",
-            "Nothing: the cashier already decided for you",
+            "Nothing, the cashier has already decided",
           ],
           correct: 0,
           feedback: {
@@ -793,10 +793,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho is offered a store card at checkout but already has two cards he's struggling to clear. Smart response?",
           options: [
-            "Decline. Another card just adds temptation and more high-rate debt",
+            "Decline, it just adds temptation",
             "Take it for the discount",
             "Take it and worry later",
-            "Take it to 'spread' the existing debt",
+            "Take it to spread the existing debt",
           ],
           correct: 0,
           feedback: {
@@ -861,10 +861,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "A simple way to stop a credit card fuelling impulse spend is to:",
           options: [
-            "Remove it from saved cards on shopping apps so each buy takes a conscious step",
+            "Remove it from saved cards on apps",
             "Save it on every site for convenience",
             "Raise the card limit",
-            "Use it for all daily spending on autopilot",
+            "Use it for all daily spending",
           ],
           correct: 0,
           feedback: {
@@ -891,8 +891,8 @@ const lesson4Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Ayesha finds the idea of removing her saved card 'scary' because she needs it for month-end. What might that signal?",
           options: [
-            "She may be relying on credit for lifestyle, not just timing",
-            "That saved cards are essential for everyone",
+            "She may rely on credit for lifestyle",
+            "That saved cards are essential for all",
             "That her bank is at fault",
             "Nothing at all",
           ],
@@ -937,7 +937,7 @@ const lesson5Slots: QuestionSlot[] = [
           options: [
             "The one with the smallest balance",
             "The one with the highest interest rate",
-            "The one you've had the longest",
+            "The one you have had for the longest",
             "The one your employer knows about",
           ],
           correct: 0,
@@ -984,8 +984,8 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why does the debt snowball work for so many people?",
           options: [
-            "Each cleared debt is a visible win that builds momentum and motivation",
-            "It's guaranteed to save the most interest",
+            "Each cleared debt builds momentum",
+            "It saves the most interest",
             "It's the only legal way to pay debt",
             "It makes debt disappear instantly",
           ],
@@ -1014,8 +1014,8 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho finishes paying off his smallest debt. Under the snowball, what does he do with that freed-up payment?",
           options: [
-            "Roll the whole amount onto the next-smallest debt",
-            "Spend it. He's earned a break",
+            "Roll it onto the next-smallest debt",
+            "Spend it, because he's earned a break",
             "Split it across unrelated wants",
             "Stop paying extra entirely",
           ],
@@ -1038,9 +1038,9 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "The 'avalanche' method differs from the snowball by attacking:",
           options: [
-            "The highest interest rate first, to save the most money",
-            "The oldest debt first",
-            "The largest balance first",
+            "The highest interest rate first",
+            "The oldest debt you hold first",
+            "The largest balance you owe first",
             "A random debt each month",
           ],
           correct: 0,
@@ -1068,10 +1068,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato is disciplined and mostly cares about paying the least interest. Which method fits her best?",
           options: [
-            "Avalanche: highest interest rate first",
+            "Avalanche, highest rate first",
             "Snowball, smallest balance first",
-            "Neither. Pay only minimums",
-            "Open a new loan",
+            "Neither, pay only minimums",
+            "Open a new consolidation loan",
           ],
           correct: 0,
           feedback: {
@@ -1104,10 +1104,10 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What matters most for a debt-payoff plan to actually work?",
           options: [
-            "Consistently putting extra at one target debt, month after month",
+            "Consistently paying one target debt",
             "Switching methods every week",
             "Only paying when you feel like it",
-            "Waiting for a big windfall to fix it all",
+            "Waiting for a big windfall to fix it",
           ],
           correct: 0,
           feedback: {
@@ -1196,10 +1196,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A consolidation offer has a lower rate but stretches repayment from 2 years to 6. What's the hidden catch?",
           options: [
-            "Even at a lower rate, paying for 6 years can cost more interest overall",
-            "There's no catch. Longer is always better",
+            "Six years of interest costs more",
+            "No catch, longer is always better",
             "It's guaranteed to be cheaper",
-            "The rate doesn't matter",
+            "The interest rate doesn't matter",
           ],
           correct: 0,
           feedback: {
@@ -1232,10 +1232,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does a registered debt counsellor do for an over-indebted person?",
           options: [
-            "Negotiates with all creditors and arranges one court-approved repayment plan",
-            "Makes the debt vanish for free",
-            "Lends them more money",
-            "Improves their score overnight",
+            "Negotiates one court-approved plan",
+            "Makes the debt vanish entirely for free",
+            "Lends them even more money",
+            "Improves their credit score overnight",
           ],
           correct: 0,
           feedback: {
@@ -1268,10 +1268,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Consolidation is most likely to genuinely help when:",
           options: [
-            "The new loan has a lower rate AND you stop adding new debt",
-            "It just combines everything, regardless of rate",
+            "The rate is lower AND you stop borrowing",
+            "It just combines everything, whatever the rate",
             "You keep spending on the cleared cards",
-            "It stretches repayment out as long as possible",
+            "It stretches repayment as long as possible",
           ],
           correct: 0,
           feedback: {
@@ -1298,7 +1298,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Before accepting a consolidation loan, the key comparison to make is:",
           options: [
-            "Total amount repaid versus your current debts",
+            "Total repaid versus your current debts",
             "Which lender has the nicest branch",
             "Whichever gives cash back today",
             "The size of the loan you're approved for",
@@ -1322,9 +1322,9 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which is a red flag when choosing a debt-help company?",
           options: [
-            "It isn't NCR-registered or demands large upfront fees",
-            "It's registered with the National Credit Regulator",
-            "Its fees are regulated and disclosed",
+            "Not NCR-registered, big upfront fees",
+            "Registered with the National Credit Regulator",
+            "Fees that are regulated and disclosed",
             "It explains the process clearly",
           ],
           correct: 0,
@@ -1352,10 +1352,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "scenario",
           question: "A company promises to 'wipe' Thabo's debt and asks for a big fee upfront before doing anything. What should he do?",
           options: [
-            "Walk away and verify any counsellor's NCR registration first",
+            "Walk away and check NCR registration",
             "Pay quickly before the offer expires",
             "Give them his card details to be safe",
-            "Assume it's fine because they called him",
+            "Assume it's fine because they called",
           ],
           correct: 0,
           feedback: {

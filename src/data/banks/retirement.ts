@@ -54,7 +54,7 @@ const twoPotSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Under the two-pot system, each contribution you make is split into:",
           options: [
-            "1/3 to the Savings Pot, 2/3 to the Retirement Pot",
+            "A third to savings",
             "Half to each pot",
             "All to the Retirement Pot",
             "All to the Savings Pot",
@@ -108,10 +108,10 @@ const twoPotSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Lindi already took a Savings Pot withdrawal this tax year and wants another before the year ends. Can she?",
           options: [
-            "No. Only one Savings Pot withdrawal per tax year is allowed",
+            "No, only one a tax year",
             "Yes, she can withdraw monthly",
-            "Yes, there's no limit",
-            "Only if her employer signs off",
+            "Yes, there is no limit",
+            "Only if her employer agrees",
           ],
           correct: 0,
           feedback: {
@@ -144,10 +144,10 @@ const twoPotSlots: QuestionSlot[] = [
           type: "mcq",
           question: "You earn R420 000/year and withdraw R50 000 from your Savings Pot. For tax, SARS treats the R50 000 as:",
           options: [
-            "Extra income, added on top and taxed at your marginal rate",
-            "Tax-free emergency money",
-            "Taxed at a flat 5%",
-            "Never taxed, since it's your own money",
+            "Income at your marginal rate",
+            "Completely tax-free emergency money",
+            "Taxed at a flat rate of just 5%",
+            "Never taxed, it's your own money",
           ],
           correct: 0,
           feedback: {
@@ -162,10 +162,10 @@ const twoPotSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Why is the Savings Pot described as 'a last resort, not a bonus account'?",
           options: [
-            "Withdrawals are taxed as income and permanently shrink your retirement savings",
+            "It's taxed and shrinks savings",
             "It earns no interest at all",
-            "Withdrawals are actually tax-free bonuses",
-            "There's no real downside to using it",
+            "Withdrawals are tax-free bonuses",
+            "There's no real downside to it",
           ],
           correct: 0,
           feedback: {
@@ -186,10 +186,10 @@ const twoPotSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Why was the two-pot system introduced?",
           options: [
-            "To stop people cashing out all their retirement savings when changing jobs",
+            "To stop full cash-outs",
             "To increase government tax revenue",
-            "To force people to buy government bonds",
-            "To simplify pension fund paperwork",
+            "To force people to buy bonds",
+            "To simplify pension paperwork",
           ],
           correct: 0,
           feedback: {
@@ -322,10 +322,10 @@ const howMuchSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Under the 4% rule, how do you work out the capital you need?",
           options: [
-            "Annual income needed ÷ 0.04",
-            "Annual income needed × 4",
-            "Monthly income needed ÷ 4",
-            "Your salary × 10",
+            "Income needed ÷ 0.04",
+            "Annual income times four",
+            "Monthly income divided by 4",
+            "Your salary times ten",
           ],
           correct: 0,
           feedback: {
@@ -415,9 +415,9 @@ const howMuchSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Why is starting early so powerful for retirement?",
           options: [
-            "Extra years of compounding outweigh a higher contribution rate started later",
+            "Extra years of compounding",
             "Money saved young is taxed less",
-            "Markets only rise while you're young",
+            "Markets only rise when young",
             "Early savers pay no fees",
           ],
           correct: 0,
@@ -433,8 +433,8 @@ const howMuchSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Themba saves R1 000/month from age 25; Sipho saves the same R1 000/month but from age 35. At 65, who has more?",
           options: [
-            "Themba, by a wide margin, ten more years of compounding",
-            "Sipho, because he earns more later",
+            "Themba, by a wide margin",
+            "Sipho, he earns more later",
             "They end up the same",
             "It's impossible to say",
           ],

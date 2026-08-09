@@ -360,7 +360,7 @@ const divSlots: QuestionSlot[] = [
             "About 41.6%",
             "Exactly 20%",
             "Exactly 27%",
-            "0%. Dividends are tax-free",
+            "Exactly 0%",
           ],
           correct: 0,
           feedback: {
@@ -578,7 +578,7 @@ const trustSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Despite the 45% rate, why do people still use trusts?",
           options: [
-            "Estate planning and asset protection. Assets in a trust fall outside your personal estate",
+            "Estate planning and asset protection",
             "Trusts are always the lowest-tax option",
             "Trusts are exempt from all tax",
             "The law requires everyone to have one",
@@ -834,7 +834,7 @@ const foreignSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Sipho, an SA tax resident, earns R2 million abroad and pays some foreign tax. How is he taxed in SA?",
           options: [
-            "R1.25m may be exempt ; the rest is taxed in SA, less a s6quat credit for foreign tax paid",
+            "R1.25m may be exempt",
             "The full R2m is tax-free in SA",
             "He pays full SA tax on R2m with no relief",
             "He owes nothing anywhere",

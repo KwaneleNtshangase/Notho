@@ -30,10 +30,10 @@ const mptSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Markowitz's core insight (Modern Portfolio Theory) is that combining assets that don't move together:",
           options: [
-            "Can lower a portfolio's risk without giving up much return",
-            "Always increases risk",
-            "Guarantees higher returns every year",
-            "Removes all possibility of loss",
+            "Can cut risk with little cost to return",
+            "Always raises the risk",
+            "Guarantees a higher return every year",
+            "Removes every possibility of a loss",
           ],
           correct: 0,
           feedback: {
@@ -138,10 +138,10 @@ const mptSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Adding low-correlation global bonds to an all-SA-equity portfolio typically:",
           options: [
-            "Lowers volatility more than it lowers return, improving the risk-adjusted return",
-            "Raises both return and risk",
-            "Has no effect at all",
-            "Guarantees a higher return",
+            "Lowers volatility more than return",
+            "Raises both return and volatility",
+            "Leaves volatility and return unchanged",
+            "Raises return with no extra volatility",
           ],
           correct: 0,
           feedback: {
@@ -167,7 +167,7 @@ const mptSlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "The 'diversification benefit' is strongest when the assets you combine have:",
-          options: ["Low correlation with each other", "Perfect correlation", "Identical holdings", "The same manager"],
+          options: ["Low correlation with each other", "Perfect correlation with each other", "Completely identical underlying holdings", "Exactly the same fund manager throughout"],
           correct: 0,
           feedback: {
             correct: "Right. The less two assets move together, the more they offset each other's swings. That's where the benefit lives.",
@@ -187,10 +187,10 @@ const mptSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Rebalancing a 60/40 portfolio back to target after equities surge means you:",
           options: [
-            "Sell some of what rose and buy what lagged",
-            "Buy more of whatever just rose",
-            "Sell everything and hold cash",
-            "Never touch it again",
+            "Sell some of what rose, buy what lagged",
+            "Buy more of whatever has risen the fastest",
+            "Sell everything and hold cash instead",
+            "Leave the holdings untouched for good",
           ],
           correct: 0,
           feedback: {
@@ -217,10 +217,10 @@ const mptSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Priya's 60/40 portfolio has drifted to 67/33 after a strong equity year. A disciplined investor would:",
           options: [
-            "Rebalance back toward 60/40, trimming equities, adding to bonds",
-            "Let the winners run to 80/20",
+            "Sell equities back down to 60/40",
+            "Let the winners keep running to 80/20",
             "Sell everything and wait in cash",
-            "Switch entirely into the winning asset",
+            "Move the whole portfolio into equities",
           ],
           correct: 0,
           feedback: {
@@ -261,10 +261,10 @@ const factorSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Investment 'factors' are:",
           options: [
-            "Characteristics that have historically earned a premium",
-            "Hot stock tips from analysts",
+            "Characteristics that earn a premium",
+            "Short-term stock tips from bank analysts",
             "Predictions of next week's prices",
-            "A type of company logo",
+            "Ratings that agencies give to companies",
           ],
           correct: 0,
           feedback: {
@@ -291,10 +291,10 @@ const factorSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Which of these is the 'momentum' factor?",
           options: [
-            "Stocks that have risen over the past 6-12 months tend to keep rising short-term",
-            "Cheap stocks on low P/E",
+            "Recent winners over 6-12 months",
+            "Cheap stocks on a low P/E",
             "Profitable, low-debt companies",
-            "Smaller companies",
+            "Smaller companies by market cap",
           ],
           correct: 0,
           feedback: {
@@ -315,10 +315,10 @@ const factorSlots: QuestionSlot[] = [
           type: "mcq",
           question: "A 'value' tilt systematically overweights:",
           options: [
-            "Stocks with low price-to-earnings and price-to-book relative to peers",
+            "Stocks on a low price-to-earnings ratio",
             "Stocks that rose most in the last 12 months",
-            "The most expensive growth stocks",
-            "The highest-dividend stocks only",
+            "Stocks trading on the highest growth multiples",
+            "Stocks that pay out the largest dividends",
           ],
           correct: 0,
           feedback: {
@@ -345,10 +345,10 @@ const factorSlots: QuestionSlot[] = [
           type: "scenario",
           question: "An investor wants a low-cost value tilt on the JSE. The most sensible tool is:",
           options: [
-            "A rules-based value or smart-beta ETF, at a low fee",
-            "An expensive active fund that claims a value style",
-            "Picking single shares on gut feel",
-            "A bank savings account",
+            "A rules-based value or smart-beta ETF",
+            "An active fund claiming a value style",
+            "A hand-picked basket of cheap-looking shares",
+            "A five-year fixed deposit at a local bank",
           ],
           correct: 0,
           feedback: {
@@ -381,10 +381,10 @@ const factorSlots: QuestionSlot[] = [
           type: "mcq",
           question: "A sensible discipline for factor investing is to:",
           options: [
-            "Hold factors as long-term tilts and combine uncorrelated ones",
-            "Switch factors every few months chasing the hot one",
+            "Hold a blend of factors for the long term",
+            "Switch factors every few months",
             "Abandon a factor the first year it lags",
-            "Only ever hold a single factor",
+            "Hold one single factor and nothing else",
           ],
           correct: 0,
           feedback: {
@@ -399,10 +399,10 @@ const factorSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Value has lagged growth for three years and an investor wants to dump their value ETF. What does the evidence suggest?",
           options: [
-            "Multi-year underperformance is normal for factors, abandoning at the low often misses the recovery",
-            "Sell immediately. The factor is clearly dead",
-            "Double down using debt",
-            "Switch to whatever rose most recently",
+            "Hold, since multi-year factor lags are normal",
+            "Sell now, since the factor is clearly dead",
+            "Borrow to double down while the price is low",
+            "Switch to whichever factor rose most recently",
           ],
           correct: 0,
           feedback: {
@@ -492,10 +492,10 @@ const offshoreSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Why do most advisors recommend meaningful offshore exposure for SA investors?",
           options: [
-            "SA is a tiny, concentrated slice of the world; offshore adds diversification and a rand hedge",
-            "Offshore investing is tax-free everywhere",
-            "The JSE is guaranteed to fall",
-            "Local shares are illegal to hold long-term",
+            "It diversifies beyond a concentrated JSE",
+            "It removes all tax on investment returns",
+            "It avoids a JSE crash that is certain to come",
+            "It is required by law for retirement money",
           ],
           correct: 0,
           feedback: {
@@ -522,10 +522,10 @@ const offshoreSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Beyond diversification, a key benefit of a global equity ETF for a SA investor is:",
           options: [
-            "A rand hedge, it gains in rand terms when the rand weakens",
-            "A guaranteed fixed return",
-            "Immunity from all market falls",
-            "Exemption from SARS forever",
+            "A rand hedge when the rand weakens",
+            "A guaranteed return in rand terms",
+            "Immunity from falls in global markets",
+            "A permanent exemption from SA tax",
           ],
           correct: 0,
           feedback: {
@@ -590,10 +590,10 @@ const offshoreSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Which accounts have NO offshore limit for a SA investor?",
           options: [
-            "TFSAs and personal discretionary investments",
-            "RAs and pension funds",
-            "All retirement funds",
-            "None. Everything is capped at 45%",
+            "TFSAs and discretionary accounts",
+            "RAs and preservation funds",
+            "All funds governed by Reg 28",
+            "None, everything is capped at 45%",
           ],
           correct: 0,
           feedback: {
@@ -620,10 +620,10 @@ const offshoreSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Someone wants maximum rand-hedge in their R1m TFSA. The simplest compliant approach is:",
           options: [
-            "100% global equity ETF . TFSAs have no offshore limit",
-            "100% SA market-cap index",
+            "A 100% global equity ETF",
+            "A 100% SA market-cap index ETF",
             "A USD fixed deposit at a SA bank",
-            "Split 50/50 because Reg 28 requires it",
+            "A 50/50 split to satisfy Reg 28",
           ],
           correct: 0,
           feedback: {
@@ -645,9 +645,9 @@ const offshoreSlots: QuestionSlot[] = [
           question: "To move money offshore personally, the single discretionary allowance (no tax clearance needed) is now:",
           options: [
             "R2 million per calendar year",
-            "R100 000 per year",
-            "R10 million per year",
-            "Unlimited",
+            "R100 000 per calendar year",
+            "R10 million per calendar year",
+            "Unlimited, with no annual cap",
           ],
           correct: 0,
           feedback: {
@@ -673,7 +673,7 @@ const offshoreSlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Combining both personal allowances, roughly how much can an individual move offshore per year?",
-          options: ["About R12 million", "About R1 million", "About R100 000", "Unlimited"],
+          options: ["About R12 million", "About R1 million a year", "About R100 000 a year", "There is no annual cap"],
           correct: 0,
           feedback: {
             correct: "Right. R2m SDA + R10m FIA = up to R12 million a year (the FIA portion needing tax clearance).",
@@ -743,10 +743,10 @@ const seqSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Sequence-of-returns risk is most dangerous:",
           options: [
-            "In the early years of retirement, when you're withdrawing income",
-            "Decades before you retire",
-            "Only for people who never withdraw",
-            "Never. It's a myth",
+            "In the first years of retirement",
+            "In the decades before you retire",
+            "In the years you make no withdrawals",
+            "At no point at all, the risk is a myth",
           ],
           correct: 0,
           feedback: {
@@ -767,10 +767,10 @@ const seqSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Why does an early crash hurt a retiree more than a still-working investor with the same loss?",
           options: [
-            "The retiree must sell units at low prices for income",
-            "It doesn't. A 30% loss is equal for everyone",
-            "Retirees pay more tax on losses",
-            "Working investors have longer to live",
+            "The retiree sells units at low prices",
+            "It doesn't, the loss is equal for both",
+            "The retiree pays more tax on the loss",
+            "The worker has a longer life expectancy",
           ],
           correct: 0,
           feedback: {
@@ -851,10 +851,10 @@ const seqSlots: QuestionSlot[] = [
           type: "scenario",
           question: "A SA retiree with a globally diversified portfolio asks what withdrawal rate is reasonable. A fair answer is:",
           options: [
-            "Start around 3-3.5%, edging toward 4-4.5% given the offshore hedge, and stay flexible",
-            "A flat 8% is fine",
-            "Withdraw everything in year one",
-            "Never withdraw at all",
+            "Start near 3.5% and stay flexible",
+            "Start at a flat 8% and never adjust",
+            "Draw the full balance in year one",
+            "Draw nothing and live on savings",
           ],
           correct: 0,
           feedback: {
@@ -905,10 +905,10 @@ const seqSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa retires with a living annuity (70% equities). The JSE falls 28% in year one. The better move for portfolio longevity is to:",
           options: [
-            "Trim her withdrawal rate for a year or two and draw from the money-market portion, not equities",
-            "Switch to 100% equities to recover faster",
-            "Move entirely to cash to stop the volatility",
-            "Withdraw the same from equities regardless",
+            "Trim withdrawals and draw from the cash portion",
+            "Switch fully to equities and recover faster",
+            "Move everything to cash",
+            "Keep withdrawing the same amount from equities",
           ],
           correct: 0,
           feedback: {

@@ -24,10 +24,10 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "Before money, people bartered. Swapping a goat for maize. What's the main problem money solves?",
           options: [
-            "You have to find someone who wants what you have AND has what you want",
-            "Goats are heavy to carry to the market",
-            "Maize goes off before you can trade it",
-            "Nothing. Barter actually works better than money",
+            "You must find a perfect match of wants",
+            "Goats are heavy to carry to market",
+            "Maize goes off before you can trade",
+            "Nothing, barter works better than money",
           ],
           correct: 0,
           feedback: {
@@ -45,10 +45,10 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "A hairdresser wants bread, but the baker doesn't want a haircut. How does money still let her eat?",
           options: [
-            "She's paid money for haircuts, then buys bread from the baker",
-            "She must first find a baker who needs a haircut",
-            "She goes without bread until someone wants a haircut",
-            "She swaps hair products for flour instead",
+            "She earns money, then buys bread",
+            "She must find a baker needing a haircut",
+            "She goes without any bread entirely",
+            "She swaps products for flour",
           ],
           correct: 0,
           feedback: {
@@ -160,9 +160,9 @@ const lesson1Slots: QuestionSlot[] = [
             "Inflation in SA is running near 5%. You keep R1 000 as cash in a tin for a year. What's actually true a year later?",
           options: [
             "It grows to about R1 050",
-            "It still says R1 000 but buys about R950 worth of goods",
-            "It loses R50 in notes you can physically see missing",
-            "Nothing changes. R1 000 is R1 000",
+            "Still R1 000, buys about R950",
+            "It loses R50 in physical notes",
+            "Nothing changes, R1 000 is R1 000",
           ],
           correct: 1,
           feedback: {
@@ -181,10 +181,10 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "What inflation rate does the South African Reserve Bank aim for?",
           options: [
-            "3%, with a tolerance band of one percentage point either side",
+            "3%, plus or minus one point",
             "Between 3% and 6%",
-            "As close to 0% as possible",
-            "Whatever the Minister of Finance sets each month",
+            "As close to 0% as is possible",
+            "Whatever the Minister sets",
           ],
           correct: 0,
           feedback: {
@@ -225,9 +225,9 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "Money has three jobs: spend (survive today), save (protect yourself), invest (grow your future). Most South Africans only ever do the first. What's the core risk of spend-only?",
           options: [
-            "You pay too much tax",
-            "You never build anything that grows or protects you. One emergency wipes you out",
-            "Your bank closes your account",
+            "You end up paying far too much tax",
+            "You build nothing that grows or protects",
+            "Your bank eventually closes your account",
             "You get better at budgeting automatically",
           ],
           correct: 1,
@@ -267,10 +267,10 @@ const lesson1Slots: QuestionSlot[] = [
           question:
             "Sipho keeps all R60 000 of his savings in a cheque account paying 0% interest 'to be safe'. Inflation averages 5%. What's really happening to that money?",
           options: [
-            "It's the safest possible choice with no downside",
-            "It's slowly losing buying power every year, about R3 000 worth in year one",
+            "The safest possible choice",
+            "It loses buying power each year",
             "It's growing tax-free",
-            "It doubles roughly every 10 years",
+            "It doubles every 10 years",
           ],
           correct: 1,
           feedback: {
@@ -333,7 +333,7 @@ const lesson2Slots: QuestionSlot[] = [
           question:
             "Ayesha wants a R1 200/month car upgrade because her current car feels 'embarrassing', though it still runs fine and gets her to work. Need or want?",
           options: [
-            "A want dressed up as a need. The current car already does the job",
+            "A want dressed up as a need",
             "A genuine need, because image matters at work",
             "A need if her colleagues drive nicer cars",
             "Impossible to tell",
@@ -353,10 +353,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the clearest sign a 'need' is actually a want?",
           options: [
-            "A cheaper option would do the same job",
-            "It costs money",
-            "You'd use it every day",
-            "It shows up on your bank statement",
+            "A cheaper option would do",
+            "It costs you money",
+            "You would use it every single day",
+            "It shows on your bank statement",
           ],
           correct: 0,
           feedback: {
@@ -527,10 +527,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato gets a R2 000 raise. What's the healthiest move?",
           options: [
-            "Put at least R1 000 toward savings and enjoy the rest",
-            "Spend the whole R2 000 on a nicer flat",
-            "Take on a new R2 000 car instalment",
-            "Ignore it. Keep everything exactly the same",
+            "Save R1 000 and enjoy the rest",
+            "Spend it all on a nicer flat",
+            "Take a new R2 000 car instalment",
+            "Ignore it and change nothing",
           ],
           correct: 0,
           feedback: {
@@ -547,10 +547,10 @@ const lesson2Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What does 'lifestyle creep' mean?",
           options: [
-            "Your spending quietly rises to match every raise",
-            "A monthly bank fee that increases each year",
-            "Inflation that only affects luxury goods",
-            "Saving so hard that you can't enjoy anything",
+            "Spending rises to match every raise",
+            "A bank fee that increases yearly",
+            "Inflation only on luxury goods",
+            "Saving so hard you can't enjoy life",
           ],
           correct: 0,
           feedback: {
@@ -609,7 +609,7 @@ const lesson3Slots: QuestionSlot[] = [
           type: "mcq",
           question: "How often should you check your budget against what actually happened?",
           options: [
-            "At least monthly. Compare planned vs actual and adjust",
+            "At least monthly",
             "Once, when you first set it up",
             "Only when you've run out of money",
             "Never. A budget should never change",
@@ -630,9 +630,9 @@ const lesson3Slots: QuestionSlot[] = [
           question:
             "Thabo budgeted R2 000 for petrol, but after fuel hikes it's now R2 600 every month. What should his budget do?",
           options: [
-            "Adjust: raise petrol to R2 600 and trim another category to balance",
+            "Raise petrol and trim another category",
             "Ignore it and hope it evens out",
-            "Delete the budget. It's clearly wrong",
+            "Delete the budget, it is clearly wrong",
             "Borrow R600 every month to cover the gap",
           ],
           correct: 0,
@@ -673,7 +673,7 @@ const lesson3Slots: QuestionSlot[] = [
           options: [
             "Your gross salary",
             "Your net (take-home) pay",
-            "Your salary plus your expected bonus",
+            "Your salary plus bonus",
             "Last year's salary",
           ],
           correct: 1,
@@ -749,9 +749,9 @@ const lesson3Slots: QuestionSlot[] = [
           question: "When building a budget, what should you allocate money to FIRST?",
           options: [
             "Entertainment and eating out",
-            "Non-negotiable fixed expenses, rent, transport, insurance",
-            "A holiday fund",
-            "The latest phone upgrade",
+            "Non-negotiable fixed expenses",
+            "A holiday fund for December",
+            "The latest phone upgrade deal",
           ],
           correct: 1,
           feedback: {
@@ -769,10 +769,10 @@ const lesson3Slots: QuestionSlot[] = [
           question:
             "Nomsa writes her income, then budgets Netflix and eating-out, and adds rent 'if there's money left'. What's the mistake?",
           options: [
-            "Fixed essentials like rent must be budgeted before wants",
-            "She should close her bank account",
-            "Nothing. Wants really do come first",
-            "She simply earns too little to budget at all",
+            "Rent must be budgeted before wants",
+            "She should just close her bank account",
+            "Nothing at all, wants do come first",
+            "She simply earns too little to budget",
           ],
           correct: 0,
           feedback: {
@@ -812,10 +812,10 @@ const lesson3Slots: QuestionSlot[] = [
           question:
             "Once income, fixed bills and savings are all assigned, the money that remains is:",
           options: [
-            "Discretionary. Spend it guilt-free, the important things are covered",
+            "Discretionary, spend it guilt-free",
             "A mistake you must fix in the budget",
-            "Extra tax you owe SARS",
-            "Money you're also required to save",
+            "Extra tax that you owe to SARS",
+            "Money you are also required to save",
           ],
           correct: 0,
           feedback: {
@@ -836,7 +836,7 @@ const lesson3Slots: QuestionSlot[] = [
             "Zero-based budgeting",
             "Gross budgeting",
             "Compound budgeting",
-            "Bracket creep",
+            "Bracket creep budgeting",
           ],
           correct: 0,
           feedback: {
@@ -890,8 +890,8 @@ const lesson4Slots: QuestionSlot[] = [
           question:
             "Tracking shows Nomsa spends R900 a month on takeaways she barely even enjoys. What's the best use of that discovery?",
           options: [
-            "Set a lower takeaway budget and redirect the difference to savings or debt",
-            "Feel bad about it and change nothing",
+            "Cut the budget and save the difference",
+            "Feel bad about it and then change nothing",
             "Stop tracking so she doesn't have to see it",
             "Spend even more so it feels worth it",
           ],
@@ -910,10 +910,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the real purpose of tracking your spending?",
           options: [
-            "To see where money leaks so you can redirect it on purpose",
+            "To see leaks and redirect",
             "To judge and punish yourself",
-            "To impress your bank",
-            "To collect a drawer full of receipts",
+            "To impress your bank manager",
+            "To collect a drawer of receipts",
           ],
           correct: 0,
           feedback: {
@@ -951,10 +951,10 @@ const lesson4Slots: QuestionSlot[] = [
           question:
             "Why is tracking your spending for a few weeks more useful than guessing from memory?",
           options: [
-            "Banks always report spending incorrectly",
-            "People underestimate small, frequent purchases that quietly add up",
+            "Banks always report spending wrongly",
+            "People underestimate small purchases",
             "SARS requires proof of every expense",
-            "Memory is more accurate than a bank statement",
+            "Memory beats a bank statement",
           ],
           correct: 1,
           feedback: {
@@ -1030,9 +1030,9 @@ const lesson4Slots: QuestionSlot[] = [
             "You tap one card for most things but also draw cash. For a full picture you should:",
           options: [
             "Use only the card history",
-            "Combine card history with the cash you remember spending",
+            "Card history plus remembered cash",
             "Ignore cash entirely",
-            "Wait for a paper statement once a year",
+            "Wait for a paper statement yearly",
           ],
           correct: 1,
           feedback: {
@@ -1049,10 +1049,10 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "For most people, the tracking method they'll actually stick to is:",
           options: [
-            "A weekly 5-minute review of their banking app categories",
-            "A perfect spreadsheet updated every hour",
+            "A weekly 5-minute app review",
+            "A spreadsheet updated every hour",
             "Memorising every single purchase",
-            "Not tracking and hoping for the best",
+            "Not tracking and hoping",
           ],
           correct: 0,
           feedback: {
@@ -1076,10 +1076,10 @@ const lesson4Slots: QuestionSlot[] = [
           question:
             "You take home R18 000. Essentials (rent, lights, transport) are R12 500, and you want to save R1 500. What should you track most closely?",
           options: [
-            "Only your rent",
-            "The roughly R4 000 left after essentials and savings, especially food and discretionary spend",
-            "Your employer's salary policy",
-            "Only long-weekend trips",
+            "Your rent and nothing else",
+            "The R4 000 of discretionary spend",
+            "Your employer's annual salary policy",
+            "Only your long-weekend trips away",
           ],
           correct: 1,
           feedback: {
@@ -1110,7 +1110,7 @@ const lesson4Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Tracking changes your outcomes most when you focus on:",
           options: [
-            "Variable spend after your fixed bills",
+            "Variable spend",
             "Your fixed rent amount",
             "Your gross salary",
             "What you spent last year",
@@ -1179,9 +1179,9 @@ const lesson5Slots: QuestionSlot[] = [
           question:
             "A jacket is '40% off. Was R1 500, now R900'. When is buying it actually the smart move?",
           options: [
-            "When you needed a jacket anyway and R900 beats other shops",
-            "Whenever the discount percentage is big",
-            "Because you might not see this deal again",
+            "When you needed a jacket anyway",
+            "Whenever the discount is big",
+            "Because you might not see it again",
             "Any time there's a sale on",
           ],
           correct: 0,
@@ -1199,9 +1199,9 @@ const lesson5Slots: QuestionSlot[] = [
           type: "mcq",
           question: "What's the real trap of a big 'sale' discount?",
           options: [
-            "It nudges you to spend on things you didn't actually need",
-            "Discounts are illegal in South Africa",
-            "The shop secretly loses money on you",
+            "It nudges you to buy anyway",
+            "Discounts are illegal in SA",
+            "The shop secretly loses money",
             "It increases the VAT you pay",
           ],
           correct: 0,
@@ -1242,8 +1242,8 @@ const lesson5Slots: QuestionSlot[] = [
             "You're about to buy a R2 400 microwave at the first shop you walk into. What's the smart move?",
           options: [
             "Buy it now before it sells out",
-            "Take 2 minutes to compare the price on PriceCheck or another store first",
-            "Only check prices after you've paid",
+            "Compare the price at another store first",
+            "Only check the prices after you have paid",
             "Assume the first price you see is always fair",
           ],
           correct: 1,
@@ -1299,7 +1299,7 @@ const lesson5Slots: QuestionSlot[] = [
           options: [
             "The 5kg bag, at R27/kg",
             "The 2kg bag, at R30/kg",
-            "They cost exactly the same per kg",
+            "They cost the same",
             "There's no way to tell",
           ],
           correct: 0,
@@ -1429,7 +1429,7 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which of these is a deliberate tactic shops use to trigger impulse buys?",
           options: [
-            "'Only 2 left in stock' and 'sale ends today' urgency",
+            "Only 2 left and sale ends today",
             "A clear, no-questions return policy",
             "Honest per-unit pricing on the shelf",
             "A 24-hour hold-it-for-you option",
@@ -1450,10 +1450,10 @@ const lesson6Slots: QuestionSlot[] = [
           question:
             "You get a sudden urge to buy something online at 11pm after a stressful day. That urge is usually really about:",
           options: [
-            "Your mood (stress, boredom), not the item itself",
-            "A genuine need that happened to appear at 11pm",
-            "The item being truly essential",
-            "Nothing. Late-night buys are always fine",
+            "Your mood, not the item",
+            "A genuine need at 11pm",
+            "The item being essential",
+            "Nothing, late buys are fine",
           ],
           correct: 0,
           feedback: {
@@ -1507,10 +1507,10 @@ const lesson6Slots: QuestionSlot[] = [
           question:
             "Sipho went in for socks and left with earphones on a store plan that cost about R1 800 over the ticket price. What rule would have saved him?",
           options: [
-            "Wait 24 hours on anything over R200 that wasn't on your list",
-            "Always buy on the first visit while it's in stock",
+            "Wait 24 hours on unplanned buys",
+            "Always buy it on the first visit",
             "Never shop with a written list",
-            "Take the store card for the loyalty points",
+            "Take the store card for points",
           ],
           correct: 0,
           feedback: {
@@ -1527,10 +1527,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Why does a 24-hour wait rule work so well on impulse buys?",
           options: [
-            "The urge usually fades once the 'buy now' pressure is gone",
+            "The urge usually fades",
             "Prices always drop overnight",
-            "Shops refund impulse buys automatically",
-            "Waiting earns you interest on the purchase",
+            "Shops refund impulse buys",
+            "Waiting earns you interest",
           ],
           correct: 0,
           feedback: {
@@ -1553,10 +1553,10 @@ const lesson6Slots: QuestionSlot[] = [
           type: "mcq",
           question: "Which habit best reduces impulse spending online?",
           options: [
-            "Saving your card details on every shopping site",
-            "Removing saved cards and shopping from a written list",
-            "Checking the sales every lunch break",
-            "Deleting your budget so you don't feel guilty",
+            "Saving your card on every site",
+            "Removing saved cards, using a list",
+            "Checking sales every lunch break",
+            "Deleting your budget to avoid guilt",
           ],
           correct: 1,
           feedback: {
@@ -1589,10 +1589,10 @@ const lesson6Slots: QuestionSlot[] = [
           question:
             "Lerato keeps overspending on late-night online shopping. What's the most effective fix?",
           options: [
-            "Remove saved cards so each buy takes effort, and shop from a list",
+            "Remove saved cards, use a list",
             "Follow more sale and deal accounts",
-            "Do her shopping later at night when she's tired",
-            "Ask the bank to raise her credit limit",
+            "Shop later at night when tired",
+            "Ask the bank to raise her limit",
           ],
           correct: 0,
           feedback: {
@@ -1629,9 +1629,9 @@ const lesson6Slots: QuestionSlot[] = [
           question:
             "You budgeted R800 for the month's takeaways but the app shows R1 250 spent. What's the useful next step?",
           options: [
-            "Name the R450 overrun and plan for it next month",
-            "Ignore it. The money's already gone",
-            "Delete the budget so it stops nagging you",
+            "Name the R450 and plan for it",
+            "Ignore it, the money's gone",
+            "Delete the budget so it stops nagging",
             "Assume the banking app is wrong",
           ],
           correct: 0,

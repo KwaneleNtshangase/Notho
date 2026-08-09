@@ -56,9 +56,9 @@ const stewardshipSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Thabo gets a bonus and asks, 'What does God want me to do with this?' instead of 'What do I feel like doing with it?' Is that a stewardship mindset?",
           options: [
-            "Yes. A steward asks how to manage what they've been entrusted with",
-            "No. A bonus is his own reward to spend freely",
-            "No. Stewardship only applies to church offerings",
+            "Yes, a steward asks how to manage it",
+            "No, a bonus is his to spend freely",
+            "No, stewardship is only for offerings",
             "Only if he gives all of it away",
           ],
           correct: 0,
@@ -92,10 +92,10 @@ const stewardshipSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Luke 16:10 says faithfulness with 'little things' matters because it:",
           options: [
-            "Shapes whether you'll be trusted with larger responsibilities",
-            "Guarantees you'll become wealthy",
-            "Only counts once you're already rich",
-            "Excuses carelessness while you're still poor",
+            "Shapes whether you're trusted more",
+            "Guarantees you will become wealthy",
+            "Only counts once you're rich",
+            "Excuses carelessness while poor",
           ],
           correct: 0,
           feedback: {
@@ -159,10 +159,10 @@ const stewardshipSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Is it unbiblical to earn a good salary or build wealth through honest work?",
           options: [
-            "No, Scripture warns against loving money, not against having it",
-            "Yes. All wealth is sinful",
-            "Yes. You must give everything away to be faithful",
-            "Only if you also tithe exactly 10%",
+            "No, the warning is about loving money",
+            "Yes, all wealth is sinful",
+            "Yes, give everything away",
+            "Only if you tithe exactly 10%",
           ],
           correct: 0,
           feedback: {
@@ -213,8 +213,8 @@ const stewardshipSlots: QuestionSlot[] = [
           type: "scenario",
           question: "The parable of the talents pictures a steward giving an account for how they managed what they were entrusted with. Does that principle apply to your money?",
           options: [
-            "Yes. Stewardship means managing it wisely, not just holding it",
-            "No. The parable has nothing to do with money",
+            "Yes, stewardship means managing wisely",
+            "No, the parable has nothing to do with money",
             "Only for people who are already wealthy",
             "Only for church funds",
           ],
@@ -262,7 +262,7 @@ const proverbsSlots: QuestionSlot[] = [
         step: {
           type: "mcq",
           question: "Proverbs 21:20 says the wise store up wealth, while fools:",
-          options: ["Spend whatever they get", "Save too much to enjoy life", "Give everything away", "Refuse to work"],
+          options: ["Spend whatever they get", "Save too much to enjoy life", "Give absolutely everything away", "Refuse to do any work at all"],
           correct: 0,
           feedback: {
             correct: "Right. 'The wise have wealth and luxury, but fools spend whatever they get.' Save before you spend.",
@@ -324,10 +324,10 @@ const proverbsSlots: QuestionSlot[] = [
           type: "mcq",
           question: "The 'ant principle' of Proverbs 6:6-8 maps most directly to which modern habit?",
           options: [
-            "Building an emergency fund and saving for the future",
+            "Building an emergency fund",
             "Borrowing for things you want now",
             "Spending every bonus immediately",
-            "Leaving the future to sort itself out",
+            "Leaving the future to sort itself",
           ],
           correct: 0,
           feedback: {
@@ -391,7 +391,7 @@ const proverbsSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Lerato wants fast money and is eyeing a 'double your cash in 30 days' scheme. What does Proverbs 21:5 suggest?",
           options: [
-            "Hasty shortcuts tend to end in loss. Plan and work steadily instead",
+            "Hasty shortcuts tend to end in loss",
             "Go for it. Speed is wisdom",
             "Borrow to put in even more",
             "Wealth is sinful, so avoid it entirely",
@@ -515,7 +515,7 @@ const giveSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Nomsa sets her giving aside first each payday, before other spending. Is that the 'firstfruits' pattern?",
           options: [
-            "Yes. She's giving off the top, as a priority",
+            "Yes. She's giving off the top",
             "No. Giving must always come last",
             "Only if she gives exactly 10%",
             "No. Firstfruits only applies to farmers",
@@ -564,9 +564,9 @@ const giveSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Someone assumes that giving regularly will inevitably leave them poorer. How does Proverbs 11:24-25 reframe that?",
           options: [
-            "It links generosity to prospering and being 'refreshed', not to loss",
-            "It agrees. Giving always makes you poorer",
-            "It says never give unless you're wealthy",
+            "It links generosity to prospering",
+            "It agrees, giving makes you poorer",
+            "It says never give unless wealthy",
             "It commands a fixed percentage",
           ],
           correct: 0,
@@ -618,10 +618,10 @@ const giveSlots: QuestionSlot[] = [
           type: "scenario",
           question: "A collector pressures Andile into pledging money he feels cornered into. How does 2 Corinthians 9:7 speak to this?",
           options: [
-            "Giving should come from the heart, not from pressure or reluctance",
-            "Pressure is fine as long as the cause is good",
-            "He must give whatever he was pressured to pledge",
-            "He should give double to make up for hesitating",
+            "Giving should come from the heart",
+            "Pressure is fine for a good cause",
+            "He must give what he pledged",
+            "He should give double for hesitating",
           ],
           correct: 0,
           feedback: {
@@ -667,10 +667,10 @@ const giveSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Zanele wonders whether money given to help someone in real need is 'wasted.' How does Proverbs 19:17 answer that?",
           options: [
-            "It's treated as lending to the Lord Himself, who repays",
-            "It's a total loss with no return",
-            "It only counts if they pay her back",
-            "It's unwise to help the poor at all",
+            "It's lending to the Lord",
+            "A total loss with no return",
+            "It only counts if repaid",
+            "It's unwise to help the poor",
           ],
           correct: 0,
           feedback: {
@@ -742,8 +742,8 @@ const debtSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Why does Proverbs 22:7 call the borrower a 'servant' to the lender?",
           options: [
-            "Owing money gives someone else a claim on your future income and freedom",
-            "Lenders are morally superior to borrowers",
+            "Debt gives someone a claim on you",
+            "Lenders are morally superior",
             "Borrowing is always sinful",
             "It only applies to business loans",
           ],
@@ -778,10 +778,10 @@ const debtSlots: QuestionSlot[] = [
           type: "mcq",
           question: "A biblical approach to debt is best summarised as:",
           options: [
-            "Pay what you owe, avoid unnecessary debt, and work toward freedom",
+            "Pay what you owe, avoid unnecessary debt",
             "Never repay anything you borrow",
             "Borrow as much as possible while you can",
-            "Only loans from family are ever acceptable",
+            "Only family loans are acceptable",
           ],
           correct: 0,
           feedback: {
@@ -796,10 +796,10 @@ const debtSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Kabelo is debt-free and debating whether to take a loan for something he merely wants. What does the biblical view of debt encourage?",
           options: [
-            "Be cautious about unnecessary debt and protect the freedom he has",
+            "Be cautious about unnecessary debt",
             "Always avoid every loan, no exceptions",
-            "Borrow freely. Debt is spiritually neutral",
-            "Only worry about debt once it's overdue",
+            "Borrow freely, since debt is neutral",
+            "Only worry once the debt is overdue",
           ],
           correct: 0,
           feedback: {
@@ -820,10 +820,10 @@ const debtSlots: QuestionSlot[] = [
           type: "mcq",
           question: "Proverbs 22:26-27 warns specifically against:",
           options: [
-            "Guaranteeing or co-signing someone else's debt",
-            "Lending to family members",
-            "Saving too aggressively",
-            "Paying off debt early",
+            "Co-signing someone else's debt",
+            "Lending to your own family members",
+            "Saving much too aggressively each month",
+            "Paying off all of your debt early",
           ],
           correct: 0,
           feedback: {
@@ -850,7 +850,7 @@ const debtSlots: QuestionSlot[] = [
           type: "scenario",
           question: "A friend asks Palesa to stand surety (co-sign) for his loan, promising she'll never actually have to pay. What does Proverbs 22:26-27 caution?",
           options: [
-            "Be very careful, if he defaults, she's legally liable for the debt",
+            "Be careful, she'd be legally liable",
             "Co-signing is risk-free if she trusts him",
             "She must co-sign to be a good friend",
             "It only matters for large loans",
@@ -899,8 +899,8 @@ const debtSlots: QuestionSlot[] = [
           type: "scenario",
           question: "Someone who can afford to repay a loan considers simply not bothering. How does Psalm 37:21 frame that choice?",
           options: [
-            "Repaying what you owe is the godly path; refusing to repay is not",
-            "Not repaying is shrewd if you can get away with it",
+            "Repaying what you owe is the godly path",
+            "Not repaying is shrewd",
             "Repayment is optional either way",
             "It only matters for debts to banks",
           ],
