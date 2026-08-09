@@ -85,6 +85,7 @@ function AppNavigation() {
 import { AuthGate } from "@/components/AuthGate";
 import { NotificationOptIn } from "@/components/NotificationOptIn";
 import { StreakRepairBanner } from "@/components/StreakRepairBanner";
+import { UsageTracker } from "@/components/UsageTracker";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -108,6 +109,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <AppNavigation />
         <NotificationOptIn />
         <StreakRepairBanner />
+        <UsageTracker />
       </AuthGate>
     </NothoProvider>
   );

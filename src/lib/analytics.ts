@@ -1,9 +1,29 @@
 import posthog from "posthog-js";
+import { recordFeatureEvent } from "@/lib/usageTracking";
 
+/**
+ * Every analytics event goes to two places:
+ *
+ *   1. PostHog  - unchanged, for funnels, session replay and ad-hoc exploration.
+ *   2. Supabase - mirrored into feature_events so the admin dashboard can join
+ *                 feature usage against a specific user and their progress.
+ *                 PostHog can't do that per-user join cheaply, and its data
+ *                 lives outside our own database.
+ *
+ * The mirror is wired here rather than at each of the ~50 call sites, so any
+ * event added to this file is captured by both sinks automatically. Each sink
+ * is isolated in its own try/catch - one failing must not stop the other, and
+ * neither must ever surface to a learner mid-lesson.
+ */
 const track = (event: string, props?: Record<string, unknown>) => {
   if (typeof window === "undefined") return;
   try {
     posthog.capture(event, props);
+  } catch {
+    /* ignore */
+  }
+  try {
+    recordFeatureEvent(event, props);
   } catch {
     /* ignore */
   }
