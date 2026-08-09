@@ -30,5 +30,12 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "supabase", "e2e", "playwright.config.ts", "temp.tsx"]
+  "exclude": [
+    "node_modules",
+    "supabase",
+    "e2e",
+    "playwright.config.ts",
+    "temp.tsx",
+    "capacitor.config.ts"
+  ]
 }
