@@ -1,0 +1,15 @@
+{
+  "maxSignal": {
+    "length": 1.15,
+    "words": 1.15,
+    "hedge": 1.15,
+    "absolute": 1.15,
+    "justifier": 1.15,
+    "connective": 1.15,
+    "flippant": 1.15,
+    "echo": 1.15,
+    "parallel": 1.15,
+    "specific": 1.15,
+    "guesserEdge": 2.5
+  }
+}

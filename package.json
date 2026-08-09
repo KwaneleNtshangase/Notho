@@ -13,7 +13,11 @@
     "test:ui": "playwright test --ui",
     "test:smoke": "playwright test --project='Desktop Chrome' e2e/01-auth.spec.ts e2e/02-lesson-flow.spec.ts",
     "test:report": "playwright show-report",
-    "test:health": "node scripts/health-check.js"
+    "test:health": "node scripts/health-check.js",
+    "scan:answers": "node scripts/answer-pattern-scan.mjs",
+    "scan:ratchet": "node scripts/answer-pattern-ratchet.mjs",
+    "content:offenders": "node scripts/export-offenders.mjs",
+    "content:trims": "node scripts/propose-trims.mjs"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.5.1",

@@ -72,3 +72,10 @@ prod.log
 /test-budget.sh
 /*.py
 e2e/.auth/
+
+# Content-tooling scan output (~4MB, fully regenerable).
+# Rebuild any time with:  npm run content:offenders
+# The curated rewrites in patches/ ARE committed - those encode editorial
+# decisions and cannot be regenerated. This directory is only the scan's
+# working set.
+/work/

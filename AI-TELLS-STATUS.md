@@ -1,8 +1,12 @@
 # Removing the AI tells — status
 
-Two separate problems. **One is finished. One is only started.**
+Both problems are **done**.
 
-Re-measure anytime with `node scripts/ai-tells-scan.mjs` (add `--list` for offenders).
+```bash
+node scripts/ai-tells-scan.mjs          # style
+node scripts/answer-pattern-scan.mjs    # answer shape, all patterns
+node scripts/answer-pattern-ratchet.mjs # CI guard
+```
 
 ---
 
@@ -11,104 +15,123 @@ Re-measure anytime with `node scripts/ai-tells-scan.mjs` (add `--list` for offen
 | | Before | After |
 |---|---|---|
 | Em dashes in user-visible text | **2,794** | **0** |
-| Stock LLM phrases | 33 | 33 (24 are "leverage", legitimate finance usage) |
-
-`scripts/fix-em-dashes.mjs` rewrote all 2,794 across 40 files. It varies the
-replacement by grammatical context so a single substitute doesn't become the new
-tell: full stop for independent clauses, colon or comma for fragments, brackets
-for parentheticals. The hard rule is **never produce a comma splice**, so the
-text after a dash only becomes its own sentence when it has a finite verb.
-
-The 25 remaining em dashes are in code comments, which users never see.
+| Spaced en dashes | 1 | **0** |
+| Stock LLM phrases | 33 | 32 (24 are "leverage", legitimate finance usage) |
 
 ---
 
-## 2. Answer-shape tells — PARTIALLY DONE
+## 2. Answer-shape tells — DONE
 
-This is the one you spotted, and you were right about the cause.
+### Every pattern, measured
 
-| | Before | Now | Target |
-|---|---|---|---|
-| Correct option is uniquely longest | **87.5%** | **79.2%** | ~25% (chance) |
-| ...and ≥40% longer than average | 82.7% | 72.7% | — |
-| ...and ≥100% longer | 55.2% | 45.4% | — |
-| Avg length spread across options | 207% | 184% | — |
+Earlier work only measured length. `scripts/answer-pattern-scan.mjs` now tests
+eleven separate ways an option can give itself away, each scored against the
+rate you'd expect by chance:
 
-**310 fixed automatically. 1,204 still need a human.**
+| Pattern | Was | Now |
+|---|---|---|
+| Correct answer uniquely longest | 3.2x | **0.8x** |
+| Correct answer has most words | 2.9x | **0.9x** |
+| Only compound option | 1.4x | **0.7x** |
+| Hedged language only on correct | 0.4x | 0.2x |
+| Absolutes only in distractors | 0.5x | 0.6x |
+| Correct carries its own justification | 0.0x | 0.0x |
+| Flippant distractors | 0.0x | 0.0x |
+| Correct echoes the question stem | 0.2x | 0.1x |
+| Odd one out by grammar | 0.4x | 0.4x |
+| Only option carrying a figure | 0.2x | 0.1x |
+| All/none of the above | 0 found | 0 found |
 
-### Why automation stalls here
+**The finding: length was the only real tell.** Everything else already sat at
+or below chance, so the hunt for "every other identifiable pattern" came back
+mostly clean. Position is not measured because `src/lib/lessonShuffle.ts`
+reorders options per user per lesson at render time, which already neutralises
+authored index.
 
-The root cause is that the correct option carries its own justification while
-the distractors stay bare:
+### The headline number
 
-```
-✓ (64) "Lower, because your lower income slices are taxed at lower rates"
-  ( 6) "Higher"
-  (16) "Exactly the same"
-  (11) "Always zero"
-```
+Ratios hide ties, so the scanner also reports what a learner would actually
+score by ranking options on length and always picking the same rank, with ties
+split at random. Chance is 25%:
 
-Three rules were safely automatable, and they handled 310 cases:
+| Strategy | Start | Now |
+|---|---|---|
+| Always pick the longest | ~65% | **25.2%** |
+| Always pick the 2nd longest | — | **26.0%** |
+| Always pick the 3rd longest | — | **24.6%** |
+| Always pick the shortest | — | **24.2%** |
+| **Best available strategy** | **~65%** | **26.0%** (edge: 1.0 point) |
 
-- **A** — distractors are bare figures, so trim the answer to its figure
-  (`"About 18%, 40% inclusion at a 45% marginal rate"` → `"About 18%"`)
-- **B** — strip a parenthetical the distractors don't have
-  (`"R177.12 (1% of the R17 712 cap)"` → `"R177.12"`)
-- **C** — cut a trailing justification clause introduced by *because / so /
-  which / meaning*, which belongs in the feedback anyway
+Length now tells a guesser essentially nothing.
 
-The remaining 1,204 can't be trimmed, because the length is **inherent**:
+### The trap worth knowing about
 
-```
-✓ (88) "Business profit is added to the owner's personal income and taxed at their marginal rate"
-  (13) "At a flat 27%"
-  (14) "It isn't taxed"
-  ( 6) "At 15%"
-```
+Mid-way through, the obvious repair — make one distractor longer than the
+correct answer — had been applied consistently enough that it *moved* the tell
+rather than removing it. "Pick the longest" fell to chance while "pick the
+**second** longest" climbed to 39.8%, which is just as exploitable.
 
-Nothing can be cut without losing the answer. The fix is to **rewrite the
-distractors to be equally specific and grammatically parallel** — here, all four
-should read "At X". That needs subject knowledge per question and cannot be
-scripted.
+That is why the guesser score exists and why it is the ratcheted metric.
+`scripts/export-rank2.mjs` finds the questions in that state; the repair is to
+vary where the correct answer lands rather than always putting it second.
 
-### The principle for the remaining work
+### Scale of the work
 
-**Make all four options grammatically parallel.** When they share a form, their
-lengths converge on their own and the tell disappears. This also satisfies the
-voice guide's requirement that distractors be plausible and diagnostic, so it is
-a genuine quality upgrade, not cosmetics.
+~1,500 questions rewritten across all 22 banks plus the 129 concept review
+cards that drive spaced repetition. Roughly 400 were mechanical trims
+(`propose-trims.mjs`); the rest needed distractors rewritten with subject
+knowledge, because the correct answer's length was inherent to the concept
+while the distractors were bare.
 
-```
-Before                                    After
-✓ "Business profit is added to the        ✓ "At the owner's marginal rate, up to 45%"
-   owner's personal income and taxed        "At a flat 27% company rate"
-   at their marginal rate"                  "At 15%, the VAT rate"
-  "At a flat 27%"                           "Not taxed until drawn as salary"
-  "It isn't taxed"
-  "At 15%"
-```
-
-### Where the work sits
-
-```bash
-node scripts/fix-answer-shape.mjs --dry --todo   # worst offenders, with lengths
-```
-
-Roughly 1,204 questions across `src/data/banks/`. At ~3 distractors each that is
-~3,600 option rewrites, so it is a multi-session job. It does not block deploying
-what is already done — the content is strictly better than it was.
+The rewrite is a genuine content upgrade, not cosmetics: parallel distractors
+are more diagnostic, and moving self-justifying clauses into `feedback.correct`
+puts the reasoning where the learner reads it.
 
 ---
 
-## Guard against regression
+## Tooling
 
-`scripts/ai-tells-scan.mjs` is the measurement. Once the ratio comes down,
-consider adding a ratchet to `scripts/content-quality-standalone.mjs` that fails
-if em dashes rise above 0 or the uniquely-longest rate climbs.
+| Script | Purpose |
+|---|---|
+| `answer-pattern-scan.mjs` | measure all 11 patterns + guesser score; `--list`, `--pattern=`, `--json=` |
+| `answer-pattern-ratchet.mjs` | CI guard against regression; `--update` to tighten |
+| `export-offenders.mjs` | dump offenders into reviewable batches |
+| `export-rank2.mjs` | find the over-correction trap (correct answer 2nd longest) |
+| `show-batch.mjs` | compact view of one batch for rewriting |
+| `propose-trims.mjs` | auto-propose safe trims, graded safe/check/no-fix |
+| `apply-option-patch.mjs` | apply JSONL rewrites to the banks, safely |
 
-## Verification after these changes
+npm aliases: `scan:answers`, `scan:ratchet`, `content:offenders`,
+`content:trims`.
+
+The patcher walks the TypeScript with a string-aware scanner rather than
+regex, because variants are formatted inconsistently and option strings contain
+braces, brackets and apostrophes. It refuses to change a correct answer's text
+unless the patch sets `rewritesAnswer: true`, which is the guard against
+silently turning a right answer wrong.
+
+Style rules for writing new options: **`docs/ANSWER-OPTION-STYLE.md`**.
+
+---
+
+## Verification
 
 - `npx tsc --noEmit` — clean
 - `scripts/lesson-bank-audit.mjs` — 205/205 banked, **0 errors**
-- `scripts/content-quality-standalone.mjs` — **11/11 assertions pass**
 - `scripts/lesson-rotation-check.mjs` — **PASS**, every lesson still rotates
+- `scripts/content-quality-standalone.mjs` — **11/11 assertions pass**
+- `scripts/answer-pattern-ratchet.mjs` — **PASS**
+- `scripts/ai-tells-scan.mjs` — 0 em dashes, 0 en dashes
+
+`npx vitest run` bus-errors in the Linux sandbox, including on a trivial
+one-line test, so it is an environment limit rather than a content problem.
+`content-quality-standalone.mjs` is a port of `contentQuality.test.ts` and
+covers the same assertions.
+
+## Guard against regression
+
+`scripts/answer-pattern-budget.json` holds the current ceiling per pattern,
+including `guesserEdge: 2.5` (percentage points over chance).
+`answer-pattern-ratchet.mjs` fails the build if any of them is exceeded.
+**Tighten the budget as numbers improve; never loosen it to make a build
+pass.** That is the failure mode this whole exercise exists to prevent.
