@@ -94,8 +94,27 @@ const nextConfig: NextConfig = {
   // Only VERCEL_DEPLOYMENT_ID belongs here. A git SHA would look equivalent and
   // is a trap: if Skew Protection is ever switched on, `?dpl=` starts routing
   // to a deployment of that id, no deployment has one, and every asset 404s.
-  // Undefined off-Vercel, which leaves behaviour unchanged.
-  deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
+  //
+  // Guarded, because "undefined off-Vercel leaves behaviour unchanged" turned
+  // out to be false. Passing the bare env var stamped the *literal string*
+  // "undefined" onto asset URLs — observed in production on 3 Aug alongside
+  // valid ids, in the same browser session:
+  //
+  //   /_next/static/chunks/1nnvvc7a9gnqj.js?dpl=dpl_Hrp5UTUzr4czBbZsyVkd41V3CA4w
+  //   /_next/static/chunks/1nnvvc7a9gnqj.js?dpl=undefined
+  //
+  // Two ids for one chunk is exactly the skew this setting exists to prevent,
+  // and "undefined" is precisely the no-such-deployment value the paragraph
+  // above warns about. Omitting the key entirely is the only safe fallback: a
+  // deployment id that does not resolve is worse than none at all.
+  //
+  // The mixture also says the variable is not reliably present at build time,
+  // so this must never be assumed. If `?dpl=` disappears from asset URLs in
+  // production, that is this guard doing its job — fix the env var, not this.
+  ...(process.env.VERCEL_DEPLOYMENT_ID &&
+  process.env.VERCEL_DEPLOYMENT_ID !== "undefined"
+    ? { deploymentId: process.env.VERCEL_DEPLOYMENT_ID }
+    : {}),
   // unpdf ships a serverless PDF.js build (no separate worker file) — keep it external so Vercel bundles it correctly for the import parse route.
   serverExternalPackages: ["unpdf"],
   async headers() {
