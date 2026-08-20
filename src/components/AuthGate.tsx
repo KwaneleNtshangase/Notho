@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Mail, KeyRound, AlertTriangle, ClipboardCopy, CheckCircle } from "@/components/icons/NothoIcons";
 import { supabase } from "@/lib/supabaseClient";
+import { isNativePlatform } from "@/lib/capacitorPlatform";
 
 // Google OAuth is blocked only in LinkedIn's in-app browser.
 // All other in-app browsers (Instagram, Facebook, WhatsApp, etc.) either use
@@ -145,13 +146,45 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   // Facebook works everywhere - no restrictions.
   // Google is blocked only inside LinkedIn's in-app browser; everywhere else it works.
+  //
+  // On native (the Capacitor iOS/Android shell) both providers are blocked
+  // regardless - Google and Facebook both refuse to complete OAuth inside any
+  // embedded webview, and a Capacitor app IS an embedded webview from their
+  // point of view. So on native we never let the flow open inside the app's
+  // own webview: skipBrowserRedirect hands us the auth URL instead of
+  // navigating to it, and we open that URL in the system browser
+  // (SFSafariViewController on iOS, Chrome Custom Tabs on Android) via
+  // @capacitor/browser. Supabase then redirects back to the
+  // za.co.notho.app://auth/callback custom scheme, which NativeAuthDeepLink
+  // (mounted in the root layout) picks up and exchanges for a session - see
+  // that file for why this needs a separate listener instead of the web
+  // flow's automatic detectSessionInUrl.
   const handleOAuthSignIn = async (provider: "google" | "facebook") => {
-    if (provider === "google" && inWebView) {
+    const native = await isNativePlatform();
+
+    if (provider === "google" && inWebView && !native) {
       setOauthBlocked(true);
       return;
     }
-    const redirectTo = typeof window !== "undefined" ? window.location.origin : undefined;
-    await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } });
+
+    const redirectTo = native
+      ? "za.co.notho.app://auth/callback"
+      : typeof window !== "undefined" ? window.location.origin : undefined;
+
+    const { data, error: e } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo, skipBrowserRedirect: native },
+    });
+
+    if (e) {
+      setError(e.message);
+      return;
+    }
+
+    if (native && data?.url) {
+      const { Browser } = await import("@capacitor/browser");
+      await Browser.open({ url: data.url });
+    }
   };
 
   const handleSignUp = async () => {

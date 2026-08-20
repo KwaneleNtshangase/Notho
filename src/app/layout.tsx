@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ErrorReportingInit } from "@/components/ErrorReportingInit";
+import { NativeAuthDeepLink } from "@/components/NativeAuthDeepLink";
 import { ServiceWorkerRegistration } from "@/lib/sw/ServiceWorkerRegistration";
 import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
 import "./globals.css";
@@ -81,6 +82,9 @@ export default function RootLayout({
           <PostHogProvider>{children}</PostHogProvider>
           <ServiceWorkerRegistration />
           <ErrorReportingInit />
+          {/* No-op on web; on native, exchanges the OAuth deep-link callback
+              for a session. See NativeAuthDeepLink.tsx and AuthGate.tsx. */}
+          <NativeAuthDeepLink />
         </ErrorBoundary>
       </body>
     </html>
