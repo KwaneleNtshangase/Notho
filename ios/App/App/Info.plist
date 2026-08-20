@@ -22,6 +22,22 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>za.co.notho.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- OAuth deep-link return target. Must match capacitor.config.ts
+				     appId and the redirect URI registered in both Supabase
+				     (Authentication > URL Configuration) and Google Cloud
+				     Console (Credentials > Authorised redirect URIs):
+				     za.co.notho.app://auth/callback -->
+				<string>za.co.notho.app</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

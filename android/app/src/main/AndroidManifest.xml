@@ -22,6 +22,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- OAuth deep-link return target. Must match capacitor.config.ts
+                 appId and the redirect URI registered in both Supabase
+                 (Authentication > URL Configuration) and Google Cloud
+                 Console (Credentials > Authorised redirect URIs):
+                 za.co.notho.app://auth/callback -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="za.co.notho.app" />
+            </intent-filter>
+
         </activity>
 
         <provider
