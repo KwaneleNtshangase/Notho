@@ -188,6 +188,25 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
     setRows((prev) => prev.filter((r) => r.sourceFileName !== name));
   };
 
+  /**
+   * Drop a single statement from the import after preview, without discarding
+   * the rest. A reconciliation warning on one file used to block importing
+   * every other file too, with no way out short of starting over from zero -
+   * this is the escape hatch. Most often needed when someone uploads
+   * statements from two different bank accounts together: each is internally
+   * consistent, but a running-balance check that assumes one continuous
+   * account will flag the file where the second account's numbers pick up.
+   */
+  const excludeFile = (fileName: string) => {
+    const match = files.find((f) => f.name === fileName);
+    if (match) {
+      removeFile(match.name, match.size);
+    } else {
+      setFileMetas((prev) => prev.filter((m) => m.fileName !== fileName));
+      setRows((prev) => prev.filter((r) => r.sourceFileName !== fileName));
+    }
+  };
+
   const handleFileInputChange = (fileList: FileList | null) => {
     if (!fileList?.length) return;
     applyValidatedFiles(Array.from(fileList));
@@ -839,10 +858,26 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                   </div>
                 ) : meta.reconciliation ? (
                   <div key={meta.fileName} style={{ background: "rgba(255,152,0,0.1)", border: "1px solid rgba(255,152,0,0.3)", borderRadius: 10, padding: 12, marginBottom: 8, fontSize: 13 }}>
-                    <div style={{ display: "flex", gap: 8, fontWeight: 700, color: "#F57C00", marginBottom: 4 }}>
-                      <AlertTriangle size={16} /> {meta.fileName} - reconciliation warning
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 4 }}>
+                      <div style={{ display: "flex", gap: 8, fontWeight: 700, color: "#F57C00", flex: 1 }}>
+                        <AlertTriangle size={16} /> {meta.fileName} - reconciliation warning
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => excludeFile(meta.fileName)}
+                        style={{
+                          background: "none", border: "1px solid rgba(245,124,0,0.4)", borderRadius: 6,
+                          cursor: "pointer", color: "#F57C00", fontSize: 11, fontWeight: 700,
+                          padding: "3px 8px", whiteSpace: "nowrap", flexShrink: 0,
+                        }}
+                      >
+                        Skip this file
+                      </button>
                     </div>
                     {meta.reconciliation.warnings.map((w) => <div key={w}>{w}</div>)}
+                    <div style={{ marginTop: 6, color: "var(--color-text-secondary)" }}>
+                      Often means this file overlaps a different account than the others below. You can still import everything else - use &ldquo;Skip this file&rdquo; to leave it out, or fix and re-upload just this statement.
+                    </div>
                   </div>
                 ) : null
               ))}
