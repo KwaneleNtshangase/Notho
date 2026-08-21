@@ -46,7 +46,7 @@ export default function SecurityPage() {
     setBusy("delete");
     try {
       const res = await fetch("/api/account/delete", { method: "POST", headers: { Authorization: `Bearer ${t}` } });
-      if (!res.ok) { setMsg("We couldn't delete the account. Please contact hello@notho.co.za."); return; }
+      if (!res.ok) { setMsg("We couldn't delete the account. Please contact support@notho.co.za."); return; }
       await supabase.auth.signOut();
       window.location.href = "/";
     } finally {
@@ -98,7 +98,7 @@ export default function SecurityPage() {
       </div>
 
       <p style={{ ...p, textAlign: "center", marginTop: 8 }}>
-        Questions? <a href="mailto:hello@notho.co.za" style={{ color: "var(--color-primary)", fontWeight: 700 }}>hello@notho.co.za</a>
+        Questions? <a href="mailto:support@notho.co.za" style={{ color: "var(--color-primary)", fontWeight: 700 }}>support@notho.co.za</a>
       </p>
     </main>
   );
