@@ -9,6 +9,7 @@
  */
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { Share2 } from "lucide-react";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
@@ -71,6 +72,7 @@ export function InteractiveReportModal({
   initialStart,
   initialEnd,
   onDownloadPdf,
+  onSharePdf,
   downloadingPdf,
 }: {
   open: boolean;
@@ -78,6 +80,7 @@ export function InteractiveReportModal({
   initialStart: string;
   initialEnd: string;
   onDownloadPdf: (periodStart: string, periodEnd: string, redactNames: boolean) => void;
+  onSharePdf: (periodStart: string, periodEnd: string, redactNames: boolean) => void;
   downloadingPdf?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
@@ -224,6 +227,10 @@ export function InteractiveReportModal({
             <div style={{ fontWeight: 900, fontSize: 16 }}>Budget report</div>
             <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>{periodLabel}</div>
           </div>
+          <button type="button" onClick={() => onSharePdf(periodStart, periodEnd, redactNames)} disabled={downloadingPdf}
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: 10, border: "1px solid var(--color-border)", background: "var(--color-bg)", color: "var(--color-text-primary)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+            <Share2 size={15} /> Share
+          </button>
           <button type="button" onClick={() => onDownloadPdf(periodStart, periodEnd, redactNames)} disabled={downloadingPdf}
             style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: 10, border: "1px solid var(--color-border)", background: "var(--color-bg)", color: "var(--color-text-primary)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
             <FileText size={15} /> {downloadingPdf ? "..." : "PDF"}

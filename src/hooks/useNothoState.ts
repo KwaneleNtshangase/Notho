@@ -8,6 +8,7 @@ import {
   computeLessonXpAward,
   replayXpStorageKey,
 } from "@/lib/lessonXp";
+import { hapticLessonComplete, hapticStreakMilestone, isStreakMilestone } from "@/lib/haptics";
 import { CONTENT_DATA } from "@/data/content";
 import { LEVEL_3_COURSES } from "@/data/content-level3";
 import { shuffleLessonSteps, lessonShuffleSeed } from "@/lib/lessonShuffle";
@@ -447,6 +448,9 @@ export function useNothoState() {
 
     const newStreak = await progress.applyStreakAfterLesson();
 
+    // No-op on web (see haptics.ts) - tactile confirmation on native only.
+    void hapticLessonComplete();
+
     if (xpAwarded > 0) {
       addXP(xpAwarded);
       if (alreadyDone && typeof window !== "undefined") {
@@ -456,6 +460,9 @@ export function useNothoState() {
 
     if (!alreadyDone) {
       analytics.streakUpdated(newStreak);
+      if (isStreakMilestone(newStreak)) {
+        void hapticStreakMilestone();
+      }
     }
 
     if (progress.userId) {

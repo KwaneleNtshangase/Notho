@@ -4,6 +4,7 @@ import { PostHogProvider } from "@/components/PostHogProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ErrorReportingInit } from "@/components/ErrorReportingInit";
 import { NativeAuthDeepLink } from "@/components/NativeAuthDeepLink";
+import { NativeShellGuards } from "@/components/NativeShellGuards";
 import { ServiceWorkerRegistration } from "@/lib/sw/ServiceWorkerRegistration";
 import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
 import "./globals.css";
@@ -85,6 +86,9 @@ export default function RootLayout({
           {/* No-op on web; on native, exchanges the OAuth deep-link callback
               for a session. See NativeAuthDeepLink.tsx and AuthGate.tsx. */}
           <NativeAuthDeepLink />
+          {/* No-op on web; on native, suppresses the browser's own PWA
+              install nudge. See NativeShellGuards.tsx. */}
+          <NativeShellGuards />
         </ErrorBoundary>
       </body>
     </html>

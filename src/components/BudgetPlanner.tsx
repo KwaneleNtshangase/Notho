@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
+import { isNativePlatform } from "@/lib/capacitorPlatform";
+import { shareFileBlob } from "@/lib/nativeShare";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
@@ -1020,6 +1022,59 @@ export function BudgetView() {
     }
   };
 
+  // Share the PDF for a specific period. Native: hands the file straight to
+  // the OS share sheet (@capacitor/share) - see nativeShare.ts. Web: falls
+  // back to the Web Share API where a browser can share files, and to the
+  // same download-link behaviour as downloadReportPdf everywhere else.
+  const shareReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
+    setExportLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) return;
+      const res = await fetch(`${window.location.origin}/api/budget/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ periodStart, periodEnd, redactNames }),
+      });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
+
+      if (await isNativePlatform()) {
+        const shared = await shareFileBlob({
+          blob,
+          fileName,
+          title: "Notho budget report",
+          dialogTitle: "Share your budget report",
+        });
+        if (shared) return;
+        // Native share failed for some reason (e.g. cancelled) - fall through
+        // to the same web-style download rather than leaving the user stuck.
+      }
+
+      const file = new File([blob], fileName, { type: "application/pdf" });
+      const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+      if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Notho budget report" });
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      /* non-fatal: the interactive view is still open */
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   // Transfers (money moved between your own accounts, or imported transfer pairs)
   // are excluded from income/expense/savings maths everywhere.
   const realEntries = entries.filter((e) => !e.is_transfer);
@@ -1143,6 +1198,7 @@ export function BudgetView() {
         initialStart={reportPeriod.start}
         initialEnd={reportPeriod.end}
         onDownloadPdf={(s, e, redact) => downloadReportPdf(s, e, redact)}
+        onSharePdf={(s, e, redact) => shareReportPdf(s, e, redact)}
         downloadingPdf={exportLoading}
       />
 
