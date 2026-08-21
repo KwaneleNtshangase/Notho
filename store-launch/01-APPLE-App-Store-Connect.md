@@ -215,8 +215,8 @@ Account deletion: sign in, then Settings > Delete account. This permanently eras
 Notho is a financial-literacy education app for South African users.
 
 DEMO ACCOUNT
-Email: [create a demo account and put it here]
-Password: [password]
+Email: hello@notho.co.za
+Password: Nomandla13
 The demo account has sample lessons completed and a sample budget already imported, so every feature is reachable without uploading a real bank statement.
 
 AI FEATURE (Cosmo)

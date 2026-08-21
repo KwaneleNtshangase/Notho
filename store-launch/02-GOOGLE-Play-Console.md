@@ -172,8 +172,8 @@ Select **"All or some functionality is restricted"** and add:
 | Field | Value |
 |---|---|
 | Name of instructions | Full app access |
-| Username | *[create a demo account and put it here]* |
-| Password | *[password]* |
+| Username | hello@notho.co.za |
+| Password | Nomandla13 |
 | Any other instructions | See block below |
 
 ```
