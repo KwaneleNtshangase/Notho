@@ -99,7 +99,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             className={`main-content ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
             style={{ display: 'flex', flexDirection: 'column' }}
           >
-            {(pathname === "/learn" || pathname === "/") && <MobileTopBarWrapper />}
+            {/* Was gated to pathname === "/learn" || "/" - that's what made
+                the streak-freeze modal (rendered inside NothoTopBar, via this
+                wrapper) unreachable on mobile from every other page. The
+                desktop StatsPanel equivalent stays gated below: it's CSS-
+                hidden under 1200px anyway (.stats-panel), so gating it by
+                route only affects >=1200px viewports on non-Learn pages,
+                which is an existing, separate gap outside this fix's scope
+                (see PR description). */}
+            <MobileTopBarWrapper />
             <div style={{ paddingBottom: "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</div>
           </div>
           {(pathname === "/learn" || pathname === "/") && (

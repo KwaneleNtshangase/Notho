@@ -59,6 +59,25 @@ body.notho-reduced-motion .skeleton { animation: none; }
    Rule of thumb: gold carries meaning through position and shape, never
    through a label rendered in gold on a light surface. Put navy on gold
    (5.80:1) when a gold surface needs text.
+
+   --- SUCCESS / CORRECTNESS (added fix/answer-affordances) -----------------
+   Neither brand colour is available for "this answer is right": teal is
+   already the primary action/link/nav colour (so a correct answer read as
+   "just another button"), and gold fails contrast outright. Correctness
+   needed its own hue - a green, picked to sit between the brand's teal
+   (~184°) and gold (~40°) without being mistaken for either: hue ~145°,
+   which reads as a clean emerald rather than a teal-green or a lime-gold.
+   Ratios measured with the WCAG relative-luminance formula (not estimated):
+
+     LIGHT  #0F7B3B  vs #FFFFFF (page/option bg) . 5.36:1  (text >=4.5:1 OK)
+            #0F7B3B  vs #F4F5F7 (card surface) . . 4.92:1  (border >=3:1 OK)
+     DARK   #2DD280  vs #000000 (page bg) . . . . 10.64:1  (text >=4.5:1 OK)
+            #2DD280  vs #141414 (dark surface) . . 9.34:1  (border >=3:1 OK)
+
+   The fill+white-text case (.option-button.correct) reuses the LIGHT value
+   in both themes rather than swapping to the bright dark value - a bright
+   #2DD280 fill would drop white text below 4.5:1. This mirrors how
+   .option-button.incorrect already keeps one #E03C31 fill in both themes.
 --------------------------------------------------------------------------- */
 :root {
   --nav-link-color: #374151;
@@ -81,11 +100,24 @@ body.notho-reduced-motion .skeleton { animation: none; }
   --color-accent-light: #FDECEA;
   --color-danger: #E03C31;
   --color-danger-light: #FDECEA;
+  /* Correctness only - see "SUCCESS / CORRECTNESS" note above for measured
+     ratios. Distinct from --color-primary (teal) and --color-secondary
+     (gold) on purpose, so "right answer" carries a colour nothing else uses. */
+  --color-success: #0F7B3B;
+  --color-success-light: #E8F7EC;
   --color-bg: #FFFFFF;
   --color-surface: #F4F5F7;
   --color-text-primary: #111827;
   --color-text-secondary: #6B7280;
   --color-border: transparent;
+  /* Answer-option pill surface + border. Deliberately NOT --color-surface /
+     --color-border: those are shared with .lesson-step (the card the options
+     sit inside), and the global "no visible borders" rule below forces every
+     --color-border use to transparent. Options need their own surface and an
+     actual border so four options read as four separate targets instead of
+     one grey block. 3.64:1 vs this bg, 3.33:1 vs --color-surface (>=3:1). */
+  --color-option-bg: #FFFFFF;
+  --color-option-border: #7A879C;
   --track-bg: #E6E8EB;
   --hover-bg: rgba(0, 0, 0, 0.06);
   --color-nav-bg: #ffffff;
@@ -105,7 +137,11 @@ body.notho-reduced-motion .skeleton { animation: none; }
   --text-light: var(--color-text-secondary);
   --border-light: var(--color-border);
   --error-red: var(--color-danger);
-  --success-green: var(--color-secondary);
+  /* Was var(--color-secondary) (gold) - the rebrand aliased "success" to
+     gold, which is how a correct answer ended up rendering in two different
+     colours depending on which component you looked at. Now points at the
+     real success token. */
+  --success-green: var(--color-success);
   --info-blue: var(--color-primary);
 }
 
@@ -702,18 +738,6 @@ html.dark .nav-link.active {
   }
 }
 
-.option-button.correct {
-  background: #007A85 !important;
-  border-color: #007A85 !important;
-  color: white !important;
-}
-
-.option-button.incorrect {
-  background: #E03C31 !important;
-  border-color: #E03C31 !important;
-  color: white !important;
-}
-
 .feedback {
   animation: fade-in 0.25s ease-out;
 }
@@ -765,11 +789,26 @@ html.dark .nav-link.active {
   margin-bottom: 24px;
 }
 
+/* ── Answer options ───────────────────────────────────────────────────────
+   Six states, all deliberately distinct (not just colour, so the pill still
+   reads correctly for colour-blind users): default, hover, selected (chosen,
+   not yet submitted), correct, incorrect, not-chosen (an option that was on
+   screen but neither picked nor the right answer once the question is over).
+
+   Every border-color / background here needs !important: the global
+   "Borderless surfaces" rule further down this file (`* { border-color:
+   transparent !important }`) otherwise wins regardless of source order or
+   selector specificity, because !important always beats non-!important. That
+   rule is why the pre-fix .option-button border and the .feedback border-left
+   accent were both silently invisible before this change. */
 .option-button {
   padding: 14px 16px;
-  background: var(--color-surface);
+  min-height: 48px; /* comfortably clears the 44px touch-target minimum */
+  display: flex;
+  align-items: center;
+  background: var(--color-option-bg) !important;
   color: var(--color-text-primary);
-  border: 2px solid var(--color-border);
+  border: 2px solid var(--color-option-border) !important;
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
@@ -779,19 +818,25 @@ html.dark .nav-link.active {
   width: 100%;
 }
 
-.option-button:hover {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
+.option-button:hover:not(:disabled) {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-light) !important;
 }
 
+/* Chosen but not yet submitted. Currently unreachable in the MCQ/true-false
+   flow (answerQuestion()/answerTrueFalse() submit immediately on click, so
+   there's no intermediate "picked, not yet checked" moment) - kept correct
+   and ready for the day a confirm-before-submit flow exists, or for reuse
+   outside LessonView. */
 .option-button.selected {
-  border-color: var(--primary-green);
-  background: rgba(88, 204, 2, 0.1);
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-light) !important;
+  box-shadow: 0 0 0 1px var(--color-primary) inset;
 }
 
 .option-button.correct {
-  background: #007A85 !important;
-  border-color: #007A85 !important;
+  background: var(--color-success) !important;
+  border-color: var(--color-success) !important;
   color: white !important;
 }
 
@@ -799,6 +844,19 @@ html.dark .nav-link.active {
   background: #E03C31 !important;
   border-color: #E03C31 !important;
   color: white !important;
+}
+
+/* The other options once the question is answered - de-emphasised, but never
+   via opacity. Fading a dark-on-light pill with `opacity` scales its text
+   contrast down with it (this was `opacity-50` in LessonView.tsx, which is
+   how it ended up failing contrast); a plain colour swap keeps the text at a
+   fixed, checkable ratio (--color-text-secondary is 4.83:1 on white / 6.06:1
+   on the dark option surface) while still reading as "not the one". */
+.option-button.not-chosen {
+  border-color: var(--color-option-border) !important;
+  background: var(--color-option-bg) !important;
+  color: var(--color-text-secondary) !important;
+  font-weight: 600;
 }
 
 .option-button:disabled {
@@ -814,9 +872,9 @@ html.dark .nav-link.active {
 }
 
 .feedback.correct {
-  background: var(--color-secondary-light);
-  color: #065f46;
-  border-left: 4px solid var(--color-secondary);
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-left: 4px solid var(--color-success) !important;
   border-radius: 8px;
   padding: 12px 16px;
 }
@@ -824,9 +882,22 @@ html.dark .nav-link.active {
 .feedback.incorrect {
   background: var(--color-danger-light);
   color: #991b1b;
-  border-left: 4px solid var(--color-danger);
+  border-left: 4px solid var(--color-danger) !important;
   border-radius: 8px;
   padding: 12px 16px;
+}
+
+/* #991b1b (7.27:1 on the light-mode #FDECEA wash) goes low-contrast once
+   --color-danger-light becomes a dark, near-black wash above - needs its own
+   light value for dark backgrounds, same reasoning as --color-success having
+   a brighter dark variant. 6.56:1 against the blended dark wash. */
+html.dark .feedback.incorrect {
+  color: #FF8078;
+}
+@media (prefers-color-scheme: dark) {
+  .feedback.incorrect {
+    color: #FF8078;
+  }
 }
 
 .lesson-actions {
@@ -1233,6 +1304,26 @@ html.dark {
   --color-text-secondary: #9AA0A6;
   --color-primary: #20D3CF;
   --color-secondary: #EFB343;
+  /* Brighter than the light-mode #0F7B3B so green text/icons/borders stay
+     readable on black - 10.64:1 vs #000, 9.34:1 vs --color-surface #141414.
+     NOT used for the .option-button.correct fill (see the palette comment
+     near :root) - that stays #0F7B3B in both themes so white text on it
+     keeps its 4.5:1+. */
+  --color-success: #2DD280;
+  --color-success-light: rgba(45, 210, 128, 0.16);
+  /* Distinct from --color-surface (#141414) the same way --color-option-bg
+     is distinct from --color-surface in light mode - see the :root comment.
+     3.89:1 vs --color-surface, 3.38:1 vs this bg (both >=3:1). */
+  --color-option-bg: #1E2226;
+  --color-option-border: #6B7480;
+  /* --color-danger-light/--color-accent-light were never given a dark
+     override, so .feedback.incorrect and .badge.earned rendered as a light
+     pink card floating on black - legible (the hardcoded #991b1b text still
+     had contrast) but visually inconsistent with .feedback.correct, which
+     this branch just made properly dark-aware. Tinted the same way as
+     --color-success-light above. */
+  --color-danger-light: rgba(224, 60, 49, 0.16);
+  --color-accent-light: rgba(224, 60, 49, 0.16);
   --bg-gray: #000000;
   --border-light: transparent;
   --text-light: #9AA0A6;
@@ -1537,17 +1628,13 @@ html.dark .stat-label {
   color: var(--color-text-secondary);
 }
 
-html.dark .option-button {
-  /* Slightly lifted surface + visible border so answer options read as
-     tappable cards, not plain text lines, on dark backgrounds */
-  background: #1A1C1E;
-  color: #E6EDF3;
-  border-color: #3A3F45;
-}
-
-html.dark .option-button:hover:not(:disabled) {
-  background: #1F2937;
-}
+/* .option-button itself is fully token-driven now (--color-option-bg /
+   --color-option-border / --color-text-primary all swap under html.dark
+   automatically - see the html.dark block above), so it no longer needs a
+   dark-specific override here. The old override hardcoded #1A1C1E / #3A3F45
+   directly; #3A3F45 measured at only 1.6-1.7:1 against its neighbours, well
+   under the 3:1 UI-component threshold, which is part of why options still
+   read as borderless in dark mode. */
 
 /* ── Budget page desktop scaling ──────────────────────────────────────── */
 @media (min-width: 768px) {
@@ -1635,6 +1722,15 @@ html.dark .option-button:hover:not(:disabled) {
     --color-primary: #20D3CF;
     --color-primary-dark: #20D3CF;
     --color-secondary: #EFB343;
+    /* Keep in sync with the html.dark block above - see its comment for
+       measured ratios. This block is the fallback for OS-dark-without-the-
+       .dark-class case; html.dark wins when both apply (higher specificity). */
+    --color-success: #2DD280;
+    --color-success-light: rgba(45, 210, 128, 0.16);
+    --color-option-bg: #1E2226;
+    --color-option-border: #6B7480;
+    --color-danger-light: rgba(224, 60, 49, 0.16);
+    --color-accent-light: rgba(224, 60, 49, 0.16);
     --border-light: transparent;
     --bg-gray: #000000;
     --sidebar-bg: #000000;
@@ -1766,6 +1862,13 @@ textarea {
 }
 
 /* ── No borders anywhere (covers Tailwind, inline, var and literal) ──────── */
+/* .option-button and .feedback deliberately opt back out of this (see their
+   own rules, all !important) - answer options need a real edge to read as
+   separate targets (fix/answer-affordances), and the feedback banner's
+   border-left is its correct/incorrect colour cue. !important vs !important
+   is decided by specificity, and `.option-button`/`.feedback` beat the bare
+   `*` here, so no exception selector is needed - just noting it so a future
+   edit doesn't "simplify" this rule and quietly re-break both. */
 *, *::before, *::after { border-color: transparent !important; }
 
 /* ── Instagram-style hover highlight on every interactive element ──────────
