@@ -6,6 +6,7 @@ import { CONCEPTS } from "@/data/concepts";
 import { applyReview, getDueCards, saveMastery } from "@/lib/spaced-repetition";
 import type { MasteryRecord } from "@/lib/spaced-repetition";
 import { hashSeed, seededPermutation } from "@/lib/lessonShuffle";
+import { useReviewCompletion, NOT_COUNTED, type ReviewOutcome } from "@/hooks/useReviewCompletion";
 
 export function ReviewSession({
   onClose,
@@ -21,8 +22,9 @@ export function ReviewSession({
   const [selected, setSelected] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
-  const [xpAwarded, setXpAwarded] = useState(0);
+  const [outcome, setOutcome] = useState<ReviewOutcome>(NOT_COUNTED);
   const completedRef = useRef(false);
+  const completeReview = useReviewCompletion();
 
   useEffect(() => {
     void getDueCards().then(setQueue);
@@ -67,12 +69,19 @@ export function ReviewSession({
     const updated = applyReview(current, isCorrect ? 4 : 1);
     void saveMastery(updated);
     if (currentIdx + 1 >= queue.length) {
+      // ── Review-complete handler ────────────────────────────────────────
+      // Guarded by a ref: this is the only place credit is applied, and it
+      // must happen exactly once per session even if React re-invokes the
+      // handler. The XP used to be computed here and displayed next to the
+      // words "Streak saved" while nothing was ever awarded and the streak
+      // was never touched. Credit now goes through the same path a lesson
+      // takes (sync-streak + the daily counters), and what the screen says
+      // is whatever actually happened.
       if (!completedRef.current) {
         completedRef.current = true;
         const finalCorrect = correctCount;
         const total = queue.length;
-        const earned = total > 0 ? 20 + finalCorrect * 5 : 0;
-        setXpAwarded(earned);
+        setOutcome(completeReview({ cards: total, correct: finalCorrect }));
         onReviewComplete?.(finalCorrect, total);
       }
       setCurrentIdx(queue.length);
@@ -94,9 +103,20 @@ export function ReviewSession({
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
             {correctCount} of {queue.length} correct
           </p>
-          {xpAwarded > 0 && (
+          {outcome.counted && outcome.xpAwarded > 0 && (
             <p className="text-sm font-bold text-green-600 dark:text-green-400 mb-4">
-              +{xpAwarded} XP · Streak saved
+              +{outcome.xpAwarded} XP · Streak kept
+            </p>
+          )}
+          {outcome.counted && outcome.alreadyCountedToday && (
+            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-4">
+              Streak kept · today&apos;s review was already counted
+            </p>
+          )}
+          {!outcome.counted && (
+            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-4">
+              Cards rescheduled. {outcome.cardsRequired} cards in a session keep
+              your streak — this one was {queue.length}.
             </p>
           )}
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">

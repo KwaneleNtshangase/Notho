@@ -9,6 +9,8 @@ import {
   replayXpStorageKey,
 } from "@/lib/lessonXp";
 import { hapticLessonComplete, hapticStreakMilestone, isStreakMilestone } from "@/lib/haptics";
+import { markConceptReviewedToday } from "@/lib/dailyChallengeFlags";
+import type { LessonResume } from "@/lib/sync/mergeRules";
 import { CONTENT_DATA } from "@/data/content";
 import { LEVEL_3_COURSES } from "@/data/content-level3";
 import { shuffleLessonSteps, lessonShuffleSeed } from "@/lib/lessonShuffle";
@@ -446,6 +448,11 @@ export function useNothoState() {
       } catch { /* best-effort */ }
     }
 
+    // The lesson is done, so no device should still be offering "Continue"
+    // for it. A tombstone (not a delete) is what makes that travel — see
+    // useProgress.clearLessonResume.
+    progress.clearLessonResume(courseId, lessonId);
+
     const newStreak = await progress.applyStreakAfterLesson();
 
     // No-op on web (see haptics.ts) - tactile confirmation on native only.
@@ -473,6 +480,40 @@ export function useNothoState() {
     }
 
     return { streak: newStreak, xpAwarded };
+  };
+
+  /**
+   * A finished spaced-repetition review session.
+   *
+   * Reviews used to award XP on paper and touch nothing — the completion
+   * screen even said "Streak saved" while the streak was untouched. They now
+   * take the same path a lesson does: /api/progress/sync-streak for the
+   * streak, lessonsToday and the daily-challenge counters for the rest.
+   *
+   * Only a session of at least `cardsRequired` cards counts, and only the
+   * first one each day pays. See useProgress.recordReviewSession.
+   */
+  const completeReviewSession = (input: { cards: number; correct: number }) => {
+    const outcome = progress.recordReviewSession(input);
+
+    // "Review a flashcard concept" is achieved by ANY finished review, even a
+    // short one — it is a daily challenge, not a streak day.
+    markConceptReviewedToday();
+
+    if (outcome.counted && !outcome.alreadyCountedToday) {
+      // Weekly-challenge counters, merged server-side like a lesson's.
+      recordWeeklyStat({
+        lessonsCompleted: 1,
+        xpEarned: outcome.xpAwarded,
+        lessonDayToday: true,
+      });
+      if (outcome.xpAwarded > 0) {
+        setXpToast({ amount: outcome.xpAwarded, id: Date.now() });
+        setTimeout(() => setXpToast(null), 2000);
+      }
+    }
+
+    return outcome;
   };
 
   const isLessonCompleted = (courseId: string, lessonId: string) =>
@@ -537,26 +578,27 @@ export function useNothoState() {
     const s = currentLessonState;
     if (!progress.userId || !s.courseId || !s.lessonId || s.steps.length === 0) return;
     try {
-      localStorage.setItem(
-        "notho-lesson-progress",
-        JSON.stringify({
-          userId: progress.userId,
-          courseId: s.courseId,
-          lessonId: s.lessonId,
-          lessonTitle: getLessonTitle(s.courseId, s.lessonId) ?? undefined,
-          stepIndex: s.stepIndex,
-          // Persist the resolved working steps so re-queued copies (mastery
-          // loop) survive a refresh — the queue can't be re-derived from
-          // static content once questions have been appended.
-          steps: s.steps,
-          answers: s.answers,
-          correctCount: s.correctCount,
-          mistakes: s.mistakes,
-          masteredQids: s.masteredQids,
-          mistakenQids: s.mistakenQids,
-          savedAt: Date.now(),
-        })
-      );
+      // Same synchronous localStorage write as before — it just also goes
+      // through the cross-device queue now, so the other device can offer
+      // "Continue". The local write is unconditional and never awaits the
+      // network; see useProgress.saveLessonResume.
+      progress.saveLessonResume({
+        courseId: s.courseId,
+        lessonId: s.lessonId,
+        lessonTitle: getLessonTitle(s.courseId, s.lessonId) ?? undefined,
+        stepIndex: s.stepIndex,
+        // Persist the resolved working steps so re-queued copies (mastery
+        // loop) survive a refresh — the queue can't be re-derived from
+        // static content once questions have been appended. LOCAL ONLY:
+        // stripped before the record leaves the device.
+        steps: s.steps,
+        answers: s.answers as Record<string, unknown>,
+        correctCount: s.correctCount,
+        mistakes: s.mistakes,
+        masteredQids: s.masteredQids,
+        mistakenQids: s.mistakenQids,
+        savedAt: Date.now(),
+      } satisfies LessonResume);
     } catch { /* best-effort */ }
   }, [currentLessonState, progress.userId]);
 
@@ -677,6 +719,10 @@ export function useNothoState() {
     isLessonCompleted,
     completedLessons: progress.completedLessons,
     completeLesson,
+    completeReviewSession,
+    /** Cross-device mid-lesson resume point, or null. */
+    lessonResume: progress.lessonResume,
+    clearLessonResume: progress.clearLessonResume,
     currentLessonState,
     setCurrentLessonState,
     newlyEarnedBadges,

@@ -4,6 +4,30 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { sastOffset, sastToday, sastWeekKey } from "@/lib/dates";
 import { clearWeeklyStats } from "@/lib/weeklyStats";
+import {
+  isTombstone,
+  mergeDailyFlags,
+  mergeResume,
+  REVIEW_MIN_CARDS,
+  reviewQualifiesForStreak,
+  reviewXp,
+  type DailyFlags,
+  type LessonResume,
+  type LessonResumeValue,
+} from "@/lib/sync/mergeRules";
+import {
+  enqueueCrossDeviceWrite,
+  flushCrossDeviceQueue,
+} from "@/lib/sync/crossDeviceQueue";
+import {
+  clearLocalResume,
+  makeResumeTombstone,
+  readLocalResume,
+  resolveOfferableResume,
+  withLocalSteps,
+  writeLocalResume,
+} from "@/lib/sync/lessonResume";
+import { readLocalDailyFlags, writeLocalDailyFlags } from "@/lib/sync/dailyFlags";
 
 type WeeklyCompletionEntry = {
   completedAt: string;
@@ -137,6 +161,8 @@ const EPHEMERAL_KEY_PREFIXES = [
   "notho-budget-visited-",
   "notho-calc-visited-",
   "notho-pending-streak-sync",
+  "notho-review-counted-",
+  "notho-pinned-courses",
   "notho-onboarded",
   "notho-user-goal",
   "notho-goal-description",
@@ -265,6 +291,10 @@ type ProgressRow = {
   daily_xp_today?: number; daily_xp_date?: string;
   daily_lessons_today?: number; daily_lessons_date?: string;
   weekly_completions?: WeeklyCompletionsMap | null;
+  /** Cross-device mid-lesson resume point (steps are never stored server-side). */
+  lesson_resume?: LessonResumeValue | null;
+  /** Cross-device daily-challenge condition flags for one SAST day. */
+  daily_flags?: DailyFlags | null;
 };
 
 // Flush the queued deltas to the server. The queue is CLAIMED (read + cleared
@@ -327,7 +357,7 @@ const PROGRESS_SELECT =
   "xp,xp_spent,streak,longest_streak,last_activity_date,completed_lessons," +
   "streak_freeze_count,weekly_xp,week_key,perfect_lessons_total," +
   "daily_xp_today,daily_xp_date,daily_lessons_today,daily_lessons_date," +
-  "weekly_completions";
+  "weekly_completions,lesson_resume,daily_flags";
 
 /** Minimum gap between automatic refreshes (focus/visibility/online). */
 const AUTO_REFRESH_MIN_MS = 15_000;
@@ -352,6 +382,11 @@ function rollPeriods(prev: ProgressState, wk: string, today: string): ProgressSt
 
 export function useProgress() {
   const [state, setState] = useState<ProgressState>(DEFAULT_STATE);
+  /**
+   * The mid-lesson resume point to offer as "Continue", already reconciled
+   * across devices. null = nothing to continue.
+   */
+  const [lessonResume, setLessonResume] = useState<LessonResume | null>(null);
   const [ready, setReady] = useState(false);
   /** True after the first successful server reconciliation for this user. */
   const [loaded, setLoaded] = useState(false);
@@ -399,6 +434,9 @@ export function useProgress() {
     loadInFlightRef.current = true;
     try {
       await flushPendingDeltas(uid).catch(() => null);
+      // Same cycle, same guarantees: anything queued while offline goes up
+      // before we read, so the row we read already reflects it.
+      await flushCrossDeviceQueue(uid).catch(() => null);
 
       const cachePre = readProgressCache(uid);
       let rpcData: ProgressRow | null = null;
@@ -483,6 +521,56 @@ export function useProgress() {
       setState(finalState);
       writeProgressCache(finalState, uid);
       setLoaded(true);
+
+      // ── Cross-device: mid-lesson resume ──────────────────────────────────
+      // Rides the same load cycle as everything else rather than introducing
+      // its own polling. Conflict rule: LWW on savedAt, GREATEST within the
+      // same lesson (mergeResume). Local `steps` are re-attached afterwards
+      // because the server copy deliberately doesn't carry them.
+      {
+        const serverResume = (data?.lesson_resume ?? null) as LessonResumeValue | null;
+        const localResume = readLocalResume(uid);
+        const mergedResume =
+          localResume && serverResume
+            ? mergeResume(serverResume, localResume)
+            : localResume ?? serverResume;
+
+        if (mergedResume) {
+          const forLocal = withLocalSteps(mergedResume, localResume);
+          // A tombstone means "there is nothing to continue" — express that
+          // locally as an ABSENT record, not as a stored tombstone, because
+          // the lesson page reads this key back verbatim on a replay.
+          if (!forLocal || isTombstone(forLocal)) clearLocalResume(uid);
+          else writeLocalResume(uid, forLocal);
+          // Local was ahead (offline edit, or a device that predates this
+          // column): push it up rather than dropping it.
+          if (localResume && mergedResume !== serverResume) {
+            enqueueCrossDeviceWrite(uid, { resume: mergedResume });
+          }
+        }
+        setLessonResume(resolveOfferableResume(mergedResume ?? null, null));
+      }
+
+      // ── Cross-device: daily-challenge flags ──────────────────────────────
+      // Merge (OR / GREATEST on the same day) and write the result back onto
+      // the legacy per-day keys, so LearnView's existing reader sees what was
+      // done on the other device without LearnView changing at all.
+      {
+        const serverFlags = (data?.daily_flags ?? null) as DailyFlags | null;
+        const localFlags = readLocalDailyFlags(today);
+        const mergedFlags = mergeDailyFlags(
+          serverFlags && serverFlags.day ? serverFlags : null,
+          localFlags
+        );
+        writeLocalDailyFlags(mergedFlags);
+        if (JSON.stringify(serverFlags ?? null) !== JSON.stringify(mergedFlags)) {
+          enqueueCrossDeviceWrite(uid, { dailyFlags: mergedFlags });
+        }
+      }
+
+      // Anything the two blocks above queued goes up now. Not awaited by any
+      // render path; a failure just leaves it queued for the next cycle.
+      void flushCrossDeviceQueue(uid).catch(() => null);
 
       if (effective.streak !== fresh.streak || effective.freezeCount !== fresh.freezeCount) {
         void supabase.from("user_progress").update({
@@ -817,6 +905,151 @@ export function useProgress() {
     }
   };
 
+  // ── Mid-lesson resume (cross-device) ───────────────────────────────────
+  //
+  // Offline-first, in this order, every time:
+  //   1. localStorage, synchronously — the lesson page and the learn page read
+  //      it on the next render whether or not there is any network;
+  //   2. the durable queue, still before any network call;
+  //   3. an opportunistic flush that nobody awaits.
+  //
+  // Called on every step, so it is deliberately cheap and never async.
+  const saveLessonResume = (record: LessonResume) => {
+    if (!userId) return;
+    writeLocalResume(userId, record);
+    setLessonResume(resolveOfferableResume(record, null));
+    enqueueCrossDeviceWrite(userId, { resume: record });
+    void flushCrossDeviceQueue(userId);
+  };
+
+  /**
+   * Clearing writes a TOMBSTONE, not a delete. A delete only says "this device
+   * has nothing"; the other device would re-offer its stale resume point on
+   * the next sync. A tombstone with a fresh savedAt says "this is finished"
+   * and wins the merge everywhere.
+   */
+  const clearLessonResume = (courseId?: string, lessonId?: string) => {
+    if (!userId) return;
+    const tombstone = makeResumeTombstone(courseId, lessonId);
+    clearLocalResume(userId);
+    setLessonResume(null);
+    enqueueCrossDeviceWrite(userId, { resume: tombstone });
+    void flushCrossDeviceQueue(userId);
+  };
+
+  // ── Review sessions count toward the streak ────────────────────────────
+  //
+  // A finished spaced-repetition session keeps the streak alive on exactly the
+  // same terms as a lesson: it goes through /api/progress/sync-streak (the
+  // only writer of `streak` / `last_activity_date`, and idempotent per SAST
+  // day), and it feeds lessonsToday and the daily-challenge counters.
+  //
+  // "Enough for a day" is REVIEW_MIN_CARDS cards answered — see the rationale
+  // on that constant in lib/sync/mergeRules.ts. Anything short of it is a real
+  // review (the cards still get rescheduled by SM-2) but earns no streak day
+  // and no XP, and the review screen says so rather than claiming otherwise.
+  //
+  // The XP and the lessons-today bump are an ATOMIC once-per-day claim on the
+  // server (claim_review_session), so a second session, a second device, or an
+  // offline claim replayed later cannot pay twice.
+  const recordReviewSession = ({
+    cards,
+    correct,
+  }: {
+    cards: number;
+    correct: number;
+  }): {
+    counted: boolean;
+    alreadyCountedToday: boolean;
+    xpAwarded: number;
+    cardsRequired: number;
+  } => {
+    const today = sastToday();
+    const wk = getCurrentWeekKey();
+
+    if (!reviewQualifiesForStreak(cards)) {
+      return {
+        counted: false,
+        alreadyCountedToday: false,
+        xpAwarded: 0,
+        cardsRequired: REVIEW_MIN_CARDS,
+      };
+    }
+
+    const flagsBefore = readLocalDailyFlags(today);
+    const alreadyCountedToday = flagsBefore.reviewCounted;
+    const xpAwarded = alreadyCountedToday ? 0 : reviewXp(correct, cards);
+
+    if (!alreadyCountedToday) {
+      // 1. Local and immediate.
+      setState((prev) => {
+        const base = rollPeriods(prev, wk, today);
+        const next = {
+          ...base,
+          xp: Math.max(0, base.xp + xpAwarded),
+          weeklyXp: base.weeklyXp + xpAwarded,
+          dailyXp: base.dailyXp + xpAwarded,
+          dailyLessons: base.dailyLessons + 1,
+        };
+        writeProgressCache(next, userId);
+        return next;
+      });
+
+      const flags: DailyFlags = {
+        ...flagsBefore,
+        reviewCounted: true,
+        conceptReviewed: true,
+      };
+      writeLocalDailyFlags(flags);
+
+      // The legacy per-day keys the daily-challenge list reads on-device.
+      // Same echo completeLesson does, for the same reason.
+      if (typeof window !== "undefined") {
+        try {
+          const lessonsKey = `notho-daily-lessons-${today}`;
+          const prevLessons = parseInt(localStorage.getItem(lessonsKey) ?? "0", 10);
+          localStorage.setItem(
+            lessonsKey,
+            String((Number.isNaN(prevLessons) ? 0 : prevLessons) + 1)
+          );
+          if (xpAwarded > 0) {
+            const xpKey = `notho-daily-xp-${today}`;
+            const prevXp = parseInt(localStorage.getItem(xpKey) ?? "0", 10);
+            localStorage.setItem(
+              xpKey,
+              String((Number.isNaN(prevXp) ? 0 : prevXp) + xpAwarded)
+            );
+          }
+        } catch { /* best-effort */ }
+      }
+
+      if (userId) {
+        // 2. Durable queue, before the network.
+        enqueueCrossDeviceWrite(userId, {
+          reviewClaim: { day: today, cards, correct, weekKey: wk },
+          dailyFlags: flags,
+        });
+        // 3. Opportunistic flush. If the server says another device already
+        //    claimed today, re-read rather than leaving the optimistic bump.
+        void flushCrossDeviceQueue(userId).then((res) => {
+          if (res?.reviewClaimed?.alreadyClaimed) void loadFromServer(userId).catch(() => undefined);
+        });
+      }
+    }
+
+    // 4. The streak itself — same endpoint as a lesson, not awaited so the
+    //    summary screen never waits on a phone with no signal. The call
+    //    already queues itself via notho-pending-streak-sync on failure.
+    void applyStreakAfterLesson();
+
+    return {
+      counted: true,
+      alreadyCountedToday,
+      xpAwarded,
+      cardsRequired: REVIEW_MIN_CARDS,
+    };
+  };
+
   const MAX_FREEZE_COUNT = 2;
 
   const buyStreakFreeze = (cost = 200): boolean => {
@@ -928,6 +1161,10 @@ export function useProgress() {
     tryDeductXp,
     completeLesson,
     applyStreakAfterLesson,
+    lessonResume,
+    saveLessonResume,
+    clearLessonResume,
+    recordReviewSession,
     buyStreakFreeze,
     useFreeze,
     resetProgress,
