@@ -209,7 +209,7 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
           <span style={{
             display: "inline-block", margin: "0 8px", padding: "2px 12px",
             borderRadius: 8, fontWeight: 800, fontSize: 16,
-            background: isCorrect ? "#007A85" : "#E03C31", color: "white",
+            background: isCorrect ? "var(--color-success)" : "#E03C31", color: "white",
           }}>
             {submittedAnswer}
           </span>
@@ -702,10 +702,10 @@ export function LessonView({
                   key={option}
                   className={`option-button w-full text-left p-5 mb-3 rounded-2xl border-2 transition-all ${answered
                     ? index === step.correct
-                      ? "correct border-green-500 font-bold"
+                      ? "correct font-bold"
                       : index === selectedAnswer
-                        ? "incorrect border-red-500 font-bold"
-                        : "opacity-50"
+                        ? "incorrect font-bold"
+                        : "not-chosen"
                     : "font-medium"
                     }`}
                   onClick={() => answerQuestion(index)}
@@ -840,10 +840,10 @@ export function LessonView({
                   key={String(value)}
                   className={`option-button w-full text-left p-5 mb-3 rounded-2xl border-2 transition-all ${answered
                     ? value === step.correct
-                      ? "correct border-green-500 font-bold"
+                      ? "correct font-bold"
                       : value === selectedAnswer
-                        ? "incorrect border-red-500 font-bold"
-                        : "opacity-50"
+                        ? "incorrect font-bold"
+                        : "not-chosen"
                     : "font-medium"
                     }`}
                   onClick={() => answerTrueFalse(value)}
