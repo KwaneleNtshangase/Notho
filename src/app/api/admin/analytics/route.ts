@@ -58,12 +58,29 @@ const VIEWS: Record<string, string> = {
   dropoff: "admin_dropoff",
   churn: "admin_churn_reasons",
   churnVerbatims: "admin_churn_verbatims",
+  // Added by the analytics v2 migration. A view here that 500s with
+  // "function does not exist" means that migration has not been applied yet.
+  funnel: "admin_activation_funnel",
+  segments: "admin_engagement_segments",
+  matrix: "admin_retention_matrix",
+  clock: "admin_activity_clock",
+  atRisk: "admin_at_risk_users",
+  featureLift: "admin_feature_lift",
+  questions: "admin_question_offenders",
+  growth: "admin_growth_accounting",
+  streaks: "admin_streak_distribution",
 };
 
 function clampDays(raw: string | null, fallback: number): number {
   const n = Number(raw);
   if (!Number.isFinite(n)) return fallback;
   return Math.min(Math.max(Math.round(n), 1), 365);
+}
+
+function clampInt(raw: string | null, fallback: number, lo: number, hi: number): number {
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(Math.max(Math.round(n), lo), hi);
 }
 
 export async function GET(req: NextRequest) {
@@ -91,12 +108,12 @@ export async function GET(req: NextRequest) {
   const days = clampDays(url.searchParams.get("days"), 30);
   let args: Record<string, unknown> = { p_days: days };
 
-  if (view === "retention") {
+  if (view === "retention" || view === "segments" || view === "streaks") {
     args = {};
   } else if (view === "users") {
     args = {
       p_search: (url.searchParams.get("search") ?? "").slice(0, 80) || null,
-      p_limit: Math.min(Math.max(Number(url.searchParams.get("limit") ?? 100), 1), 500),
+      p_limit: clampInt(url.searchParams.get("limit"), 100, 1, 500),
       p_offset: Math.max(Number(url.searchParams.get("offset") ?? 0), 0),
       p_sort: url.searchParams.get("sort") ?? "last_seen",
     };
@@ -109,21 +126,38 @@ export async function GET(req: NextRequest) {
     }
     args = { p_user_id: id };
   } else if (view === "content") {
-    args = { p_days: days, p_min_att: 5 };
+    args = { p_days: days, p_min_att: clampInt(url.searchParams.get("minAttempts"), 5, 1, 100) };
+  } else if (view === "questions") {
+    args = {
+      p_days: days,
+      p_min_att: clampInt(url.searchParams.get("minAttempts"), 4, 1, 100),
+    };
   } else if (view === "churnVerbatims") {
-    args = { p_days: days, p_limit: Math.min(Math.max(Number(url.searchParams.get("limit") ?? 100), 1), 500) };
+    args = { p_days: days, p_limit: clampInt(url.searchParams.get("limit"), 100, 1, 500) };
+  } else if (view === "matrix" || view === "growth") {
+    args = { p_weeks: clampInt(url.searchParams.get("weeks"), 12, 2, 26) };
+  } else if (view === "atRisk") {
+    args = { p_limit: clampInt(url.searchParams.get("limit"), 50, 1, 300) };
   }
 
   const { data, error } = await admin.rpc(fn, args);
 
   if (error) {
-    // The message can name internal objects, so it is logged rather than
-    // returned. The admin still gets enough to know which panel broke.
     console.error(`[admin/analytics] ${view} failed:`, error.message);
+    // The caller is already a verified admin, so hiding the cause from them
+    // buys nothing and costs a debugging session - the previous version of this
+    // route returned a bare 'Could not load "user"' for a missing column, which
+    // took a database dump to diagnose. Admins see the real error; nobody else
+    // can reach this line.
+    const missingFn = /(does not exist|schema cache)/i.test(error.message ?? "");
     return NextResponse.json(
       {
         error: `Could not load "${view}".`,
-        hint: "If this is the first load, the analytics migration may not have been applied yet.",
+        detail: error.message,
+        code: error.code ?? null,
+        hint: missingFn
+          ? `The database function ${fn}() is missing. Apply the pending migrations in supabase/migrations (the newest is the admin analytics v2 one).`
+          : "This is the raw Postgres error. It is shown because you are an admin.",
       },
       { status: 500 }
     );

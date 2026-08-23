@@ -1,61 +1,74 @@
 "use client";
 
 /**
- * /admin/analytics
+ * /admin/analytics - the Notho product dashboard.
  *
- * The product dashboard: who uses Notho, for how long, which features they
- * reach for, whether they come back, and which lessons are landing.
- *
- * Live by design - every panel re-queries Postgres on load and on the refresh
- * cadence below, so nothing here is a stale nightly export.
+ * Live by design: every panel re-queries Postgres on load, on the refresh
+ * cadence below, and whenever the tab regains focus. Nothing here is a stale
+ * nightly export.
  *
  * Access: the API route is the real gate (it checks profiles.is_admin against a
- * service-role client). The check on this page is a courtesy so a non-admin
- * sees a clear message instead of five broken panels.
+ * service-role client, and the RPCs themselves are revoked from authenticated).
+ * The check on this page is a courtesy so a non-admin sees one clear message
+ * instead of seven broken panels.
+ *
+ * The tab order is deliberate. Pulse first because it answers "what should I do
+ * today"; the rest are the evidence, arranged in the order a product question
+ * usually travels - are people arriving, do they engage, do they come back, is
+ * the content right, why do they leave, and finally who exactly are they.
  */
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { C, fetchView } from "./lib";
-import { Button, Card, ErrorNote, Loading, SegmentedControl } from "./components";
-import {
-  ChurnPanel,
-  ContentPanel,
-  FeaturesPanel,
-  OverviewPanel,
-  RetentionPanel,
-  UsersPanel,
-} from "./panels";
+import { fetchView } from "./lib";
+import { ThemeProvider, useTheme } from "./theme";
+import { Btn, Card, ErrorNote, Segmented, Skeleton } from "./ui";
+import { PulsePanel } from "./panelsPulse";
+import { GrowthPanel } from "./panelsGrowth";
+import { EngagementPanel } from "./panelsEngagement";
+import { RetentionPanel } from "./panelsRetention";
+import { ContentPanel } from "./panelsContent";
+import { ChurnPanel } from "./panelsChurn";
+import { PeoplePanel } from "./panelsPeople";
 
-type Tab = "overview" | "features" | "retention" | "churn" | "content" | "users";
+type Tab = "pulse" | "growth" | "engagement" | "retention" | "content" | "churn" | "people";
 
 const TABS: { value: Tab; label: string; blurb: string }[] = [
-  { value: "overview", label: "Overview", blurb: "The headline numbers — users, time, growth." },
-  { value: "features", label: "Features", blurb: "Which parts of the app people actually use." },
-  { value: "retention", label: "Retention", blurb: "Do they come back, and where do they give up?" },
-  // Sits next to Retention on purpose: that tab shows how many left, this one
-  // shows why. Reading either alone is how you end up guessing.
-  { value: "churn", label: "Churn", blurb: "Why the ones who left, left — in their own words." },
-  { value: "content", label: "Content", blurb: "Which lessons are too hard, too easy, or just right." },
-  { value: "users", label: "Users", blurb: "Every user, searchable, with a full drill-down." },
+  { value: "pulse", label: "Pulse", blurb: "The state of the app right now, and what to do about it." },
+  { value: "growth", label: "Growth", blurb: "Who is arriving, and how many of them become real users." },
+  { value: "engagement", label: "Engagement", blurb: "Which parts of Notho earn their place, and when people show up." },
+  { value: "retention", label: "Retention", blurb: "Do they come back, and who is about to stop?" },
+  { value: "content", label: "Content", blurb: "Which lessons and questions to rewrite, and which to leave alone." },
+  { value: "churn", label: "Churn", blurb: "Why the ones who left, left - in their own words." },
+  { value: "people", label: "People", blurb: "Every account, searchable, with a full drill-down." },
 ];
 
 const WINDOWS = [
-  { value: "7", label: "7 days" },
-  { value: "30", label: "30 days" },
-  { value: "90", label: "90 days" },
-  { value: "365", label: "1 year" },
+  { value: "7", label: "7d" },
+  { value: "30", label: "30d" },
+  { value: "90", label: "90d" },
+  { value: "365", label: "1y" },
 ];
 
 /** Auto-refresh cadence. Frequent enough to feel live, gentle on the database. */
 const REFRESH_MS = 60_000;
 
 export default function AdminAnalyticsPage() {
-  const [tab, setTab] = useState<Tab>("overview");
+  return (
+    <ThemeProvider>
+      <Dashboard />
+    </ThemeProvider>
+  );
+}
+
+function Dashboard() {
+  const { mode, toggle } = useTheme();
+  const [tab, setTab] = useState<Tab>("pulse");
   const [days, setDays] = useState("30");
   const [nonce, setNonce] = useState(0);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [auto, setAuto] = useState(true);
+  const [openUser, setOpenUser] = useState<string | null>(null);
 
   const [gate, setGate] = useState<"checking" | "ok" | "denied" | "signed-out">("checking");
   const [gateError, setGateError] = useState<string | null>(null);
@@ -110,164 +123,143 @@ export default function AdminAnalyticsPage() {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [gate, refresh]);
 
-  if (gate === "checking") {
-    return (
-      <Shell>
-        <Loading label="Checking your access…" />
-      </Shell>
-    );
-  }
+  /** Insight cards jump to the tab that proves them. */
+  const jump = useCallback((next: string) => {
+    if (TABS.some((t) => t.value === next)) {
+      setTab(next as Tab);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, []);
 
-  if (gate === "signed-out") {
-    return (
-      <Shell>
+  const openUserFromAnywhere = useCallback((id: string) => {
+    setOpenUser(id);
+    setTab("people");
+  }, []);
+
+  const active = useMemo(() => TABS.find((t) => t.value === tab)!, [tab]);
+  const numDays = Number(days);
+
+  return (
+    <div className="nv-shell">
+      <header className="nv-head">
+        <div className="nv-title">
+          <div className="nv-mark" aria-hidden="true">
+            N
+          </div>
+          <div>
+            <h1 className="nv-h1">Notho mission control</h1>
+            <p className="nv-sub">
+              Live from your database. Every panel updates on its own — no exports, no waiting.
+            </p>
+          </div>
+        </div>
+
+        <div className="nv-actions">
+          {gate === "ok" && (
+            <>
+              <label className="nv-live">
+                <input
+                  type="checkbox"
+                  checked={auto}
+                  onChange={(e) => setAuto(e.target.checked)}
+                  style={{ accentColor: "var(--teal)" }}
+                />
+                <span className={`nv-pulse ${auto ? "" : "off"}`} />
+                {auto ? "Live" : "Paused"}
+                {lastRefresh && (
+                  <span>
+                    {" · "}
+                    {lastRefresh.toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                )}
+              </label>
+              <Btn onClick={refresh}>Refresh</Btn>
+            </>
+          )}
+          <Btn onClick={toggle} title="Switch between the dark console and the light, screenshot-friendly theme">
+            {mode === "dark" ? "☀︎ Light" : "☾ Dark"}
+          </Btn>
+        </div>
+      </header>
+
+      {gate === "checking" && <Skeleton height={260} />}
+
+      {gate === "signed-out" && (
         <Card>
-          <h2 style={{ fontSize: 17, fontWeight: 800, color: C.ink, margin: "0 0 8px" }}>
+          <h2 className="nv-card-title" style={{ marginBottom: 8 }}>
             Please sign in
           </h2>
-          <p style={{ fontSize: 14, color: C.body, margin: 0, lineHeight: 1.6 }}>
-            This dashboard is admin-only. Sign in with your admin account and come back to
-            this page.
+          <p style={{ fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
+            This dashboard is admin-only. Sign in with your admin account and come back to this page.
           </p>
         </Card>
-      </Shell>
-    );
-  }
+      )}
 
-  if (gate === "denied") {
-    return (
-      <Shell>
+      {gate === "denied" && (
         <ErrorNote
           message={
             gateError ??
             "This dashboard is admin-only and your account is not an admin. Ask an existing admin to set is_admin on your profile."
           }
         />
-      </Shell>
-    );
-  }
+      )}
 
-  const numDays = Number(days);
-  const activeTab = TABS.find((t) => t.value === tab)!;
-
-  return (
-    <Shell>
-      {/* Controls */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 14,
-          flexWrap: "wrap",
-          marginBottom: 18,
-        }}
-      >
-        <SegmentedControl
-          options={TABS.map((t) => ({ value: t.value, label: t.label }))}
-          value={tab}
-          onChange={setTab}
-        />
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          {tab !== "users" && tab !== "content" && (
-            <SegmentedControl options={WINDOWS} value={days} onChange={setDays} />
-          )}
-          <Button onClick={refresh}>Refresh</Button>
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 12,
-          flexWrap: "wrap",
-          marginBottom: 18,
-        }}
-      >
-        <p style={{ fontSize: 13.5, color: C.muted, margin: 0 }}>{activeTab.blurb}</p>
-        <label
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            fontSize: 12.5,
-            color: C.muted,
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} />
-          <span
+      {gate === "ok" && (
+        <>
+          <div
             style={{
-              display: "inline-flex",
+              display: "flex",
+              justifyContent: "space-between",
               alignItems: "center",
-              gap: 6,
+              gap: 12,
+              flexWrap: "wrap",
+              marginBottom: 14,
             }}
           >
-            <span
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                background: auto ? C.green : C.muted,
-                display: "inline-block",
-              }}
-            />
-            Live
-            {lastRefresh && (
-              <span>
-                · updated{" "}
-                {lastRefresh.toLocaleTimeString("en-ZA", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
+            <nav className="nv-nav" role="tablist" aria-label="Dashboard sections">
+              {TABS.map((t) => (
+                <button
+                  key={t.value}
+                  role="tab"
+                  aria-selected={tab === t.value}
+                  className="nv-tab"
+                  onClick={() => setTab(t.value)}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </nav>
+
+            {tab !== "people" && (
+              <Segmented options={WINDOWS} value={days} onChange={setDays} label="Time window" />
             )}
-          </span>
-        </label>
-      </div>
+          </div>
 
-      {tab === "overview" && <OverviewPanel days={numDays} nonce={nonce} />}
-      {tab === "features" && <FeaturesPanel days={numDays} nonce={nonce} />}
-      {tab === "retention" && <RetentionPanel days={numDays} nonce={nonce} />}
-      {tab === "churn" && <ChurnPanel days={numDays} nonce={nonce} />}
-      {tab === "content" && <ContentPanel nonce={nonce} />}
-      {tab === "users" && <UsersPanel nonce={nonce} />}
+          <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 18px" }}>{active.blurb}</p>
 
-      <p
-        style={{
-          fontSize: 11.5,
-          color: C.muted,
-          marginTop: 28,
-          lineHeight: 1.6,
-          maxWidth: 720,
-        }}
-      >
-        This page shows personal data and is restricted to admins. Under POPIA, only view what
-        you need for a legitimate product purpose, and prefer the aggregate tabs over the
-        per-user drill-down when preparing anything you will share outside the team.
-      </p>
-    </Shell>
-  );
-}
+          <div role="tabpanel" aria-label={active.label}>
+          {tab === "pulse" && <PulsePanel days={numDays} nonce={nonce} onJump={jump} />}
+          {tab === "growth" && <GrowthPanel days={numDays} nonce={nonce} />}
+          {tab === "engagement" && <EngagementPanel days={numDays} nonce={nonce} />}
+          {tab === "retention" && (
+            <RetentionPanel days={numDays} nonce={nonce} onOpenUser={openUserFromAnywhere} />
+          )}
+          {tab === "content" && <ContentPanel days={numDays} nonce={nonce} />}
+          {tab === "churn" && <ChurnPanel days={numDays} nonce={nonce} />}
+          {tab === "people" && (
+            <PeoplePanel nonce={nonce} openUser={openUser} onOpenUser={setOpenUser} />
+          )}
+          </div>
 
-function Shell({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ minHeight: "100vh", background: C.bg, padding: "28px 20px 60px" }}>
-      <div style={{ maxWidth: 1180, margin: "0 auto" }}>
-        <header style={{ marginBottom: 22 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: C.navy, margin: "0 0 6px" }}>
-            Notho product dashboard
-          </h1>
-          <p style={{ fontSize: 14, color: C.muted, margin: 0, lineHeight: 1.55 }}>
-            Live data straight from your database. Every panel updates on its own — no exports,
-            no waiting.
+          <p className="nv-foot">
+            This page shows personal data and is restricted to admins. Under POPIA, only view what
+            you need for a legitimate product purpose, and prefer the aggregate tabs over the
+            per-user drill-down when preparing anything you will share outside the team. Time
+            buckets are South African time; &ldquo;active&rdquo; means a tracked session, a question
+            answered, or any recorded feature event.
           </p>
-        </header>
-        {children}
-      </div>
+        </>
+      )}
     </div>
   );
 }
