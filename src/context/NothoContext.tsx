@@ -84,20 +84,26 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
   // every navigation. Mid-lesson resume is unaffected — that lives in the
   // "notho-lesson-progress" localStorage record, which is written by the save
   // effect in useNothoState and is not touched here.
+  //
+  // The three setters below come straight from useState in useNothoState, so
+  // their identity is stable across renders even though the object holding
+  // them is rebuilt every time. That is why they can sit in dependency arrays
+  // without churning.
   const rawLessonCourseId = state.currentLessonState.courseId;
   const rawSummaryCourseId = state.lessonSummary?.courseId ?? null;
-  const setCurrentLessonStateRef = React.useRef(state.setCurrentLessonState);
-  const setLessonSummaryRef = React.useRef(state.setLessonSummary);
-  const setRouteRef = React.useRef(state.setRoute);
-  setCurrentLessonStateRef.current = state.setCurrentLessonState;
-  setLessonSummaryRef.current = state.setLessonSummary;
-  setRouteRef.current = state.setRoute;
+  const { setCurrentLessonState, setLessonSummary, setRoute: setRouteState } = state;
 
   React.useEffect(() => {
     if (lessonLocation) return; // still inside a lesson — nothing to release
-    if (rawLessonCourseId !== null) setCurrentLessonStateRef.current(NO_LESSON);
-    if (rawSummaryCourseId !== null) setLessonSummaryRef.current(null);
-  }, [lessonLocation, rawLessonCourseId, rawSummaryCourseId]);
+    if (rawLessonCourseId !== null) setCurrentLessonState(NO_LESSON);
+    if (rawSummaryCourseId !== null) setLessonSummary(null);
+  }, [
+    lessonLocation,
+    rawLessonCourseId,
+    rawSummaryCourseId,
+    setCurrentLessonState,
+    setLessonSummary,
+  ]);
 
   // ── Navigation ──────────────────────────────────────────────────────────
   //
@@ -173,14 +179,19 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
     (courseId?: string | null) => {
       const target = lessonLocation?.courseId || courseId || null;
       const href = exitHrefForLesson(pathname, courseId ?? null);
-      setLessonSummaryRef.current(null);
-      setCurrentLessonStateRef.current(NO_LESSON);
-      setRouteRef.current(
-        target ? { name: "course", courseId: target } : { name: "learn" }
-      );
+      setLessonSummary(null);
+      setCurrentLessonState(NO_LESSON);
+      setRouteState(target ? { name: "course", courseId: target } : { name: "learn" });
       router.replace(href);
     },
-    [router, pathname, lessonLocation]
+    [
+      router,
+      pathname,
+      lessonLocation,
+      setCurrentLessonState,
+      setLessonSummary,
+      setRouteState,
+    ]
   );
 
   // Wrap startLesson so it uses Next.js routing after setting up lesson state.

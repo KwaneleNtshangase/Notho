@@ -126,30 +126,32 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
 
   // ── Phase, keyed to the lesson in the URL ───────────────────────────────
   //
-  // Keying by lessonKey rather than resetting in an effect means a new lesson
-  // starts in "playing" on its very first render. An effect would leave one
-  // frame where the previous lesson's phase still applied — small, but that is
-  // precisely the size of window this whole fix is about.
-  //
-  // The ref is the synchronous half: two taps in the same frame both read
-  // `phase` from the last committed render, so the state alone cannot stop the
-  // second one from awarding XP twice. The ref is written before the await.
-  const phaseRef = React.useRef<{ key: string; phase: LessonPhase }>({
-    key: lessonKey,
-    phase: "playing",
-  });
+  // Keyed rather than reset in an effect, so a new lesson starts in "playing"
+  // on its very first render. An effect would leave one frame where the
+  // previous lesson's phase still applied — small, but that is precisely the
+  // size of the window this whole fix is about. Adjusting state during render
+  // when a prop changes is React's own sanctioned pattern for this.
   const [phaseState, setPhaseState] = React.useState<{ key: string; phase: LessonPhase }>({
     key: lessonKey,
     phase: "playing",
   });
-  if (phaseRef.current.key !== lessonKey) {
-    phaseRef.current = { key: lessonKey, phase: "playing" };
+  if (phaseState.key !== lessonKey) {
+    setPhaseState({ key: lessonKey, phase: "playing" });
   }
   const phase: LessonPhase = phaseState.key === lessonKey ? phaseState.phase : "playing";
 
+  // Synchronous mirror of the phase, for the one thing state cannot do: stop a
+  // second tap that lands in the same frame, before React has re-rendered, from
+  // starting a second finalize and awarding XP twice. Written only in event
+  // handlers and effects — never during render.
+  const phaseRef = React.useRef<LessonPhase>("playing");
+  React.useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
+
   const enterPhase = React.useCallback(
     (next: LessonPhase) => {
-      phaseRef.current = { key: lessonKey, phase: next };
+      phaseRef.current = next;
       setPhaseState({ key: lessonKey, phase: next });
     },
     [lessonKey]
@@ -162,23 +164,28 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
   // each pass round the bounce showed a larger time — the "counter that keeps
   // climbing". Freezing it also makes the number honest: it measures the
   // lesson, not the lesson plus however long the summary sat on screen.
+  //
+  // Started in an effect, not in the useRef initialiser: Date.now() is impure,
+  // and a render may run more than once. First paint is the right moment to
+  // start timing a lesson anyway.
+  //
   // LessonView receives lessonStartTimeRef as a prop. It does not read it today,
   // and it does not need to: the phase machine unmounts LessonView the moment
   // finalize begins, so any timer that ever lives in there stops by
   // construction rather than by remembering to stop it.
-  const clockKeyRef = React.useRef<string>(lessonKey);
-  const lessonStartTimeRef = React.useRef<number>(Date.now());
+  const lessonStartTimeRef = React.useRef<number>(0);
   const frozenSecondsRef = React.useRef<number | null>(null);
-  if (clockKeyRef.current !== lessonKey) {
-    clockKeyRef.current = lessonKey;
+  React.useEffect(() => {
     lessonStartTimeRef.current = Date.now();
     frozenSecondsRef.current = null;
-  }
+  }, [lessonKey]);
+
   const stopLessonClock = React.useCallback(() => {
     if (frozenSecondsRef.current === null) {
+      const startedAt = lessonStartTimeRef.current || Date.now();
       frozenSecondsRef.current = Math.max(
         0,
-        Math.round((Date.now() - lessonStartTimeRef.current) / 1000)
+        Math.round((Date.now() - startedAt) / 1000)
       );
     }
     return frozenSecondsRef.current;
@@ -243,6 +250,10 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
         ) as WorkingStep[];
       }
       if (workingSteps.length === 0) {
+        // Redirecting away from a route that cannot render is exactly what an
+        // effect is for; the phase change is what stops this effect re-arming
+        // the lesson while the navigation is in flight.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         enterPhase("leaving");
         leaveLesson(courseId);
         return;
@@ -263,15 +274,17 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       });
       return;
     }
+    // Unknown lesson — same redirect-from-an-effect as above.
     enterPhase("leaving");
     leaveLesson(courseId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, hasLessonState, userId, courseId, lessonId]);
 
   const finalizeCurrentLesson = async (choice: "next" | "course") => {
-    // One owner, checked synchronously: a second tap in the same frame reads
-    // the ref, not the not-yet-committed state.
-    if (phaseRef.current.key !== lessonKey || phaseRef.current.phase !== "playing") return;
+    // `phase` is correct for this render; the ref catches a second tap that
+    // lands in the same frame, before React has re-rendered. One owner, two
+    // reads, neither of which can be stale.
+    if (phase !== "playing" || phaseRef.current !== "playing") return;
     if (!hasLessonState || !currentLessonState.courseId || !currentLessonState.lessonId) return;
 
     const lessonCourseId = currentLessonState.courseId;
