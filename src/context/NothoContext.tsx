@@ -1,30 +1,124 @@
 "use client";
 
-import React, { createContext, useContext, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React, { createContext, useContext } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useNothoState as useNothoStateInternal } from "@/hooks/useNothoState";
 import type { NothoState } from "@/hooks/useNothoState";
 import type { Route } from "@/app/pageViews.types";
+import {
+  belongsToLocation,
+  courseHref,
+  exitHrefForLesson,
+  lessonHref,
+  lessonLocationFromPath,
+} from "@/lib/lessonRoute";
 
-export const NothoContext = createContext<NothoState | null>(null);
+type LessonState = NothoState["currentLessonState"];
+
+/**
+ * The value handed to consumers whenever the URL is not on the lesson that the
+ * in-memory state describes. A module-level constant so its identity is stable
+ * across renders — a fresh object here would invalidate every memo downstream.
+ */
+const NO_LESSON: LessonState = {
+  courseId: null,
+  lessonId: null,
+  stepIndex: 0,
+  steps: [],
+  answers: {},
+  correctCount: 0,
+  mistakes: 0,
+  masteredQids: [],
+  mistakenQids: [],
+};
+
+export const NothoContext = createContext<
+  (NothoState & { leaveLesson: (courseId?: string | null) => void }) | null
+>(null);
 
 export function NothoProvider({ children }: { children: React.ReactNode }) {
   const state = useNothoStateInternal();
   const router = useRouter();
-  
-  // Intercept setRoute to use Next.js routing instead of just updating local state
+  const pathname = usePathname();
+
+  // ── The URL is the owner of "where am I" ────────────────────────────────
+  //
+  // Everything below reads from this. `route` in useNothoState is still
+  // written (the onboarding reconcile and the notho-last-route persistence
+  // both read it) but it is bookkeeping, not a second source of truth: no
+  // component outside that hook consumes it, and nothing here branches on it.
+  const lessonLocation = React.useMemo(
+    () => lessonLocationFromPath(pathname),
+    [pathname]
+  );
+
+  // ── Lesson state, scoped to the URL ─────────────────────────────────────
+  //
+  // Previously this was a free-floating global. router.push is async and
+  // setState is not, so between "Continue" and the new page actually rendering
+  // there was a window in which the lesson page re-rendered the lesson the user
+  // had just finished — complete with its "Done - Back to Course" button. That
+  // button re-entered finalize, which cancelled the exit and restarted the
+  // clock: the reported bounce.
+  //
+  // Scoping it closes the window by construction. A lesson state that does not
+  // belong to the lesson in the URL is not visible to anybody, so it cannot be
+  // rendered, cannot be finalised, and cannot leak onto the course page or into
+  // the next lesson.
+  const currentLessonState = belongsToLocation(state.currentLessonState, lessonLocation)
+    ? state.currentLessonState
+    : NO_LESSON;
+
+  // Same rule for the summary. A summary belongs to exactly one lesson; once
+  // the URL is somewhere else it is history, not a screen. This is what stops a
+  // stale full-screen summary overlay (zIndex 600) from covering the next
+  // lesson and swallowing its exit controls.
+  const lessonSummary = belongsToLocation(state.lessonSummary, lessonLocation)
+    ? state.lessonSummary
+    : null;
+
+  // ── Drop lesson state when the URL leaves the lesson section ────────────
+  //
+  // Scoping already hides it; this releases it. Note the guard: clearing
+  // unconditionally on every pathname change would re-render the whole tree on
+  // every navigation. Mid-lesson resume is unaffected — that lives in the
+  // "notho-lesson-progress" localStorage record, which is written by the save
+  // effect in useNothoState and is not touched here.
+  //
+  // The three setters below come straight from useState in useNothoState, so
+  // their identity is stable across renders even though the object holding
+  // them is rebuilt every time. That is why they can sit in dependency arrays
+  // without churning.
+  const rawLessonCourseId = state.currentLessonState.courseId;
+  const rawSummaryCourseId = state.lessonSummary?.courseId ?? null;
+  const { setCurrentLessonState, setLessonSummary, setRoute: setRouteState } = state;
+
+  React.useEffect(() => {
+    if (lessonLocation) return; // still inside a lesson — nothing to release
+    if (rawLessonCourseId !== null) setCurrentLessonState(NO_LESSON);
+    if (rawSummaryCourseId !== null) setLessonSummary(null);
+  }, [
+    lessonLocation,
+    rawLessonCourseId,
+    rawSummaryCourseId,
+    setCurrentLessonState,
+    setLessonSummary,
+  ]);
+
+  // ── Navigation ──────────────────────────────────────────────────────────
+  //
+  // setRoute still mirrors into React state so the onboarding reconcile and the
+  // last-route persistence keep working, but the navigation itself is the part
+  // that matters: the pathname is what every screen decision is made from.
   const setRoute = React.useCallback(
     (newRouteAction: React.SetStateAction<Route>) => {
-      // Evaluate if it's a function update
       const newRoute =
         typeof newRouteAction === "function"
           ? newRouteAction(state.route)
           : newRouteAction;
 
-      // Ensure the actual state gets updated so components re-render if they rely on it
       state.setRoute(newRoute);
 
-      // Perform router navigation based on the route
       switch (newRoute.name) {
         case "learn":
           router.push("/learn");
@@ -48,11 +142,11 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
           router.push("/settings");
           break;
         case "course":
-          if (newRoute.courseId) router.push(`/course/${newRoute.courseId}`);
+          if (newRoute.courseId) router.push(courseHref(newRoute.courseId));
           break;
         case "lesson":
           if (newRoute.courseId && newRoute.lessonId) {
-            router.push(`/lesson/${newRoute.courseId}/${newRoute.lessonId}`);
+            router.push(lessonHref(newRoute.courseId, newRoute.lessonId));
           }
           break;
         case "onboarding":
@@ -66,33 +160,68 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
     [router, state]
   );
 
+  /**
+   * Leave the lesson, unconditionally.
+   *
+   * Three properties the old `setRoute({ name: "course" })` did not have:
+   *
+   *  - It takes the course from the URL first (see exitHrefForLesson), so it
+   *    still lands correctly when in-memory lesson state is stale, empty, or
+   *    mid-restore — exactly when the learner is most stuck.
+   *  - It drops the lesson state and the summary FIRST, so nothing can
+   *    re-render the lesson (or re-arm it from the mount effect) while the
+   *    navigation is in flight.
+   *  - It uses replace, not push. With push, Back from the course page dropped
+   *    the learner straight back into the finished lesson's completion screen,
+   *    which is the same trap by another door.
+   */
+  const leaveLesson = React.useCallback(
+    (courseId?: string | null) => {
+      const target = lessonLocation?.courseId || courseId || null;
+      const href = exitHrefForLesson(pathname, courseId ?? null);
+      setLessonSummary(null);
+      setCurrentLessonState(NO_LESSON);
+      setRouteState(target ? { name: "course", courseId: target } : { name: "learn" });
+      router.replace(href);
+    },
+    [
+      router,
+      pathname,
+      lessonLocation,
+      setCurrentLessonState,
+      setLessonSummary,
+      setRouteState,
+    ]
+  );
+
   // Wrap startLesson so it uses Next.js routing after setting up lesson state.
   // The raw startLesson in useNothoState intentionally does NOT call setRoute
   // (it used to call the raw useState setter which was the navigation bug).
-  // This wrapper handles both state update and router.push on success.
   const startLesson = React.useCallback(
     (courseId: string, lessonId: string): boolean => {
       const ok = state.startLesson(courseId, lessonId);
       if (ok) {
         state.setRoute({ name: "lesson", courseId, lessonId });
-        router.push(`/lesson/${courseId}/${lessonId}`);
+        router.push(lessonHref(courseId, lessonId));
       }
       return ok;
     },
     [router, state]
   );
 
-  const value = React.useMemo(() => ({
-    ...state,
-    setRoute,
-    startLesson,
-  }), [state, setRoute, startLesson]);
-
-  return (
-    <NothoContext.Provider value={value}>
-      {children}
-    </NothoContext.Provider>
+  const value = React.useMemo(
+    () => ({
+      ...state,
+      currentLessonState,
+      lessonSummary,
+      setRoute,
+      startLesson,
+      leaveLesson,
+    }),
+    [state, currentLessonState, lessonSummary, setRoute, startLesson, leaveLesson]
   );
+
+  return <NothoContext.Provider value={value}>{children}</NothoContext.Provider>;
 }
 
 export function useNotho() {

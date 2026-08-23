@@ -30,6 +30,28 @@ import { logQuestionAttempt } from "@/lib/questionAttempts";
 /** Saved mid-lesson progress is honoured for this long after the last step. */
 const SAVED_PROGRESS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
+/**
+ * Where this lesson URL is in its lifecycle.
+ *
+ * This replaces `isFinalizingRef`, which was a guard flag: it stopped a second
+ * finalize from running but changed nothing on screen, so LessonView stayed
+ * mounted with its "Done - Back to Course" button live through the whole
+ * await — and again after the summary was dismissed, while router.push was
+ * still in flight. Tapping it there re-entered finalize, cancelled the exit and
+ * recomputed the elapsed time from a start that never reset. That is the
+ * bounce, and the climbing clock.
+ *
+ * A phase fixes it because it is monotonic and it drives the render: once a
+ * lesson leaves "playing" it never shows LessonView again, so there is no
+ * button left to tap.
+ *
+ *   playing   → the learner is working through the steps
+ *   finishing → finalize is awaiting the server; show progress, accept nothing
+ *   summary   → LessonSummaryView is up
+ *   leaving   → navigation is in flight; render nothing interactive
+ */
+type LessonPhase = "playing" | "finishing" | "summary" | "leaving";
+
 type SavedMidLesson = {
   userId?: string;
   courseId?: string;
@@ -62,13 +84,36 @@ function readSavedMidLesson(
   }
 }
 
+/** Neutral screen for the phases where nothing may be interactive. */
+function LessonInterstitial({ label }: { label: string }) {
+  return (
+    <div
+      className="p-4"
+      role="status"
+      aria-live="polite"
+      style={{
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "var(--color-text-secondary)",
+        fontWeight: 600,
+      }}
+    >
+      {label}
+    </div>
+  );
+}
+
 export default function LessonPage({ params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const { courseId, lessonId } = use(params);
   const {
     userId,
+    userData,
     currentLessonState,
     setCurrentLessonState,
     setRoute,
+    leaveLesson,
     hearts,
     loseHeart,
     completeLesson,
@@ -77,13 +122,80 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
     setLessonSummary,
   } = useNotho();
 
-  const lessonStartTimeRef = React.useRef(Date.now());
-  const isFinalizingRef = React.useRef(false);
-  const lessonHeartLostRef = React.useRef(false); // To track if a heart was lost during this lesson
+  const lessonKey = `${courseId}:${lessonId}`;
 
-  // State is only usable when it belongs to THIS URL. A stale state from the
-  // previous lesson (e.g. after "Continue to next lesson") must be re-inited,
-  // or the old lesson's steps render under the new URL.
+  // ── Phase, keyed to the lesson in the URL ───────────────────────────────
+  //
+  // Keyed rather than reset in an effect, so a new lesson starts in "playing"
+  // on its very first render. An effect would leave one frame where the
+  // previous lesson's phase still applied — small, but that is precisely the
+  // size of the window this whole fix is about. Adjusting state during render
+  // when a prop changes is React's own sanctioned pattern for this.
+  const [phaseState, setPhaseState] = React.useState<{ key: string; phase: LessonPhase }>({
+    key: lessonKey,
+    phase: "playing",
+  });
+  if (phaseState.key !== lessonKey) {
+    setPhaseState({ key: lessonKey, phase: "playing" });
+  }
+  const phase: LessonPhase = phaseState.key === lessonKey ? phaseState.phase : "playing";
+
+  // Synchronous mirror of the phase, for the one thing state cannot do: stop a
+  // second tap that lands in the same frame, before React has re-rendered, from
+  // starting a second finalize and awarding XP twice. Written only in event
+  // handlers and effects — never during render.
+  const phaseRef = React.useRef<LessonPhase>("playing");
+  React.useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
+
+  const enterPhase = React.useCallback(
+    (next: LessonPhase) => {
+      phaseRef.current = next;
+      setPhaseState({ key: lessonKey, phase: next });
+    },
+    [lessonKey]
+  );
+
+  // ── The lesson clock ────────────────────────────────────────────────────
+  //
+  // Started per lesson URL and STOPPED at the instant finalize begins. It was
+  // previously read fresh on every finalize from a ref that never reset, so
+  // each pass round the bounce showed a larger time — the "counter that keeps
+  // climbing". Freezing it also makes the number honest: it measures the
+  // lesson, not the lesson plus however long the summary sat on screen.
+  //
+  // Started in an effect, not in the useRef initialiser: Date.now() is impure,
+  // and a render may run more than once. First paint is the right moment to
+  // start timing a lesson anyway.
+  //
+  // LessonView receives lessonStartTimeRef as a prop. It does not read it today,
+  // and it does not need to: the phase machine unmounts LessonView the moment
+  // finalize begins, so any timer that ever lives in there stops by
+  // construction rather than by remembering to stop it.
+  const lessonStartTimeRef = React.useRef<number>(0);
+  const frozenSecondsRef = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    lessonStartTimeRef.current = Date.now();
+    frozenSecondsRef.current = null;
+  }, [lessonKey]);
+
+  const stopLessonClock = React.useCallback(() => {
+    if (frozenSecondsRef.current === null) {
+      const startedAt = lessonStartTimeRef.current || Date.now();
+      frozenSecondsRef.current = Math.max(
+        0,
+        Math.round((Date.now() - startedAt) / 1000)
+      );
+    }
+    return frozenSecondsRef.current;
+  }, []);
+
+  const lessonHeartLostRef = React.useRef(false); // did a heart go during this run
+
+  // State is only usable when it belongs to THIS URL. NothoContext already
+  // scopes it to the pathname, so this is now a cheap local restatement rather
+  // than the only thing standing between the user and the previous lesson.
   const hasLessonState = Boolean(
     currentLessonState &&
       currentLessonState.steps &&
@@ -96,9 +208,14 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
   // deep link, or next-lesson navigation). Restore the saved mid-lesson
   // position if one exists for this exact lesson, otherwise start it fresh
   // from content; only bail to the course page when the lesson is unknown.
-  // Runs in an effect — the previous version called setRoute during render,
-  // which is unsafe and dumped users back to the course on every refresh.
+  //
+  // The `phase !== "playing"` guard is the important addition. Without it this
+  // effect re-armed a lesson the learner had just left: finalize clears the
+  // saved progress, the context releases the lesson state, `hasLessonState`
+  // goes false — and this effect promptly built a brand new run of the same
+  // lesson underneath the summary, which is what the exit was then fighting.
   React.useEffect(() => {
+    if (phase !== "playing") return;
     if (hasLessonState) return;
     const course = CONTENT_DATA.courses.find((c) => c.id === courseId);
     const lesson = course?.units
@@ -133,7 +250,12 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
         ) as WorkingStep[];
       }
       if (workingSteps.length === 0) {
-        setRoute({ name: "course", courseId });
+        // Redirecting away from a route that cannot render is exactly what an
+        // effect is for; the phase change is what stops this effect re-arming
+        // the lesson while the navigation is in flight.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        enterPhase("leaving");
+        leaveLesson(courseId);
         return;
       }
       const stepIdx = saved
@@ -152,25 +274,29 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       });
       return;
     }
-    setRoute({ name: "course", courseId });
+    // Unknown lesson — same redirect-from-an-effect as above.
+    enterPhase("leaving");
+    leaveLesson(courseId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasLessonState, userId, courseId, lessonId]);
-
-  if (!hasLessonState || !currentLessonState) {
-    return <div className="p-4">Loading lesson...</div>;
-  }
+  }, [phase, hasLessonState, userId, courseId, lessonId]);
 
   const finalizeCurrentLesson = async (choice: "next" | "course") => {
-    // Prevent double-tap on Done from awarding XP multiple times
-    if (isFinalizingRef.current) return;
-    isFinalizingRef.current = true;
+    // `phase` is correct for this render; the ref catches a second tap that
+    // lands in the same frame, before React has re-rendered. One owner, two
+    // reads, neither of which can be stale.
+    if (phase !== "playing" || phaseRef.current !== "playing") return;
+    if (!hasLessonState || !currentLessonState.courseId || !currentLessonState.lessonId) return;
+
+    const lessonCourseId = currentLessonState.courseId;
+    const lessonLessonId = currentLessonState.lessonId;
+
+    // Stop the clock before anything can await. Everything below reports this
+    // number, so the summary can never grow while it is on screen.
+    const timeSeconds = stopLessonClock();
+    enterPhase("finishing");
 
     const baseXP = 50;
     const totalXP = baseXP + currentLessonState.correctCount * 10;
-    if (!currentLessonState.courseId || !currentLessonState.lessonId) {
-      isFinalizingRef.current = false;
-      return;
-    }
 
     // Distinct questions in the lesson (re-queued copies share a qid, so this
     // is not inflated by the mastery loop).
@@ -179,99 +305,109 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
     // longer mean "all correct" — it means the learner never missed on the
     // first try.
     const isPerfect = totalQuestions > 0 && currentLessonState.mistakes === 0;
+    const alreadyCompleted = isLessonCompleted(lessonCourseId, lessonLessonId);
+    const lessonTitleDone = getLessonTitle(lessonCourseId, lessonLessonId) ?? "";
+    const nextLessonId = getNextLesson(lessonCourseId, lessonLessonId)?.id ?? null;
 
-    const lessonTitleDone =
-      getLessonTitle(currentLessonState.courseId, currentLessonState.lessonId) ?? "";
-    const alreadyCompleted = isLessonCompleted(
-      currentLessonState.courseId,
-      currentLessonState.lessonId
-    );
+    // Accuracy differs by branch and always has. A replay has no first-try
+    // record to speak of (the mistakenQids of THIS run only), so it reports
+    // straight correctness; a first completion reports first-try accuracy,
+    // which is the number the mastery loop makes meaningful.
+    const accuracy = alreadyCompleted
+      ? totalQuestions > 0
+        ? Math.min(100, Math.round((currentLessonState.correctCount / totalQuestions) * 100))
+        : 0
+      : firstTryAccuracy(currentLessonState.steps, currentLessonState.mistakenQids);
 
-    const { streak: streakAfterLesson, xpAwarded } = await completeLesson(
-      currentLessonState.courseId,
-      currentLessonState.lessonId,
-      totalXP,
-      isPerfect
-    );
+    let xpAwarded = 0;
+    let streakAfterLesson = userData?.streak ?? 0;
 
-    analytics.lessonCompleted(
-      currentLessonState.courseId,
-      currentLessonState.lessonId,
-      lessonTitleDone,
-      {
+    try {
+      const result = await completeLesson(
+        lessonCourseId,
+        lessonLessonId,
+        totalXP,
+        isPerfect
+      );
+      xpAwarded = result.xpAwarded;
+      streakAfterLesson = result.streak;
+    } catch (err) {
+      // Never strand the learner inside a finished lesson. completeLesson does
+      // its own network error handling, but if anything in it ever throws, the
+      // old code left isFinalizingRef stuck true and every subsequent tap on
+      // "Done - Back to Course" became a silent no-op — the reported "I am
+      // trapped in the lesson". Show what we know and let them out.
+      console.error("[lesson] finalize failed; showing local summary", err);
+    }
+
+    try {
+      analytics.lessonCompleted(lessonCourseId, lessonLessonId, lessonTitleDone, {
         xpEarned: xpAwarded,
         isPerfect,
-        timeSeconds: Math.round((Date.now() - lessonStartTimeRef.current) / 1000),
+        timeSeconds,
         heartLost: lessonHeartLostRef.current,
-      }
-    );
+      });
+    } catch {
+      /* analytics must never block the exit */
+    }
 
     if (typeof window !== "undefined") {
-      localStorage.removeItem("notho-lesson-progress");
+      try {
+        localStorage.removeItem("notho-lesson-progress");
+      } catch {
+        /* best-effort */
+      }
     }
 
-    if (alreadyCompleted) {
-      const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
-      const accuracy =
-        totalQuestions > 0
-          ? Math.min(100, Math.round((currentLessonState.correctCount / totalQuestions) * 100))
-          : 0;
-      setLessonSummary({
-        xpEarned: xpAwarded,
-        timeSeconds: elapsedSeconds,
-        accuracy,
-        streak: streakAfterLesson,
-        isPerfect,
-        choice,
-        nextLessonId: getNextLesson(currentLessonState.courseId, currentLessonState.lessonId)?.id ?? null,
-        courseId: currentLessonState.courseId,
-        lessonId: currentLessonState.lessonId,
-      });
-      isFinalizingRef.current = false;
-      return;
-    }
-
-    // Perfect-lesson count is now server-backed (perfect_lessons_total via
+    // Perfect-lesson count is server-backed (perfect_lessons_total via
     // completeLesson → recordLessonStats) — no device-local counter to drift.
-
-    const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
-    const accuracy = firstTryAccuracy(
-      currentLessonState.steps,
-      currentLessonState.mistakenQids
-    );
-
     setLessonSummary({
       xpEarned: xpAwarded,
-      timeSeconds: elapsedSeconds,
+      timeSeconds,
       accuracy,
       streak: streakAfterLesson,
       isPerfect,
       choice,
-      nextLessonId: getNextLesson(currentLessonState.courseId, currentLessonState.lessonId)?.id ?? null,
-      courseId: currentLessonState.courseId,
-      lessonId: currentLessonState.lessonId,
+      nextLessonId,
+      courseId: lessonCourseId,
+      lessonId: lessonLessonId,
     });
-    
-    isFinalizingRef.current = false;
+    enterPhase("summary");
   };
 
   const handleLessonSummaryClose = () => {
-    if (!lessonSummary) return;
-    const { choice, nextLessonId, courseId } = lessonSummary;
+    const summary = lessonSummary;
+    // Enter "leaving" BEFORE clearing the summary. Clearing first is what used
+    // to hand the screen back to LessonView — and its finish button — for the
+    // whole duration of the pending navigation.
+    enterPhase("leaving");
     setLessonSummary(null);
-    if (choice === "next" && nextLessonId) {
-      setRoute({ name: "lesson", courseId, lessonId: nextLessonId });
-    } else {
-      setRoute({ name: "course", courseId });
+    if (summary?.choice === "next" && summary.nextLessonId) {
+      setRoute({
+        name: "lesson",
+        courseId: summary.courseId,
+        lessonId: summary.nextLessonId,
+      });
+      return;
     }
+    leaveLesson(summary?.courseId ?? courseId);
   };
 
-  if (lessonSummary) {
+  // ── Render by phase. Order matters: the terminal phases win. ─────────────
+  if (phase === "leaving") {
+    return <LessonInterstitial label="Taking you back…" />;
+  }
+
+  if (phase === "summary") {
+    // The summary is scoped to this URL by NothoContext. If it is gone, the URL
+    // moved on and this page is on its way out — never fall back to LessonView.
+    if (!lessonSummary) return <LessonInterstitial label="Taking you back…" />;
     return (
       <LessonSummaryView
         lessonSummary={lessonSummary}
         onClose={handleLessonSummaryClose}
         onBudgetBridge={() => {
+          enterPhase("leaving");
           setLessonSummary(null);
           setRoute({ name: "budget" });
         }}
@@ -279,9 +415,16 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
     );
   }
 
+  if (phase === "finishing") {
+    return <LessonInterstitial label="Saving your progress…" />;
+  }
+
+  if (!hasLessonState || !currentLessonState) {
+    return <div className="p-4">Loading lesson...</div>;
+  }
+
   const nextTitle = (() => {
-    if (!currentLessonState.courseId || !currentLessonState.lessonId) return undefined;
-    const next = getNextLesson(currentLessonState.courseId, currentLessonState.lessonId);
+    const next = getNextLesson(courseId, lessonId);
     return next?.title ?? undefined;
   })();
 
@@ -294,6 +437,8 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       | (WorkingStep & { conceptId?: string })
       | undefined;
     setCurrentLessonState((prev) => {
+      // Never write an answer into a lesson that is not the one on screen.
+      if (prev.courseId !== courseId || prev.lessonId !== lessonId) return prev;
       const step = prev.steps[prev.stepIndex] as WorkingStep;
       const qid = step?.__qid;
       const answers = { ...prev.answers, [prev.stepIndex]: answerValue };
@@ -369,10 +514,10 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       }}
       completeLessonFlow={() => {}}
       nextStep={() => {
-        setCurrentLessonState((prev) => ({
-          ...prev,
-          stepIndex: prev.stepIndex + 1,
-        }));
+        setCurrentLessonState((prev) => {
+          if (prev.courseId !== courseId || prev.lessonId !== lessonId) return prev;
+          return { ...prev, stepIndex: prev.stepIndex + 1 };
+        });
       }}
       finalizeLesson={finalizeCurrentLesson}
       canFinalize={canFinalize}
@@ -396,7 +541,14 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       correctCount={currentLessonState.correctCount}
       hearts={hearts}
       maxHearts={5}
-      goBack={() => setRoute({ name: "course", courseId })}
+      // Exit is unconditional and takes its destination from the URL, so it
+      // works when in-memory state is stale, empty or mid-restore. Entering
+      // "leaving" first stops the mount effect above from re-arming the lesson
+      // while the navigation is in flight.
+      goBack={() => {
+        enterPhase("leaving");
+        leaveLesson(courseId);
+      }}
       courseId={courseId}
       courseAccent="#007A85"
       nextLessonTitle={nextTitle}
@@ -404,7 +556,7 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       lessonStartTimeRef={lessonStartTimeRef}
       // Was counting non-existent types ("question", "action-check") — must
       // match the scoreable set used in finalize, or accuracy is misstated.
-      totalQuestions={currentLessonState.steps.filter((s: any) => s.type === "mcq" || s.type === "true-false" || s.type === "scenario" || s.type === "fill-blank").length}
+      totalQuestions={currentLessonState.steps.filter((s: WorkingStep) => s.type === "mcq" || s.type === "true-false" || s.type === "scenario" || s.type === "fill-blank").length}
     />
   );
 }
