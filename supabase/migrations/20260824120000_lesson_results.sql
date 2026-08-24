@@ -122,6 +122,18 @@ create index if not exists lesson_results_user_lesson_completed_idx
 
 alter table public.lesson_results enable row level security;
 
+-- Table privileges, stated rather than inherited.
+--
+-- Supabase's bootstrap sets default privileges that grant new public tables to
+-- anon/authenticated, and every earlier migration in this repo relies on that.
+-- Relying on it here is a silent failure waiting to happen: fetchLessonResults()
+-- swallows errors and returns [], so a missing SELECT grant shows up as "no
+-- grades anywhere" with nothing in the console. RLS is what actually restricts
+-- the rows; this only opens the door RLS then guards.
+grant select, insert on public.lesson_results to authenticated;
+-- anon gets nothing: results belong to a signed-in learner or to no one.
+revoke all on public.lesson_results from anon;
+
 drop policy if exists "Users read own lesson results" on public.lesson_results;
 create policy "Users read own lesson results" on public.lesson_results
   for select to authenticated
