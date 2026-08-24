@@ -113,18 +113,59 @@ export const RE5_KNOWLEDGE_AREAS: Record<string, KnowledgeArea> = {
 };
 
 /**
- * Question number → knowledge area, per mock exam.
+ * Concept id → knowledge area.
  *
- * Keyed on the "Qn." prefix the mock questions already carry in their text,
- * NOT on position in the array: the step list is shuffled per learner
- * (lessonShuffle.ts) and grows re-queued copies mid-attempt, so an index-based
- * map would silently mis-attribute every breakdown.
+ * THIS is the primary attribution, and it is the one that works on the live
+ * path. Every slot in the RE5 question banks carries a `conceptId`
+ * (src/data/banks/re5-mock-a.ts et al), and lessonBank.ts:148 attaches it to
+ * every resolved step. It is a small, stable vocabulary that names what the
+ * question tests, so it survives slots being renumbered, reordered, or added.
  *
- * The mapping is editorial — the source questions are untagged — and was read
- * off each question against the unit that teaches it. Where a question spans
- * two areas it is filed under the rule it actually tests: Mock A Q41 ("advise
- * on a structure you aren't licensed for") is Licensing, not Suitability,
- * because the answer turns on authorised categories.
+ * Do not attribute by the "Qn." prefix alone: the bank variants — which is
+ * what learners actually sit — carry NO question numbers. Only the static
+ * fallback steps in content-re5.ts do. An earlier revision of this file keyed
+ * solely on that prefix and would have filed all 50 questions of every real
+ * sitting under "Unclassified".
+ */
+export const RE5_CONCEPT_AREAS: Record<string, string> = {
+  "fais-purpose": "framework",
+  "fais-definitions": "framework",
+
+  "fsp-categories": "licensing",
+  "fsp-licence-action": "licensing",
+
+  "fais-representatives": "representatives",
+  "fais-debarment": "representatives",
+
+  "fit-and-proper": "fitproper",
+  "fais-competence-cpd": "fitproper",
+
+  "code-general-duty": "disclosure",
+  "code-disclosures": "disclosure",
+
+  "code-suitability": "suitability",
+  "code-records-coi": "suitability",
+
+  "tcf-complaints": "complaints",
+  "fais-ombud": "complaints",
+
+  fica: "fica",
+};
+
+/**
+ * Question number → knowledge area, per mock exam. The FALLBACK.
+ *
+ * Used when a step has no recognised `conceptId`: keyed on the slot number in
+ * `__slotId` ("re5-exam-prep/mock-a/q17"), and failing that on the "Qn."
+ * prefix in the static content-re5.ts steps. Never on position in the array —
+ * the step list is shuffled per learner (lessonShuffle.ts) and grows re-queued
+ * copies mid-attempt, so an index-based map would mis-attribute everything.
+ *
+ * The mapping is editorial, read off each question against the unit that
+ * teaches it. Where a question spans two areas it is filed under the rule it
+ * actually tests: Mock A Q41 ("advise on a structure you aren't licensed for")
+ * is Licensing, not Suitability, because the answer turns on authorised
+ * categories.
  */
 const MOCK_A_AREAS: Record<number, string> = {
   1: "framework", 2: "framework", 3: "framework",
@@ -186,8 +227,29 @@ const AREA_MAPS: Record<string, Record<number, string>> = {
   "re5-mock-b": MOCK_B_AREAS,
 };
 
-/** The "Q17." prefix every mock question carries. Null if absent. */
+/** The `conceptId` a resolved bank step carries, if any. */
+export function conceptIdOf(step: WorkingStep): string | null {
+  if (!("conceptId" in step)) return null;
+  const id = (step as { conceptId?: unknown }).conceptId;
+  return typeof id === "string" && id.length > 0 ? id : null;
+}
+
+/**
+ * The question's number in the paper, from whichever source has it.
+ *
+ * `__slotId` first — bank slots are named "re5-exam-prep/mock-a/q17" and that
+ * is what a real sitting produces. The "Q17." text prefix second, which only
+ * the static content-re5.ts steps carry.
+ */
 export function questionNumberOf(step: WorkingStep): number | null {
+  const slotId = step.__slotId;
+  if (typeof slotId === "string") {
+    const m = /\/q(\d+)$/.exec(slotId);
+    if (m) {
+      const n = Number(m[1]);
+      if (Number.isInteger(n) && n > 0) return n;
+    }
+  }
   const text =
     "question" in step && typeof step.question === "string"
       ? step.question
@@ -200,19 +262,30 @@ export function questionNumberOf(step: WorkingStep): number | null {
 }
 
 /**
- * Area resolver for one mock exam. Returns null for anything it cannot place,
- * which `breakdownByArea` files under "Unclassified" — a visible gap in the
+ * Area resolver for an RE5 lesson.
+ *
+ * Tries `conceptId` first (works on every bank-backed lesson, mock or
+ * teaching), then the question number from `__slotId` or the "Qn." prefix
+ * against this exam's map. Returns null for anything it cannot place, which
+ * `breakdownByArea` files under "Unclassified" — a visible gap in the
  * breakdown, rather than a question quietly padding whichever area came first.
  */
 export function re5AreaResolver(lessonId: string): AreaResolver {
-  const map = AREA_MAPS[lessonId];
+  const numberMap = AREA_MAPS[lessonId];
   return (step) => {
-    if (!map) return null;
+    const byConcept = RE5_CONCEPT_AREAS[conceptIdOf(step) ?? ""];
+    if (byConcept) return labelFor(byConcept);
+
+    if (!numberMap) return null;
     const n = questionNumberOf(step);
     if (n === null) return null;
-    const area = RE5_KNOWLEDGE_AREAS[map[n]];
-    return area ? { areaId: area.areaId, areaLabel: area.areaLabel } : null;
+    return labelFor(numberMap[n]);
   };
+}
+
+function labelFor(areaId: string | undefined) {
+  const area = areaId ? RE5_KNOWLEDGE_AREAS[areaId] : undefined;
+  return area ? { areaId: area.areaId, areaLabel: area.areaLabel } : null;
 }
 
 /** Total questions the area map accounts for — asserted in the unit tests. */

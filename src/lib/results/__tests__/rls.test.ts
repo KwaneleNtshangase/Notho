@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
+import { RE5_MOCK_EXAMS } from "@/lib/results/re5";
 
 /**
  * Guards on the lesson_results migration.
@@ -143,10 +144,31 @@ describe("the question_attempts backfill", () => {
     expect(lower).toContain("on conflict (user_id, lesson_id, attempt_no) do nothing");
   });
 
-  it("invents neither a pass mark nor a knowledge-area breakdown", () => {
+  it("scores a mock exam only when the whole 50-question paper is there", () => {
+    // Judging a partial paper against "33 of 50" manufactures a fail out of an
+    // abandoned attempt — on the one number a learner may spend money acting on.
+    expect(lower).toContain("c.total_questions = c.mock_total_questions");
+  });
+
+  it("keeps the SQL's hardcoded mock literals in step with RE5_MOCK_EXAMS", () => {
+    // SQL cannot import the TS spec, so the duplication is asserted instead of
+    // hoped for. If the FSCA changes the format, this fails loudly.
+    const spec = RE5_MOCK_EXAMS["re5-mock-a"];
+    expect(lower).toContain(`${spec.totalQuestions} as mock_total_questions`);
+    expect(lower).toContain(`${spec.passMarkCorrect} as mock_pass_mark`);
+    for (const lessonId of Object.keys(RE5_MOCK_EXAMS)) {
+      expect(lower, `${lessonId} is not classified as a mock in the backfill`)
+        .toContain(`'${lessonId}'`);
+    }
+  });
+
+  it("invents no knowledge-area breakdown", () => {
+    // conceptId is nullable on question_attempts, so a reconstructed breakdown
+    // would be silently partial. Empty is honest; partial-presented-as-whole is not.
     const insert = lower.slice(lower.indexOf("insert into public.lesson_results ("));
     expect(insert).toContain("'[]'::jsonb");
   });
+
 });
 
 describe("no other migration re-opens these reads", () => {

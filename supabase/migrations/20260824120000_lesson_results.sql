@@ -1,38 +1,42 @@
 -- Per-attempt lesson & exam results.
 --
--- WHY A NEW TABLE RATHER THAN AGGREGATING public.question_attempts
--- ================================================================
--- question_attempts is a good analytics log and a bad scoreboard. Four
--- reasons, in descending order of how badly they bite:
+-- WHY A MATERIALISED RESULT ROW RATHER THAN AGGREGATING public.question_attempts
+-- ==============================================================================
+-- Correction first, because an earlier draft of this file got it wrong and a
+-- future reader should not re-derive the error: question_attempts DOES cover
+-- the two RE5 mock exams. They are bank-backed (src/data/banks/re5-mock-a.ts
+-- registers 50 slots under "re5-exam-prep::re5-mock-a"), so resolved steps
+-- carry slot_id/variant_id and logQuestionAttempt() fires for every answer.
+-- The backfill at the bottom of this file relies on exactly that.
 --
--- 1. IT DOES NOT SEE THE RE5 MOCK EXAMS AT ALL. The only caller of
---    logQuestionAttempt() (src/app/(app)/lesson/.../page.tsx) is guarded by
---    `if (userId && slotId && variantId)`. slot_id/variant_id only exist on
---    steps produced by bank resolution (src/lib/lessonBank.ts). re5-mock-a and
---    re5-mock-b are legacy static `lesson.steps` arrays with no slots, so they
---    log ZERO rows. Aggregating question_attempts could not score the two
---    exams this work exists to score.
+-- The log is still the wrong place to READ a score from:
 --
--- 2. attempt_no IS DEVICE-LOCAL. It comes from nextAttemptNo(), which reads
---    and increments a localStorage map ("notho-lesson-attempts"). It restarts
---    at 1 on a new device, in a private window, or after a storage clear, so
---    (user_id, lesson_id, attempt_no) does not identify one sitting. Grouping
---    a "result per attempt" over it silently merges two devices' attempts.
+-- 1. attempt_no IS DEVICE-LOCAL. It comes from nextAttemptNo(), which reads and
+--    increments a localStorage map ("notho-lesson-attempts"). It restarts at 1
+--    on a new device, in a private window, or after a storage clear, so
+--    (user_id, lesson_id, attempt_no) does not reliably identify one sitting.
+--    Two devices silently merge into one "attempt".
 --
--- 3. NO DENOMINATOR AND NO CLOSE EVENT. A row is written per answer, with no
---    marker for "the lesson finished" and no record of how many questions the
---    lesson had. An abandoned 12-of-50 exam and a completed 12-question lesson
---    are indistinguishable — both are 12 rows. A score needs to know it is
---    complete before it is shown.
+-- 2. NO COMPLETION EVENT. A row is written per answer, with nothing marking
+--    "the learner finished". An abandoned 12-of-50 exam and a completed
+--    12-question lesson are both just 12 rows. A score must know it is complete
+--    before it is shown — which is why the backfill below will only score a
+--    mock exam when all 50 slots are present.
 --
--- 4. NO TIME TAKEN, and answered_at spans are not a substitute: a learner who
---    walks away mid-lesson would clock two hours.
+-- 3. NO TIME TAKEN, NO PASS MARK, NO KNOWLEDGE-AREA BREAKDOWN. answered_at
+--    spans are not a substitute for elapsed time: a learner who walks away
+--    mid-paper would clock two hours.
 --
--- So results are recorded explicitly, once, at finalize. question_attempts
--- stays exactly what it is — the per-answer log — and is used here only to
--- backfill history for bank-backed lessons (bottom of this file), which is the
--- one thing it genuinely can answer.
+-- 4. COST AND STABILITY. The course map renders a grade per lesson; deriving
+--    those live means a DISTINCT ON over every answer the learner has ever
+--    given, on every render. And a derived number moves when the log's shape
+--    changes. A number shown for an FSCA regulatory exam should be recorded
+--    once and stay put.
 --
+-- So question_attempts stays exactly what it is — the per-answer analytics log
+-- — and results are recorded explicitly, once, at finalize. The two are
+-- reconciled once, by the backfill.
+
 -- SCORE SEMANTICS: FIRST-TRY ACCURACY.
 -- src/lib/lessonMastery.ts re-queues every missed question until it is
 -- answered correctly, so a lesson can only ever end with 100% of questions
@@ -200,48 +204,34 @@ grant execute on function public.record_lesson_result(
 
 -- ── Backfill from question_attempts ─────────────────────────────────────────
 -- So learners open the new screens on their real history instead of an empty
--- state. This is the one question question_attempts CAN answer well: for
--- bank-backed lessons it records every answer with is_correct, and slot_id is
--- a stable per-question identity, so "was this question right the FIRST time
--- it was presented?" is recoverable by taking the earliest row per slot.
+-- state. For bank-backed lessons the log records every answer with is_correct,
+-- and slot_id is a stable per-question identity, so "was this question right
+-- the FIRST time it was presented?" is recoverable by taking the earliest row
+-- per slot. The RE5 mock exams are bank-backed too, so past sittings are
+-- recoverable — and are scored as exams, against the real pass mark.
 --
--- Scope and honesty about it:
---   • Bank-backed lessons only. The RE5 mock exams log nothing (reason 1 at
---     the top of this file), so they have no history to recover and will
---     populate from the first sitting after this ships. That is correct — an
---     invented mock exam score would be worse than none on a regulatory exam.
---   • attempt_no is the client's device-local counter (reason 2). Attempts
---     from two devices can collide into one row here. Rows are stamped
---     source='backfill' and the UI labels them as reconstructed rather than
---     showing them as recorded sittings.
---   • Groups with fewer than 3 distinct questions are skipped: they are more
---     likely an abandoned opening than a lesson, and a 1-of-1 = 100% badge on
---     a lesson someone quit is exactly the untrustworthy number to avoid.
---   • pass_mark_correct/passed stay NULL and area_breakdown stays empty:
---     neither is recoverable, and guessing them is not on.
+-- Scope, and the limits of it:
+--   • attempt_no is the client's device-local counter (reason 1 above), so
+--     attempts from two devices can collide into one row. Every row here is
+--     stamped source='backfill' and the UI labels it as reconstructed rather
+--     than presenting it as a recorded sitting.
+--   • A MOCK EXAM is only scored when all 50 slots are present. Judging a
+--     partial paper against "33 of 50" would manufacture a fail out of an
+--     abandoned attempt, on the one number in this app a learner might spend
+--     money acting on. Partial mock attempts are skipped entirely — no row —
+--     rather than recorded as an ungraded lesson, which would put a bare grade
+--     chip on an exam with no pass/fail beside it.
+--   • Ordinary lessons need at least 3 distinct questions: fewer is more likely
+--     an abandoned opening, and a 1-of-1 = 100% badge on a lesson someone quit
+--     is exactly the untrustworthy number this work exists to avoid.
+--   • Anything answered in the last hour is left alone; it may still be in
+--     flight and will be recorded live.
+--   • area_breakdown stays empty. conceptId is nullable on question_attempts
+--     and was not populated for older rows, so a breakdown reconstructed from
+--     it would be silently partial. An incomplete breakdown presented as a
+--     complete one is worse than none; new sittings record it properly.
 
-insert into public.lesson_results (
-  user_id, course_id, lesson_id, attempt_no, kind,
-  total_questions, first_try_correct, score_pct,
-  pass_mark_correct, passed, duration_seconds, area_breakdown, source,
-  completed_at
-)
-select
-  f.user_id,
-  f.course_id,
-  f.lesson_id,
-  f.attempt_no,
-  'lesson',
-  count(*)::int                                             as total_questions,
-  count(*) filter (where f.is_correct)::int                 as first_try_correct,
-  round(
-    (count(*) filter (where f.is_correct))::numeric / count(*) * 100
-  )::int                                                    as score_pct,
-  null, null, null,
-  '[]'::jsonb,
-  'backfill',
-  max(f.answered_at)                                        as completed_at
-from (
+with first_try as (
   -- Earliest answer per question (slot) within one recorded attempt: the
   -- first-try outcome. Later rows for the same slot are the mastery loop's
   -- re-queues and must not count, or every lesson reads 100%.
@@ -249,11 +239,54 @@ from (
     user_id, course_id, lesson_id, attempt_no, slot_id, is_correct, answered_at
   from public.question_attempts
   order by user_id, course_id, lesson_id, attempt_no, slot_id, answered_at asc, id asc
-) f
-group by f.user_id, f.course_id, f.lesson_id, f.attempt_no
-having count(*) >= 3
-   -- Leave anything still in flight alone; it will be recorded live instead.
-   and max(f.answered_at) < now() - interval '1 hour'
+),
+grouped as (
+  select
+    user_id, course_id, lesson_id, attempt_no,
+    count(*)::int                            as total_questions,
+    count(*) filter (where is_correct)::int  as first_try_correct,
+    max(answered_at)                         as completed_at
+  from first_try
+  group by user_id, course_id, lesson_id, attempt_no
+),
+classified as (
+  select
+    g.*,
+    -- These literals mirror RE5_MOCK_EXAMS in src/lib/results/re5.ts, which is
+    -- the single source of truth in the app. SQL cannot import it, so the unit
+    -- tests assert the two agree (see results/__tests__/rls.test.ts).
+    (g.lesson_id in ('re5-mock-a', 're5-mock-b')) as is_mock_exam,
+    50 as mock_total_questions,
+    33 as mock_pass_mark
+  from grouped g
+)
+insert into public.lesson_results (
+  user_id, course_id, lesson_id, attempt_no, kind,
+  total_questions, first_try_correct, score_pct,
+  pass_mark_correct, passed, duration_seconds, area_breakdown, source,
+  completed_at
+)
+select
+  c.user_id,
+  c.course_id,
+  c.lesson_id,
+  c.attempt_no,
+  case when c.is_mock_exam then 'exam' else 'lesson' end,
+  c.total_questions,
+  c.first_try_correct,
+  round((c.first_try_correct::numeric / c.total_questions) * 100)::int,
+  case when c.is_mock_exam then c.mock_pass_mark end,
+  case when c.is_mock_exam then c.first_try_correct >= c.mock_pass_mark end,
+  null,                 -- duration is not recoverable from an answer log
+  '[]'::jsonb,
+  'backfill',
+  c.completed_at
+from classified c
+where c.completed_at < now() - interval '1 hour'
+  and case
+        when c.is_mock_exam then c.total_questions = c.mock_total_questions
+        else c.total_questions >= 3
+      end
 on conflict (user_id, lesson_id, attempt_no) do nothing;
 
 comment on table public.lesson_results is

@@ -15,12 +15,16 @@ import {
   scoreAttempt,
 } from "@/lib/results/score";
 import {
+  RE5_CONCEPT_AREAS,
   RE5_KNOWLEDGE_AREAS,
   RE5_MOCK_EXAMS,
+  conceptIdOf,
   mappedQuestionCount,
   questionNumberOf,
   re5AreaResolver,
 } from "@/lib/results/re5";
+import { RE5_MOCK_A_BANK } from "@/data/banks/re5-mock-a";
+import { RE5_MOCK_B_BANK } from "@/data/banks/re5-mock-b";
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -270,6 +274,137 @@ describe("knowledge-area breakdown", () => {
     expect(questionNumberOf(q(41) as WorkingStep)).toBe(41);
     expect(questionNumberOf(info() as WorkingStep)).toBeNull();
   });
+});
+
+/**
+ * The shape a learner ACTUALLY sits.
+ *
+ * lessonBank.ts resolves a bank slot into a step carrying `__slotId`,
+ * `__variantId` and `conceptId` — and, critically, question text with NO "Qn."
+ * prefix. The static content-re5.ts steps are only a fallback. An earlier
+ * revision attributed areas by the text prefix alone, so every question of
+ * every real sitting would have landed in "Unclassified" while the tests —
+ * which used the static shape — stayed green.
+ */
+function bankStep(n: number, conceptId: string, lessonSlug = "mock-a"): LessonStep {
+  return {
+    type: "mcq",
+    question: "The primary purpose of the FAIS Act is to:",
+    options: ["a", "b", "c", "d"],
+    correct: 0,
+    feedback: { correct: "yes", incorrect: "no" },
+    conceptId,
+  };
+}
+
+function bankAttempt(
+  specs: { n: number; conceptId: string }[],
+  lessonSlug: string,
+  missedQids: number[]
+): WorkingStep[] {
+  const tagged = assignQids([
+    info(),
+    ...specs.map((s) => bankStep(s.n, s.conceptId, lessonSlug)),
+  ]).map((step, i) =>
+    i === 0
+      ? step
+      : {
+          ...step,
+          __slotId: `re5-exam-prep/${lessonSlug}/q${specs[i - 1].n}`,
+          __variantId: `r5a-q${specs[i - 1].n}-v1`,
+        }
+  );
+  const requeues = tagged.filter(
+    (s) => s.__qid !== undefined && missedQids.includes(s.__qid)
+  );
+  return [...tagged, ...requeues.map(requeuedCopy)];
+}
+
+describe("knowledge-area breakdown on bank-backed steps (the live path)", () => {
+  const specs = [
+    { n: 1, conceptId: "fais-purpose" },
+    { n: 2, conceptId: "fais-definitions" },
+    { n: 5, conceptId: "fsp-categories" },
+    { n: 36, conceptId: "fica" },
+    { n: 31, conceptId: "fais-ombud" },
+  ];
+
+  it("places every question, though none carries a 'Qn.' prefix", () => {
+    const steps = bankAttempt(specs, "mock-a", [0]);
+    const scored = scoreAttempt(steps, [0], re5AreaResolver("re5-mock-a"));
+
+    expect(scored.totalQuestions).toBe(5);
+    expect(scored.areaBreakdown.some((a) => a.areaId === "unclassified")).toBe(false);
+    expect(scored.areaBreakdown.reduce((n, a) => n + a.total, 0)).toBe(5);
+
+    const framework = scored.areaBreakdown.find((a) => a.areaId === "framework")!;
+    expect(framework.total).toBe(2); // fais-purpose + fais-definitions
+    expect(framework.correct).toBe(1); // qid 0 was missed
+  });
+
+  it("reads the question number out of __slotId, not the text", () => {
+    const steps = bankAttempt(specs, "mock-a", []);
+    const q = steps.find((s) => s.__slotId?.endsWith("/q36"));
+    expect(questionNumberOf(q!)).toBe(36);
+    expect(conceptIdOf(q!)).toBe("fica");
+  });
+
+  it("falls back to the slot number when the concept is unrecognised", () => {
+    const steps = bankAttempt(
+      [{ n: 41, conceptId: "some-concept-added-later" }],
+      "mock-a",
+      []
+    );
+    const scored = scoreAttempt(steps, [], re5AreaResolver("re5-mock-a"));
+    // Mock A Q41 is filed under Licensing in the number map.
+    expect(scored.areaBreakdown[0].areaId).toBe("licensing");
+  });
+});
+
+describe("the real RE5 question banks", () => {
+  const banks = [
+    ["re5-mock-a", RE5_MOCK_A_BANK["re5-exam-prep::re5-mock-a"]],
+    ["re5-mock-b", RE5_MOCK_B_BANK["re5-exam-prep::re5-mock-b"]],
+  ] as const;
+
+  for (const [lessonId, bank] of banks) {
+    it(`${lessonId}: every slot's conceptId maps to a known area`, () => {
+      const unmapped = (bank.slots ?? [])
+        .map((slot) => slot.conceptId)
+        .filter((id): id is string => typeof id === "string")
+        .filter((id) => !RE5_CONCEPT_AREAS[id]);
+      expect(unmapped).toEqual([]);
+    });
+
+    it(`${lessonId}: has one slot per exam question`, () => {
+      expect((bank.slots ?? []).length).toBe(
+        RE5_MOCK_EXAMS[lessonId].totalQuestions
+      );
+    });
+
+    it(`${lessonId}: no slot carries a "Qn." prefix, so concepts must do the work`, () => {
+      const prefixed = (bank.slots ?? []).filter((slot) =>
+        slot.variants.some((v) => {
+          const step = v.step as { question?: string };
+          return typeof step.question === "string" && /^\s*Q\d+\s*[.):]/.test(step.question);
+        })
+      );
+      expect(prefixed.length).toBe(0);
+    });
+
+    it(`${lessonId}: the resolver places every slot in the bank`, () => {
+      for (const slot of bank.slots ?? []) {
+        const step = {
+          ...(slot.variants[0].step as object),
+          conceptId: slot.conceptId,
+          __slotId: slot.slotId,
+        } as WorkingStep;
+        const area = re5AreaResolver(lessonId)(step);
+        expect(area, `${slot.slotId} is unplaced`).not.toBeNull();
+        expect(RE5_KNOWLEDGE_AREAS[area!.areaId]).toBeDefined();
+      }
+    });
+  }
 });
 
 describe("the RE5 area maps", () => {
