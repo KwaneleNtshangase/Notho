@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { LearnView } from "@/components/views/LearnView";
 import { CONTENT_DATA, Lesson } from "@/data/content";
 import { useNotho } from "@/context/NothoContext";
 import { analytics } from "@/lib/analytics";
 import { shuffleLessonSteps, lessonShuffleSeed } from "@/lib/lessonShuffle";
 import { assignQids, type WorkingStep } from "@/lib/lessonMastery";
+import type { SavedLessonProgress } from "@/app/pageViews.types";
 
 export default function LearnPage() {
   const {
@@ -17,32 +18,27 @@ export default function LearnPage() {
     userData,
     hearts,
     setShowNoHearts,
-    setCurrentLessonState
+    setCurrentLessonState,
+    lessonResume,
   } = useNotho();
 
-  const [savedProgress, setSavedProgress] = useState<any>(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !userId) return;
-    const item = localStorage.getItem("notho-lesson-progress");
-    if (item) {
-      try {
-        const parsed = JSON.parse(item);
-        const fresh =
-          typeof parsed.savedAt === "number" &&
-          Date.now() - parsed.savedAt <= 7 * 24 * 60 * 60 * 1000;
-        if (parsed.userId === userId && fresh) {
-          setSavedProgress(parsed);
-        } else if (parsed.userId === userId && !fresh) {
-          // Stale save — clean it up so the resume card doesn't point at
-          // a week-old position.
-          localStorage.removeItem("notho-lesson-progress");
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-  }, [userId]);
+  // The resume point now comes from the cross-device store rather than
+  // straight out of localStorage: it is the merge of this device's record and
+  // the account's (LWW on savedAt, GREATEST within the same lesson), already
+  // filtered for tombstones and for the 7-day staleness cut-off. So a lesson
+  // started on the phone shows up as "Continue" here.
+  const [dismissed, setDismissed] = useState(false);
+  // LearnView types the resume card's payload as SavedLessonProgress — it only
+  // reads the title and a timestamp — but hands the same object straight back
+  // to onResumeLesson, which needs the full position. Same object, wider
+  // runtime shape, exactly as when this came out of localStorage as `any`.
+  const savedProgress =
+    dismissed || !lessonResume
+      ? null
+      : ({
+          ...lessonResume,
+          completedAt: lessonResume.savedAt,
+        } as unknown as SavedLessonProgress);
 
   const resumeLesson = React.useCallback(
     (progress: any) => {
@@ -89,8 +85,9 @@ export default function LearnPage() {
         mistakenQids: progress.mistakenQids ?? [],
       });
       setRoute({ name: "lesson", courseId: progress.courseId, lessonId: progress.lessonId });
-      setSavedProgress(null);
-      localStorage.removeItem("notho-lesson-progress");
+      // Hide the card for this render; the lesson state effect immediately
+      // writes a fresh resume record (and syncs it) as the learner steps.
+      setDismissed(true);
     },
     [hearts, userId, setCurrentLessonState, setRoute, setShowNoHearts]
   );

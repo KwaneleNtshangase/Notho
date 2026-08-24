@@ -152,10 +152,10 @@ import { formatWithSpaces, formatRand, formatZAR } from "@/lib/formatters";
 import { sastToday } from "@/lib/dates";
 import {
   bumpCorrectAnswerStreakToday,
-  markConceptReviewedToday,
   resetCorrectAnswerStreakToday,
 } from "@/lib/dailyChallengeFlags";
 import { useNothoState } from "@/hooks/useNothoState";
+import { useReviewCompletion, NOT_COUNTED, type ReviewOutcome } from "@/hooks/useReviewCompletion";
 import { SettingsView } from "@/components/SettingsView";
 
 function getDailyFact(): string {
@@ -482,6 +482,9 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
   const [correctCount, setCorrectCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [outcome, setOutcome] = useState<ReviewOutcome>(NOT_COUNTED);
+  const completedRef = useRef(false);
+  const completeReview = useReviewCompletion();
   const REVIEW_SESSION_KEY = "notho-review-session";
 
   useEffect(() => {
@@ -568,6 +571,15 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
     const updated = applyReview(current, isCorrect ? 4 : 1);
     saveMastery(updated);
     if (currentIdx + 1 >= queue.length) {
+      // ── Review-complete handler ────────────────────────────────────────
+      // Reviews used to end here having awarded nothing. A finished session
+      // now takes the same path a lesson does — /api/progress/sync-streak for
+      // the streak, plus lessonsToday and the daily-challenge counters — when
+      // it is long enough to count. Ref-guarded so credit applies once.
+      if (!completedRef.current) {
+        completedRef.current = true;
+        setOutcome(completeReview({ cards: queue.length, correct: correctCount }));
+      }
       // All done - go to summary by setting currentIdx beyond queue
       setCurrentIdx(queue.length);
     } else {
@@ -612,16 +624,27 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
   if (isDone) {
     if (typeof window !== "undefined") {
       localStorage.removeItem(REVIEW_SESSION_KEY);
-      markConceptReviewedToday();
+      // markConceptReviewedToday() now happens in the review-complete
+      // handler above, alongside the rest of the credit.
     }
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
         <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
           <Brain size={52} className="mx-auto mb-3" style={{ color: "#3B7DD8" }} />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Review complete!</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
             {correctCount} of {queue.length} correct
           </p>
+          {outcome.counted && outcome.xpAwarded > 0 && (
+            <p className="text-sm font-bold text-green-600 dark:text-green-400 mb-4">
+              +{outcome.xpAwarded} XP · Streak kept
+            </p>
+          )}
+          {outcome.counted && outcome.alreadyCountedToday && (
+            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-4">
+              Streak kept · today&apos;s review was already counted
+            </p>
+          )}
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">
             <div
               className="h-2 rounded-full bg-green-500"
@@ -629,7 +652,9 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
             />
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
-            Cards are rescheduled. Keep it up daily to master your finances!
+            {outcome.counted
+              ? "Cards are rescheduled. Keep it up daily to master your finances!"
+              : `Cards are rescheduled. ${outcome.cardsRequired} cards in one session keep your streak going — this one was ${queue.length}.`}
           </p>
           <button
             type="button"
