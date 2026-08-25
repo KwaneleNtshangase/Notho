@@ -131,6 +131,9 @@ import {
   hasSeenOnboardingTooltips,
   markOnboardingTooltipsSeen,
 } from "@/components/OnboardingTooltips";
+import { useLessonResults } from "@/hooks/useLessonResults";
+import { courseScore } from "@/lib/results/select";
+import { GradeBadge } from "@/components/results/GradeBadge";
 import {
   UserData,
   Route,
@@ -864,6 +867,11 @@ export function LearnView({
         .filter(Boolean)
     : courses;
 
+  // Every recorded result for this learner, across every course, so each card
+  // can carry its own score. RLS scopes the rows; an empty list just means no
+  // badges, never someone else's numbers.
+  const { results: scoreResults } = useLessonResults();
+
   // Lesson counts drive both the card's progress bar and the completed/active
   // split, so they're computed in one place.
   const courseCompletion = React.useCallback(
@@ -1148,6 +1156,16 @@ export function LearnView({
                   </div>
                 ) : (
                   <>
+                    {(() => {
+                      // Question-weighted score over best attempts. Sits beside
+                      // the completion percentage, which measures something
+                      // different: how much of the course has been done, not
+                      // how well.
+                      const score = courseScore(scoreResults, course.id);
+                      return score ? (
+                        <GradeBadge scorePct={score.scorePct} size="sm" showLabel={false} />
+                      ) : null;
+                    })()}
                     <div className="course-percentage" style={{ color: colour.accent }}>{percentage}%</div>
                     {/* Pin toggle. Sits in the title row rather than absolutely
                         positioned so it can't collide with the percentage.
