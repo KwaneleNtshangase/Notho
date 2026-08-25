@@ -5,7 +5,7 @@ import {
   RE5_AREA_FLOOR_PCT,
   RE5_CONFIDENT_CORRECT,
 } from "@/lib/results/readiness";
-import { bestByLesson, attemptsFor } from "@/lib/results/select";
+import { bestByLesson, attemptsFor, courseScore } from "@/lib/results/select";
 import { RE5_COURSE_ID } from "@/lib/results/re5";
 import type { AreaScore, LessonResult } from "@/lib/results/types";
 
@@ -196,5 +196,100 @@ describe("attemptsFor", () => {
       "re5-mock-a"
     );
     expect(rows.map((r) => r.attemptNo)).toEqual([1, 3]);
+  });
+});
+
+
+describe("courseScore", () => {
+  it("weights by questions, not by lesson", () => {
+    // A 16-question lesson at 50% and a 4-question lesson at 100%.
+    const rows = [
+      result({ lessonId: "long",  totalQuestions: 16, firstTryCorrect: 8,  passMarkCorrect: null, kind: "lesson" }),
+      result({ lessonId: "short", totalQuestions: 4,  firstTryCorrect: 4,  passMarkCorrect: null, kind: "lesson" }),
+    ];
+    const score = courseScore(rows, RE5_COURSE_ID)!;
+
+    // Simple average of the two percentages would be 75% — the short lesson
+    // pulling as hard as the long one. Weighted is (8 + 4) / 20.
+    expect(Math.round((50 + 100) / 2)).toBe(75);
+    expect(score.scorePct).toBe(60);
+    expect(score.firstTryCorrect).toBe(12);
+    expect(score.totalQuestions).toBe(20);
+    expect(score.lessonsScored).toBe(2);
+  });
+
+  it("counts each lesson's BEST attempt, so improving raises the course score", () => {
+    const before = courseScore(
+      [result({ lessonId: "l1", totalQuestions: 10, firstTryCorrect: 6, passMarkCorrect: null })],
+      RE5_COURSE_ID
+    )!;
+    expect(before.scorePct).toBe(60);
+
+    const after = courseScore(
+      [
+        result({ lessonId: "l1", attemptNo: 1, totalQuestions: 10, firstTryCorrect: 6,  passMarkCorrect: null }),
+        result({ lessonId: "l1", attemptNo: 2, totalQuestions: 10, firstTryCorrect: 10, passMarkCorrect: null }),
+      ],
+      RE5_COURSE_ID
+    )!;
+    expect(after.scorePct).toBe(100);
+    // Two attempts at one lesson is still one lesson.
+    expect(after.lessonsScored).toBe(1);
+  });
+
+  it("does not let a later worse attempt drag the score down", () => {
+    const score = courseScore(
+      [
+        result({ lessonId: "l1", attemptNo: 1, totalQuestions: 10, firstTryCorrect: 10, passMarkCorrect: null }),
+        result({ lessonId: "l1", attemptNo: 2, totalQuestions: 10, firstTryCorrect: 3,  passMarkCorrect: null }),
+      ],
+      RE5_COURSE_ID
+    )!;
+    expect(score.scorePct).toBe(100);
+  });
+
+  it("returns null rather than 0% when nothing has been scored", () => {
+    // 0% on an untouched course would be a lie about the learner.
+    expect(courseScore([], RE5_COURSE_ID)).toBeNull();
+    expect(
+      courseScore([result({ courseId: "some-other-course" })], RE5_COURSE_ID)
+    ).toBeNull();
+  });
+
+  it("ignores other courses entirely", () => {
+    const score = courseScore(
+      [
+        result({ courseId: RE5_COURSE_ID, lessonId: "l1", totalQuestions: 10, firstTryCorrect: 10, passMarkCorrect: null }),
+        result({ courseId: "money-basics", lessonId: "l1", totalQuestions: 10, firstTryCorrect: 0,  passMarkCorrect: null }),
+      ],
+      RE5_COURSE_ID
+    )!;
+    expect(score.scorePct).toBe(100);
+    expect(score.lessonsScored).toBe(1);
+  });
+
+  it("skips results with no questions instead of counting them as lessons", () => {
+    const score = courseScore(
+      [
+        result({ lessonId: "real",  totalQuestions: 5, firstTryCorrect: 4, passMarkCorrect: null }),
+        result({ lessonId: "empty", totalQuestions: 0, firstTryCorrect: 0, passMarkCorrect: null }),
+      ],
+      RE5_COURSE_ID
+    )!;
+    expect(score.lessonsScored).toBe(1);
+    expect(score.totalQuestions).toBe(5);
+    expect(score.scorePct).toBe(80);
+  });
+
+  it("reaches 100% only when every scored question was right first time", () => {
+    const score = courseScore(
+      [
+        result({ lessonId: "a", totalQuestions: 7, firstTryCorrect: 7, passMarkCorrect: null }),
+        result({ lessonId: "b", totalQuestions: 9, firstTryCorrect: 9, passMarkCorrect: null }),
+      ],
+      RE5_COURSE_ID
+    )!;
+    expect(score.scorePct).toBe(100);
+    expect(score.totalQuestions).toBe(16);
   });
 });
