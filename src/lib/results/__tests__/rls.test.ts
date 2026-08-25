@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { RE5_MOCK_EXAMS } from "@/lib/results/re5";
+import { CONTENT_DATA } from "@/data/content";
 
 /**
  * Guards on the lesson_results migration.
@@ -189,5 +190,72 @@ describe("no other migration re-opens these reads", () => {
       }
     }
     expect(offenders).toEqual([]);
+  });
+});
+
+
+/**
+ * The bug 20260825200000 exists to fix.
+ *
+ * 20260824120000 keyed a sitting as (user_id, lesson_id, attempt_no), assuming
+ * lesson ids are globally unique. `lesson-1` is used by twelve different
+ * courses, so the backfill's ON CONFLICT silently discarded eleven of them and
+ * the early courses showed no grades at all.
+ */
+describe("lesson ids are not unique across courses", () => {
+  const byLessonId = new Map<string, Set<string>>();
+  for (const course of CONTENT_DATA.courses) {
+    for (const unit of course.units) {
+      for (const lesson of unit.lessons) {
+        const set = byLessonId.get(lesson.id) ?? new Set<string>();
+        set.add(course.id);
+        byLessonId.set(lesson.id, set);
+      }
+    }
+  }
+  const shared = [...byLessonId.entries()].filter(([, courses]) => courses.size > 1);
+
+  it("really does reuse lesson ids across courses", () => {
+    // If this ever becomes 0, the constraint below is merely belt-and-braces
+    // rather than load-bearing — but do not relax it on that basis.
+    expect(shared.length > 0).toBe(true);
+    const lesson1 = byLessonId.get("lesson-1");
+    expect((lesson1?.size ?? 0) > 1).toBe(true);
+  });
+
+  it("so a sitting must be keyed by course as well as lesson", () => {
+    const fix = stripComments(
+      readFileSync(join(MIGRATIONS, "20260825200000_lesson_results_scope_by_course.sql"), "utf8")
+    ).toLowerCase();
+    expect(fix).toContain("unique (user_id, course_id, lesson_id, attempt_no)");
+    expect(fix).toContain("drop constraint if exists lesson_results_user_lesson_attempt_key");
+  });
+
+  it("and the attempt counter must be scoped by course too", () => {
+    const fix = stripComments(
+      readFileSync(join(MIGRATIONS, "20260825200000_lesson_results_scope_by_course.sql"), "utf8")
+    ).toLowerCase();
+    const fn = fix.slice(fix.indexOf("create or replace function public.record_lesson_result"));
+    const maxQuery = fn.slice(fn.indexOf("select coalesce(max(attempt_no)"), fn.indexOf("insert into"));
+    expect(maxQuery).toContain("course_id = p_course_id");
+    expect(maxQuery).toContain("lesson_id = p_lesson_id");
+  });
+
+  it("recovers the discarded rows with the corrected conflict target", () => {
+    const fix = stripComments(
+      readFileSync(join(MIGRATIONS, "20260825200000_lesson_results_scope_by_course.sql"), "utf8")
+    ).toLowerCase();
+    expect(fix).toContain(
+      "on conflict (user_id, course_id, lesson_id, attempt_no) do nothing"
+    );
+  });
+
+  it("keeps the client and the database agreeing on the key", () => {
+    // src/lib/results/select.ts keys its map on `${courseId}:${lessonId}` and
+    // always did. The database is what was wrong.
+    const select = readFileSync(
+      join(process.cwd(), "src", "lib", "results", "select.ts"), "utf8"
+    );
+    expect(select).toContain("${r.courseId}:${r.lessonId}");
   });
 });
