@@ -159,6 +159,7 @@ import { useRouter } from "next/navigation";
 import { useLessonResults } from "@/hooks/useLessonResults";
 import { GradeBadge, PassPill } from "@/components/results/GradeBadge";
 import { RE5_COURSE_ID, examSpecFor } from "@/lib/results/re5";
+import { courseScore } from "@/lib/results/select";
 
 function getDailyFact(): string {
   const start = new Date(new Date().getFullYear(), 0, 0);
@@ -203,8 +204,30 @@ export function CourseView({
   // proved they can do rather than their most recent off-day. Scoped by RLS to
   // this user; `best` is empty while loading and for signed-out/first-time
   // learners, and every read below tolerates a miss.
-  const { best: bestResults } = useLessonResults(course.id);
+  const { results: allResults, best: bestResults } = useLessonResults(course.id);
   const isRe5 = course.id === RE5_COURSE_ID;
+
+  // One question-weighted score for the course, over the best attempt at each
+  // lesson. Null until something has been scored — 0% on an untouched course
+  // would be a lie, and this is the number a learner reads first.
+  const overall = React.useMemo(
+    () => courseScore(allResults, course.id),
+    [allResults, course.id]
+  );
+
+  /** Lessons that have content, i.e. the denominator a learner can actually reach. */
+  const playableLessonCount = React.useMemo(
+    () =>
+      course.units.reduce(
+        (n, unit) =>
+          n +
+          unit.lessons.filter(
+            (l) => Array.isArray(l.steps) && l.steps.length > 0
+          ).length,
+        0
+      ),
+    [course]
+  );
 
   // ── Progression logic ──────────────────────────────────────────────────────
   // A lesson state is determined by LIVE PROGRESS, not the static comingSoon flag.
@@ -294,6 +317,54 @@ export function CourseView({
           <h2 className="course-map-title" style={{ color: colour.accent }}>{course.title}</h2>
           <p className="course-map-description">{course.description}</p>
         </div>
+
+        {/* Course score. Question-weighted across best attempts (see
+            courseScore in src/lib/results/select.ts), and always shown with
+            how many lessons it covers — the number must not read as though it
+            spans lessons the learner has never sat. */}
+        {overall && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              flexWrap: "wrap",
+              background: "var(--color-surface)",
+              border: "1.5px solid var(--color-border)",
+              borderRadius: 16,
+              padding: "14px 16px",
+              marginBottom: 12,
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: 0.5,
+                  textTransform: "uppercase",
+                  color: "var(--color-text-secondary)",
+                  marginBottom: 4,
+                }}
+              >
+                Course score
+              </div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  color: "var(--color-text-secondary)",
+                  lineHeight: 1.55,
+                }}
+              >
+                {overall.firstTryCorrect} of {overall.totalQuestions} questions
+                right first time, across {overall.lessonsScored} of{" "}
+                {playableLessonCount} lesson{playableLessonCount === 1 ? "" : "s"}.
+              </div>
+            </div>
+            <GradeBadge scorePct={overall.scorePct} />
+          </div>
+        )}
 
         {/* RE5 is a paid FSCA exam sitting — "am I ready to book?" is the
             question this course exists to answer, so it gets a permanent
