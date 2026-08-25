@@ -259,3 +259,30 @@ describe("lesson ids are not unique across courses", () => {
     expect(select).toContain("${r.courseId}:${r.lessonId}");
   });
 });
+
+
+describe("the widened backfill", () => {
+  const widened = stripComments(
+    readFileSync(join(MIGRATIONS, "20260825230000_lesson_results_widen_backfill.sql"), "utf8")
+  ).toLowerCase();
+
+  it("scores an ordinary lesson on whatever it recorded", () => {
+    expect(widened).toContain("c.total_questions >= 1");
+  });
+
+  it("still refuses to score a partial mock exam against the pass mark", () => {
+    // A 12-of-50 paper judged against 33 manufactures a fail out of an
+    // abandoned sitting — the one number a learner may spend money acting on.
+    expect(widened).toContain("c.total_questions = c.mock_total_questions");
+  });
+
+  it("still leaves an in-flight attempt alone", () => {
+    expect(widened).toContain("interval '5 minutes'");
+  });
+
+  it("stays idempotent", () => {
+    expect(widened).toContain(
+      "on conflict (user_id, course_id, lesson_id, attempt_no) do nothing"
+    );
+  });
+});

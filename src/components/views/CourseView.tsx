@@ -318,10 +318,11 @@ export function CourseView({
           <p className="course-map-description">{course.description}</p>
         </div>
 
-        {/* Course score. Question-weighted across best attempts (see
-            courseScore in src/lib/results/select.ts), and always shown with
-            how many lessons it covers — the number must not read as though it
-            spans lessons the learner has never sat. */}
+        {/* Course score: the badge, and nothing to read. Question-weighted
+            over the best attempt at each lesson (courseScore in
+            src/lib/results/select.ts). The coverage fraction beside the label
+            is the one thing the percentage cannot carry on its own — 100%
+            built from one lesson out of fourteen is not a course score yet. */}
         {overall && (
           <div
             style={{
@@ -329,40 +330,29 @@ export function CourseView({
               alignItems: "center",
               justifyContent: "space-between",
               gap: 12,
-              flexWrap: "wrap",
               background: "var(--color-surface)",
               border: "1.5px solid var(--color-border)",
               borderRadius: 16,
-              padding: "14px 16px",
+              padding: "12px 16px",
               marginBottom: 12,
             }}
           >
-            <div style={{ minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  letterSpacing: 0.5,
-                  textTransform: "uppercase",
-                  color: "var(--color-text-secondary)",
-                  marginBottom: 4,
-                }}
-              >
-                Course score
-              </div>
-              <div
-                style={{
-                  fontSize: 12.5,
-                  color: "var(--color-text-secondary)",
-                  lineHeight: 1.55,
-                }}
-              >
-                {overall.firstTryCorrect} of {overall.totalQuestions} questions
-                right first time, across {overall.lessonsScored} of{" "}
-                {playableLessonCount} lesson{playableLessonCount === 1 ? "" : "s"}.
-              </div>
-            </div>
-            <GradeBadge scorePct={overall.scorePct} />
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: 0.5,
+                textTransform: "uppercase",
+                color: "var(--color-text-secondary)",
+              }}
+            >
+              Course score
+              <span style={{ opacity: 0.7, fontWeight: 600 }}>
+                {" · "}
+                {overall.lessonsScored}/{playableLessonCount}
+              </span>
+            </span>
+            <GradeBadge scorePct={overall.scorePct} showLabel={false} />
           </div>
         )}
 
