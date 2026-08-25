@@ -1149,7 +1149,11 @@ export const RE5_COURSE: Course = {
             { type: "mcq", question: "Q48. Rendering financial services without a licence is:", options: ["Permitted for small FSPs", "An offence under FAIS", "Allowed under supervision only", "A civil matter only"], correct: 1, feedback: { correct: "It's an offence.", incorrect: "Acting as an FSP without a licence is an offence." } },
             { type: "scenario", question: "Q49. A client complains in writing; you resolve it fully within 3 weeks to their satisfaction. Must you tell them about the Ombud?", options: ["Yes, the Ombud must be disclosed in every case", "No, that right arises when it is not resolved satisfactorily", "Only where the claimed loss exceeded R3.5 million", "Only once six weeks have passed, regardless of outcome"], correct: 1, feedback: { correct: "The Ombud referral is for unresolved/unsatisfactory outcomes.", incorrect: "You must inform them of the Ombud right when the complaint is not resolved to their satisfaction." } },
             { type: "mcq", question: "Q50. The best one-line summary of a representative's core FAIS duty is to act:", options: ["In the interest of the product supplier", "Honestly, fairly and in the client's best interest, with proper disclosure", "To maximise personal commission", "Only when supervised"], correct: 1, feedback: { correct: "Honestly, fairly, in the client's interest, with disclosure.", incorrect: "Act honestly, fairly and in the client's best interest, with full disclosure." } },
-            { type: "info", title: "Score Yourself", content: "<p>Count your correct answers. <strong>33 or more out of 50 (66%) is a pass.</strong></p><p>Under 33? Note which knowledge areas tripped you up and redo those teaching units, then attempt Mock Exam B. Aim to consistently score 40+ before booking the real exam.</p>" },
+            // The "Score Yourself — count your correct answers" info step that
+            // used to close this paper is gone. RE5 is a real FSCA exam and a
+            // self-marked number is not one a learner can act on, so the app
+            // now marks the paper: see ExamResultView + src/lib/results/.
+            // The exam ends on Q50; finishing it opens the marked result.
           ],
         },
       ],
@@ -1219,7 +1223,11 @@ export const RE5_COURSE: Course = {
             { type: "mcq", question: "Q48. Which is required BEFORE a product-specific recommendation?", options: ["A signed client mandate on file", "Product-specific training on that product", "Five years of industry experience", "Written approval from the FSCA"], correct: 1, feedback: { correct: "Product-specific training is required first.", incorrect: "You need product-specific training before advising on that product." } },
             { type: "scenario", question: "Q49. A client asks you to guarantee, in writing, that a unit trust 'cannot lose money'. You should:", options: ["Sign the guarantee", "Explain you cannot guarantee market performance and disclose the material risks honestly", "Refer them to the Ombud", "Change the product to cash without telling them"], correct: 1, feedback: { correct: "No performance guarantees; disclose risks honestly.", incorrect: "You cannot guarantee market performance - disclose the risks honestly." } },
             { type: "mcq", question: "Q50. Overall, the RE5 tests a representative's knowledge of:", options: ["The technical features of each product class", "The FAIS framework and a representative's conduct obligations", "The commercial skills needed to build a client base", "The accounting treatment of financial products"], correct: 1, feedback: { correct: "The FAIS framework and conduct obligations.", incorrect: "RE5 tests the FAIS regulatory framework and your conduct obligations." } },
-            { type: "info", title: "Score Yourself", content: "<p><strong>33+ of 50 = pass (66%).</strong> Compare with your Mock Exam A score.</p><p>Consistently 40+ across both mocks, with no single knowledge area repeatedly weak, is a strong signal you're ready. Book the real exam with confidence - and re-verify the current format on the FSCA site first.</p>" },
+            // The "Score Yourself — count your correct answers" info step that
+            // used to close this paper is gone. RE5 is a real FSCA exam and a
+            // self-marked number is not one a learner can act on, so the app
+            // now marks the paper: see ExamResultView + src/lib/results/.
+            // The exam ends on Q50; finishing it opens the marked result.
           ],
         },
       ],

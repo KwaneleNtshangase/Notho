@@ -155,6 +155,10 @@ import {
 import { CourseIcon } from "@/components/views/LearnView";
 import { useNothoState } from "@/hooks/useNothoState";
 import { SettingsView } from "@/components/SettingsView";
+import { useRouter } from "next/navigation";
+import { useLessonResults } from "@/hooks/useLessonResults";
+import { GradeBadge, PassPill } from "@/components/results/GradeBadge";
+import { RE5_COURSE_ID, examSpecFor } from "@/lib/results/re5";
 
 function getDailyFact(): string {
   const start = new Date(new Date().getFullYear(), 0, 0);
@@ -194,6 +198,14 @@ export function CourseView({
     reason: string;
   } | null>(null);
 
+  const router = useRouter();
+  // Best recorded attempt per lesson, so the map shows what the learner has
+  // proved they can do rather than their most recent off-day. Scoped by RLS to
+  // this user; `best` is empty while loading and for signed-out/first-time
+  // learners, and every read below tolerates a miss.
+  const { best: bestResults } = useLessonResults(course.id);
+  const isRe5 = course.id === RE5_COURSE_ID;
+
   // ── Progression logic ──────────────────────────────────────────────────────
   // A lesson state is determined by LIVE PROGRESS, not the static comingSoon flag.
   //   completed   → isLessonCompleted() is true
@@ -217,6 +229,54 @@ export function CourseView({
     return state;
   }
 
+  /**
+   * The grade chip under a lesson on the map.
+   *
+   * Score is FIRST-TRY accuracy (src/lib/results/score.ts): the mastery loop
+   * re-queues missed questions until they are right, so "% correct" would read
+   * 100% for every lesson and mean nothing. Mock exams lead with PASS/FAIL
+   * against the 33-of-50 mark, because that is the number a learner is
+   * actually deciding on.
+   */
+  function lessonGrade(lessonId: string): ReactNode {
+    const result = bestResults.get(`${course.id}:${lessonId}`);
+    if (!result || result.totalQuestions === 0) return null;
+    const spec = examSpecFor(lessonId);
+
+    return (
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 5,
+          flexWrap: "wrap",
+          justifyContent: "center",
+          marginTop: 4,
+        }}
+      >
+        {spec && result.passed !== null && (
+          <PassPill
+            passed={result.passed}
+            passMarkCorrect={spec.passMarkCorrect}
+            totalQuestions={spec.totalQuestions}
+            size="sm"
+          />
+        )}
+        <GradeBadge
+          scorePct={result.scorePct}
+          size="sm"
+          title={
+            `Best attempt (#${result.attemptNo}): ` +
+            `${result.firstTryCorrect} of ${result.totalQuestions} right first time` +
+            (result.source === "backfill"
+              ? " (reconstructed from your earlier answers)"
+              : "")
+          }
+        />
+      </span>
+    );
+  }
+
   return (
     <main >
       <div className="course-map">
@@ -234,6 +294,23 @@ export function CourseView({
           <h2 className="course-map-title" style={{ color: colour.accent }}>{course.title}</h2>
           <p className="course-map-description">{course.description}</p>
         </div>
+
+        {/* RE5 is a paid FSCA exam sitting — "am I ready to book?" is the
+            question this course exists to answer, so it gets a permanent
+            entry point rather than living only behind a finished mock. */}
+        {isRe5 && (
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{ width: "100%", marginBottom: 16 }}
+            onClick={() => router.push("/re5-readiness")}
+          >
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+              <GraduationCap size={18} />
+              My RE5 readiness
+            </span>
+          </button>
+        )}
 
         {course.units.map((unit) => (
           <div className="unit" key={unit.id}>
@@ -304,6 +381,7 @@ export function CourseView({
                     </div>
                     <div className="lesson-label">
                       {lesson.title}
+                      {lessonGrade(lesson.id)}
                       {state === "coming_soon" && (
                         <span
                           style={{

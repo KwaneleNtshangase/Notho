@@ -2,6 +2,7 @@
 
 import { isScorableStep } from "@/lib/lessonScoring";
 import React, { use } from "react";
+import { useRouter } from "next/navigation";
 import { LessonView } from "@/components/views/LessonView";
 import { LessonSummaryView } from "@/components/views/LessonSummaryView";
 import { useNotho } from "@/context/NothoContext";
@@ -13,7 +14,6 @@ import {
   assignQids,
   requeuedCopy,
   allQuestionsMastered,
-  firstTryAccuracy,
   baseQids,
   type WorkingStep,
 } from "@/lib/lessonMastery";
@@ -26,6 +26,11 @@ import {
   clearMissedVariant,
 } from "@/lib/lessonBank";
 import { logQuestionAttempt } from "@/lib/questionAttempts";
+import { ExamResultView, type ExamAttemptSummary } from "@/components/views/ExamResultView";
+import { scoreAttempt } from "@/lib/results/score";
+import { examSpecFor, re5AreaResolver } from "@/lib/results/re5";
+import { fetchLessonResults, recordLessonResult } from "@/lib/results/store";
+import type { LessonResult } from "@/lib/results/types";
 
 /** Saved mid-lesson progress is honoured for this long after the last step. */
 const SAVED_PROGRESS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -72,14 +77,21 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
     hearts,
     loseHeart,
     completeLesson,
-    isLessonCompleted,
     lessonSummary,
     setLessonSummary,
   } = useNotho();
 
+  const router = useRouter();
   const lessonStartTimeRef = React.useRef(Date.now());
   const isFinalizingRef = React.useRef(false);
   const lessonHeartLostRef = React.useRef(false); // To track if a heart was lost during this lesson
+
+  // Marked result for an RE5 mock exam. Rendered instead of LessonSummaryView,
+  // which has no room for a pass mark, a knowledge-area breakdown or a time.
+  const [examResult, setExamResult] = React.useState<{
+    attempt: ExamAttemptSummary;
+    previousAttempts: LessonResult[];
+  } | null>(null);
 
   // State is only usable when it belongs to THIS URL. A stale state from the
   // previous lesson (e.g. after "Continue to next lesson") must be re-inited,
@@ -182,11 +194,6 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
 
     const lessonTitleDone =
       getLessonTitle(currentLessonState.courseId, currentLessonState.lessonId) ?? "";
-    const alreadyCompleted = isLessonCompleted(
-      currentLessonState.courseId,
-      currentLessonState.lessonId
-    );
-
     const { streak: streakAfterLesson, xpAwarded } = await completeLesson(
       currentLessonState.courseId,
       currentLessonState.lessonId,
@@ -210,40 +217,63 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       localStorage.removeItem("notho-lesson-progress");
     }
 
-    if (alreadyCompleted) {
-      const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
-      const accuracy =
-        totalQuestions > 0
-          ? Math.min(100, Math.round((currentLessonState.correctCount / totalQuestions) * 100))
-          : 0;
-      setLessonSummary({
-        xpEarned: xpAwarded,
-        timeSeconds: elapsedSeconds,
-        accuracy,
-        streak: streakAfterLesson,
-        isPerfect,
-        choice,
-        nextLessonId: getNextLesson(currentLessonState.courseId, currentLessonState.lessonId)?.id ?? null,
-        courseId: currentLessonState.courseId,
-        lessonId: currentLessonState.lessonId,
+    // ── Record the result ─────────────────────────────────────────────────
+    // Runs on EVERY finish, replays included. A re-sit of a mock exam is a
+    // replay by definition, and the old early-return for already-completed
+    // lessons meant a second attempt produced no score at all — and reported
+    // accuracy as correctCount/totalQuestions, which the mastery loop pins at
+    // 100% because every question ends correct. Score once, honestly, here.
+    const spec = examSpecFor(currentLessonState.lessonId);
+    const scored = scoreAttempt(
+      currentLessonState.steps,
+      currentLessonState.mistakenQids,
+      spec ? re5AreaResolver(currentLessonState.lessonId) : undefined
+    );
+    const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
+
+    // Read history BEFORE writing this attempt, so "previous best" on the exam
+    // result means previous.
+    const priorResults = spec
+      ? await fetchLessonResults(currentLessonState.courseId)
+      : [];
+
+    const savedResult = await recordLessonResult({
+      courseId: currentLessonState.courseId,
+      lessonId: currentLessonState.lessonId,
+      kind: spec ? "exam" : "lesson",
+      totalQuestions: scored.totalQuestions,
+      firstTryCorrect: scored.firstTryCorrect,
+      passMarkCorrect: spec?.passMarkCorrect ?? null,
+      durationSeconds: elapsedSeconds,
+      areaBreakdown: scored.areaBreakdown,
+    });
+
+    if (spec) {
+      setExamResult({
+        attempt: {
+          spec,
+          firstTryCorrect: scored.firstTryCorrect,
+          totalQuestions: scored.totalQuestions,
+          scorePct: scored.scorePct,
+          // Integer comparison against the pass mark as a COUNT, never a
+          // percentage one: 33 is written down in RE5_MOCK_EXAMS rather than
+          // derived from 66%, which is a float boundary that rounds up by one
+          // for some totals. See requiredCorrect() in src/lib/results/score.ts.
+          passed: scored.firstTryCorrect >= spec.passMarkCorrect,
+          durationSeconds: elapsedSeconds,
+          areaBreakdown: scored.areaBreakdown,
+          saved: savedResult !== null,
+        },
+        previousAttempts: priorResults,
       });
       isFinalizingRef.current = false;
       return;
     }
 
-    // Perfect-lesson count is now server-backed (perfect_lessons_total via
-    // completeLesson → recordLessonStats) — no device-local counter to drift.
-
-    const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
-    const accuracy = firstTryAccuracy(
-      currentLessonState.steps,
-      currentLessonState.mistakenQids
-    );
-
     setLessonSummary({
       xpEarned: xpAwarded,
       timeSeconds: elapsedSeconds,
-      accuracy,
+      accuracy: scored.scorePct,
       streak: streakAfterLesson,
       isPerfect,
       choice,
@@ -251,7 +281,7 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       courseId: currentLessonState.courseId,
       lessonId: currentLessonState.lessonId,
     });
-    
+
     isFinalizingRef.current = false;
   };
 
@@ -265,6 +295,30 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       setRoute({ name: "course", courseId });
     }
   };
+
+  if (examResult) {
+    return (
+      <ExamResultView
+        attempt={examResult.attempt}
+        previousAttempts={examResult.previousAttempts}
+        onBackToCourse={() => {
+          setExamResult(null);
+          setRoute({ name: "course", courseId });
+        }}
+        onViewReadiness={() => {
+          setExamResult(null);
+          router.push("/re5-readiness");
+        }}
+        onRetake={() => {
+          setExamResult(null);
+          // Clear the finished attempt so the effect above re-resolves the
+          // exam from content instead of restoring the completed step list.
+          setCurrentLessonState((prev) => ({ ...prev, courseId: null, lessonId: null, steps: [] }));
+          setRoute({ name: "lesson", courseId, lessonId });
+        }}
+      />
+    );
+  }
 
   if (lessonSummary) {
     return (
