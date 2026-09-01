@@ -361,7 +361,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 340, width: "100%" }}>
               {[
                 { icon: "📚", text: "Bite-size lessons on SA money life - payslips, debit orders, SARS, TFSAs" },
-                { icon: "📊", text: "Budget tracker with bank statement import - processed in memory, never stored" },
+                { icon: "📊", text: "Budget tracker with bank statement import - statement files are processed in memory; categorised transactions are saved to your account" },
                 { icon: "🎯", text: "Calculators, goals and streaks that make finance stick" },
               ].map((f) => (
                 <div key={f.text} style={{
