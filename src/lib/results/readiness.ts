@@ -17,7 +17,7 @@ import { RE5_KNOWLEDGE_AREAS, RE5_MOCK_EXAMS, type ExamSpec } from "@/lib/result
 export const RE5_CONFIDENT_CORRECT = 40;
 
 /** An area below this is worth going back to a unit for. Matches the pass mark. */
-export const RE5_AREA_FLOOR_PCT = 66;
+export const RE5_AREA_FLOOR_PCT = 65;
 
 export type ReadinessVerdict =
   | "not-started"
@@ -158,7 +158,7 @@ export function computeRe5Readiness(results: LessonResult[]): Re5Readiness {
       headline: "Ready to book",
       detail:
         `You cleared ${RE5_CONFIDENT_CORRECT}+ of 50 on your latest sitting of both mocks, ` +
-        "with no knowledge area under 66%. Re-verify the current exam format on the " +
+        "with no knowledge area under 65%. Re-verify the current exam format on the " +
         "FSCA site before you book — this app tracks your scores, not the FSCA's rules.",
       mocks,
       areas,
@@ -173,7 +173,7 @@ export function computeRe5Readiness(results: LessonResult[]): Re5Readiness {
       `your latest sitting is under ${RE5_CONFIDENT_CORRECT} of 50, which is a pass but a narrow one`
     );
   }
-  if (weakAreas.length > 0) reasons.push(`${listAreas(weakAreas)} is under 66%`);
+  if (weakAreas.length > 0) reasons.push(`${listAreas(weakAreas)} is under 65%`);
 
   return {
     verdict: "borderline",

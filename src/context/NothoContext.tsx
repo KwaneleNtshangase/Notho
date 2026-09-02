@@ -1,10 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useCallback } from "react";
+import React, { createContext, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { useNothoState as useNothoStateInternal } from "@/hooks/useNothoState";
 import type { NothoState } from "@/hooks/useNothoState";
 import type { Route } from "@/app/pageViews.types";
+import { RE5_COURSE_ID, isRe5MockExam } from "@/lib/results/re5";
 
 export const NothoContext = createContext<NothoState | null>(null);
 
@@ -72,6 +73,14 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
   // This wrapper handles both state update and router.push on success.
   const startLesson = React.useCallback(
     (courseId: string, lessonId: string): boolean => {
+      // Secure RE5 mocks are created only after the dedicated page reaches the
+      // authenticated server API. They deliberately have no client lesson
+      // steps to initialise here.
+      if (courseId === RE5_COURSE_ID && isRe5MockExam(lessonId)) {
+        state.setRoute({ name: "lesson", courseId, lessonId });
+        router.push(`/lesson/${courseId}/${lessonId}`);
+        return true;
+      }
       const ok = state.startLesson(courseId, lessonId);
       if (ok) {
         state.setRoute({ name: "lesson", courseId, lessonId });

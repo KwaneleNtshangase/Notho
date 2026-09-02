@@ -61,7 +61,7 @@ export type LessonResultDraft = {
  * A displayable band for a score.
  *
  * `letter` is Notho's own band, not an FSCA grade — the FSCA reports RE5 as a
- * percentage against a 66% pass mark and nothing else. For exams the pass/fail
+ * percentage against the published 65% pass mark and nothing else. For exams the pass/fail
  * verdict is the headline and the band is secondary.
  */
 export type Grade = {

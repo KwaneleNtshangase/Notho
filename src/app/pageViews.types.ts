@@ -351,7 +351,10 @@ export const getNextLesson = (courseId: string, lessonId: string): Lesson | null
   if (currentIndex === -1) return null;
   for (let i = currentIndex + 1; i < allLessons.length; i++) {
     const candidate = allLessons[i];
-    if (candidate.steps && candidate.steps.length > 0) return candidate;
+    if (
+      (candidate.steps && candidate.steps.length > 0) ||
+      (candidate.secureQuestionCount ?? 0) > 0
+    ) return candidate;
   }
   return null;
 };
