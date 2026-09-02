@@ -118,7 +118,9 @@ async function run() {
   // screen's own copy ("Your financial journey starts here" is 34), so a stuck
   // splash counted as a rendered page. Kept only as a crude "not literally
   // blank" signal now — check 3 is what actually decides whether the app works.
-  const bodyText = await page.evaluate(() => document.body?.innerText ?? "");
+  // A locator is re-resolved after client redirects; page.evaluate can lose
+  // its execution context while the signed-out app settles on /learn.
+  const bodyText = await page.locator("body").innerText({ timeout: 10_000 });
   if (bodyText.trim().length < 20) {
     fail("Page renders content (not blank)", `Body text: "${bodyText.slice(0, 60)}"`);
   } else {
