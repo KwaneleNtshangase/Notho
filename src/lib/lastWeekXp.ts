@@ -1,6 +1,6 @@
 import { sastWeekKey } from "@/lib/dates";
 
-type Slot = {
+export type LastWeekSlot = {
   currentWeekKey: string;
   currentXp: number;
   prevWeekKey: string;
@@ -11,16 +11,34 @@ function storageKey(userId: string): string {
   return `notho-last-week-xp-${userId}`;
 }
 
-function empty(weekKey: string): Slot {
+function empty(weekKey: string): LastWeekSlot {
   return { currentWeekKey: weekKey, currentXp: 0, prevWeekKey: "", prevXp: 0 };
 }
 
-function readSlot(userId: string): Slot | null {
+/** Pure week roll. When the SAST week key changes, current becomes last week. */
+export function rollLastWeekSlot(
+  prev: LastWeekSlot | null,
+  weekKey: string,
+  weeklyXp: number
+): LastWeekSlot {
+  const safeXp = Math.max(0, Number(weeklyXp) || 0);
+  if (!prev || prev.currentWeekKey !== weekKey) {
+    return {
+      currentWeekKey: weekKey,
+      currentXp: safeXp,
+      prevWeekKey: prev?.currentWeekKey ?? "",
+      prevXp: prev?.currentXp ?? 0,
+    };
+  }
+  return { ...prev, currentXp: safeXp };
+}
+
+function readSlot(userId: string): LastWeekSlot | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(storageKey(userId));
     if (!raw) return null;
-    const p = JSON.parse(raw) as Partial<Slot>;
+    const p = JSON.parse(raw) as Partial<LastWeekSlot>;
     return {
       currentWeekKey: String(p.currentWeekKey ?? ""),
       currentXp: Math.max(0, Number(p.currentXp ?? 0) || 0),
@@ -32,7 +50,7 @@ function readSlot(userId: string): Slot | null {
   }
 }
 
-function writeSlot(userId: string, slot: Slot): void {
+function writeSlot(userId: string, slot: LastWeekSlot): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(storageKey(userId), JSON.stringify(slot));
@@ -44,18 +62,7 @@ function writeSlot(userId: string, slot: Slot): void {
 export function syncLastWeekXp(userId: string | null, weeklyXp: number): number {
   const weekKey = sastWeekKey();
   if (!userId || typeof window === "undefined") return 0;
-  const prev = readSlot(userId) ?? empty(weekKey);
-  let next: Slot;
-  if (prev.currentWeekKey !== weekKey) {
-    next = {
-      currentWeekKey: weekKey,
-      currentXp: weeklyXp,
-      prevWeekKey: prev.currentWeekKey,
-      prevXp: prev.currentXp,
-    };
-  } else {
-    next = { ...prev, currentXp: weeklyXp };
-  }
+  const next = rollLastWeekSlot(readSlot(userId) ?? empty(weekKey), weekKey, weeklyXp);
   writeSlot(userId, next);
   return next.prevXp;
 }
