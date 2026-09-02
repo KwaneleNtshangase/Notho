@@ -72,12 +72,8 @@ test.describe("Progress & Gamification", () => {
       await expect(page.getByText(/Financial Learner · Level \d+/)).toBeVisible({ timeout: 10_000 });
       return;
     }
-    // Should see progression info near Level display
-    const levelSection = page.locator("text=Level").first();
-    await expect(levelSection).toBeVisible({ timeout: 10_000 });
-    // XP to next level text
-    const nextLevel = page.locator("text=/XP to Level|Max level/i").first();
-    await expect(nextLevel).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText("Level", { exact: true }).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator("#levelValue")).toHaveText(/^\d+$/);
   });
 
   test("4.8 — Weekly challenges track correctly", async ({ page }) => {
