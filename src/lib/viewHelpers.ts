@@ -272,6 +272,7 @@ export type Route =
 
 export type { CalcInputs } from "@/lib/calculators";
 export { calcGrowth } from "@/lib/calculators";
+export { ShareResultButton, generateShareCard } from "@/components/ShareCard";
 
 export function formatWithSpaces(value: number) {
   if (!isFinite(value) || isNaN(value)) return "0";
