@@ -1,19 +1,5 @@
 /**
  * Classify client error reports so the inbox only gets things a person can act on.
- *
- * The public /api/errors/report endpoint emails every stored row. That is the
- * right default for a real crash. It is the wrong default for:
- *
- *   - Service worker registration aborted because the tab navigated or React
- *     Strict Mode remounted the registrar. Chrome surfaces this as
- *     DOMException AbortError / "Operation has been aborted".
- *   - A hashed Next chunk that 404'd after a deploy while a tab was still on
- *     the previous build. ErrorBoundary already reloads the page.
- *   - Generic "network error" / "Failed to fetch" unhandledrejections from a
- *     dropped mobile radio.
- *
- * Those still happen. They are not product defects. Treating them as bugs
- * trains the founder to ignore the inbox.
  */
 
 export type ErrorClass = "noise" | "transient" | "actionable";
@@ -34,7 +20,14 @@ const NETWORK_BLIP =
 
 const SW_REJECTED = /^rejected$/i;
 
-/** Stable-ish id so repeats of the same fault group together. */
+const SW_LIFECYCLE =
+  /failed to (update|register) a serviceworker|script \S+ load failed|sw\.js load failed/i;
+
+const LOCK_STEAL = /lock broken by another request with the ['‘]steal['’] option/i;
+
+const CHUNK_MESSAGE =
+  /(failed to load chunk|loading chunk \S+ failed|chunkloaderror|failed to fetch dynamically imported module|importing a module script failed)/i;
+
 export function errorFingerprint(area: string, message: string): string {
   const normalised = message
     .toLowerCase()
@@ -53,17 +46,38 @@ export function classifyClientError(area: string, message: string): ClassifiedEr
   const fingerprint = errorFingerprint(area, message);
   const text = message.trim();
 
-  if (area === "sw-registration" && (ABORT_MESSAGE.test(text) || SW_REJECTED.test(text))) {
+  if (
+    area === "sw-registration" &&
+    (ABORT_MESSAGE.test(text) || SW_REJECTED.test(text) || SW_LIFECYCLE.test(text))
+  ) {
     return {
       classification: "noise",
       severity: "P4",
       fingerprint,
       reason:
-        "Browser aborted or rejected service-worker registration (navigation, remount, or unsupported context). Not a product defect.",
+        "Browser aborted or rejected service-worker registration (navigation, remount, bot, or unsupported context). Not a product defect.",
     };
   }
 
-  if (area === "chunk-load") {
+  if (SW_LIFECYCLE.test(text) || /serviceworker for scope/i.test(text)) {
+    return {
+      classification: "noise",
+      severity: "P4",
+      fingerprint,
+      reason: "Service-worker update/load failed. Next visit retries. Not a product defect.",
+    };
+  }
+
+  if (LOCK_STEAL.test(text)) {
+    return {
+      classification: "noise",
+      severity: "P4",
+      fingerprint,
+      reason: "Supabase auth lock stolen by another tab. Harmless multi-tab race.",
+    };
+  }
+
+  if (area === "chunk-load" || CHUNK_MESSAGE.test(text)) {
     return {
       classification: "transient",
       severity: "P3",
@@ -108,10 +122,8 @@ export function isBenignClientNoise(area: string, message: string): boolean {
   return classifyClientError(area, message).classification === "noise";
 }
 
-/** How many transient hits in 24h before we treat the wave as worth an email. */
 export const TRANSIENT_EMAIL_THRESHOLD = 8;
 
-/** Pull a short client label out of a UA string for the alert email. */
 export function summariseUserAgent(ua: string): string {
   if (!ua) return "unknown client";
   const chrome = ua.match(/Chrome\/([\d.]+)/);
