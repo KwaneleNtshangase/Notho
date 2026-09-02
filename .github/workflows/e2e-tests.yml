@@ -2,20 +2,18 @@ name: E2E Tests — Notho
 
 # MANUAL ONLY. Deliberately no `push` and no `schedule`.
 #
-# This suite has not produced a reliable green run across the mobile
-# matrix. Left on every push it emailed a failure for each one, which is
-# how an alert stops being an alert.
+# This suite is intentionally manual so its production-facing scenarios can be
+# run when auth, lessons, budget, or calculator behavior changes without adding
+# a long browser matrix to every push.
 #
 # It has earned its place: it found the action-step scoring bug and the
-# crawler-filter gap. Run it on demand when you change auth, lessons,
-# budget, or the calculator — not as inbox wallpaper.
+# crawler-filter gap.
 #
 #   gh workflow run "E2E Tests — Notho"
 #   or the "Run workflow" button on the Actions tab.
 #
-# Matrix is Desktop Chrome only. Mobile Safari / Pixel were the source of
-# most red emails and did not add a second useful signal once desktop
-# failed. Restore them after two consecutive green desktop runs.
+# The mobile projects were restored after two consecutive green desktop runs
+# and after their session setup and viewport-specific selectors were repaired.
 on:
   workflow_dispatch:
 
@@ -30,6 +28,8 @@ jobs:
       matrix:
         project:
           - "Desktop Chrome"
+          - "Mobile Safari (iPhone 14)"
+          - "Mobile Chrome (Pixel 7)"
 
     steps:
       - name: Checkout code
@@ -54,11 +54,11 @@ jobs:
 
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
 
       - name: Install Playwright system deps (cached hit)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: npx playwright install-deps chromium webkit
 
       - name: Run Playwright tests (${{ matrix.project }})
         run: npx playwright test --project="${{ matrix.project }}"
