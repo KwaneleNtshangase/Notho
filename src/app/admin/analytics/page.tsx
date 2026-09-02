@@ -34,7 +34,7 @@ import { PeoplePanel } from "./panelsPeople";
 type Tab = "pulse" | "growth" | "engagement" | "retention" | "content" | "churn" | "people";
 
 const TABS: { value: Tab; label: string; blurb: string }[] = [
-  { value: "pulse", label: "Pulse", blurb: "The state of the app right now, and what to do about it." },
+  { value: "pulse", label: "Pulse", blurb: "What to do today. Counts first. Percentages only when the sample can carry them." },
   { value: "growth", label: "Growth", blurb: "Who is arriving, and how many of them become real users." },
   { value: "engagement", label: "Engagement", blurb: "Which parts of Notho earn their place, and when people show up." },
   { value: "retention", label: "Retention", blurb: "Do they come back, and who is about to stop?" },
@@ -136,18 +136,19 @@ function Dashboard() {
     setTab("people");
   }, []);
 
-  const active = useMemo(() => TABS.find((t) => t.value === tab)!, [tab]);
+  const active = useMemo(() => TABS.find((t) => t.value === tab)!,[tab]);
   const numDays = Number(days);
 
   return (
     <div className="nv-shell">
       <header className="nv-head">
         <div className="nv-title">
-          <div className="nv-mark" aria-hidden="true">
-            N
+          <div className="nv-mark">
+            <img src="/notho-icon.png" alt="" width={36} height={36} />
           </div>
           <div>
-            <h1 className="nv-h1">Notho mission control</h1>
+            <h1 className="nv-h1">Notho Desk</h1>
+            <p className="nv-lockup">Learn · Grow · Build wealth</p>
             <p className="nv-sub">
               Live from your database. Every panel updates on its own — no exports, no waiting.
             </p>
@@ -176,8 +177,11 @@ function Dashboard() {
               <Btn onClick={refresh}>Refresh</Btn>
             </>
           )}
-          <Btn onClick={toggle} title="Switch between the dark console and the light, screenshot-friendly theme">
-            {mode === "dark" ? "☀︎ Light" : "☾ Dark"}
+          <Btn
+            onClick={toggle}
+            title="Dark is the working console. Light is the export theme for screenshots and decks."
+          >
+            {mode === "dark" ? "☀︎ Export theme" : "☾ Console theme"}
           </Btn>
         </div>
       </header>
