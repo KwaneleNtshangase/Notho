@@ -93,16 +93,33 @@ export function GrowthChart({
   );
 }
 
-export function BudgetAsk({ onDismiss }: { onDismiss: () => void }) {
+export function BudgetAsk({
+  onDismiss,
+  monthly,
+}: {
+  onDismiss: () => void;
+  monthly?: number;
+}) {
+  const amount = Math.max(0, Math.round(monthly ?? 0));
+  const openBudget = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(
+        "notho-calc-budget-hint",
+        JSON.stringify({ monthly: amount, at: Date.now() })
+      );
+    }
+  };
   return (
     <div style={{ marginBottom: 16, padding: "14px 16px", borderRadius: 14, border: "1px solid var(--color-border)", background: "var(--color-surface)" }}>
-      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Want this next to a budget?</div>
+      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Does this contribution fit the month?</div>
       <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 12, lineHeight: 1.45 }}>
-        Optional. Skip if this is a what-if or a client scenario. We will not change these inputs or pull a live balance.
+        {amount > 0
+          ? `This plan uses ${formatZAR(amount)} a month. Open Budget to put that figure next to this month's surplus — we will not change these calculator inputs or pull a live balance.`
+          : "Open Budget to see this month's surplus next to the plan. Skip if this is a what-if or a client scenario. We will not change these inputs or pull a live balance."}
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <a href="/budget" className="btn btn-primary" style={{ padding: "8px 12px", fontSize: 13, textDecoration: "none" }}>
-          Open budget
+        <a href="/budget" className="btn btn-primary" style={{ padding: "8px 12px", fontSize: 13, textDecoration: "none" }} onClick={openBudget}>
+          Check against budget
         </a>
         <button type="button" className="btn btn-secondary" style={{ padding: "8px 12px", fontSize: 13 }} onClick={onDismiss}>
           Not now
