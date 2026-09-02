@@ -1,9 +1,11 @@
 name: Lighthouse — Performance Audit
 
+# Weekly + manual only. A Lighthouse budget failure on every main push is
+# the same class of noise as the old health-check-on-push: it emails when
+# you are mid-WIP and trains you to ignore the alert. CI already gates
+# typecheck/tests/build. This workflow is a performance signal, not a
+# deploy gate.
 on:
-  push:
-    branches: [main]
-  # Weekly on Monday morning
   schedule:
     - cron: "0 6 * * 1"
   workflow_dispatch:
@@ -23,7 +25,6 @@ jobs:
         with:
           urls: |
             ${{ secrets.BASE_URL || 'https://www.notho.co.za' }}
-          # Fail if any score drops below these thresholds
           budgetPath: ./lighthouse-budget.json
           uploadArtifacts: true
           temporaryPublicStorage: true

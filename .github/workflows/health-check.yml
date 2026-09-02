@@ -1,19 +1,15 @@
 name: Health Check — Notho
 
 on:
-  push:
-    branches: [main]
+  # Do not run on every push. CI and E2E already cover commits; attaching a
+  # full Playwright production crawl to each main push is what filled Gmail
+  # during the 2 Sep calculator restore burst.
   schedule:
-    # Hourly. Was every 6 hours (an outage could hide most of a working day),
-    # then */30, which was too aggressive: runs overlapped and GitHub cancelled
-    # them, producing "All jobs were cancelled" emails that read as failures and
-    # were pure noise. Hourly is 24 runs a day with no overlap.
-    #
-    # This is not the floor on detection time and is not meant to be. GitHub
-    # deprioritises scheduled runs under load, so treat it as "about hourly".
-    # The external uptime monitor in docs/MONITORING.md checks every 5 minutes
-    # and is the only layer that does not depend on GitHub Actions.
-    - cron: "0 * * * *"
+    # Every 6 hours. Hourly + on-push was 24+ emails a day whenever the check
+    # went red, and GitHub already deprioritises scheduled Actions under load.
+    # Real uptime belongs on /api/health via an external monitor (see
+    # docs/MONITORING.md), not in this inbox.
+    - cron: "0 */6 * * *"
   workflow_dispatch:
 
 jobs:
@@ -29,10 +25,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node 20
+      - name: Set up Node 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Cache Playwright browsers
@@ -57,11 +53,10 @@ jobs:
       - name: Run health-check script
         run: node scripts/health-check.js
         env:
-          # Must be the CANONICAL host. fundiapp.co.za 301s to www.notho.co.za
-          # (see vercel.json), and pointing the check at the old domain makes
-          # every run pay a redirect chain before the app even starts loading.
-          # Bare notho.co.za also redirects to www — use www directly.
-          BASE_URL: ${{ secrets.BASE_URL || 'https://www.notho.co.za' }}
+          # Signed-out visitors land on /learn. Hitting / pays a 307 and then a
+          # client navigation that used to throw "Execution context was destroyed"
+          # and fail a healthy site.
+          BASE_URL: ${{ secrets.BASE_URL || 'https://www.notho.co.za/learn' }}
 
       - name: Upload screenshot
         if: always()
@@ -71,13 +66,6 @@ jobs:
           path: health-check-screenshot.png
           retention-days: 7
 
-      # ── Alerting ──────────────────────────────────────────────────────────
-      #
-      # One rolling incident issue, not one per day. At the old 6-hourly cadence
-      # a per-day issue was tolerable; at 48 runs a day it would bury you, and
-      # an alert channel you have learned to ignore is worse than none. So:
-      # first failure opens an issue, subsequent failures comment on it, and
-      # recovery closes it. The issue being open is a live status indicator.
       - name: Open or update the incident issue
         if: failure()
         continue-on-error: true
@@ -96,7 +84,6 @@ jobs:
             });
 
             if (open.length > 0) {
-              // Already in a known incident. Add a datapoint, don't add noise.
               const issue = open[0];
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -111,7 +98,7 @@ jobs:
             const { data: created } = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🔴 Notho health check failing (since ${when})`,
+              title: `Notho health check failing (since ${when})`,
               body: [
                 'The automated health check could not confirm the app is working.',
                 '',
@@ -119,10 +106,8 @@ jobs:
                 `**Commit:** ${context.sha.slice(0, 7)}`,
                 '',
                 'The run log lists which checks failed. The `App booted` check is',
-                'the important one: if it failed, React never rendered an',
-                'interactive control and users are looking at a stuck splash',
-                'screen. The uploaded screenshot artifact shows what the browser',
-                'actually saw.',
+                'the important one. The uploaded screenshot artifact shows what',
+                'the browser actually saw.',
                 '',
                 'This issue updates itself on each subsequent failure and closes',
                 'automatically once a run passes. Please do not close it by hand',
@@ -132,8 +117,6 @@ jobs:
             });
             core.setFailed(`Health check failing — opened issue #${created.number}`);
 
-      # Recovery. Without this the incident issue stays open forever and the
-      # signal decays back into the 36-open-issues problem.
       - name: Close the incident issue on recovery
         if: success()
         continue-on-error: true
@@ -153,7 +136,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: `✅ Recovered. [Run #${context.runNumber}](${runUrl}) passed. Closing.`,
+                body: `Recovered. [Run #${context.runNumber}](${runUrl}) passed. Closing.`,
               });
               await github.rest.issues.update({
                 owner: context.repo.owner,

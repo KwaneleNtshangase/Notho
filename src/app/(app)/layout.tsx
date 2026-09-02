@@ -9,7 +9,6 @@ import {
   NothoCalculate,
   NothoBudget,
   NothoGoals,
-  NothoProgress,
   NothoProfile,
 } from "@/components/icons/NothoIcons";
 import { usePathname } from "next/navigation";
@@ -62,20 +61,12 @@ function AppNavigation() {
           order: "order-4",
         },
         {
-          key: "progress",
-          label: "Leaderboard",
-          icon: <NothoProgress size={24} className="text-current" />,
-          isActive: is("/leaderboard"),
-          onClick: () => handleNav("leaderboard"),
-          order: "order-5",
-        },
-        {
           key: "profile",
           label: "Profile",
           icon: <NothoProfile size={24} className="text-current" />,
-          isActive: is("/profile"),
+          isActive: is("/profile") || is("/leaderboard"),
           onClick: () => handleNav("profile"),
-          order: "order-6",
+          order: "order-5",
         },
       ]}
     />

@@ -41,16 +41,11 @@ test.describe("Progress & Gamification", () => {
     await expect(hearts).toBeVisible({ timeout: 10_000 });
   });
 
-  test("4.5 — Leaderboard loads and shows real user names", async ({ page, isMobile }) => {
-    // The current five-item mobile nav groups leaderboard access under Profile;
-    // exercise the leaderboard route directly on that layout.
-    if (isMobile) await page.goto("/leaderboard", { waitUntil: "domcontentloaded" });
-    else await goToTab(page, "Leaderboard");
+  test("4.5 — Leaderboard loads and shows real user names", async ({ page }) => {
+    await page.goto("/leaderboard", { waitUntil: "domcontentloaded" });
     await expect(
       page.getByRole("heading", { name: /Leaderboard|This week's learners/i })
     ).toBeVisible();
-    const lbBtn = page.locator("button, a", { hasText: /Leaderboard/i }).first();
-    if (await lbBtn.isVisible()) await lbBtn.click();
     await page.waitForTimeout(1500);
     // Names should appear — check they're NOT all "Learner XXXX"
     const entries = page.locator(".leaderboard-entry, [data-rank]");
@@ -64,9 +59,8 @@ test.describe("Progress & Gamification", () => {
     await expect(errorMsg).not.toBeVisible();
   });
 
-  test("4.6 — Progress tab loads without crash", async ({ page, isMobile }) => {
-    if (isMobile) await page.goto("/leaderboard", { waitUntil: "domcontentloaded" });
-    else await goToTab(page, "Leaderboard");
+  test("4.6 — Weekly learners page loads without crash", async ({ page }) => {
+    await page.goto("/leaderboard", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(1000);
     const error = page.locator("text=Something went wrong, text=Error loading");
     await expect(error).not.toBeVisible();

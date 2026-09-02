@@ -3,11 +3,16 @@ import {
   calculateCompoundInterest,
   calculateGrowth,
   calculateLoanMonthlyPayment,
+  formatDuration,
   growthFinal,
+  projectGrowth,
   solveForInitial,
   solveForMonthly,
+  solveForMonths,
   solveForRate,
+  solveForWithdrawal,
   solveForYears,
+  TFSA_ANNUAL_LIMIT,
 } from "../calculators";
 
 const DEFAULTS = {
@@ -23,12 +28,13 @@ describe("calculateGrowth", () => {
   it("matches the ordinary-annuity closed form when escalation is 0", () => {
     const r = 0.1 / 12;
     const n = 120;
-    const closed =
-      50_000 * Math.pow(1 + r, n) + 1_000 * (Math.pow(1 + r, n) - 1) / r;
+    const closed = 50_000 * Math.pow(1 + r, n) + (1_000 * (Math.pow(1 + r, n) - 1)) / r;
     const live = growthFinal({ ...DEFAULTS, escalation: 0 });
     expect(live.value).toBe(Math.round(closed));
     expect(live.contributions).toBe(170_000);
     expect(live.interest).toBe(live.value - live.contributions);
+    expect(live.withdrawals).toBe(0);
+    expect(live.realValue).toBe(live.value);
   });
 
   it("uses monthly compounding for once-off lumps", () => {
@@ -59,13 +65,88 @@ describe("calculateGrowth", () => {
       years: -3,
     });
     expect(data).toHaveLength(1);
-    expect(data[0]).toEqual({ year: 0, value: 0, contributions: 0, interest: 0 });
+    expect(data[0].value).toBe(0);
+    expect(data[0].contributions).toBe(0);
+    expect(data[0].interest).toBe(0);
   });
 
-  it("keeps value = contributions + interest after rounding", () => {
+  it("keeps value = contributions + interest - withdrawals after rounding", () => {
     for (const point of calculateGrowth(DEFAULTS)) {
-      expect(point.value).toBe(point.contributions + point.interest);
+      expect(point.value).toBe(point.contributions + point.interest - point.withdrawals);
     }
+  });
+
+  it("does not change the path when fee and inflation are zero", () => {
+    const plain = growthFinal(DEFAULTS);
+    const extra = growthFinal({ ...DEFAULTS, fee: 0, inflation: 0, withdrawal: 0 });
+    expect(extra.value).toBe(plain.value);
+  });
+
+  it("applies fee as a drag so the pot is smaller", () => {
+    const gross = growthFinal({ ...DEFAULTS, escalation: 0, fee: 0 });
+    const net = growthFinal({ ...DEFAULTS, escalation: 0, fee: 1 });
+    expect(net.value).toBeLessThan(gross.value);
+  });
+
+  it("shows real value below nominal when inflation is set", () => {
+    const p = growthFinal({ ...DEFAULTS, inflation: 5 });
+    expect(p.realValue).toBeLessThan(p.value);
+    expect(p.realValue).toBe(Math.round(p.value / Math.pow(1.05, 10)));
+  });
+
+  it("caps TFSA contributions at the annual limit", () => {
+    const p = projectGrowth({
+      ...DEFAULTS,
+      wrapper: "tfsa",
+      monthly: 10_000,
+      escalation: 0,
+      years: 1,
+    });
+    expect(p.points[1].contributions - p.points[0].contributions).toBe(TFSA_ANNUAL_LIMIT);
+    expect(p.notes.some((n) => n.includes("capped") || n.includes("TFSA"))).toBe(true);
+  });
+
+  it("stops new TFSA contributions at the lifetime limit", () => {
+    const p = projectGrowth({
+      ...DEFAULTS,
+      wrapper: "tfsa",
+      monthly: 10_000,
+      escalation: 0,
+      years: 2,
+      tfsaUsedLifetime: 490_000,
+    });
+    expect(p.points[2].contributions - p.points[0].contributions).toBe(10_000);
+  });
+
+  it("depletes the pot when withdrawals exceed growth", () => {
+    const p = projectGrowth({
+      principal: 12_000,
+      monthly: 0,
+      rate: 0,
+      years: 5,
+      escalation: 0,
+      frequency: "once-off",
+      withdrawal: 1_000,
+      withdrawFromYear: 0,
+    });
+    expect(p.depletedYear).toBe(1);
+    expect(p.points[p.points.length - 1].value).toBe(0);
+    expect(p.points[p.points.length - 1].withdrawals).toBe(12_000);
+  });
+
+  it("clamps living-annuity withdrawals into the 2.5–17.5% band", () => {
+    const p = projectGrowth({
+      principal: 100_000,
+      monthly: 0,
+      rate: 0,
+      years: 1,
+      escalation: 0,
+      frequency: "once-off",
+      wrapper: "living-annuity",
+      withdrawal: 100,
+      withdrawFromYear: 0,
+    });
+    expect(p.points[1].withdrawals).toBe(2_500);
   });
 });
 
@@ -76,6 +157,14 @@ describe("solvers", () => {
     expect(years).toBe(12);
     expect(growthFinal({ ...DEFAULTS, years: 11 }).value).toBeLessThan(goal);
     expect(growthFinal({ ...DEFAULTS, years }).value).toBeGreaterThanOrEqual(goal);
+  });
+
+  it("returns a month count inside the year that first clears the goal", () => {
+    const months = solveForMonths(DEFAULTS, 500_000);
+    expect(months).toBeGreaterThan(11 * 12);
+    expect(months).toBeLessThanOrEqual(12 * 12);
+    expect(formatDuration(12)).toBe("1 year");
+    expect(formatDuration(13)).toBe("1 year 1 month");
   });
 
   it("solves monthly so the projection meets the goal", () => {
@@ -97,6 +186,35 @@ describe("solvers", () => {
     const initial = solveForInitial(DEFAULTS, goal);
     expect(growthFinal({ ...DEFAULTS, rate }).value).toBeGreaterThanOrEqual(goal - 1);
     expect(growthFinal({ ...DEFAULTS, principal: initial }).value).toBeGreaterThanOrEqual(goal - 1);
+  });
+
+  it("ignores withdrawals when solving for an accumulation goal", () => {
+    expect(solveForYears({ ...DEFAULTS, withdrawal: 50_000, withdrawFromYear: 0 }, 500_000)).toBe(12);
+  });
+
+  it("finds a withdrawal that does not empty the pot", () => {
+    const w = solveForWithdrawal({
+      principal: 500_000,
+      monthly: 0,
+      rate: 10,
+      years: 10,
+      escalation: 0,
+      frequency: "once-off",
+      withdrawFromYear: 0,
+    });
+    expect(w).toBeGreaterThan(0);
+    const p = projectGrowth({
+      principal: 500_000,
+      monthly: 0,
+      rate: 10,
+      years: 10,
+      escalation: 0,
+      frequency: "once-off",
+      withdrawal: w,
+      withdrawFromYear: 0,
+    });
+    expect(p.depletedYear).toBeNull();
+    expect(p.points[p.points.length - 1].value).toBeGreaterThan(0);
   });
 });
 

@@ -23,7 +23,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { fetchView } from "./lib";
 import { ThemeProvider, useTheme } from "./theme";
 import { Btn, Card, ErrorNote, Segmented, Skeleton } from "./ui";
-import { PulsePanel } from "./panelsPulse";
+import { PulsePanel } from "./pulseDesk";
 import { GrowthPanel } from "./panelsGrowth";
 import { EngagementPanel } from "./panelsEngagement";
 import { RetentionPanel } from "./panelsRetention";
@@ -34,7 +34,7 @@ import { PeoplePanel } from "./panelsPeople";
 type Tab = "pulse" | "growth" | "engagement" | "retention" | "content" | "churn" | "people";
 
 const TABS: { value: Tab; label: string; blurb: string }[] = [
-  { value: "pulse", label: "Pulse", blurb: "The state of the app right now, and what to do about it." },
+  { value: "pulse", label: "Pulse", blurb: "What to do today. Counts first. Percentages only when the sample can carry them." },
   { value: "growth", label: "Growth", blurb: "Who is arriving, and how many of them become real users." },
   { value: "engagement", label: "Engagement", blurb: "Which parts of Notho earn their place, and when people show up." },
   { value: "retention", label: "Retention", blurb: "Do they come back, and who is about to stop?" },
@@ -50,12 +50,28 @@ const WINDOWS = [
   { value: "365", label: "1y" },
 ];
 
-/** Auto-refresh cadence. Frequent enough to feel live, gentle on the database. */
 const REFRESH_MS = 60_000;
+
+const DESK_CSS = `
+.nv-mark { overflow:hidden; padding:0; }
+.nv-mark img { width:100%; height:100%; object-fit:cover; display:block; }
+.nv-lockup {
+  margin:4px 0 0; font-size:10.5px; font-weight:800; letter-spacing:0.16em;
+  text-transform:uppercase; color:var(--teal);
+}
+.nv-tab[aria-selected="true"] {
+  color:#04121B; background:var(--teal);
+  box-shadow:0 6px 18px rgba(46,217,206,0.28);
+}
+.nv-root[data-mode="light"] .nv-tab[aria-selected="true"] {
+  color:#FFFFFF; background:var(--teal-deep);
+}
+`;
 
 export default function AdminAnalyticsPage() {
   return (
     <ThemeProvider>
+      <style dangerouslySetInnerHTML={{ __html: DESK_CSS }} />
       <Dashboard />
     </ThemeProvider>
   );
@@ -78,8 +94,6 @@ function Dashboard() {
     setLastRefresh(new Date());
   }, []);
 
-  // One cheap probe up front, so an unauthorised visitor gets one clear message
-  // rather than the same error repeated across every panel.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -112,8 +126,6 @@ function Dashboard() {
     return () => clearInterval(t);
   }, [auto, gate, refresh]);
 
-  // Refreshing the moment the tab regains focus means the numbers are current
-  // the instant you look at them, not up to a minute stale.
   useEffect(() => {
     if (gate !== "ok") return;
     const onVisible = () => {
@@ -123,7 +135,6 @@ function Dashboard() {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [gate, refresh]);
 
-  /** Insight cards jump to the tab that proves them. */
   const jump = useCallback((next: string) => {
     if (TABS.some((t) => t.value === next)) {
       setTab(next as Tab);
@@ -136,18 +147,19 @@ function Dashboard() {
     setTab("people");
   }, []);
 
-  const active = useMemo(() => TABS.find((t) => t.value === tab)!, [tab]);
+  const active = useMemo(() => TABS.find((t) => t.value === tab)!,[tab]);
   const numDays = Number(days);
 
   return (
     <div className="nv-shell">
       <header className="nv-head">
         <div className="nv-title">
-          <div className="nv-mark" aria-hidden="true">
-            N
+          <div className="nv-mark">
+            <img src="/notho-icon.png" alt="" width={36} height={36} />
           </div>
           <div>
-            <h1 className="nv-h1">Notho mission control</h1>
+            <h1 className="nv-h1">Notho Desk</h1>
+            <p className="nv-lockup">Learn · Grow · Build wealth</p>
             <p className="nv-sub">
               Live from your database. Every panel updates on its own — no exports, no waiting.
             </p>
@@ -176,8 +188,11 @@ function Dashboard() {
               <Btn onClick={refresh}>Refresh</Btn>
             </>
           )}
-          <Btn onClick={toggle} title="Switch between the dark console and the light, screenshot-friendly theme">
-            {mode === "dark" ? "☀︎ Light" : "☾ Dark"}
+          <Btn
+            onClick={toggle}
+            title="Dark is the working console. Light is the export theme for screenshots and decks."
+          >
+            {mode === "dark" ? "☀︎ Export theme" : "☾ Console theme"}
           </Btn>
         </div>
       </header>
