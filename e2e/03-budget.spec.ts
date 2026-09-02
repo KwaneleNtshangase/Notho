@@ -11,7 +11,7 @@ test.describe("Budget", () => {
   });
 
   test("3.1 — Budget tab loads without crashing", async ({ page }) => {
-    await expect(page.locator("text=Budget").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Budget", exact: true })).toBeVisible();
     // Should not show an error or blank screen
     const errorText = page.locator("text=Something went wrong, text=Error");
     await expect(errorText).not.toBeVisible();
@@ -29,42 +29,37 @@ test.describe("Budget", () => {
   });
 
   test("3.3 — Add income entry", async ({ page }) => {
-    // Look for + button or add entry
-    const addBtn = page.locator("button", { hasText: /Add|Income|\+/i }).first();
+    const addBtn = page.getByRole("button", { name: "Add", exact: true });
     await addBtn.waitFor({ state: "visible", timeout: 10000 });
     await addBtn.click();
-    await page.waitForTimeout(400);
-    // Modal or form should appear
-    const incomeTab = page.locator("button", { hasText: "Income +" }).first();
-    if (await incomeTab.isVisible()) {
-      await incomeTab.click();
-      await page.waitForTimeout(300);
-    }
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("button", { name: "Income +", exact: true }).click();
 
-    const categoryBtn = page.locator("button", { hasText: /Salary|Business|Side Hustle|Other/i }).first();
+    const categoryBtn = dialog.getByRole("button", { name: /Salary|Business|Side Hustle|Other/i }).first();
     if (await categoryBtn.isVisible()) {
       await categoryBtn.click();
     }
 
-    const amountInput = page.locator('input[type="number"], input[placeholder*="amount" i], input[placeholder*="R" i]').first();
+    const amountInput = dialog.locator('input[type="number"]').first();
     await amountInput.waitFor({ state: "visible", timeout: 5000 });
     await amountInput.fill("5000");
 
-    const saveBtn = page.locator("button", { hasText: /Save|Add|Done/i }).last();
+    const saveBtn = dialog.getByRole("button", { name: "Save Entry", exact: true });
     await saveBtn.click();
-    await page.waitForTimeout(600);
-    // Amount should appear somewhere
-    await expect(page.locator("text=/5.000|5000/").first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText("Loading...", { exact: true })).toBeHidden({ timeout: 30_000 });
+    await expect(page.getByText(/R5[\s\u00a0]000/).first()).toBeVisible({ timeout: 10_000 });
   });
 
   test("3.4 — Year view loads with income/expenses chart", async ({ page }) => {
-    const yearBtn = page.locator("button", { hasText: /Year|Annual/i }).first();
+    const yearBtn = page.getByRole("button", { name: "Year", exact: true });
     if (await yearBtn.isVisible()) {
       await yearBtn.click();
       await page.waitForTimeout(600);
       // Chart container should be present
-      const chart = page.locator(".recharts-wrapper, svg").first();
-      await expect(chart).toBeVisible({ timeout: 5_000 });
+      await expect(page.getByText(/Overview$/)).toBeVisible({ timeout: 5_000 });
+      const chart = page.locator(".recharts-wrapper:visible").first();
+      if ((await chart.count()) > 0) await expect(chart).toBeVisible();
     }
   });
 

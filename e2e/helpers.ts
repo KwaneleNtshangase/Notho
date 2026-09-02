@@ -248,6 +248,52 @@ export async function recoverIfOutOfHearts(page: Page): Promise<boolean> {
 export const AUTH_STATE_PATH = "e2e/.auth/user.json";
 
 /**
+ * Create the shared browser session through Supabase's trusted admin API.
+ *
+ * The service credential remains in Playwright's Node process. Only the
+ * ordinary E2E user's short-lived session is installed in browser storage.
+ * This keeps setup independent of password-endpoint rate limits while the
+ * desktop auth specs continue to exercise the real sign-in UI.
+ */
+export async function seedAuthenticatedSession(page: Page): Promise<void> {
+  const url = process.env.TEST_SUPABASE_URL;
+  const serviceKey = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) {
+    throw new Error(
+      "Trusted E2E session setup requires TEST_SUPABASE_URL and " +
+        "TEST_SUPABASE_SERVICE_ROLE_KEY"
+    );
+  }
+
+  const admin = createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const { data: link, error: linkError } = await admin.auth.admin.generateLink({
+    type: "magiclink",
+    email: TEST_EMAIL,
+  });
+  if (linkError) throw linkError;
+
+  const { data: verification, error: verificationError } = await admin.auth.verifyOtp({
+    token_hash: link.properties.hashed_token,
+    type: "magiclink",
+  });
+  if (verificationError) throw verificationError;
+  if (!verification.session) throw new Error("Supabase did not return an E2E session");
+
+  const projectRef = new URL(url).hostname.split(".")[0];
+  const storageKey = `sb-${projectRef}-auth-token`;
+  await page.addInitScript(
+    ({ key, session }) => localStorage.setItem(key, JSON.stringify(session)),
+    { key: storageKey, session: verification.session }
+  );
+
+  await resetServerHearts();
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  await expect(page.locator(".app-container").first()).toBeVisible({ timeout: 30_000 });
+}
+
+/**
  * Sign in with email/password, wait for the app shell to appear.
  *
  * Now session-aware. With storageState restored by the setup project the app is
@@ -270,11 +316,20 @@ export async function signIn(page: Page) {
     await signInButton.waitFor({ state: "visible", timeout: 15_000 });
     await signInButton.click();
   } catch {
-    // If button doesn't appear, maybe we're already on the signin form.
+    // The authenticated shell may have finished loading while we waited for a
+    // landing-page control that never appears for signed-in users.
+    if (await shell.isVisible().catch(() => false)) return;
   }
 
   const emailInput = page.locator('input[type="email"]').first();
-  await emailInput.waitFor({ state: "visible", timeout: 15_000 });
+  try {
+    await emailInput.waitFor({ state: "visible", timeout: 15_000 });
+  } catch (error) {
+    // Re-check the authenticated state before treating a missing form as a
+    // failure. Mobile WebKit can finish hydration after the first shell wait.
+    if (await shell.isVisible().catch(() => false)) return;
+    throw error;
+  }
   await emailInput.fill(TEST_EMAIL);
   await page.locator('input[type="password"]').first().fill(TEST_PASSWORD);
   // Click the primary sign-in/up submit button (has data-testid="auth-submit")
