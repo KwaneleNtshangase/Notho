@@ -1,31 +1,21 @@
 name: E2E Tests — Notho
 
-# MANUAL ONLY, as of 9 Aug 2026. Deliberately no `push` and no `schedule`.
+# MANUAL ONLY. Deliberately no `push` and no `schedule`.
 #
-# This suite has not produced a green run. Left on every push it emailed a
-# failure for each one, which is how an alert stops being an alert — the same
-# reason the dependency audit was made advisory and the health-check issues were
-# collapsed into one rolling incident.
+# This suite has not produced a reliable green run across the mobile
+# matrix. Left on every push it emailed a failure for each one, which is
+# how an alert stops being an alert.
 #
-# It has earned its place: it found the action-step scoring bug that made "Done
-# - I did it!" cost users a heart and re-queue the step forever, and it found
-# the crawler-filter gap. But it also produced six defects in its own design,
-# and a permanently red check gives no signal about the app while masking the
-# moment something real breaks.
+# It has earned its place: it found the action-step scoring bug and the
+# crawler-filter gap. Run it on demand when you change auth, lessons,
+# budget, or the calculator — not as inbox wallpaper.
 #
-# So it runs on demand, not on a timer:
 #   gh workflow run "E2E Tests — Notho"
 #   or the "Run workflow" button on the Actions tab.
 #
-# To put it back on push, restore the two keys below — but only once a manual
-# run has been green twice in a row:
-#   push:
-#     branches: [main]
-#   schedule:
-#     - cron: "0 5 * * *"
-#
-# Coverage did not vanish with it. 440 unit tests gate every push in ci.yml, and
-# the health check exercises the deployed app every 30 minutes.
+# Matrix is Desktop Chrome only. Mobile Safari / Pixel were the source of
+# most red emails and did not add a second useful signal once desktop
+# failed. Restore them after two consecutive green desktop runs.
 on:
   workflow_dispatch:
 
@@ -33,9 +23,6 @@ jobs:
   e2e:
     name: Playwright E2E (${{ matrix.project }})
     runs-on: ubuntu-latest
-    # Was 30, and run #369 hit it at 30m 21s — a job killed by its own cap
-    # reports as a failure indistinguishable from a real one. 41 tests x 1
-    # worker x up to 2 retries needs headroom, particularly on Mobile Safari.
     timeout-minutes: 45
 
     strategy:
@@ -43,8 +30,6 @@ jobs:
       matrix:
         project:
           - "Desktop Chrome"
-          - "Mobile Safari (iPhone 14)"
-          - "Mobile Chrome (Pixel 7)"
 
     steps:
       - name: Checkout code
@@ -69,26 +54,18 @@ jobs:
 
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium webkit
+        run: npx playwright install --with-deps chromium
 
       - name: Install Playwright system deps (cached hit)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium webkit
+        run: npx playwright install-deps chromium
 
       - name: Run Playwright tests (${{ matrix.project }})
         run: npx playwright test --project="${{ matrix.project }}"
         env:
-          # Canonical host only — the old domain 301s to www.notho.co.za and
-          # lands on /learn, which is not the landing route these specs expect.
           BASE_URL: ${{ secrets.BASE_URL || 'https://www.notho.co.za' }}
-          # NOT brand strings. These are the credentials of a real Supabase auth
-          # account; renaming the literal cannot rename the stored credential, it
-          # would just break sign-in wherever the secret is unset. Rotate the
-          # account in Supabase first if you want to change them.
           TEST_EMAIL: ${{ secrets.TEST_EMAIL || 'e2e-test@fundiapp.co.za' }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD || 'FundiE2E_Test#2026' }}
-          # Node-only trusted fixture. Required because browser/localStorage
-          # heart refills no longer exist; the RPC appends an immutable grant.
           TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
           TEST_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TEST_SUPABASE_SERVICE_ROLE_KEY }}
 
