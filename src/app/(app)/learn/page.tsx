@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { LearnView } from "@/components/views/LearnView";
+import { ThisWeekCard } from "@/components/ThisWeekCard";
 import { CONTENT_DATA, Lesson } from "@/data/content";
 import { useNotho } from "@/context/NothoContext";
 import { analytics } from "@/lib/analytics";
@@ -12,6 +13,7 @@ import type { SavedLessonProgress } from "@/app/pageViews.types";
 export default function LearnPage() {
   const {
     userId,
+    weeklyXp,
     isLessonCompleted,
     setRoute,
     progressReady,
@@ -22,16 +24,7 @@ export default function LearnPage() {
     lessonResume,
   } = useNotho();
 
-  // The resume point now comes from the cross-device store rather than
-  // straight out of localStorage: it is the merge of this device's record and
-  // the account's (LWW on savedAt, GREATEST within the same lesson), already
-  // filtered for tombstones and for the 7-day staleness cut-off. So a lesson
-  // started on the phone shows up as "Continue" here.
   const [dismissed, setDismissed] = useState(false);
-  // LearnView types the resume card's payload as SavedLessonProgress — it only
-  // reads the title and a timestamp — but hands the same object straight back
-  // to onResumeLesson, which needs the full position. Same object, wider
-  // runtime shape, exactly as when this came out of localStorage as `any`.
   const savedProgress =
     dismissed || !lessonResume
       ? null
@@ -58,9 +51,6 @@ export default function LearnPage() {
         setShowNoHearts(true);
         return;
       }
-      // Prefer the persisted working steps (they carry any re-queued copies
-      // from the mastery loop). Otherwise rebuild from content, tagging question
-      // ids so the mastery loop tracks completion.
       const savedSteps: WorkingStep[] = savedHasSteps
         ? (progress.steps as WorkingStep[])
         : (shuffleLessonSteps(
@@ -76,8 +66,6 @@ export default function LearnPage() {
         lessonId: progress.lessonId,
         stepIndex: stepIdx,
         steps: savedSteps,
-        // Restore the user's actual answers so accuracy/XP aren't understated
-        // after a resume (previously reset to zero).
         answers: progress.answers ?? {},
         correctCount: progress.correctCount ?? 0,
         mistakes: progress.mistakes ?? 0,
@@ -85,27 +73,28 @@ export default function LearnPage() {
         mistakenQids: progress.mistakenQids ?? [],
       });
       setRoute({ name: "lesson", courseId: progress.courseId, lessonId: progress.lessonId });
-      // Hide the card for this render; the lesson state effect immediately
-      // writes a fresh resume record (and syncs it) as the learner steps.
       setDismissed(true);
     },
     [hearts, userId, setCurrentLessonState, setRoute, setShowNoHearts]
   );
 
   return (
-    <LearnView
-      courses={CONTENT_DATA.courses}
-      isLessonCompleted={isLessonCompleted}
-      goToCourse={(courseId) => {
-        const c = CONTENT_DATA.courses.find((x) => x.id === courseId);
-        if (c) analytics.courseOpened(courseId, c.title);
-        setRoute({ name: "course", courseId });
-      }}
-      contentLoaded={progressReady}
-      savedProgress={savedProgress}
-      onResumeLesson={resumeLesson}
-      userLevel={userData?.level ?? 1}
-      userXP={userData?.xp ?? 0}
-    />
+    <>
+      <ThisWeekCard weeklyXp={weeklyXp ?? 0} userId={userId ?? null} />
+      <LearnView
+        courses={CONTENT_DATA.courses}
+        isLessonCompleted={isLessonCompleted}
+        goToCourse={(courseId) => {
+          const c = CONTENT_DATA.courses.find((x) => x.id === courseId);
+          if (c) analytics.courseOpened(courseId, c.title);
+          setRoute({ name: "course", courseId });
+        }}
+        contentLoaded={progressReady}
+        savedProgress={savedProgress}
+        onResumeLesson={resumeLesson}
+        userLevel={userData?.level ?? 1}
+        userXP={userData?.xp ?? 0}
+      />
+    </>
   );
 }
