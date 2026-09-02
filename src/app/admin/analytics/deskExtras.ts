@@ -20,21 +20,22 @@ export function deskInsights(input: InsightInput): Insight[] {
   const o = input.overview ?? null;
 
   if (o && o.pwaShare < 15 && (o.sessions >= 10 || o.totalUsers >= 10)) {
-    if (!out.some((i) => i.id === "pwa-low")) {
-      out.push({
-        id: "pwa-low",
-        severity: o.pwaShare === 0 ? "critical" : "opportunity",
-        weight: o.pwaShare === 0 ? 93 : 46,
-        title:
-          o.pwaShare === 0
-            ? "Nobody has installed Notho to their home screen"
-            : "Almost nobody has installed the app to their home screen",
-        evidence: `${o.pwaShare}% of sessions came from an installed app. Store launch with a browser-tab habit will not compound.`,
-        action:
-          "Prompt for install after a completed lesson, when the app has just proved its worth — never on first load. Treat install share as a launch gate, not a footnote.",
-        tab: "engagement",
-      });
-    }
+    const pwa = {
+      id: "pwa-low",
+      severity: (o.pwaShare === 0 ? "critical" : "opportunity") as Insight["severity"],
+      weight: o.pwaShare === 0 ? 93 : 46,
+      title:
+        o.pwaShare === 0
+          ? "Nobody has installed Notho to their home screen"
+          : "Almost nobody has installed the app to their home screen",
+      evidence: `${o.pwaShare}% of sessions came from an installed app. Store launch with a browser-tab habit will not compound.`,
+      action:
+        "Prompt for install after a completed lesson, when the app has just proved its worth \u2014 never on first load. Treat install share as a launch gate, not a footnote.",
+      tab: "engagement",
+    };
+    const idx = out.findIndex((i) => i.id === "pwa-low");
+    if (idx >= 0) out[idx] = { ...out[idx], ...pwa };
+    else out.push(pwa);
   }
 
   if (o && o.answers >= 200 && o.lessonsInWindow < 20 && o.activeUsers <= 10) {
@@ -70,7 +71,7 @@ export function deskHealth(input: InsightInput): { score: number; parts: HealthP
     return {
       ...part,
       score: Math.min(part.score, 40),
-      detail: `${o.dau} today / ${o.mau} this month — too small to call a habit`,
+      detail: `${o.dau} today / ${o.mau} this month \u2014 too small to call a habit`,
     };
   });
 

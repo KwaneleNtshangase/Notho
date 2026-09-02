@@ -23,7 +23,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { fetchView } from "./lib";
 import { ThemeProvider, useTheme } from "./theme";
 import { Btn, Card, ErrorNote, Segmented, Skeleton } from "./ui";
-import { PulsePanel } from "./panelsPulse";
+import { PulsePanel } from "./pulseDesk";
 import { GrowthPanel } from "./panelsGrowth";
 import { EngagementPanel } from "./panelsEngagement";
 import { RetentionPanel } from "./panelsRetention";
@@ -169,7 +169,7 @@ function Dashboard() {
                 {auto ? "Live" : "Paused"}
                 {lastRefresh && (
                   <span>
-                    {" · "}
+                    {" \u00b7 "}
                     {lastRefresh.toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 )}
@@ -181,7 +181,7 @@ function Dashboard() {
             onClick={toggle}
             title="Dark is the working console. Light is the export theme for screenshots and decks."
           >
-            {mode === "dark" ? "☀︎ Export theme" : "☾ Console theme"}
+            {mode === "dark" ? "\u2600\ufe0e Export theme" : "\u263e Console theme"}
           </Btn>
         </div>
       </header>
