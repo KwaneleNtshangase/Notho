@@ -44,13 +44,13 @@ export type ScoredAttempt = {
  * 100 questions at 55% comes out as 56, and 50 questions at 28% as 15 instead
  * of 14. Each of those is a learner told they failed on the mark they needed.
  *
- * RE5's own 33-of-50 is NOT one of the misfiring pairs — 66% of 50 lands on
- * exactly 33 either way. That is luck, not a reason to write it the loose way:
- * the whole point of this module is that the number is right because of how it
- * is computed, not because someone checked one case once.
+ * RE5's published 65% threshold is one of those whole-answer boundaries: on a
+ * 50-question paper it requires 33 correct. The whole point of this module is
+ * that the boundary is right because of how it is computed, not because
+ * someone checked one case once.
  *
  * Two defences. Multiply before dividing, so integer inputs stay exact
- * (50 * 66 = 3300 exactly, /100 = 33 exactly). Then subtract an epsilon before
+ * (50 * 65 = 3250 exactly, /100 = 32.5). Then subtract an epsilon before
  * the ceiling, which absorbs the residue a non-integer pass mark leaves without
  * ever pulling an exact boundary down to the integer below it.
  *
@@ -150,10 +150,10 @@ export function areaPct(area: AreaScore): number {
 /**
  * Notho's own score band.
  *
- * The boundaries are anchored on 66 — the RE5 pass mark — so a "C" never
- * straddles pass and fail. This is a study aid, not an FSCA grade: the FSCA
- * reports RE5 as a percentage against 66% and awards no letters. Components
- * showing an exam lead with the pass/fail verdict, not the letter.
+ * The 66 boundary is Notho's own conservative study band. It is not the
+ * regulator's published pass mark and must not be presented as one. The FSCA
+ * does not award these letters; exam components lead with the server-marked
+ * pass/fail verdict instead.
  */
 export function gradeFor(scorePct: number): Grade {
   const pct = Math.max(0, Math.min(100, Math.round(scorePct)));

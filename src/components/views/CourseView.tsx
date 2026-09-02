@@ -222,7 +222,9 @@ export function CourseView({
         (n, unit) =>
           n +
           unit.lessons.filter(
-            (l) => Array.isArray(l.steps) && l.steps.length > 0
+            (l) =>
+              (Array.isArray(l.steps) && l.steps.length > 0) ||
+              (l.secureQuestionCount ?? 0) > 0
           ).length,
         0
       ),
@@ -242,7 +244,9 @@ export function CourseView({
     lessonIndex: number
   ): LessonState {
     const lesson = unitLessons[lessonIndex];
-    const hasContent = Array.isArray(lesson.steps) && lesson.steps.length > 0;
+    const hasContent =
+      (Array.isArray(lesson.steps) && lesson.steps.length > 0) ||
+      (lesson.secureQuestionCount ?? 0) > 0;
 
     if (!hasContent) return "coming_soon";
     if (isLessonCompleted(course.id, lesson.id)) return "completed";

@@ -34,6 +34,39 @@ import {
   getLessonTitle,
 } from "@/app/pageViews.types";
 
+type HeartRpcRow = {
+  balance: number;
+  next_reward_at: string | null;
+  version: number;
+  spent?: boolean;
+};
+
+function firstHeartRpcRow(value: unknown): HeartRpcRow | null {
+  const row = Array.isArray(value) ? value[0] : value;
+  if (!row || typeof row !== "object") return null;
+
+  const candidate = row as Partial<HeartRpcRow>;
+  const balance = Number(candidate.balance);
+  const version = Number(candidate.version);
+  if (
+    !Number.isInteger(balance) ||
+    balance < 0 ||
+    balance > 5 ||
+    !Number.isSafeInteger(version) ||
+    version < 0
+  ) {
+    return null;
+  }
+
+  return {
+    balance,
+    version,
+    next_reward_at:
+      typeof candidate.next_reward_at === "string" ? candidate.next_reward_at : null,
+    spent: candidate.spent,
+  };
+}
+
 export function useNothoState() {
   const progress = useProgress();
   // ── User settings (sound, dark mode, daily goal, calc saved) ─────────────
@@ -61,181 +94,98 @@ export function useNothoState() {
   });
   // ── Hearts ────────────────────────────────────────────────────────────
   const MAX_HEARTS = 5;
-  const HEART_REGEN_MS = 60 * 60 * 1000; // 1 hour
-  const [hearts, setHearts] = useState<number>(() => {
-    if (typeof window === "undefined") return MAX_HEARTS;
-    const storedRaw = localStorage.getItem("notho-hearts");
-    const lastLostRaw = localStorage.getItem("notho-last-heart-lost");
-    if (storedRaw === null) return MAX_HEARTS;
-    let current = parseInt(storedRaw, 10);
-    if (Number.isNaN(current)) current = MAX_HEARTS;
-    if (lastLostRaw) {
-      const lastLost = parseInt(lastLostRaw, 10);
-      if (!Number.isNaN(lastLost) && current < MAX_HEARTS) {
-        const elapsed = Date.now() - lastLost;
-        const regained = Math.floor(elapsed / HEART_REGEN_MS);
-        if (regained > 0) {
-          current = Math.min(MAX_HEARTS, current + regained);
-          localStorage.setItem("notho-hearts", String(current));
-          const newLast = lastLost + regained * HEART_REGEN_MS;
-          if (current >= MAX_HEARTS) {
-            localStorage.removeItem("notho-last-heart-lost");
-          } else {
-            localStorage.setItem("notho-last-heart-lost", String(newLast));
-          }
-        }
-      }
-    }
-    return current;
-  });
-  const [lastHeartLostAt, setLastHeartLostAt] = useState<number | null>(() => {
-    if (typeof window === "undefined") return null;
-    const v = localStorage.getItem("notho-last-heart-lost");
-    return v ? parseInt(v, 10) : null;
-  });
+  // A browser value is display state only. It is never seeded from storage and
+  // never becomes an input to a balance mutation.
+  const [hearts, setHearts] = useState(0);
+  const [nextHeartAt, setNextHeartAt] = useState<string | null>(null);
   const [showNoHearts, setShowNoHearts] = useState(false);
-  const syncHeartsToSupabase = React.useCallback(
-    async (nextHearts: number) => {
-      if (!progress.userId) return;
-      await supabase
-        .from("user_progress")
-        .update({ hearts: Math.max(0, Math.min(MAX_HEARTS, nextHearts)) })
-        .eq("user_id", progress.userId);
+  const activeHeartUserId = React.useRef(progress.userId);
+  const lastHeartVersion = React.useRef(-1);
+  const heartSpendQueue = React.useRef<Promise<void>>(Promise.resolve());
+
+  const applyHeartRpcRow = React.useCallback(
+    (row: HeartRpcRow, expectedUserId: string): boolean => {
+      if (activeHeartUserId.current !== expectedUserId) return false;
+      if (row.version < lastHeartVersion.current) return false;
+
+      lastHeartVersion.current = row.version;
+      setHearts(row.balance);
+      setNextHeartAt(row.next_reward_at);
+      if (row.balance > 0) setShowNoHearts(false);
+      return true;
     },
-    [progress.userId]
+    []
   );
 
-  // Persist hearts to localStorage (local cache) + Supabase
-  useEffect(() => {
-    localStorage.setItem("notho-hearts", String(hearts));
-  }, [hearts]);
-  useEffect(() => {
-    if (lastHeartLostAt !== null) {
-      localStorage.setItem("notho-last-heart-lost", String(lastHeartLostAt));
-      // Sync to Supabase so cross-device heart regen is accurate
-      if (progress.userId) {
-        void supabase
-          .from("user_progress")
-          .update({ last_heart_lost_at: lastHeartLostAt })
-          .eq("user_id", progress.userId);
-      }
-    }
-  }, [lastHeartLostAt, progress.userId]);
+  const refreshHearts = React.useCallback(async () => {
+    const requestedUserId = progress.userId;
+    if (!requestedUserId) return null;
 
+    const { data, error } = await supabase.rpc("get_heart_balance");
+    const row = error ? null : firstHeartRpcRow(data);
+    if (row) applyHeartRpcRow(row, requestedUserId);
+    return row;
+  }, [applyHeartRpcRow, progress.userId]);
+
+  useEffect(() => {
+    activeHeartUserId.current = progress.userId;
+    lastHeartVersion.current = -1;
+    const timer = window.setTimeout(() => {
+      setHearts(0);
+      setNextHeartAt(null);
+      if (progress.userId) void refreshHearts();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [progress.userId, refreshHearts]);
+
+  // The database applies due hourly rewards. Polling only asks it for a fresh
+  // ledger-derived projection; it never regenerates or persists a client value.
   useEffect(() => {
     if (!progress.userId) return;
-    void (async () => {
-      const { data } = await supabase
-        .from("user_progress")
-        .select("hearts, last_heart_lost_at")
-        .eq("user_id", progress.userId)
-        .maybeSingle();
-      const HEARTS_CAP = MAX_HEARTS;
-      const heartsWithRegen = (count: number, lastLostMs: number | null): number => {
-        const base = Math.max(0, Math.min(HEARTS_CAP, count));
-        if (base >= HEARTS_CAP || !lastLostMs) return base;
-        const regained = Math.floor((Date.now() - lastLostMs) / HEART_REGEN_MS);
-        return Math.min(HEARTS_CAP, base + regained);
-      };
-
-      const localHeartsRaw = parseInt(localStorage.getItem("notho-hearts") ?? String(HEARTS_CAP), 10);
-      const localHearts = Number.isNaN(localHeartsRaw) ? HEARTS_CAP : localHeartsRaw;
-      const localLastLostRaw = localStorage.getItem("notho-last-heart-lost");
-      const localLastLost = localLastLostRaw ? parseInt(localLastLostRaw, 10) : null;
-
-      const remoteHeartsRaw = Number((data as any)?.hearts);
-      const remoteHearts = Number.isFinite(remoteHeartsRaw) ? remoteHeartsRaw : HEARTS_CAP;
-      const remoteLastLost = (data as any)?.last_heart_lost_at as number | null | undefined;
-
-      const localEffective = heartsWithRegen(localHearts, localLastLost);
-      const remoteEffective = heartsWithRegen(remoteHearts, remoteLastLost ?? null);
-      const mergedHearts = Math.max(localEffective, remoteEffective);
-
-      setHearts(mergedHearts);
-      localStorage.setItem("notho-hearts", String(mergedHearts));
-
-      let mergedLastLost: number | null = null;
-      if (mergedHearts >= HEARTS_CAP) {
-        localStorage.removeItem("notho-last-heart-lost");
-        setLastHeartLostAt(null);
-      } else {
-        mergedLastLost =
-          localLastLost && remoteLastLost
-            ? Math.min(localLastLost, remoteLastLost)
-            : localLastLost ?? remoteLastLost ?? null;
-        if (mergedLastLost) {
-          localStorage.setItem("notho-last-heart-lost", String(mergedLastLost));
-          setLastHeartLostAt(mergedLastLost);
-        }
-      }
-
-      const remoteLastLostNorm = remoteLastLost ?? null;
-      if (mergedHearts !== remoteEffective || mergedLastLost !== remoteLastLostNorm) {
-        await supabase
-          .from("user_progress")
-          .update({
-            hearts: mergedHearts,
-            last_heart_lost_at: mergedLastLost,
-          })
-          .eq("user_id", progress.userId);
-      }
-    })().catch(() => {});
-  }, [progress.userId]);
-
-  // Auto-regen: 1 heart per hour
-  useEffect(() => {
-    if (hearts >= MAX_HEARTS || !lastHeartLostAt) return;
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - lastHeartLostAt;
-      const toAdd = Math.floor(elapsed / HEART_REGEN_MS);
-      if (toAdd > 0) {
-        setHearts((h) => {
-          const next = Math.min(h + toAdd, MAX_HEARTS);
-          if (next !== h) {
-            void syncHeartsToSupabase(next);
-          }
-          if (next >= MAX_HEARTS) {
-            localStorage.removeItem("notho-last-heart-lost");
-            setLastHeartLostAt(null);
-          } else {
-            setLastHeartLostAt(Date.now() - (elapsed % HEART_REGEN_MS));
-          }
-          return next;
-        });
-      }
-    }, 30000);
+    const interval = window.setInterval(() => void refreshHearts(), 30_000);
     return () => clearInterval(interval);
-  }, [hearts, lastHeartLostAt, syncHeartsToSupabase]);
+  }, [progress.userId, refreshHearts]);
 
-  const loseHeart = () => {
-    setHearts((h) => {
-      if (h <= 0) return h;
-      const next = h - 1;
-      localStorage.setItem("notho-hearts", String(next));
-      localStorage.setItem("notho-last-heart-lost", String(Date.now()));
-      void syncHeartsToSupabase(next);
-      if (next === 0) {
-        queueMicrotask(() => setShowNoHearts(true));
-      }
-      return next;
-    });
-    setLastHeartLostAt(Date.now());
-  };
+  const loseHeart = React.useCallback((): Promise<boolean> => {
+    const requestedUserId = progress.userId;
+    if (!requestedUserId) return Promise.resolve(false);
 
-  const gainHeart = () => {
-    setHearts((h) => {
-      const next = Math.min(h + 1, MAX_HEARTS);
-      if (next !== h) {
-        void syncHeartsToSupabase(next);
+    // Serialising calls ensures two rapid wrong answers cannot apply responses
+    // in reverse order. The row lock and idempotency key provide the matching
+    // cross-device guarantees.
+    const spend = heartSpendQueue.current.then(async () => {
+      if (activeHeartUserId.current !== requestedUserId) return false;
+
+      const { data, error } = await supabase.rpc("spend_heart", {
+        p_idempotency_key: crypto.randomUUID(),
+      });
+      const row = error ? null : firstHeartRpcRow(data);
+      if (!row) {
+        await refreshHearts();
+        return false;
       }
-      return next;
+
+      applyHeartRpcRow(row, requestedUserId);
+      if (row.balance === 0 && activeHeartUserId.current === requestedUserId) {
+        setShowNoHearts(true);
+      }
+      return row.spent === true;
     });
-  };
+
+    heartSpendQueue.current = spend.then(
+      () => undefined,
+      () => undefined
+    );
+    return spend;
+  }, [applyHeartRpcRow, progress.userId, refreshHearts]);
+
+  // Kept for context compatibility. There is deliberately no browser-facing
+  // grant path; approved grants must be ledgered by a trusted server process.
+  const gainHeart = React.useCallback(() => undefined, []);
 
   const heartsRegenInfo = (): { nextHeartIn: string; minutesLeft: number } | null => {
-    if (hearts >= MAX_HEARTS || !lastHeartLostAt) return null;
-    const elapsed = Date.now() - lastHeartLostAt;
-    const remaining = HEART_REGEN_MS - (elapsed % HEART_REGEN_MS);
+    if (hearts >= MAX_HEARTS || !nextHeartAt) return null;
+    const remaining = Math.max(0, new Date(nextHeartAt).getTime() - Date.now());
     const minutes = Math.ceil(remaining / 60000);
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;

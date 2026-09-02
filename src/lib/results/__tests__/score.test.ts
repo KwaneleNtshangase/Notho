@@ -68,7 +68,7 @@ describe("requiredCorrect", () => {
     // too high for 27 of the (total, pct) pairs with total <= 200. Each one is
     // a learner told they missed the mark they actually hit.
     //
-    // RE5's own 33-of-50 is not among them — 66% of 50 is exact either way.
+    // RE5's published 65% threshold requires 33 whole answers out of 50.
     // These cases are pinned so the safe form cannot be "simplified" back on
     // the grounds that the RE5 case happens to work.
     const naive = (t: number, p: number) => Math.ceil(t * (p / 100));
@@ -426,7 +426,7 @@ describe("the RE5 area maps", () => {
     for (const spec of Object.values(RE5_MOCK_EXAMS)) {
       expect(spec.totalQuestions).toBe(50);
       expect(spec.passMarkCorrect).toBe(33);
-      expect(spec.passMarkPct).toBe(66);
+      expect(spec.passMarkPct).toBe(65);
       expect(spec.timeLimitMinutes).toBe(120);
     }
   });

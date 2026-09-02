@@ -151,7 +151,7 @@ describe("mergeAreas", () => {
 
   it("flags an area under the floor and leaves one on it alone", () => {
     const onFloor = mergeAreas([
-      result({ areaBreakdown: areas({ x: [66, 100] }) }),
+      result({ areaBreakdown: areas({ x: [65, 100] }) }),
     ]);
     expect(onFloor[0].pct).toBe(RE5_AREA_FLOOR_PCT);
     expect(onFloor[0].pct < RE5_AREA_FLOOR_PCT).toBe(false);

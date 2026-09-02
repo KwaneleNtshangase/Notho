@@ -87,6 +87,10 @@ jobs:
           # account in Supabase first if you want to change them.
           TEST_EMAIL: ${{ secrets.TEST_EMAIL || 'e2e-test@fundiapp.co.za' }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD || 'FundiE2E_Test#2026' }}
+          # Node-only trusted fixture. Required because browser/localStorage
+          # heart refills no longer exist; the RPC appends an immutable grant.
+          TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+          TEST_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TEST_SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Upload Playwright HTML report
         if: always()

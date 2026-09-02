@@ -2,9 +2,9 @@
  * RE5-specific exam facts and the knowledge-area map for the two mock exams.
  *
  * RE5 is the FSCA Regulatory Examination Level 1 for representatives under the
- * FAIS Act. The real paper is 50 questions in 2 hours and the pass mark is 33
- * correct — 66%. Every one of those numbers is stated here once, as a count
- * wherever possible, and read from here everywhere else.
+ * FAIS Act. The published pass mark is 65%; on a 50-question paper the app
+ * therefore requires 33 whole correct answers. Every one of those numbers is
+ * stated here once and read from here everywhere else.
  *
  * ⚠️ Verify against the current FSCA "RE Preparation Guide" before a sitting.
  * If the FSCA amends the format, this file is the only place to change it.
@@ -21,9 +21,9 @@ export type ExamSpec = {
   totalQuestions: number;
   /**
    * The pass mark as a COUNT of correct answers, not a percentage.
-   * 33 of 50 is exactly 66%, but a count derived from a percentage is a
-   * floating-point boundary and rounds up by one for some totals — see
-   * requiredCorrect() in ./score. Written down, it cannot.
+   * A published 65% threshold on 50 questions requires 33 whole correct
+   * answers. Store that count explicitly rather than re-deriving it at a
+   * floating-point boundary — see requiredCorrect() in ./score.
    */
   passMarkCorrect: number;
   /** Displayed alongside the count. Never used to compute the count. */
@@ -37,7 +37,7 @@ export const RE5_MOCK_EXAMS: Record<string, ExamSpec> = {
     label: "Mock Exam A",
     totalQuestions: 50,
     passMarkCorrect: 33,
-    passMarkPct: 66,
+    passMarkPct: 65,
     timeLimitMinutes: 120,
   },
   "re5-mock-b": {
@@ -45,7 +45,7 @@ export const RE5_MOCK_EXAMS: Record<string, ExamSpec> = {
     label: "Mock Exam B",
     totalQuestions: 50,
     passMarkCorrect: 33,
-    passMarkPct: 66,
+    passMarkPct: 65,
     timeLimitMinutes: 120,
   },
 };

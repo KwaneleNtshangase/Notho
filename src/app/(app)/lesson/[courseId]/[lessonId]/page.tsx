@@ -5,6 +5,7 @@ import React, { use } from "react";
 import { useRouter } from "next/navigation";
 import { LessonView } from "@/components/views/LessonView";
 import { LessonSummaryView } from "@/components/views/LessonSummaryView";
+import { MockAttemptExperience } from "@/components/views/MockAttemptExperience";
 import { useNotho } from "@/context/NothoContext";
 import { getLessonTitle, getNextLesson } from "@/app/pageViews.types";
 import { analytics } from "@/lib/analytics";
@@ -28,7 +29,12 @@ import {
 import { logQuestionAttempt } from "@/lib/questionAttempts";
 import { ExamResultView, type ExamAttemptSummary } from "@/components/views/ExamResultView";
 import { scoreAttempt } from "@/lib/results/score";
-import { examSpecFor, re5AreaResolver } from "@/lib/results/re5";
+import {
+  RE5_COURSE_ID,
+  examSpecFor,
+  isRe5MockExam,
+  re5AreaResolver,
+} from "@/lib/results/re5";
 import { fetchLessonResults, recordLessonResult } from "@/lib/results/store";
 import type { LessonResult } from "@/lib/results/types";
 
@@ -69,6 +75,25 @@ function readSavedMidLesson(
 
 export default function LessonPage({ params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const { courseId, lessonId } = use(params);
+
+  // RE5 mocks have a separate server-owned lifecycle. Keep them out of the
+  // generic lesson engine, whose browser-local answers, correctness feedback,
+  // mastery requeue and heart deductions are intentionally inappropriate for
+  // an examination sitting.
+  if (courseId === RE5_COURSE_ID && isRe5MockExam(lessonId)) {
+    return <MockAttemptExperience courseId={courseId} lessonId={lessonId} />;
+  }
+
+  return <StandardLessonPage courseId={courseId} lessonId={lessonId} />;
+}
+
+function StandardLessonPage({
+  courseId,
+  lessonId,
+}: {
+  courseId: string;
+  lessonId: string;
+}) {
   const {
     userId,
     currentLessonState,
@@ -257,8 +282,8 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
           scorePct: scored.scorePct,
           // Integer comparison against the pass mark as a COUNT, never a
           // percentage one: 33 is written down in RE5_MOCK_EXAMS rather than
-          // derived from 66%, which is a float boundary that rounds up by one
-          // for some totals. See requiredCorrect() in src/lib/results/score.ts.
+          // re-derived from the published 65% threshold. See requiredCorrect()
+          // in src/lib/results/score.ts.
           passed: scored.firstTryCorrect >= spec.passMarkCorrect,
           durationSeconds: elapsedSeconds,
           areaBreakdown: scored.areaBreakdown,

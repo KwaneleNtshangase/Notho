@@ -88,15 +88,18 @@ import { StreakRepairBanner } from "@/components/StreakRepairBanner";
 import { UsageTracker } from "@/components/UsageTracker";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "/";
+  const isMockExam = /^\/lesson\/re5-exam-prep\/re5-mock-[ab](?:\/|$)/.test(
+    pathname
+  );
 
   return (
     <NothoProvider>
       <AuthGate>
         <div className="app-container">
-          <DesktopSidebar />
+          {!isMockExam && <DesktopSidebar />}
           <div
-            className={`main-content ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
+            className={`main-content ${isMockExam ? "mock-main-content" : ""} ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
             style={{ display: 'flex', flexDirection: 'column' }}
           >
             {/* Was gated to pathname === "/learn" || "/" - that's what made
@@ -107,16 +110,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 route only affects >=1200px viewports on non-Learn pages,
                 which is an existing, separate gap outside this fix's scope
                 (see PR description). */}
-            <MobileTopBarWrapper />
-            <div style={{ paddingBottom: "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</div>
+            {!isMockExam && <MobileTopBarWrapper />}
+            <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</div>
           </div>
           {(pathname === "/learn" || pathname === "/") && (
             <StatsPanelWrapper />
           )}
         </div>
-        <AppNavigation />
-        <NotificationOptIn />
-        <StreakRepairBanner />
+        {!isMockExam && <AppNavigation />}
+        {!isMockExam && <NotificationOptIn />}
+        {!isMockExam && <StreakRepairBanner />}
         <UsageTracker />
       </AuthGate>
     </NothoProvider>

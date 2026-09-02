@@ -13,8 +13,8 @@ import type { LessonBank } from "./money-basics";
  *  - Complaints: FSP has 6 weeks; client then 6 months to the Ombud; 3-year
  *    prescription. FAIS Ombud award cap R3.5 million (raised from R800 000 on
  *    1 July 2024). FICA: CDD, RMCP, STR/CTR reporting, no tipping off.
- * The two 50-question mock exams (re5-mock-a/b) are intentionally left whole
- * (not banked) so they remain full-length practice papers.
+ * The two 50-question mocks live in separate server-only authoring banks and
+ * are intentionally absent from the client LESSON_BANKS registry.
  */
 
 // ── helpers keep this large file readable ──────────────────────────────────
