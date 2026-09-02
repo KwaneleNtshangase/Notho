@@ -22,7 +22,6 @@ import {
   YAxis,
 } from "recharts";
 import {
-  delta,
   downloadCsv,
   fmt,
   shortDate,
@@ -31,6 +30,7 @@ import {
   type Overview,
   type SegmentRow,
 } from "./lib";
+import { honestDelta } from "./honesty";
 import { usePalette } from "./theme";
 import {
   Btn,
@@ -49,9 +49,6 @@ import { ComposedChart } from "recharts";
 
 export function GrowthPanel({ days, nonce }: { days: number; nonce: number }) {
   const p = usePalette();
-  // The funnel always looks back at least 90 days regardless of the window
-  // picker: a seven-day activation funnel measures cohorts that have not had
-  // time to activate, and reads as a collapse that is really just impatience.
   const funnelDays = Math.max(days, 90);
   const o = useView<Overview>("overview", { days }, nonce);
   const funnel = useView<FunnelRow[]>("funnel", { days: funnelDays }, nonce);
@@ -75,11 +72,11 @@ export function GrowthPanel({ days, nonce }: { days: number; nonce: number }) {
             hint="Everyone who has ever signed up."
           />
           <Stat
-            label={`New · ${s.windowDays}d`}
+            label={`New \u00b7 ${s.windowDays}d`}
             value={fmt(s.newUsers)}
-            trend={delta(s.newUsers, s.newUsersPrev)}
+            trend={honestDelta(s.newUsers, s.newUsersPrev)}
             accent={p.gold}
-            hint="Compared with the previous window of the same length."
+            hint="Compared with the previous window of the same length. Percent change hides until n \u2265 30."
           />
           <Stat
             label="Activated"

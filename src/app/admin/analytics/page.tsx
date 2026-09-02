@@ -50,12 +50,28 @@ const WINDOWS = [
   { value: "365", label: "1y" },
 ];
 
-/** Auto-refresh cadence. Frequent enough to feel live, gentle on the database. */
 const REFRESH_MS = 60_000;
+
+const DESK_CSS = `
+.nv-mark { overflow:hidden; padding:0; }
+.nv-mark img { width:100%; height:100%; object-fit:cover; display:block; }
+.nv-lockup {
+  margin:4px 0 0; font-size:10.5px; font-weight:800; letter-spacing:0.16em;
+  text-transform:uppercase; color:var(--teal);
+}
+.nv-tab[aria-selected="true"] {
+  color:#04121B; background:var(--teal);
+  box-shadow:0 6px 18px rgba(46,217,206,0.28);
+}
+.nv-root[data-mode="light"] .nv-tab[aria-selected="true"] {
+  color:#FFFFFF; background:var(--teal-deep);
+}
+`;
 
 export default function AdminAnalyticsPage() {
   return (
     <ThemeProvider>
+      <style dangerouslySetInnerHTML={{ __html: DESK_CSS }} />
       <Dashboard />
     </ThemeProvider>
   );
@@ -78,8 +94,6 @@ function Dashboard() {
     setLastRefresh(new Date());
   }, []);
 
-  // One cheap probe up front, so an unauthorised visitor gets one clear message
-  // rather than the same error repeated across every panel.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -112,8 +126,6 @@ function Dashboard() {
     return () => clearInterval(t);
   }, [auto, gate, refresh]);
 
-  // Refreshing the moment the tab regains focus means the numbers are current
-  // the instant you look at them, not up to a minute stale.
   useEffect(() => {
     if (gate !== "ok") return;
     const onVisible = () => {
@@ -123,7 +135,6 @@ function Dashboard() {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [gate, refresh]);
 
-  /** Insight cards jump to the tab that proves them. */
   const jump = useCallback((next: string) => {
     if (TABS.some((t) => t.value === next)) {
       setTab(next as Tab);
@@ -169,7 +180,7 @@ function Dashboard() {
                 {auto ? "Live" : "Paused"}
                 {lastRefresh && (
                   <span>
-                    {" \u00b7 "}
+                    {" · "}
                     {lastRefresh.toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 )}
@@ -181,7 +192,7 @@ function Dashboard() {
             onClick={toggle}
             title="Dark is the working console. Light is the export theme for screenshots and decks."
           >
-            {mode === "dark" ? "\u2600\ufe0e Export theme" : "\u263e Console theme"}
+            {mode === "dark" ? "☀︎ Export theme" : "☾ Console theme"}
           </Btn>
         </div>
       </header>
