@@ -5,11 +5,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { escapeHtml, isAutomatedUserAgent } from "@/lib/errorReportGuards";
-
-// escapeHtml and the automation check live in @/lib/errorReportGuards so they
-// have one definition and a test. They were duplicated here and in
-// errorReporting.ts, and the copies drifted: the bot list matched vendor names
-// as whole words, so AhrefsBot and SemrushBot were never filtered.
+import {
+  classifyClientError,
+  summariseUserAgent,
+  TRANSIENT_EMAIL_THRESHOLD,
+} from "@/lib/errorNoise";
 
 /** Extract the real client IP from Vercel / proxy forwarding headers. */
 function clientIp(req: NextRequest): string {
@@ -20,23 +20,11 @@ function clientIp(req: NextRequest): string {
   );
 }
 
-const MAX_BODY_BYTES = 16_384; // 16 KB hard cap on the request body
-const RL_WINDOW_MS   = 10 * 60 * 1000; // 10-minute sliding window
-const RL_MAX_PER_IP  = 20;             // max submissions per IP per window
-// TODO(rate-limiting): For true cross-instance limiting on Vercel serverless,
-// replace the DB-count approach below with Upstash Redis via @upstash/ratelimit
-// (INCR + EXPIRE). The DB approach is correct but adds one SELECT round-trip
-// and is eventually consistent across cold-start instances.
+const MAX_BODY_BYTES = 16_384;
+const RL_WINDOW_MS   = 10 * 60 * 1000;
+const RL_MAX_PER_IP  = 20;
 
-/**
- * Records an auto-captured client error as a "bug" in the feedback table so the
- * team can triage it in the admin console and (once fixed) notify the user.
- * Stored alongside manual reports; resolution state lives in email_status.
- *
- * Intentionally unauthenticated - errors happen on logged-out screens.
- */
 export async function POST(req: NextRequest) {
-  // ── 1. Content-type + body-size guards ───────────────────────────────────
   const ct = req.headers.get("content-type") ?? "";
   if (!ct.includes("application/json")) {
     return NextResponse.json({ ok: false, reason: "json_required" }, { status: 415 });
@@ -51,8 +39,6 @@ export async function POST(req: NextRequest) {
     extra?: Record<string, unknown> | null;
   };
   try {
-    // Read as text first so we can enforce the hard cap even without a
-    // Content-Length header (chunked transfers, etc.).
     const raw = await req.text();
     if (raw.length > MAX_BODY_BYTES) {
       return NextResponse.json({ ok: false, reason: "payload_too_large" }, { status: 413 });
@@ -66,13 +52,20 @@ export async function POST(req: NextRequest) {
   if (!message) return NextResponse.json({ ok: false }, { status: 400 });
 
   const area = (body.area ?? "unknown").toString().slice(0, 80);
+  const classified = classifyClientError(area, message);
+
+  // Client filters noise too. Repeat the check here because this endpoint is
+  // public and an old client can still POST the Chrome abort string.
+  if (classified.classification === "noise") {
+    return NextResponse.json({ ok: true, skipped: "benign-noise" });
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !serviceKey) return NextResponse.json({ ok: true, skipped: true });
 
   const admin = createClient(supabaseUrl, serviceKey);
 
-  // ── 2. IP-based rate limiting (DB-count approach - see TODO above) ────────
   const ip = clientIp(req);
   if (ip !== "unknown") {
     const windowStart = new Date(Date.now() - RL_WINDOW_MS).toISOString();
@@ -87,44 +80,17 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Second line of defence against crawler noise. The client filters bots
-  // before sending, but that check ships in JS a bot can ignore, and this
-  // endpoint is public. Dropping it here keeps the feedback table clean too,
-  // not just the inbox.
   const reportedUa = String(body.userAgent ?? "");
   if (isAutomatedUserAgent(reportedUa)) {
-    // 200, not an error: the caller is misbehaving but there is nothing for it
-    // to retry, and a failure response would just invite one.
     return NextResponse.json({ ok: true, skipped: "automated-client" });
   }
 
-  // User is optional - errors can happen on unauthenticated screens.
   const user = await getUserFromRequest(req).catch(() => null);
 
-  // Pseudonymous id, still used to correlate reports in the admin console
-  // without printing an address on every row.
   const userIdentifier = user?.email
     ? createHash('sha256').update(user.email).digest('hex').substring(0, 12)
     : "anonymous";
 
-  // The alert email needs a real person, not a hash. A bug report you cannot
-  // reply to is half a bug report: the whole point is to message the user back
-  // once it is fixed.
-  //
-  // The name can live in two places and they drift apart:
-  //   1. `profiles.full_name` - written only when someone saves their profile
-  //      or settings. A user who signed up and went straight to the app has an
-  //      empty one.
-  //   2. `auth.users.raw_user_meta_data` - set at signup, including by OAuth.
-  //      This is what the Supabase dashboard shows as "Display name".
-  //
-  // Erin Barrett had a name in (2) and nothing in (1), so the first alert read
-  // "(no name set)" for a user whose name we plainly knew. Check the profile
-  // first because the user edited it deliberately, then fall back to signup
-  // metadata. OAuth providers vary on the key, so try all three.
-  //
-  // NB: profiles is keyed on `user_id`, NOT `id`. Querying `.eq("id", ...)`
-  // matches nothing and fails silently as an empty name.
   let userName = "";
   if (user?.id) {
     const { data: prof } = await admin
@@ -139,22 +105,25 @@ export async function POST(req: NextRequest) {
     ? `${userName || "(no name set)"} <${user.email}>`
     : "Not signed in";
 
-  // SAST, because that is the clock the person reporting it was looking at.
   const occurredAt = new Date().toLocaleString("en-ZA", {
     timeZone: "Africa/Johannesburg",
     dateStyle: "full",
     timeStyle: "medium",
   });
 
-  const subject = `[Auto] ${area}: ${message}`.slice(0, 200);
-  // Values stored in the DB stay raw - the admin page renders them safely via
-  // React text nodes. Only the email HTML needs escaping.
+  const clientLabel = summariseUserAgent(reportedUa);
+  const subject = `[Auto] ${classified.severity} ${area}: ${message}`.slice(0, 200);
   const description = [
+    `Severity: ${classified.severity}`,
+    `Class: ${classified.classification}`,
+    `Fingerprint: ${classified.fingerprint}`,
     `Area: ${area}`,
     `When: ${occurredAt} (SAST)`,
     `User: ${userLabel}`,
+    `Client: ${clientLabel}`,
     `URL: ${body.url ?? "-"}`,
     `Device: ${body.userAgent ?? "-"}`,
+    `Triage: ${classified.reason}`,
     body.extra ? `Extra: ${JSON.stringify(body.extra)}` : null,
     "",
     body.stack || message,
@@ -168,27 +137,20 @@ export async function POST(req: NextRequest) {
     description,
     issue_type: "bug",
     email_status: {
-      auto:      true,
+      auto:           true,
       area,
-      url:       body.url      ?? null,
-      userAgent: body.userAgent ?? null,
-      userEmail: user?.email   ?? null,
-      client_ip: ip,           // stored for the rate-limit SELECT above
-      status:    "new",
+      url:            body.url      ?? null,
+      userAgent:      body.userAgent ?? null,
+      userEmail:      user?.email   ?? null,
+      client_ip:      ip,
+      status:         classified.classification === "transient" ? "transient" : "new",
+      severity:       classified.severity,
+      classification: classified.classification,
+      fingerprint:    classified.fingerprint,
     },
   });
   if (insertErr) return NextResponse.json({ ok: false }, { status: 500 });
 
-  // EVERY occurrence is emailed. No throttle, no thresholds, no dedupe.
-  //
-  // Throttling was hiding exactly the signal that matters: the same person
-  // hitting the same bug three times running is not noise, it is someone stuck
-  // in a loop and about to give up on the product. At current volumes the
-  // inbox can take it, and a full log beats a tidy one. Revisit only if the
-  // volume genuinely becomes unmanageable - and then by routing, not silencing.
-  //
-  // The occurrence count is still computed, because "3rd time today" in the
-  // subject line is useful triage context even when every one gets sent.
   try {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { count } = await admin
@@ -198,28 +160,34 @@ export async function POST(req: NextRequest) {
       .gte("created_at", since);
 
     const occurrence = count ?? 1;
+    const shouldEmail =
+      classified.classification === "actionable" ||
+      occurrence >= TRANSIENT_EMAIL_THRESHOLD;
+
     const resendKey = process.env.RESEND_API_KEY;
-    if (resendKey) {
-      // HTML-escape every attacker-controlled value before it enters the email.
+    if (resendKey && shouldEmail) {
       const eArea      = escapeHtml(area);
       const eMessage   = escapeHtml(message);
       const eUrl       = escapeHtml((body.url       ?? "-").toString());
-      const eUserAgent = escapeHtml((body.userAgent  ?? "-").toString());
-      // userIdentifier is a hex digest - safe, but escape for consistency.
+      const eUserAgent = escapeHtml(reportedUa);
+      const eClient    = escapeHtml(clientLabel);
       const eUserId    = escapeHtml(userIdentifier);
       const eUser      = escapeHtml(userLabel);
       const eWhen      = escapeHtml(occurredAt);
-      // The layout fingerprint is the thing that makes an import bug fixable,
-      // so it gets its own readable block rather than being buried in the JSON
-      // blob and truncated at 500 chars. It is masked by construction.
+      const eSev       = escapeHtml(classified.severity);
+      const eClass     = escapeHtml(classified.classification);
+      const ePrint     = escapeHtml(classified.fingerprint);
+      const eReason    = escapeHtml(classified.reason);
       const extraObj   = (body.extra ?? null) as Record<string, unknown> | null;
       const diagnostics = typeof extraObj?.diagnostics === "string" ? extraObj.diagnostics : null;
       const eDiagnostics = diagnostics ? escapeHtml(diagnostics.slice(0, 6000)) : null;
       const ref        = typeof extraObj?.ref === "string" ? escapeHtml(extraObj.ref) : null;
-      // body.extra is arbitrary JSON - serialise then escape the whole blob.
+      const stack      = typeof body.stack === "string" ? body.stack.slice(0, 2500) : "";
+      const eStack     = stack ? escapeHtml(stack) : null;
       const eExtra     = extraObj
         ? escapeHtml(JSON.stringify({ ...extraObj, diagnostics: undefined }).slice(0, 1500))
         : null;
+      const sevColor = classified.severity === "P1" ? "#E03C31" : classified.severity === "P2" ? "#b45309" : "#007A85";
 
       await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -228,34 +196,40 @@ export async function POST(req: NextRequest) {
           from: MAIL_FROM,
           to:   [ALERT_TO],
           subject:
-            `Notho bug${ref ? ` [${ref}]` : ""}: ${area}` +
-            (occurrence > 1 ? ` (${occurrence}x today)` : ""),
+            `Notho ${classified.severity}${ref ? ` [${ref}]` : ""}: ${area}` +
+            (occurrence > 1 ? ` (${occurrence}x/24h)` : ""),
           html: `
             <div style="font-family:Arial,sans-serif;line-height:1.6;color:#1f2937;max-width:700px">
-              <h2 style="color:#E03C31;margin:0 0 4px">A user hit a bug</h2>
-              ${occurrence > 1 ? `<p style="margin:0 0 12px;font-size:13px;color:#b45309">Occurrence ${occurrence} of this same error in the last 24h.</p>` : ""}
+              <p style="margin:0 0 8px">
+                <span style="display:inline-block;background:${sevColor};color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:999px">${eSev}</span>
+                <span style="display:inline-block;margin-left:6px;background:#f3f4f6;color:#374151;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px">${eClass}</span>
+              </p>
+              <h2 style="color:${sevColor};margin:0 0 4px">${classified.classification === "actionable" ? "Actionable client error" : "Repeated transient error"}</h2>
+              ${occurrence > 1 ? `<p style="margin:0 0 12px;font-size:13px;color:#b45309">Occurrence ${occurrence} of this fingerprint in the last 24h.</p>` : ""}
+              <p style="margin:0 0 12px;font-size:13px;color:#4b5563">${eReason}</p>
               <table cellpadding="0" cellspacing="0" style="width:100%;font-size:14px;margin:12px 0">
-                <tr><td style="padding:3px 0;color:#6b7280;width:110px"><b>User</b></td><td style="padding:3px 0">${eUser}</td></tr>
+                <tr><td style="padding:3px 0;color:#6b7280;width:120px"><b>User</b></td><td style="padding:3px 0">${eUser}</td></tr>
                 <tr><td style="padding:3px 0;color:#6b7280"><b>When</b></td><td style="padding:3px 0">${eWhen} (SAST)</td></tr>
                 <tr><td style="padding:3px 0;color:#6b7280"><b>Area</b></td><td style="padding:3px 0">${eArea}</td></tr>
-                ${ref ? `<tr><td style="padding:3px 0;color:#6b7280"><b>Reference</b></td><td style="padding:3px 0"><code>${ref}</code> - the user was shown this code</td></tr>` : ""}
+                ${ref ? `<tr><td style="padding:3px 0;color:#6b7280"><b>Reference</b></td><td style="padding:3px 0"><code>${ref}</code> — shown to the user</td></tr>` : ""}
                 <tr><td style="padding:3px 0;color:#6b7280"><b>Message</b></td><td style="padding:3px 0">${eMessage}</td></tr>
                 <tr><td style="padding:3px 0;color:#6b7280"><b>URL</b></td><td style="padding:3px 0">${eUrl}</td></tr>
-                <tr><td style="padding:3px 0;color:#6b7280"><b>Device</b></td><td style="padding:3px 0;font-size:12px">${eUserAgent}</td></tr>
+                <tr><td style="padding:3px 0;color:#6b7280"><b>Client</b></td><td style="padding:3px 0">${eClient}</td></tr>
+                <tr><td style="padding:3px 0;color:#6b7280"><b>Fingerprint</b></td><td style="padding:3px 0;font-size:12px"><code>${ePrint}</code></td></tr>
+                <tr><td style="padding:3px 0;color:#6b7280"><b>UA</b></td><td style="padding:3px 0;font-size:12px">${eUserAgent}</td></tr>
               </table>
               ${eExtra ? `<p style="margin:4px 0;font-size:13px"><b>Context:</b> <code style="font-size:12px">${eExtra}</code></p>` : ""}
+              ${eStack ? `<pre style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:12px;font-size:11px;line-height:1.45;overflow-x:auto;white-space:pre-wrap">${eStack}</pre>` : ""}
               ${eDiagnostics ? `
                 <h3 style="margin:20px 0 4px;font-size:15px">Statement layout fingerprint</h3>
                 <p style="margin:0 0 8px;font-size:12px;color:#6b7280">
                   Column headings are the bank's own boilerplate, shown verbatim. Transaction
-                  rows are masked - every letter is x, every digit is 9. No statement content
-                  left the user's device. This should be enough to build a fixture and add the
-                  layout without asking them for the file.
+                  rows are masked. No statement content left the user's device.
                 </p>
                 <pre style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:12px;font-size:11px;line-height:1.45;overflow-x:auto;white-space:pre-wrap">${eDiagnostics}</pre>
               ` : ""}
               <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0" />
-              <p style="font-size:13px;color:#6b7280">Reply to the user directly, or triage from the console:</p>
+              <p style="font-size:13px;color:#6b7280">Reply to the user if we have an address. Otherwise triage in the console.</p>
               <p><a href="https://www.notho.co.za/admin/bugs" style="color:#007A85;font-weight:700">Open bug console →</a></p>
               <p style="margin:12px 0 0;font-size:11px;color:#9ca3af">User token: ${eUserId}</p>
             </div>`,
