@@ -8,15 +8,12 @@ import {
 
 describe("classifyClientError", () => {
   it("treats aborted SW registration as noise", () => {
-    const c = classifyClientError(
-      "sw-registration",
-      "Failed to register a ServiceWorker for scope ('https://www.notho.co.za/') with script ('https://www.notho.co.za/sw.js'): Operation has been aborted"
-    );
+    const message =
+      "Failed to register a ServiceWorker for scope ('https://www.notho.co.za/') with script ('https://www.notho.co.za/sw.js'): Operation has been aborted";
+    const c = classifyClientError("sw-registration", message);
     expect(c.classification).toBe("noise");
     expect(c.severity).toBe("P4");
-    expect(isBenignClientNoise("sw-registration", c.fingerprint && "Operation has been aborted")).toBe(
-      true
-    );
+    expect(isBenignClientNoise("sw-registration", message)).toBe(true);
   });
 
   it("treats a bare Rejected SW registration as noise", () => {
