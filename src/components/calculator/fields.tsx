@@ -95,3 +95,231 @@ export function CalcNumberRow({
     </div>
   );
 }
+
+export function InputPanel({
+  label,
+  inputs,
+  setInputs,
+  hideField,
+  allowMore,
+  showMore,
+  setShowMore,
+}: {
+  label?: string;
+  inputs: CalcInputs;
+  setInputs: (i: CalcInputs) => void;
+  hideField?: SolveMode;
+  allowMore?: boolean;
+  showMore?: boolean;
+  setShowMore?: (v: boolean | ((s: boolean) => boolean)) => void;
+}) {
+  const living = inputs.wrapper === "living-annuity";
+  return (
+    <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 16, padding: 20, flex: 1 }}>
+      {label && (
+        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", marginBottom: 16, textTransform: "uppercase", letterSpacing: 1 }}>
+          {label}
+        </div>
+      )}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Account type</div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {WRAPPERS.map((w) => (
+            <button
+              key={w.id}
+              type="button"
+              onClick={() => {
+                const next: CalcInputs = { ...inputs, wrapper: w.id };
+                if (w.id === "living-annuity") {
+                  next.monthly = 0;
+                  next.frequency = "once-off";
+                  next.withdrawFromYear = 0;
+                }
+                setInputs(next);
+              }}
+              style={{
+                padding: "6px 10px",
+                borderRadius: 8,
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+                border: "2px solid",
+                borderColor: (inputs.wrapper ?? "none") === w.id ? "var(--color-primary)" : "var(--color-border)",
+                background: (inputs.wrapper ?? "none") === w.id ? "var(--color-primary-light)" : "transparent",
+                color: (inputs.wrapper ?? "none") === w.id ? "var(--color-primary)" : "var(--color-text-secondary)",
+              }}
+            >
+              {w.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {hideField !== "initial" && (
+        <CalcNumberRow
+          label="Initial Amount (R)"
+          tooltip="The lump sum this plan starts with today. Typed in — we never pull a live balance."
+          value={inputs.principal}
+          onChange={(v) => setInputs({ ...inputs, principal: Math.max(0, v) })}
+        />
+      )}
+      {hideField !== "monthly" && !living && (
+        <CalcNumberRow
+          label="Monthly Contribution (R)"
+          tooltip="How much is added every month."
+          value={inputs.monthly}
+          onChange={(v) => setInputs({ ...inputs, monthly: Math.max(0, v) })}
+        />
+      )}
+      {hideField !== "rate" && (
+        <div>
+          <CalcNumberRow
+            label="Annual Return Rate (%)"
+            tooltip="Nominal yearly growth before fees. JSE long-run average is often illustrated around 10%."
+            value={inputs.rate}
+            step="0.01"
+            onChange={(v) => setInputs({ ...inputs, rate: v })}
+          />
+          <div style={{ display: "flex", gap: 6, marginTop: -12, marginBottom: 16 }}>
+            {[8, 10, 12].map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setInputs({ ...inputs, rate: r })}
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  padding: "4px 8px",
+                  borderRadius: 6,
+                  border: "1px solid var(--color-border)",
+                  background: inputs.rate === r ? "var(--color-primary-light)" : "transparent",
+                  color: "var(--color-text-secondary)",
+                  cursor: "pointer",
+                }}
+              >
+                {r}%
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {!living && (
+        <CalcNumberRow
+          label="Annual Contribution Increase (%)"
+          tooltip="How much the monthly contribution rises each year."
+          value={inputs.escalation}
+          step="0.01"
+          onChange={(v) => setInputs({ ...inputs, escalation: v })}
+        />
+      )}
+      {hideField !== "time" && (
+        <CalcNumberRow
+          label="Investment Period (years)"
+          tooltip="How many years the chart runs for."
+          value={inputs.years}
+          step="1"
+          onChange={(v) =>
+            setInputs({
+              ...inputs,
+              years: Math.max(0, Math.floor(v)),
+              withdrawFromYear: inputs.withdrawal ? inputs.withdrawFromYear : Math.max(0, Math.floor(v)),
+            })
+          }
+        />
+      )}
+      {inputs.wrapper === "ra" && (
+        <CalcNumberRow
+          label="Annual income (R, optional)"
+          tooltip="Used only to size the RA 27.5% / R430 000 cap. Leave 0 to apply the rand cap alone."
+          value={inputs.annualIncome ?? 0}
+          onChange={(v) => setInputs({ ...inputs, annualIncome: Math.max(0, v) })}
+        />
+      )}
+      {!living && (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Investment Frequency</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {(["monthly", "annually", "once-off"] as const).map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setInputs({ ...inputs, frequency: f })}
+                style={{
+                  flex: 1,
+                  padding: "8px 4px",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  border: "2px solid",
+                  borderColor: inputs.frequency === f ? "var(--color-primary)" : "var(--color-border)",
+                  background: inputs.frequency === f ? "var(--color-primary-light)" : "white",
+                  color: inputs.frequency === f ? "var(--color-primary)" : "var(--color-text-secondary)",
+                }}
+              >
+                {f === "once-off" ? "Once-off" : f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {allowMore && setShowMore && (
+        <>
+          <button
+            type="button"
+            onClick={() => setShowMore((s) => !s)}
+            style={{ background: "none", border: "none", color: "var(--color-primary)", fontWeight: 700, fontSize: 13, cursor: "pointer", padding: 0, marginBottom: showMore ? 16 : 0 }}
+          >
+            {showMore ? "Hide fees, inflation and withdrawals" : "Fees, inflation and withdrawals"}
+          </button>
+          {showMore && (
+            <div>
+              <CalcNumberRow
+                label="Annual fee / EAC (%)"
+                tooltip="Taken off the pot each month. 0 keeps the current no-fee path."
+                value={inputs.fee ?? 0}
+                step="0.01"
+                onChange={(v) => setInputs({ ...inputs, fee: Math.max(0, v) })}
+              />
+              <CalcNumberRow
+                label="Inflation (%)"
+                tooltip="Does not change the rand total. Adds a today's-rands line on the chart."
+                value={inputs.inflation ?? 0}
+                step="0.01"
+                onChange={(v) => setInputs({ ...inputs, inflation: Math.max(0, v) })}
+              />
+              <CalcNumberRow
+                label="Monthly withdrawal (R)"
+                tooltip="Taken at the end of each month once withdrawals start. 0 means the pot only grows."
+                value={inputs.withdrawal ?? 0}
+                onChange={(v) =>
+                  setInputs({
+                    ...inputs,
+                    withdrawal: Math.max(0, v),
+                    withdrawFromYear: v > 0 ? (inputs.withdrawFromYear ?? 0) : inputs.years,
+                  })
+                }
+              />
+              {(inputs.withdrawal ?? 0) > 0 && (
+                <CalcNumberRow
+                  label="Start withdrawals in year"
+                  tooltip="0 = from today. Set this below the period to see the pot drawn down on the chart."
+                  value={inputs.withdrawFromYear ?? 0}
+                  step="1"
+                  onChange={(v) => setInputs({ ...inputs, withdrawFromYear: Math.max(0, Math.floor(v)) })}
+                />
+              )}
+              {inputs.wrapper === "tfsa" && (
+                <CalcNumberRow
+                  label="TFSA lifetime already used (R)"
+                  tooltip="Contributions already made across every TFSA. Growth does not count."
+                  value={inputs.tfsaUsedLifetime ?? 0}
+                  onChange={(v) => setInputs({ ...inputs, tfsaUsedLifetime: Math.max(0, v) })}
+                />
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
