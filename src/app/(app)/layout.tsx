@@ -9,7 +9,6 @@ import {
   NothoCalculate,
   NothoBudget,
   NothoGoals,
-  NothoProgress,
   NothoProfile,
 } from "@/components/icons/NothoIcons";
 import { usePathname } from "next/navigation";
@@ -22,7 +21,6 @@ function AppNavigation() {
   const is = (p: string) => pathname.startsWith(p);
 
   const handleNav = (name: string) => {
-    // We just dispatch setRoute; the NothoContext will do router.push()
     setRoute({ name: name as never });
   };
 
@@ -62,20 +60,12 @@ function AppNavigation() {
           order: "order-4",
         },
         {
-          key: "progress",
-          label: "Leaderboard",
-          icon: <NothoProgress size={24} className="text-current" />,
-          isActive: is("/leaderboard"),
-          onClick: () => handleNav("leaderboard"),
-          order: "order-5",
-        },
-        {
           key: "profile",
           label: "Profile",
           icon: <NothoProfile size={24} className="text-current" />,
-          isActive: is("/profile"),
+          isActive: is("/profile") || is("/leaderboard"),
           onClick: () => handleNav("profile"),
-          order: "order-6",
+          order: "order-5",
         },
       ]}
     />
@@ -102,14 +92,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             className={`main-content ${isMockExam ? "mock-main-content" : ""} ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
             style={{ display: 'flex', flexDirection: 'column' }}
           >
-            {/* Was gated to pathname === "/learn" || "/" - that's what made
-                the streak-freeze modal (rendered inside NothoTopBar, via this
-                wrapper) unreachable on mobile from every other page. The
-                desktop StatsPanel equivalent stays gated below: it's CSS-
-                hidden under 1200px anyway (.stats-panel), so gating it by
-                route only affects >=1200px viewports on non-Learn pages,
-                which is an existing, separate gap outside this fix's scope
-                (see PR description). */}
             {!isMockExam && <MobileTopBarWrapper />}
             <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</div>
           </div>
@@ -126,8 +108,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Compact streak/XP/hearts bar for phones and tablets - the desktop StatsPanel
-// only exists at >=1200px, so without this mobile users never see their hearts.
 function MobileTopBarWrapper() {
   const { userData, hearts, maxHearts, heartsRegenInfo, freezeCount, buyStreakFreeze, useFreeze } = useNotho();
   if (!userData) return null;
@@ -151,7 +131,7 @@ function MobileTopBarWrapper() {
 
 function StatsPanelWrapper() {
   const { userData, hearts, maxHearts, freezeCount, buyStreakFreeze, useFreeze } = useNotho();
-  
+
   if (!userData) return null;
 
   const handleBuyFreeze = () => buyStreakFreeze();

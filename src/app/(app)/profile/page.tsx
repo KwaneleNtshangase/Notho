@@ -17,6 +17,17 @@ export default function ProfilePage() {
   };
 
   return (
+    <>
+      <div style={{ maxWidth: 760, margin: "0 auto 12px", width: "100%", textAlign: "right" }}>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => setRoute({ name: "leaderboard" })}
+          style={{ fontSize: 13, fontWeight: 700 }}
+        >
+          This week&apos;s learners
+        </button>
+      </div>
     <ProfileView
       userData={userData as any}
       onSignOut={handleProfileSignOut}
@@ -36,5 +47,6 @@ export default function ProfilePage() {
         void userSettings.setCalcSaved(null as any);
       }}
     />
+    </>
   );
 }
