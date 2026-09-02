@@ -8,7 +8,6 @@ import {
   NothoCalculate,
   NothoBudget,
   NothoGoals,
-  NothoProgress as NothoLeaderboard,
   NothoProfile,
 } from "@/components/icons/NothoIcons";
 
@@ -17,8 +16,7 @@ function activeKeyFromPath(pathname: string): string {
   if (pathname.startsWith("/budget")) return "budget";
   if (pathname.startsWith("/calculator")) return "calculator";
   if (pathname.startsWith("/quests")) return "quests";
-  if (pathname.startsWith("/leaderboard")) return "leaderboard";
-  if (pathname.startsWith("/profile")) return "profile";
+  if (pathname.startsWith("/profile") || pathname.startsWith("/leaderboard")) return "profile";
   // learn, course, lesson and the root all live under "Learn"
   return "learn";
 }
@@ -34,14 +32,11 @@ export function DesktopSidebar() {
 
   return (
     <nav className="sidebar" style={{ background: "var(--color-bg)", border: "none" }}>
-      {/* Branded sidebar header */}
       <div style={{
         padding: "20px 20px 16px",
         borderBottom: "1px solid var(--color-border)",
         marginBottom: 8,
       }}>
-        {/* Full lockup fills the header. Mode-aware: navy wordmark on the light
-            sidebar, white wordmark on the dark one. */}
         <img
           className="logo-light"
           src="/notho-logo.png"
@@ -102,18 +97,6 @@ export function DesktopSidebar() {
               <NothoGoals size={20} className="text-current" />
             </span>
             Goals
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${active ==="leaderboard" ? "active" : ""}`}
-            style={active !=="leaderboard" ? { color: "var(--nav-link-color)" } : {}}
-            onClick={() => handleNav("leaderboard")}
-          >
-            <span className="nav-icon">
-              <NothoLeaderboard size={20} className="text-current" />
-            </span>
-            Leaderboard
           </button>
         </li>
         <li className="nav-item">
