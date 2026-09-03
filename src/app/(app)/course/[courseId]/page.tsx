@@ -7,7 +7,7 @@ import { CONTENT_DATA } from "@/data/content";
 
 export default function CoursePage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = use(params);
-  const { setRoute, isLessonCompleted, completedLessons, startLesson } = useNotho();
+  const { setRoute, isLessonCompleted, startLesson, progressReady } = useNotho();
   const course = CONTENT_DATA.courses.find(c => c.id === courseId);
 
   if (!course) {
@@ -19,6 +19,7 @@ export default function CoursePage({ params }: { params: Promise<{ courseId: str
       course={course}
       isLessonCompleted={isLessonCompleted}
       goBack={() => setRoute({ name: "learn" })}
+      progressReady={progressReady}
       goToLesson={(lessonId) => {
         // startLesson resolves the lesson bank, tags question ids for the
         // mastery loop, and navigates — every lesson entry point goes through
