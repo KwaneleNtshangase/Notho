@@ -14,6 +14,7 @@ import {
 import { usePathname } from "next/navigation";
 import { StatsPanel } from "@/components/StatsPanel";
 import { NothoTopBar } from "@/components/NothoTopBar";
+import "../gestures.css";
 
 function AppNavigation() {
   const { setRoute } = useNotho();
