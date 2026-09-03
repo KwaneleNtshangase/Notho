@@ -9,6 +9,7 @@ import { analytics } from "@/lib/analytics";
 import { shuffleLessonSteps, lessonShuffleSeed } from "@/lib/lessonShuffle";
 import { assignQids, type WorkingStep } from "@/lib/lessonMastery";
 import type { SavedLessonProgress } from "@/app/pageViews.types";
+import { markCourseFocus } from "@/lib/scrollMemory";
 
 export default function LearnPage() {
   const {
@@ -87,6 +88,7 @@ export default function LearnPage() {
         goToCourse={(courseId) => {
           const c = CONTENT_DATA.courses.find((x) => x.id === courseId);
           if (c) analytics.courseOpened(courseId, c.title);
+          markCourseFocus(courseId);
           setRoute({ name: "course", courseId });
         }}
         contentLoaded={progressReady}
