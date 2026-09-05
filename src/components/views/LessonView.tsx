@@ -1047,7 +1047,7 @@ export function LessonView({
             borderTop: "1px solid var(--color-border)",
             marginTop: 4,
           }}>
-            📚 For educational purposes only - not financial advice. Consult a licensed financial advisor before making financial decisions.
+            Education only. Not financial advice.
           </div>
         </div>
       </main>

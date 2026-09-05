@@ -50,9 +50,9 @@ export function OnboardingFlow({
   const screenCount = 4;
   const screensMeta = [
     {
-      title: "Welcome to Notho - let's get you sorted with money",
-      body: "You've got this. We'll keep it simple: short, SA-specific lessons you can finish in minutes.",
-      cta: "Let's go",
+      title: "Notho is for how money works in South Africa",
+      body: "Lessons are short. Topics match what you actually deal with: payslips, bank fees, debit orders, tax.",
+      cta: "Continue",
       action: () => {
         if (ageConfirmed && consentPrivacy && consentTerms) {
           setScreen(1);
@@ -60,25 +60,25 @@ export function OnboardingFlow({
       },
     },
     {
-      title: "What's your money goal?",
-      body: "We'll personalise tips based on what matters most to you. Optional - skip if you prefer.",
+      title: "What are you working on?",
+      body: "This only changes which courses we put first. You can skip it.",
       cta: "Next",
       action: () => {
         if (selectedGoal) setScreen(2);
       },
     },
     {
-      title: "Your age range",
-      body: "Helps us keep examples relevant. Optional - skip if you prefer.",
+      title: "Age range",
+      body: "Used so examples match your stage. Skip if you would rather not say.",
       cta: "Next",
       action: () => {
         setScreen(3);
       },
     },
     {
-      title: "How it works",
-      body: "Earn XP for every lesson. Build streaks. Unlock badges. Compete on the leaderboard. Every lesson takes less than 3 minutes.",
-      cta: "Start learning",
+      title: "Lessons take a few minutes",
+      body: "Finish a lesson, earn XP. Come back tomorrow and the streak counter moves. That is the whole loop.",
+      cta: "Open the first course",
       action: () =>
         onComplete({
           goal: selectedGoal || undefined,
@@ -123,27 +123,7 @@ export function OnboardingFlow({
             <Flag size={64} strokeWidth={1.5} style={{ color: "var(--color-primary)" }} aria-hidden />
           </div>
         )}
-        {screen === 3 && (
-          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 20 }}>
-            {[Target, Zap, Trophy].map((IconComp, i) => (
-              <div
-                key={i}
-                style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: "50%",
-                  background: "var(--color-surface)",
-                  border: "1px solid var(--color-border)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <IconComp size={24} style={{ color: "var(--color-primary)" }} />
-              </div>
-            ))}
-          </div>
-        )}
+        {null}
 
         <h1 style={{ fontSize: 26, fontWeight: 900, marginBottom: 12, color: "var(--color-text-primary)" }}>
           {current.title}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Mail, KeyRound, AlertTriangle, ClipboardCopy, CheckCircle } from "@/components/icons/NothoIcons";
+import { Mail, KeyRound, AlertTriangle, ClipboardCopy, CheckCircle, NothoLearn, NothoBudget, NothoCalculate } from "@/components/icons/NothoIcons";
 import { supabase } from "@/lib/supabaseClient";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
 
@@ -276,28 +276,12 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               the wordmark is navy, and in dark mode the splash background flips
               to a dark surface, leaving a navy-on-dark logo that reads as dim.
               The icon's teal + gold carry on both light and dark. */}
-          <div className="splash-logo-wrap" style={{ position: "relative", zIndex: 1, marginBottom: 28 }}>
+          <div className="splash-logo-wrap" style={{ position: "relative", zIndex: 1 }}>
             <img
               src="/notho-icon.png"
               alt="Notho"
               style={{ width: 168, height: 168, objectFit: "contain", display: "block" }}
             />
-          </div>
-
-          {/* Thin divider */}
-          <div className="splash-divider" style={{
-            width: 40, height: 2, borderRadius: 1,
-            background: "linear-gradient(90deg, transparent, rgba(1,160,170,0.6), transparent)",
-            marginBottom: 14, position: "relative", zIndex: 1,
-          }} />
-
-          {/* Tagline */}
-          <div className="splash-tagline" style={{
-            color: "var(--color-text-secondary)", fontSize: 11,
-            letterSpacing: 2, textTransform: "uppercase", fontWeight: 500,
-            position: "relative", zIndex: 1,
-          }}>
-            Your financial journey starts here
           </div>
         </div>
       </>
@@ -344,37 +328,28 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               style={{ width: "min(340px, 78vw)", height: "auto", objectFit: "contain", marginBottom: 32 }}
             />
             <p style={{
-              fontSize: 11, fontWeight: 700, color: "#007A85",
-              textAlign: "center", letterSpacing: 3, textTransform: "uppercase",
-              margin: "0 0 10px",
+              fontSize: 15, color: "#374151", textAlign: "center",
+              lineHeight: 1.55, maxWidth: 300, margin: "0 0 22px", fontWeight: 500,
             }}>
-              Your financial journey starts here
-            </p>
-            <p style={{
-              fontSize: 13, color: "#9CA3AF", textAlign: "center",
-              lineHeight: 1.6, maxWidth: 280, margin: "0 0 28px",
-            }}>
-              Learn how money works, build real habits, and take control of your finances.
+              Money lessons written for South Africa. Payslips, debit orders, SARS, TFSAs.
             </p>
 
-            {/* Value prop - why sign up (kept compact for small screens) */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 340, width: "100%" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 340, width: "100%" }}>
               {[
-                { icon: "📚", text: "Bite-size lessons on SA money life - payslips, debit orders, SARS, TFSAs" },
-                { icon: "📊", text: "Budget tracker with bank statement import - statement files are processed in memory; categorised transactions are saved to your account" },
-                { icon: "🎯", text: "Calculators, goals and streaks that make finance stick" },
+                { Icon: NothoLearn, text: "Short lessons on how money actually works here." },
+                { Icon: NothoBudget, text: "Import a statement. We read it in memory and do not keep the file." },
+                { Icon: NothoCalculate, text: "Calculators and a budget you can check against real numbers." },
               ].map((f) => (
                 <div key={f.text} style={{
-                  display: "flex", alignItems: "flex-start", gap: 10,
-                  background: "#F7FAF8", border: "1px solid #E5EFE9",
-                  borderRadius: 12, padding: "10px 14px",
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "6px 4px",
                 }}>
-                  <span style={{ fontSize: 16, lineHeight: "20px" }} aria-hidden>{f.icon}</span>
-                  <span style={{ fontSize: 12.5, color: "#4B5563", lineHeight: 1.5, textAlign: "left" }}>{f.text}</span>
+                  <f.Icon size={20} style={{ color: "#007A85", flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, color: "#4B5563", lineHeight: 1.45, textAlign: "left" }}>{f.text}</span>
                 </div>
               ))}
-              <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center", margin: "4px 0 0" }}>
-                Free to use · Built for South Africa · Educational content only, not financial advice
+              <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center", margin: "10px 0 0" }}>
+                Free. Education only, not advice.
               </p>
             </div>
           </div>
@@ -392,7 +367,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 borderRadius: 14, cursor: "pointer", letterSpacing: 0.4,
               }}
             >
-              Get Started
+              Create an account
             </button>
             <button
               onClick={() => setMode("signin")}
@@ -403,7 +378,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 letterSpacing: 0.2,
               }}
             >
-              I Already Have an Account
+              Sign in
             </button>
           </div>
         </div>
