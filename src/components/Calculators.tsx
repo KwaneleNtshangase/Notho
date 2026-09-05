@@ -189,7 +189,7 @@ function FormulaePanel() {
           </div>
 
           <div style={{ marginBottom: 12 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>📈 Closed-form equivalent (no escalation, lump sum only)</strong>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Closed-form equivalent (no escalation, lump sum only)</strong>
             <code style={{ display: "block", background: "var(--color-bg)", padding: "8px 10px", borderRadius: 8, fontSize: 12, marginBottom: 4 }}>
               FV = P × (1 + r/n)^(n×t)
             </code>
@@ -197,7 +197,7 @@ function FormulaePanel() {
           </div>
 
           <div style={{ marginBottom: 12 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>📈 Closed-form (monthly contributions, no escalation)</strong>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Closed-form (monthly contributions, no escalation)</strong>
             <code style={{ display: "block", background: "var(--color-bg)", padding: "8px 10px", borderRadius: 8, fontSize: 12, marginBottom: 4 }}>
               FV = P × (1 + r/12)^(12t) + PMT × [(1 + r/12)^(12t) − 1] / (r/12)
             </code>
@@ -205,13 +205,13 @@ function FormulaePanel() {
           </div>
 
           <div style={{ marginBottom: 12 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>📊 Annual escalation (growing annuity)</strong>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Annual escalation (growing annuity)</strong>
             <p style={{ margin: "0 0 4px" }}>Contribution after year y: <code>PMT × (1 + g)^y</code> where g = escalation rate (e.g. 5% → 0.05)</p>
             <p style={{ margin: "0 0 4px" }}>There's no simple closed-form when escalation is applied monthly. The simulation loop handles this correctly.</p>
           </div>
 
           <div style={{ marginBottom: 12 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>💰 Total contributions & interest</strong>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Total contributions & interest</strong>
             <code style={{ display: "block", background: "var(--color-bg)", padding: "8px 10px", borderRadius: 8, fontSize: 12, marginBottom: 4 }}>
               {`Total Contributions = initial lump sum + Σ(monthly payments made)`}{"\n"}
               {`Interest Earned = Final Value − Total Contributions`}{"\n"}
@@ -220,7 +220,7 @@ function FormulaePanel() {
           </div>
 
           <div style={{ marginBottom: 4 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>📝 Key assumptions</strong>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Key assumptions</strong>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
               <li>Rate is the gross annual return before fees/inflation</li>
               <li>Monthly contributions are paid at end of each month (ordinary annuity)</li>

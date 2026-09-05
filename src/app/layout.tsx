@@ -58,9 +58,7 @@ export const metadata: Metadata = {
     title: "Notho",
     description: "Learn to manage money the South African way",
   },
-  other: {
-    "mobile-web-app-capable": "yes",
-  },
+  // mobile-web-app-capable is already emitted by appleWebApp.capable above
 };
 
 export default function RootLayout({

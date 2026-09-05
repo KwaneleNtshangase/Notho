@@ -11,6 +11,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { CosmoCharacter } from "@/components/CosmoCharacter";
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
@@ -218,17 +219,20 @@ export function CosmoCoachChat() {
         <button
           type="button"
           className="notho-chat-fab"
-          aria-label="Ask Cosmo about your money"
+          aria-label="Ask Cosmo"
           onClick={() => setOpen(true)}
         >
-          💬
+          <CosmoCharacter size={40} expression="default" />
         </button>
       )}
 
       {open && (
         <div className="notho-chat-panel" role="dialog" aria-label="Ask Cosmo, your money coach">
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-            <span style={{ fontSize: 15, fontWeight: 800 }}>💬 Ask Cosmo</span>
+            <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 800 }}>
+              <CosmoCharacter size={22} expression="default" />
+              Cosmo
+            </span>
             {/* Persistent "this is AI" marker. Apple and Google both require a
                 user-facing disclosure wherever generative AI output appears,
                 not only behind the one-time consent step. */}
@@ -331,7 +335,7 @@ export function CosmoCoachChat() {
               >
                 {messages.length === 0 && !sending && (
                   <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: 0 }}>
-                    Try: &ldquo;Why is my food spend up this month?&rdquo;
+                    Ask about a category on this month&apos;s budget.
                   </p>
                 )}
                 {messages.map((m, i) => (
