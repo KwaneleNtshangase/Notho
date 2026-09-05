@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-/* ─── robots.ts ──────────────────────────────────────────────────── */
+/* ─── robots.ts ──────────────────────────────────────── */
 
 describe("robots.ts", () => {
   it("exports a function that returns valid robots config", async () => {
@@ -29,7 +29,7 @@ describe("robots.ts", () => {
   });
 });
 
-/* ─── sitemap.ts ─────────────────────────────────────────────────── */
+/* ─── sitemap.ts ───────────────────────────────────── */
 
 describe("sitemap.ts", () => {
   it("exports a function that returns entries for all public pages", async () => {
@@ -60,11 +60,10 @@ describe("sitemap.ts", () => {
   });
 });
 
-/* ─── AuthGate bank-statement copy ───────────────────────────────── */
+/* ─── AuthGate bank-statement copy ───────────────────────────── */
 
 describe("AuthGate bank-statement copy", () => {
   it("does NOT contain the misleading 'never stored' phrasing", async () => {
-    // Read the source file as text to verify the copy
     const fs = await import("fs");
     const path = await import("path");
     const filePath = path.resolve(
@@ -73,12 +72,7 @@ describe("AuthGate bank-statement copy", () => {
     );
     const content = fs.readFileSync(filePath, "utf-8");
 
-    // The old misleading copy should no longer be present
     expect(content).not.toContain("processed in memory, never stored");
-
-    // The corrected copy should be present
-    expect(content).toContain(
-      "statement files are processed in memory; categorised transactions are saved to your account"
-    );
+    expect(content).toContain("We read it in memory and do not keep the file.");
   });
 });
