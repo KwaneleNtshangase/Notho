@@ -177,21 +177,22 @@ const CSS = `
 
 .nv-root *, .nv-root *::before, .nv-root *::after { box-sizing:border-box; }
 
-/* ── Layout ──────────────────────────────────────────────────────────────── */
+/* Layout */
 .nv-shell { max-width:1440px; margin:0 auto; padding:22px 20px 72px; }
 .nv-head { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; flex-wrap:wrap; margin-bottom:20px; }
 .nv-title { display:flex; align-items:center; gap:13px; }
 .nv-mark {
-  width:40px; height:40px; border-radius:13px; display:grid; place-items:center;
-  background:linear-gradient(140deg, var(--teal), var(--blue));
+  width:58px; height:58px; border-radius:14px; display:grid; place-items:center;
+  background:transparent; overflow:hidden;
   color:#04121B; font-weight:900; font-size:19px; letter-spacing:-0.5px;
-  box-shadow:var(--glow); flex:none;
+  box-shadow:none; flex:none;
 }
+.nv-mark img { width:100%; height:100%; object-fit:cover; display:block; }
 .nv-h1 { margin:0; font-size:21px; font-weight:800; color:var(--ink); letter-spacing:-0.35px; line-height:1.15; }
 .nv-sub { margin:3px 0 0; font-size:12.5px; color:var(--muted); }
 .nv-actions { display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
 
-/* ── Navigation ──────────────────────────────────────────────────────────── */
+/* Navigation */
 .nv-nav {
   display:flex; gap:4px; padding:5px; border-radius:15px; overflow-x:auto;
   background:var(--panel-2); border:1px solid var(--border);
@@ -211,7 +212,7 @@ const CSS = `
 }
 .nv-root[data-mode="light"] .nv-tab[aria-selected="true"] { color:#FFFFFF; background:linear-gradient(140deg, var(--teal), var(--blue)); }
 
-/* ── Cards ───────────────────────────────────────────────────────────────── */
+/* Cards */
 .nv-card {
   background:var(--panel); border:1px solid var(--border); border-radius:18px;
   padding:20px; backdrop-filter:blur(16px); box-shadow:var(--shadow);
@@ -227,7 +228,7 @@ const CSS = `
 .nv-grid.three { grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); }
 .nv-stack { display:flex; flex-direction:column; gap:16px; }
 
-/* ── Stat tiles ──────────────────────────────────────────────────────────── */
+/* Stat tiles */
 .nv-stats { display:grid; gap:13px; grid-template-columns:repeat(auto-fit, minmax(185px, 1fr)); }
 .nv-stat {
   position:relative; padding:16px 16px 14px; border-radius:16px; overflow:hidden;
@@ -252,7 +253,7 @@ const CSS = `
 .nv-delta.down { color:var(--red); background:color-mix(in srgb, var(--red) 14%, transparent); }
 .nv-delta.flat { color:var(--muted); background:var(--raise); }
 
-/* ── Tags ────────────────────────────────────────────────────────────────── */
+/* Tags */
 .nv-tag {
   display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px;
   font-size:11px; font-weight:800; letter-spacing:.2px; white-space:nowrap;
@@ -264,7 +265,7 @@ const CSS = `
 .nv-tag.info { color:var(--blue); background:color-mix(in srgb, var(--blue) 13%, transparent); border-color:color-mix(in srgb, var(--blue) 30%, transparent); }
 .nv-tag.neutral { color:var(--body); background:var(--raise); border-color:var(--border); }
 
-/* ── Buttons & inputs ────────────────────────────────────────────────────── */
+/* Buttons & inputs */
 .nv-btn {
   appearance:none; cursor:pointer; display:inline-flex; align-items:center; gap:7px;
   padding:8px 13px; border-radius:11px; font-size:12.5px; font-weight:700;
@@ -302,7 +303,7 @@ const CSS = `
   100% { box-shadow:0 0 0 0 transparent; }
 }
 
-/* ── Table ───────────────────────────────────────────────────────────────── */
+/* Table */
 .nv-table-wrap { overflow-x:auto; border-radius:14px; border:1px solid var(--border); }
 .nv-table { width:100%; border-collapse:collapse; font-size:13px; }
 .nv-table th {
@@ -323,7 +324,7 @@ const CSS = `
 .nv-table tbody tr.clickable:hover { background:var(--raise); }
 .nv-strong { color:var(--ink); font-weight:700; }
 
-/* ── Insight cards ───────────────────────────────────────────────────────── */
+/* Insight cards */
 .nv-insight {
   display:flex; gap:13px; padding:15px 16px; border-radius:15px;
   background:var(--panel-2); border:1px solid var(--border);
@@ -341,7 +342,7 @@ const CSS = `
 }
 .nv-insight-jump:hover { text-decoration:underline; }
 
-/* ── Misc ────────────────────────────────────────────────────────────────── */
+/* Misc */
 .nv-note {
   padding:12px 14px; border-radius:13px; font-size:12.4px; line-height:1.62; color:var(--body);
   background:color-mix(in srgb, var(--teal) 8%, transparent);

@@ -3,32 +3,38 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 /**
  * Admin identity helpers for internal routes.
  *
- * Authority order (both conditions are OR'd in requireAdmin):
+ * Authority order (OR'd in requireAdmin):
  *   1. DB flag   - profiles.is_admin = true (authoritative; survives env changes)
- *   2. Env list  - ADMIN_EMAILS env var (secondary; useful for bootstrap / CI)
+ *   2. Env list  - ADMIN_EMAILS env var (secondary; useful for extra operators)
+ *   3. Owner     - OWNER_ADMIN_EMAIL, always treated as admin so the founder
+ *                  can open /admin without first flipping a DB row or an env var
  *
- * The old hardcoded FALLBACK_ADMIN_EMAILS list has been removed so the system
- * fails closed: if neither the DB flag nor ADMIN_EMAILS is set, no one is admin.
+ * Everyone else fails closed.
  */
 
+/** Founder mailbox. Used as the desk sign-in default and as a bootstrap allow-list. */
+export const OWNER_ADMIN_EMAIL = "kwanelebc031@gmail.com";
+
 /**
- * Returns the list of admin emails from the ADMIN_EMAILS env var.
- * Returns an empty array if the env var is not set - fails closed.
+ * Returns the list of admin emails: ADMIN_EMAILS plus the owner mailbox.
  */
 export function getAdminEmails(): string[] {
   const env = process.env.ADMIN_EMAILS ?? "";
-  return env.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+  const fromEnv = env
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  const set = new Set(fromEnv);
+  set.add(OWNER_ADMIN_EMAIL.toLowerCase());
+  return [...set];
 }
 
 /**
- * Returns true if the given email is in the ADMIN_EMAILS env var list.
- * Secondary check - only consulted when ADMIN_EMAILS is explicitly configured.
+ * Returns true if the given email is the owner mailbox or is in ADMIN_EMAILS.
  */
 export function isAdminEmail(email?: string | null): boolean {
   if (!email) return false;
-  const list = getAdminEmails();
-  // Fail closed: if the env var is not set the list is empty, so this returns false.
-  return list.length > 0 && list.includes(email.toLowerCase());
+  return getAdminEmails().includes(email.toLowerCase());
 }
 
 /**
