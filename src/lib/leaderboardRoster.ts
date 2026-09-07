@@ -40,6 +40,10 @@ export function buildWeeklyRoster(
     const uid = String(r.user_id);
     const isYou = Boolean(opts.myId) && uid === opts.myId;
     if (!isYou && isTestAccount(r.username)) continue;
+    // A missing handle must never be replaced with a real name or synthetic
+    // public identity. The signed-in user may still see their own private
+    // "You" row while onboarding redirects them to choose a handle.
+    if (!isYou && !(r.username ?? "").trim()) continue;
 
     const isCurrentWeek = (r.week_key ?? "") === opts.currentWeekKey;
     const remoteWeekly = isCurrentWeek ? (r.weekly_xp ?? 0) : 0;

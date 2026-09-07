@@ -211,12 +211,14 @@ export function OnboardingView({
     };
   }, [screen, username]);
 
-  // 2-screen onboarding: goal → username → first lesson
+  // 2-screen onboarding: primary goal → username → first lesson. Both are
+  // required so no account can reach the app with a real name exposed as a
+  // leaderboard fallback or without a learning goal.
   const screenCount = 2;
   const screensMeta = [
     {
       title: "What's your money goal?",
-      body: "We'll drop you straight into lessons that match. Skip if you prefer.",
+      body: "Pick the main goal you want Notho to help you with first.",
       cta: "Next",
       action: () => { if (ageConfirmed) setScreen(1); },
     },
@@ -409,7 +411,7 @@ export function OnboardingView({
           style={{ width: "100%", padding: "14px", fontSize: 16, fontWeight: 700 }}
           onClick={current.action}
           disabled={
-            (screen === 0 && !ageConfirmed) ||
+            (screen === 0 && (!ageConfirmed || !selectedGoal)) ||
             (screen === 1 && (!usernameAvailable || usernameChecking))
           }
         >
@@ -417,32 +419,15 @@ export function OnboardingView({
         </button>
 
         {/* Inline hint so a blocked Next never fails silently */}
-        {screen === 0 && !ageConfirmed && (
+        {screen === 0 && (!ageConfirmed || !selectedGoal) && (
           <div style={{
             marginTop: 10, fontSize: 12, fontWeight: 600,
             color: "var(--color-text-secondary)", textAlign: "center",
           }}>
-            Tick the 18-or-older confirmation above to continue.
+            {!selectedGoal
+              ? "Choose a money goal to continue."
+              : "Tick the 18-or-older confirmation above to continue."}
           </div>
-        )}
-
-        {/* Skip goal - allowed once age is confirmed */}
-        {screen === 0 && (
-          <button
-            type="button"
-            onClick={() => { if (ageConfirmed) setScreen(1); }}
-            disabled={!ageConfirmed}
-            style={{
-              marginTop: 12, background: "none", border: "none",
-              color: "var(--color-text-secondary)",
-              opacity: ageConfirmed ? 1 : 0.55,
-              textDecoration: "underline",
-              cursor: ageConfirmed ? "pointer" : "default",
-              fontSize: 14, width: "100%",
-            }}
-          >
-            Skip goal →
-          </button>
         )}
 
         {screen > 0 && (

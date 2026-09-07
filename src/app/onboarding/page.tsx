@@ -4,20 +4,14 @@ import React from "react";
 import { OnboardingView } from "@/components/views/OnboardingView";
 import { supabase } from "@/lib/supabaseClient";
 import { normalizeUsername, isUsernameAvailable, GOAL_COURSE_MAP } from "@/app/pageViews.types";
-import { CONTENT_DATA, Lesson } from "@/data/content";
+import { CONTENT_DATA } from "@/data/content";
 import { useNotho, NothoProvider } from "@/context/NothoContext";
-import { useRouter } from "next/navigation";
 
 function OnboardingContent() {
   const { setRoute, startLesson } = useNotho();
-  const router = useRouter();
 
   const handleOnboardingComplete = async (payload: { goal?: string; ageRange?: string; goalDescription?: string; username: string }) => {
-    localStorage.setItem("notho-onboarded", "true");
-    if (payload.goal) localStorage.setItem("notho-user-goal", payload.goal);
-    if (payload.goalDescription) localStorage.setItem("notho-goal-description", payload.goalDescription);
-    if (payload.ageRange) localStorage.setItem("notho-age-range", payload.ageRange);
-    localStorage.setItem("notho-username", payload.username);
+    if (!payload.goal || !payload.username) return;
     
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -63,6 +57,14 @@ function OnboardingContent() {
       }
       await supabase.from("user_progress").upsert({ user_id: user.id, display_name: username }, { onConflict: "user_id" });
     }
+
+    // Mark onboarding complete only after the required identity and goal have
+    // passed validation and the signed-in user's profile has been persisted.
+    localStorage.setItem("notho-onboarded", "true");
+    localStorage.setItem("notho-user-goal", payload.goal);
+    if (payload.goalDescription) localStorage.setItem("notho-goal-description", payload.goalDescription);
+    if (payload.ageRange) localStorage.setItem("notho-age-range", payload.ageRange);
+    localStorage.setItem("notho-username", payload.username);
     
     // Fire welcome email (non-blocking) via the app's own route
     void (async () => {

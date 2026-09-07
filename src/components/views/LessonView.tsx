@@ -577,7 +577,7 @@ export function LessonView({
           }}>
             <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--color-text-primary)", fontWeight: 500 }}>{s.challenge}</p>
           </div>
-          {!didAction ? (
+          {didAction === undefined ? (
             <div style={{ display: "flex", gap: 10 }}>
               <button
                 type="button"
@@ -627,7 +627,7 @@ export function LessonView({
               </p>
             </div>
           )}
-          {didAction && (
+          {didAction !== undefined && (
             <div className="lesson-actions">
               {showFinish ? (
                 <div style={{ textAlign: "center", width: "100%" }}>
