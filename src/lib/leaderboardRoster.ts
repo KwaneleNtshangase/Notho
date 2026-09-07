@@ -40,11 +40,6 @@ export function buildWeeklyRoster(
     const uid = String(r.user_id);
     const isYou = Boolean(opts.myId) && uid === opts.myId;
     if (!isYou && isTestAccount(r.username)) continue;
-    // A missing handle must never be replaced with a real name or synthetic
-    // public identity. The signed-in user may still see their own private
-    // "You" row while onboarding redirects them to choose a handle.
-    if (!isYou && !(r.username ?? "").trim()) continue;
-
     const isCurrentWeek = (r.week_key ?? "") === opts.currentWeekKey;
     const remoteWeekly = isCurrentWeek ? (r.weekly_xp ?? 0) : 0;
     const displayWeeklyXp = isYou
@@ -54,9 +49,9 @@ export function buildWeeklyRoster(
     if (!isYou && displayWeeklyXp <= 0) continue;
 
     const rawName = (r.username ?? "").trim();
-    const name = isYou
-      ? "You"
-      : rawName || "Learner " + uid.slice(0, 4).toUpperCase();
+    // Legacy learners may have activity but no chosen handle yet. Keep their
+    // activity visible without deriving a label from a real name or user ID.
+    const name = isYou ? "You" : rawName || `Learner ${built.length + 1}`;
 
     built.push({
       id: uid,
