@@ -569,16 +569,19 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               aria-label="Continue with Apple"
               onClick={() => handleOAuthSignIn("apple")}
               style={{
-                width: "100%", minHeight: 44, padding: "11px 16px", borderRadius: 10,
-                border: "1.5px solid #000", background: "#000",
-                color: "#fff", fontWeight: 600, fontSize: 14,
-                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                width: "100%", minHeight: 44, padding: 0, borderRadius: 10,
+                border: "none", background: "#000", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
               }}
             >
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.53-3.05-.03-4.9-2.84-4.18-10.19 1.37-10.5 1.35.07 2.29.74 3.08.79 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.3M12.03 10c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25" />
-              </svg>
-              Continue with Apple
+              <img
+                src="https://appleid.cdn-apple.com/appleid/button?height=44&width=375&color=black&border=false&type=continue&border_radius=10&scale=3&locale=en_GB"
+                alt=""
+                width={375}
+                height={44}
+                aria-hidden="true"
+                style={{ width: "100%", height: "auto", maxHeight: 44, objectFit: "contain", display: "block" }}
+              />
             </button>
             <button
               type="button"
