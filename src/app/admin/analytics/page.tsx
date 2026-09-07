@@ -57,9 +57,12 @@ const WINDOWS = [
 const REFRESH_MS = 60_000;
 
 const DESK_CSS = `
+.nv-title { align-items: stretch; }
 .nv-mark {
-  width: 58px;
-  height: 58px;
+  align-self: stretch;
+  aspect-ratio: 1 / 1;
+  width: auto;
+  height: auto;
   border-radius: 14px;
   background: transparent !important;
   box-shadow: none !important;
@@ -69,7 +72,7 @@ const DESK_CSS = `
 .nv-mark img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 .nv-lockup {
@@ -200,7 +203,7 @@ function Dashboard() {
       <header className="nv-head">
         <div className="nv-title">
           <div className="nv-mark">
-            <img src="/notho-icon-192.png" alt="Notho" width={58} height={58} />
+            <img src="/notho-icon-192.png" alt="Notho" />
           </div>
           <div>
             <h1 className="nv-h1">Notho Desk</h1>
@@ -210,11 +213,11 @@ function Dashboard() {
         </div>
 
         <div className="nv-actions">
+          <Link href="/admin" className="nv-btn" style={{ textDecoration: "none" }}>
+            Backend
+          </Link>
           {gate === "ok" && (
             <>
-              <Link href="/admin" className="nv-btn" style={{ textDecoration: "none" }}>
-                Backend
-              </Link>
               <Link href="/admin/bugs" className="nv-btn" style={{ textDecoration: "none" }}>
                 Bugs
               </Link>

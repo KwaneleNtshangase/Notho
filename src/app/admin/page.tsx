@@ -45,18 +45,16 @@ function Hub() {
   }, [refresh]);
 
   return (
-    <div className="nv-shell" style={{ maxWidth: 720 }}>
+    <div className="nv-shell" style={{ maxWidth: 820 }}>
       <header className="nv-head">
         <div className="nv-title">
-          <div className="nv-mark" style={{ width: 58, height: 58, background: "transparent", boxShadow: "none" }}>
-            <img src="/notho-icon-192.png" alt="Notho" width={58} height={58} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div className="nv-mark">
+            <img src="/notho-icon-192.png" alt="Notho" />
           </div>
           <div>
             <h1 className="nv-h1">Notho backend</h1>
-            <p className="nv-lockup" style={{ margin: "4px 0 0", fontSize: 10.5, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--teal)" }}>
-              Learn · Grow · Build wealth
-            </p>
-            <p className="nv-sub">Operator tools. Not the learner app.</p>
+            <p className="nv-lockup">Learn · Grow · Build wealth</p>
+            <p className="nv-sub">Operator tools. Sign in here — not in the learner app.</p>
           </div>
         </div>
       </header>
@@ -84,6 +82,9 @@ function Hub() {
               </p>
             </Link>
           </div>
+          <p className="nv-card-sub" style={{ margin: 0 }}>
+            Google, a password, or a magic link all stay on /admin. They do not open Learn.
+          </p>
           <button
             type="button"
             className="nv-btn"
