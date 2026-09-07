@@ -218,6 +218,24 @@ export default function AccountDeletionPage() {
           </p>
         </div>
 
+        {/* Apple */}
+        <div style={card}>
+          <h2 style={h2}>Signed in with Apple?</h2>
+          <p style={{ ...p, marginBottom: 0 }}>
+            Deleting your account in Notho removes your Notho account and data.
+            You can also disconnect Notho from your Apple Account under{" "}
+            <strong>
+              Sign-In &amp; Security &rarr; Sign in with Apple &rarr; Notho &rarr;
+              Stop Using Sign in with Apple
+            </strong>{" "}
+            at{" "}
+            <a href="https://account.apple.com" style={link}>
+              account.apple.com
+            </a>
+            .
+          </p>
+        </div>
+
         {/* Footer */}
         <div
           style={{

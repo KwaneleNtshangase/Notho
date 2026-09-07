@@ -8,7 +8,7 @@ import { isNativePlatform } from "@/lib/capacitorPlatform";
 // Google OAuth is blocked only in LinkedIn's in-app browser.
 // All other in-app browsers (Instagram, Facebook, WhatsApp, etc.) either use
 // SFSafariViewController or handle the redirect acceptably.
-// Facebook OAuth works everywhere - no restrictions.
+// Facebook and Apple OAuth work everywhere - no restrictions.
 function isLinkedInBrowser(): boolean {
   if (typeof window === "undefined") return false;
   return /\[LinkedInApp\]/i.test(window.navigator.userAgent);
@@ -60,7 +60,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [forgotSent, setForgotSent] = useState(false);
   const [awaitingVerification, setAwaitingVerification] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
-  const [inWebView, setInWebView] = useState(false);
+  const [inWebView] = useState(isLinkedInBrowser);
   const [linkCopied, setLinkCopied] = useState(false);
   const [oauthBlocked, setOauthBlocked] = useState(false);
 
@@ -80,10 +80,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     // the previous 1500ms minimum added 1.1s+ of pure dead time per load.
     const t = setTimeout(() => setSplashMinElapsed(true), 400);
     return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    setInWebView(isLinkedInBrowser());
   }, []);
 
   useEffect(() => {
@@ -144,22 +140,19 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     else setError(null);
   };
 
-  // Facebook works everywhere - no restrictions.
+  // Facebook and Apple work everywhere - no restrictions.
   // Google is blocked only inside LinkedIn's in-app browser; everywhere else it works.
   //
-  // On native (the Capacitor iOS/Android shell) both providers are blocked
-  // regardless - Google and Facebook both refuse to complete OAuth inside any
-  // embedded webview, and a Capacitor app IS an embedded webview from their
-  // point of view. So on native we never let the flow open inside the app's
-  // own webview: skipBrowserRedirect hands us the auth URL instead of
-  // navigating to it, and we open that URL in the system browser
-  // (SFSafariViewController on iOS, Chrome Custom Tabs on Android) via
-  // @capacitor/browser. Supabase then redirects back to the
+  // On native (the Capacitor iOS/Android shell), OAuth must not run inside the
+  // app's embedded webview. skipBrowserRedirect hands us the Apple, Google, or
+  // Facebook authorization URL instead of navigating to it, and we open that
+  // URL in the system browser (SFSafariViewController on iOS, Chrome Custom
+  // Tabs on Android) via @capacitor/browser. Supabase then redirects back to the
   // za.co.notho.app://auth/callback custom scheme, which NativeAuthDeepLink
   // (mounted in the root layout) picks up and exchanges for a session - see
   // that file for why this needs a separate listener instead of the web
   // flow's automatic detectSessionInUrl.
-  const handleOAuthSignIn = async (provider: "google" | "facebook") => {
+  const handleOAuthSignIn = async (provider: "apple" | "google" | "facebook") => {
     const native = await isNativePlatform();
 
     if (provider === "google" && inWebView && !native) {
@@ -517,7 +510,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                     Google sign-in is blocked in LinkedIn
                   </p>
                   <p style={{ fontSize: 12, color: "#78350F", margin: 0, lineHeight: 1.55 }}>
-                    LinkedIn&apos;s browser blocks Google. Use Facebook, email, or copy the link and open it in Chrome or Safari.
+                    LinkedIn&apos;s browser blocks Google. Use Apple, Facebook, email, or copy the link and open it in Chrome or Safari.
                   </p>
                 </div>
               </div>
@@ -571,6 +564,24 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           {/* ── Social sign-in buttons ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 4 }}>
             <button
+              type="button"
+              data-testid="apple-oauth"
+              aria-label="Continue with Apple"
+              onClick={() => handleOAuthSignIn("apple")}
+              style={{
+                width: "100%", minHeight: 44, padding: "11px 16px", borderRadius: 10,
+                border: "1.5px solid #000", background: "#000",
+                color: "#fff", fontWeight: 600, fontSize: 14,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+              }}
+            >
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.53-3.05-.03-4.9-2.84-4.18-10.19 1.37-10.5 1.35.07 2.29.74 3.08.79 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.3M12.03 10c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25" />
+              </svg>
+              Continue with Apple
+            </button>
+            <button
+              type="button"
               onClick={() => handleOAuthSignIn("google")}
               style={{
                 width: "100%", padding: "11px 16px", borderRadius: 10,
@@ -588,6 +599,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               Continue with Google
             </button>
             <button
+              type="button"
               onClick={() => handleOAuthSignIn("facebook")}
               style={{
                 width: "100%", padding: "11px 16px", borderRadius: 10,
