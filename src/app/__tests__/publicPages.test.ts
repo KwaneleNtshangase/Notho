@@ -76,3 +76,26 @@ describe("AuthGate bank-statement copy", () => {
     expect(content).toContain("We read it in memory and do not keep the file.");
   });
 });
+
+/* ─── Sign in with Apple release guard ──────────────────────── */
+
+describe("Sign in with Apple configuration", () => {
+  it("keeps the Apple OAuth option and iOS entitlement in source control", async () => {
+    const fs = await import("fs");
+    const path = await import("path");
+    const authGate = fs.readFileSync(
+      path.resolve(__dirname, "../../components/AuthGate.tsx"),
+      "utf-8"
+    );
+    const entitlements = fs.readFileSync(
+      path.resolve(__dirname, "../../../ios/App/App/App.entitlements"),
+      "utf-8"
+    );
+
+    expect(authGate).toContain('handleOAuthSignIn("apple")');
+    expect(authGate).toContain('data-testid="apple-oauth"');
+    expect(authGate).toContain("Continue with Apple");
+    expect(entitlements).toContain("com.apple.developer.applesignin");
+    expect(entitlements).toContain("<string>Default</string>");
+  });
+});
