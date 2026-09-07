@@ -12,6 +12,8 @@
  * The check on this page is a courtesy so a non-admin sees one clear message
  * instead of seven broken panels.
  *
+ * Sign-in happens here. Do not send operators through the learner AuthGate.
+ *
  * The tab order is deliberate. Pulse first because it answers "what should I do
  * today"; the rest are the evidence, arranged in the order a product question
  * usually travels - are people arriving, do they engage, do they come back, is
@@ -19,6 +21,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { fetchView } from "./lib";
 import { ThemeProvider, useTheme } from "./theme";
@@ -30,6 +33,7 @@ import { RetentionPanel } from "./panelsRetention";
 import { ContentPanel } from "./panelsContent";
 import { ChurnPanel } from "./panelsChurn";
 import { PeoplePanel } from "./panelsPeople";
+import { DeskSignIn } from "../DeskSignIn";
 
 type Tab = "pulse" | "growth" | "engagement" | "retention" | "content" | "churn" | "people";
 
@@ -54,9 +58,9 @@ const REFRESH_MS = 60_000;
 
 const DESK_CSS = `
 .nv-mark {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
   background: transparent !important;
   box-shadow: none !important;
   overflow: hidden;
@@ -107,37 +111,53 @@ function Dashboard() {
 
   const [gate, setGate] = useState<"checking" | "ok" | "denied" | "signed-out">("checking");
   const [gateError, setGateError] = useState<string | null>(null);
+  const [who, setWho] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
     setNonce((n) => n + 1);
     setLastRefresh(new Date());
   }, []);
 
+  const checkGate = useCallback(async () => {
+    setGateError(null);
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      setWho(null);
+      setGate("signed-out");
+      return;
+    }
+    setWho(data.session.user.email ?? null);
+    try {
+      await fetchView("overview", { days: 1 });
+      setGate("ok");
+      setLastRefresh(new Date());
+    } catch (e) {
+      const msg = (e as Error).message;
+      setGateError(msg);
+      setGate(msg.includes("admin-only") ? "denied" : "ok");
+    }
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        if (!cancelled) setGate("signed-out");
-        return;
-      }
-      try {
-        await fetchView("overview", { days: 1 });
-        if (!cancelled) {
-          setGate("ok");
-          setLastRefresh(new Date());
-        }
-      } catch (e) {
-        if (cancelled) return;
-        const msg = (e as Error).message;
-        setGateError(msg);
-        setGate(msg.includes("admin-only") ? "denied" : "ok");
-      }
+      await checkGate();
+      if (cancelled) return;
     })();
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+        checkGate();
+      }
+      if (event === "SIGNED_OUT") {
+        setWho(null);
+        setGate("signed-out");
+      }
+    });
     return () => {
       cancelled = true;
+      sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [checkGate]);
 
   useEffect(() => {
     if (!auto || gate !== "ok") return;
@@ -166,7 +186,13 @@ function Dashboard() {
     setTab("people");
   }, []);
 
-  const active = useMemo(() => TABS.find((t) => t.value === tab)!, [tab]);
+  const signOut = useCallback(async () => {
+    await supabase.auth.signOut();
+    setWho(null);
+    setGate("signed-out");
+  }, []);
+
+  const active = useMemo(() => TABS.find((t) => t.value === tab)!,[tab]);
   const numDays = Number(days);
 
   return (
@@ -174,7 +200,7 @@ function Dashboard() {
       <header className="nv-head">
         <div className="nv-title">
           <div className="nv-mark">
-            <img src="/notho-icon-192.png" alt="Notho" width={48} height={48} />
+            <img src="/notho-icon-192.png" alt="Notho" width={58} height={58} />
           </div>
           <div>
             <h1 className="nv-h1">Notho Desk</h1>
@@ -186,6 +212,12 @@ function Dashboard() {
         <div className="nv-actions">
           {gate === "ok" && (
             <>
+              <Link href="/admin" className="nv-btn" style={{ textDecoration: "none" }}>
+                Backend
+              </Link>
+              <Link href="/admin/bugs" className="nv-btn" style={{ textDecoration: "none" }}>
+                Bugs
+              </Link>
               <label className="nv-live">
                 <input
                   type="checkbox"
@@ -211,29 +243,32 @@ function Dashboard() {
           >
             {mode === "dark" ? "Export theme" : "Console theme"}
           </Btn>
+          {gate === "ok" && (
+            <Btn onClick={signOut} title={who ?? "Sign out"}>
+              Sign out
+            </Btn>
+          )}
         </div>
       </header>
 
       {gate === "checking" && <Skeleton height={260} />}
 
       {gate === "signed-out" && (
-        <Card>
-          <h2 className="nv-card-title" style={{ marginBottom: 8 }}>
-            Please sign in
-          </h2>
-          <p style={{ fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
-            This dashboard is admin-only. Sign in with your admin account and come back to this page.
-          </p>
-        </Card>
+        <DeskSignIn onSignedIn={checkGate} returnPath="/admin/analytics" />
       )}
 
       {gate === "denied" && (
-        <ErrorNote
-          message={
-            gateError ??
-            "This dashboard is admin-only and your account is not an admin. Ask an existing admin to set is_admin on your profile."
-          }
-        />
+        <Card>
+          <ErrorNote
+            message={
+              gateError ??
+              "This dashboard is admin-only and your account is not an admin. Ask an existing admin to set is_admin on your profile."
+            }
+          />
+          <div style={{ marginTop: 14, display: "flex", gap: 8 }}>
+            <Btn onClick={signOut}>Use a different account</Btn>
+          </div>
+        </Card>
       )}
 
       {gate === "ok" && (
