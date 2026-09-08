@@ -73,8 +73,13 @@ async function safeEvaluate(page, fn) {
   }
 }
 
+const LANDING_CTA =
+  /Create an account|Sign in|I Already Have an Account|Get Started/i;
+const LANDING_COPY =
+  /Create an account|Sign in|Money lessons written for South Africa/i;
+
 async function run() {
-  console.log(`\n🔍  Notho Health Check`);
+  console.log(`\n\ud83d\udd0d  Notho Health Check`);
   console.log(`    Target: ${BASE_URL}`);
   console.log(`    ${new Date().toISOString()}\n`);
 
@@ -167,11 +172,11 @@ async function run() {
   const bootDeadline = Date.now() + BOOT_DEADLINE_MS;
 
   while (Date.now() < bootDeadline && !bootedAs) {
-    const landingBtn = page
-      .locator("button", { hasText: /I Already Have an Account|Get Started/i })
+    const landingCta = page
+      .locator("button, a, [role='button']", { hasText: LANDING_CTA })
       .first();
-    if (await landingBtn.isVisible().catch(() => false)) {
-      bootedAs = "landing screen (sign-in / get-started controls interactive)";
+    if (await landingCta.isVisible().catch(() => false)) {
+      bootedAs = "landing screen (create-account / sign-in controls interactive)";
       break;
     }
 
@@ -188,6 +193,13 @@ async function run() {
       await page.locator(".app-container").first().isVisible().catch(() => false)
     ) {
       bootedAs = "app shell (authenticated session)";
+      break;
+    }
+
+    const liveText = bodyText || "";
+    const buttonCount = await page.locator("button").count().catch(() => 0);
+    if (LANDING_COPY.test(liveText) && buttonCount >= 1) {
+      bootedAs = "landing screen (CTA copy + visible button)";
       break;
     }
 
