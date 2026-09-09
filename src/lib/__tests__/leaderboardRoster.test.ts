@@ -65,6 +65,15 @@ describe("buildWeeklyRoster", () => {
     expect(roster.some((r) => r.isYou)).toBe(true);
   });
 
+  it("shows active legacy learners with neutral labels, never real names", () => {
+    const roster = buildWeeklyRoster(
+      [row("me", null, 20, 20), row("peer", null, 10, 10)],
+      { myId: "me", currentWeekKey: week }
+    );
+    expect(roster.map((r) => r.name)).toEqual(["You", "Learner 2"]);
+    expect(roster.some((r) => /kwanele|takalani/i.test(r.name))).toBe(false);
+  });
+
   it("caps the public list and still includes you", () => {
     const rows = [
       row("me", "YouHandle", 1, 1),

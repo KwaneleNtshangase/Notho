@@ -134,8 +134,11 @@ export default function PrivacyPage() {
           <p>We collect the following categories of information:</p>
           <ul style={{ paddingLeft: "20px", lineHeight: 1.8 }}>
             <li>
-              <strong>Account information</strong> - your name, email address,
-              and profile photo if you sign in with Google or Facebook.
+              <strong>Account information</strong> - your email address and,
+              where the provider makes them available, your name and profile
+              photo if you sign in with Apple, Google, or Facebook. Apple lets
+              you use a private relay email address instead of sharing your
+              personal address with us.
             </li>
             <li>
               <strong>Learning progress</strong> - lessons completed, XP
@@ -208,9 +211,10 @@ export default function PrivacyPage() {
               serving the app.
             </li>
             <li>
-              <strong>Google &amp; Meta (Facebook)</strong> - solely for
-              OAuth sign-in; we receive only the account profile data you
-              authorise during the login flow.
+              <strong>Apple, Google &amp; Meta (Facebook)</strong> - solely
+              for OAuth sign-in; we receive only the account profile data you
+              authorise during the login flow. Apple may provide a private relay
+              email address instead of your personal address.
             </li>
             <li>
               <strong>Google (Gemini API)</strong> - powers Cosmo, our optional

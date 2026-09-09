@@ -85,10 +85,10 @@ export function NotificationOptIn() {
     >
       <div style={{ flex: 1, minWidth: 200 }}>
         <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)" }}>
-          🔔 Don&apos;t lose your streak
+          Streak reminder
         </div>
         <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>
-          Get a reminder before your streak ends and alerts when a budget runs hot.
+          Optional reminder before a streak drops, and when a budget category runs hot.
         </div>
       </div>
       <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>

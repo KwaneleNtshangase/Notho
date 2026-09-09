@@ -120,12 +120,12 @@ export function StreakRepairBanner() {
     >
       {done ? (
         <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-primary)" }}>
-          🔥 Streak restored! Do a lesson today to keep it going.
+          Streak restored. Do a lesson today or it drops again.
         </div>
       ) : (
         <>
           <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)" }}>
-            💔 Your {offer.streak}-day streak broke!
+            Your {offer.streak}-day streak broke.
           </div>
           <div style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "4px 0 10px" }}>
             Restore it for {COST} XP (you have {Math.floor(offer.xp)}). This offer expires soon.

@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Mail, KeyRound, AlertTriangle, ClipboardCopy, CheckCircle } from "@/components/icons/NothoIcons";
+import { Mail, KeyRound, AlertTriangle, ClipboardCopy, CheckCircle, NothoLearn, NothoBudget, NothoCalculate } from "@/components/icons/NothoIcons";
 import { supabase } from "@/lib/supabaseClient";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
 
 // Google OAuth is blocked only in LinkedIn's in-app browser.
 // All other in-app browsers (Instagram, Facebook, WhatsApp, etc.) either use
 // SFSafariViewController or handle the redirect acceptably.
-// Facebook OAuth works everywhere - no restrictions.
+// Facebook and Apple OAuth work everywhere - no restrictions.
 function isLinkedInBrowser(): boolean {
   if (typeof window === "undefined") return false;
   return /\[LinkedInApp\]/i.test(window.navigator.userAgent);
@@ -60,7 +60,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [forgotSent, setForgotSent] = useState(false);
   const [awaitingVerification, setAwaitingVerification] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
-  const [inWebView, setInWebView] = useState(false);
+  const [inWebView] = useState(isLinkedInBrowser);
   const [linkCopied, setLinkCopied] = useState(false);
   const [oauthBlocked, setOauthBlocked] = useState(false);
 
@@ -80,10 +80,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     // the previous 1500ms minimum added 1.1s+ of pure dead time per load.
     const t = setTimeout(() => setSplashMinElapsed(true), 400);
     return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    setInWebView(isLinkedInBrowser());
   }, []);
 
   useEffect(() => {
@@ -144,22 +140,19 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     else setError(null);
   };
 
-  // Facebook works everywhere - no restrictions.
+  // Facebook and Apple work everywhere - no restrictions.
   // Google is blocked only inside LinkedIn's in-app browser; everywhere else it works.
   //
-  // On native (the Capacitor iOS/Android shell) both providers are blocked
-  // regardless - Google and Facebook both refuse to complete OAuth inside any
-  // embedded webview, and a Capacitor app IS an embedded webview from their
-  // point of view. So on native we never let the flow open inside the app's
-  // own webview: skipBrowserRedirect hands us the auth URL instead of
-  // navigating to it, and we open that URL in the system browser
-  // (SFSafariViewController on iOS, Chrome Custom Tabs on Android) via
-  // @capacitor/browser. Supabase then redirects back to the
+  // On native (the Capacitor iOS/Android shell), OAuth must not run inside the
+  // app's embedded webview. skipBrowserRedirect hands us the Apple, Google, or
+  // Facebook authorization URL instead of navigating to it, and we open that
+  // URL in the system browser (SFSafariViewController on iOS, Chrome Custom
+  // Tabs on Android) via @capacitor/browser. Supabase then redirects back to the
   // za.co.notho.app://auth/callback custom scheme, which NativeAuthDeepLink
   // (mounted in the root layout) picks up and exchanges for a session - see
   // that file for why this needs a separate listener instead of the web
   // flow's automatic detectSessionInUrl.
-  const handleOAuthSignIn = async (provider: "google" | "facebook") => {
+  const handleOAuthSignIn = async (provider: "apple" | "google" | "facebook") => {
     const native = await isNativePlatform();
 
     if (provider === "google" && inWebView && !native) {
@@ -276,28 +269,12 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               the wordmark is navy, and in dark mode the splash background flips
               to a dark surface, leaving a navy-on-dark logo that reads as dim.
               The icon's teal + gold carry on both light and dark. */}
-          <div className="splash-logo-wrap" style={{ position: "relative", zIndex: 1, marginBottom: 28 }}>
+          <div className="splash-logo-wrap" style={{ position: "relative", zIndex: 1 }}>
             <img
               src="/notho-icon.png"
               alt="Notho"
               style={{ width: 168, height: 168, objectFit: "contain", display: "block" }}
             />
-          </div>
-
-          {/* Thin divider */}
-          <div className="splash-divider" style={{
-            width: 40, height: 2, borderRadius: 1,
-            background: "linear-gradient(90deg, transparent, rgba(1,160,170,0.6), transparent)",
-            marginBottom: 14, position: "relative", zIndex: 1,
-          }} />
-
-          {/* Tagline */}
-          <div className="splash-tagline" style={{
-            color: "var(--color-text-secondary)", fontSize: 11,
-            letterSpacing: 2, textTransform: "uppercase", fontWeight: 500,
-            position: "relative", zIndex: 1,
-          }}>
-            Your financial journey starts here
           </div>
         </div>
       </>
@@ -344,37 +321,28 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               style={{ width: "min(340px, 78vw)", height: "auto", objectFit: "contain", marginBottom: 32 }}
             />
             <p style={{
-              fontSize: 11, fontWeight: 700, color: "#007A85",
-              textAlign: "center", letterSpacing: 3, textTransform: "uppercase",
-              margin: "0 0 10px",
+              fontSize: 15, color: "#374151", textAlign: "center",
+              lineHeight: 1.55, maxWidth: 300, margin: "0 0 22px", fontWeight: 500,
             }}>
-              Your financial journey starts here
-            </p>
-            <p style={{
-              fontSize: 13, color: "#9CA3AF", textAlign: "center",
-              lineHeight: 1.6, maxWidth: 280, margin: "0 0 28px",
-            }}>
-              Learn how money works, build real habits, and take control of your finances.
+              Money lessons written for South Africa. Payslips, debit orders, SARS, TFSAs.
             </p>
 
-            {/* Value prop - why sign up (kept compact for small screens) */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 340, width: "100%" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 340, width: "100%" }}>
               {[
-                { icon: "📚", text: "Bite-size lessons on SA money life - payslips, debit orders, SARS, TFSAs" },
-                { icon: "📊", text: "Budget tracker with bank statement import - processed in memory, never stored" },
-                { icon: "🎯", text: "Calculators, goals and streaks that make finance stick" },
+                { Icon: NothoLearn, text: "Short lessons on how money actually works here." },
+                { Icon: NothoBudget, text: "Import a statement. We read it in memory and do not keep the file." },
+                { Icon: NothoCalculate, text: "Calculators and a budget you can check against real numbers." },
               ].map((f) => (
                 <div key={f.text} style={{
-                  display: "flex", alignItems: "flex-start", gap: 10,
-                  background: "#F7FAF8", border: "1px solid #E5EFE9",
-                  borderRadius: 12, padding: "10px 14px",
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "6px 4px",
                 }}>
-                  <span style={{ fontSize: 16, lineHeight: "20px" }} aria-hidden>{f.icon}</span>
-                  <span style={{ fontSize: 12.5, color: "#4B5563", lineHeight: 1.5, textAlign: "left" }}>{f.text}</span>
+                  <f.Icon size={20} style={{ color: "#007A85", flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, color: "#4B5563", lineHeight: 1.45, textAlign: "left" }}>{f.text}</span>
                 </div>
               ))}
-              <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center", margin: "4px 0 0" }}>
-                Free to use · Built for South Africa · Educational content only, not financial advice
+              <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center", margin: "10px 0 0" }}>
+                Free. Education only, not advice.
               </p>
             </div>
           </div>
@@ -392,7 +360,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 borderRadius: 14, cursor: "pointer", letterSpacing: 0.4,
               }}
             >
-              Get Started
+              Create an account
             </button>
             <button
               onClick={() => setMode("signin")}
@@ -403,7 +371,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 letterSpacing: 0.2,
               }}
             >
-              I Already Have an Account
+              Sign in
             </button>
           </div>
         </div>
@@ -542,7 +510,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                     Google sign-in is blocked in LinkedIn
                   </p>
                   <p style={{ fontSize: 12, color: "#78350F", margin: 0, lineHeight: 1.55 }}>
-                    LinkedIn&apos;s browser blocks Google. Use Facebook, email, or copy the link and open it in Chrome or Safari.
+                    LinkedIn&apos;s browser blocks Google. Use Apple, Facebook, email, or copy the link and open it in Chrome or Safari.
                   </p>
                 </div>
               </div>
@@ -596,6 +564,27 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           {/* ── Social sign-in buttons ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 4 }}>
             <button
+              type="button"
+              data-testid="apple-oauth"
+              aria-label="Continue with Apple"
+              onClick={() => handleOAuthSignIn("apple")}
+              style={{
+                width: "100%", minHeight: 44, padding: 0, borderRadius: 10,
+                border: "none", background: "#000", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+              }}
+            >
+              <img
+                src="https://appleid.cdn-apple.com/appleid/button?height=44&width=375&color=black&border=false&type=continue&border_radius=10&scale=3&locale=en_GB"
+                alt=""
+                width={375}
+                height={44}
+                aria-hidden="true"
+                style={{ width: "100%", height: "auto", maxHeight: 44, objectFit: "contain", display: "block" }}
+              />
+            </button>
+            <button
+              type="button"
               onClick={() => handleOAuthSignIn("google")}
               style={{
                 width: "100%", padding: "11px 16px", borderRadius: 10,
@@ -613,6 +602,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               Continue with Google
             </button>
             <button
+              type="button"
               onClick={() => handleOAuthSignIn("facebook")}
               style={{
                 width: "100%", padding: "11px 16px", borderRadius: 10,

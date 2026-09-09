@@ -608,10 +608,9 @@ export function useNothoState() {
         .eq("user_id", progress.userId!)
         .maybeSingle();
 
-      const hasIdentityName =
-        Boolean(profile?.username && String(profile.username).trim()) ||
-        Boolean(profile?.full_name && String(profile.full_name).trim());
-      const hasOnboarded = Boolean(profile?.goal) || hasIdentityName;
+      const hasUsername = Boolean(profile?.username && String(profile.username).trim());
+      const hasGoal = Boolean(profile?.goal && String(profile.goal).trim());
+      const hasOnboarded = hasUsername && hasGoal;
 
       if (hasOnboarded) {
         localStorage.setItem("notho-onboarded", "true");

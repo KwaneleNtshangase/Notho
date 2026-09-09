@@ -11,6 +11,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { MessageSquare } from "@/components/icons/NothoIcons";
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
@@ -31,7 +32,6 @@ export function CosmoCoachChat() {
   const [notice, setNotice] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Load consent + today's history when the panel first opens.
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
@@ -67,7 +67,6 @@ export function CosmoCoachChat() {
     return () => { cancelled = true; };
   }, [open]);
 
-  // Keep the newest message in view.
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [messages, sending]);
@@ -94,8 +93,6 @@ export function CosmoCoachChat() {
       const token = session?.access_token;
       if (!token) throw new Error("no-session");
 
-      // Bound the wait so a slow model call can't leave the chat "typing"
-      // indefinitely; abort after 45s and show a clean retry message.
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 45_000);
       let res: Response;
@@ -187,9 +184,6 @@ export function CosmoCoachChat() {
           .notho-chat-fab { right: 24px; bottom: 24px; }
           .notho-chat-panel { right: 24px; left: auto; bottom: 92px; width: 380px; }
         }
-        /* Class-based with !important: globals.css paints inputs dark in dark
-           mode (html.dark input) and strips borders globally, so inline styles
-           are not enough to keep this pill white in both themes. */
         .notho-chat-form {
           display: flex;
           align-items: center;
@@ -218,20 +212,19 @@ export function CosmoCoachChat() {
         <button
           type="button"
           className="notho-chat-fab"
-          aria-label="Ask Cosmo about your money"
+          aria-label="Ask Cosmo"
           onClick={() => setOpen(true)}
         >
-          💬
+          <MessageSquare size={24} style={{ color: "#fff" }} />
         </button>
       )}
 
       {open && (
         <div className="notho-chat-panel" role="dialog" aria-label="Ask Cosmo, your money coach">
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-            <span style={{ fontSize: 15, fontWeight: 800 }}>💬 Ask Cosmo</span>
-            {/* Persistent "this is AI" marker. Apple and Google both require a
-                user-facing disclosure wherever generative AI output appears,
-                not only behind the one-time consent step. */}
+            <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 800 }}>
+              Cosmo
+            </span>
             <span
               style={{
                 fontSize: 10,
@@ -331,7 +324,7 @@ export function CosmoCoachChat() {
               >
                 {messages.length === 0 && !sending && (
                   <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: 0 }}>
-                    Try: &ldquo;Why is my food spend up this month?&rdquo;
+                    Ask about a category on this month&apos;s budget.
                   </p>
                 )}
                 {messages.map((m, i) => (

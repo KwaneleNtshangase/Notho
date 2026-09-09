@@ -577,7 +577,7 @@ export function LessonView({
           }}>
             <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--color-text-primary)", fontWeight: 500 }}>{s.challenge}</p>
           </div>
-          {!didAction ? (
+          {didAction === undefined ? (
             <div style={{ display: "flex", gap: 10 }}>
               <button
                 type="button"
@@ -627,7 +627,7 @@ export function LessonView({
               </p>
             </div>
           )}
-          {didAction && (
+          {didAction !== undefined && (
             <div className="lesson-actions">
               {showFinish ? (
                 <div style={{ textAlign: "center", width: "100%" }}>
@@ -1047,7 +1047,7 @@ export function LessonView({
             borderTop: "1px solid var(--color-border)",
             marginTop: 4,
           }}>
-            📚 For educational purposes only - not financial advice. Consult a licensed financial advisor before making financial decisions.
+            Education only. Not financial advice.
           </div>
         </div>
       </main>

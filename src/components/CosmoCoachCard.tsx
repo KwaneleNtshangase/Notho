@@ -201,8 +201,7 @@ export function CosmoCoachCard({
       <>
       {!showInsights && (
         <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}>
-          No nudges right now. Cosmo is your money coach. Add entries or import a
-          bank statement and Cosmo will spot what&apos;s worth a look.
+          Nothing flagged on this month yet. Add entries or import a statement.
         </p>
       )}
 
