@@ -13,13 +13,21 @@ export type TransferPair = {
 };
 
 const TRANSFER_HINTS =
-  /\b(transfer|payment to|payment from|inter.?account|own account|trf|internet trf|immediate trf)\b/i;
+  /\b(transfer|payment to|payment from|inter.?account|own account|trf|internet trf|immediate trf|fund transfers?|ib payment|rtc pmt)\b/i;
 
-const AMOUNT_TOLERANCE_CENTS = 100; // R1.00
-const MAX_DATE_DAYS = 3;
+const FEE_OR_INTEREST =
+  /\b(fee|fees|charge|charges|interest|vat|service fee|admin fee|txn fee|transaction fee|cash finance)\b/i;
+
+const AMOUNT_TOLERANCE_CENTS = 1;
+const LOOSE_TOLERANCE_CENTS = 100;
+const MAX_DATE_DAYS = 2;
 
 function transferHintScore(description: string): number {
   return TRANSFER_HINTS.test(description) ? 30 : 0;
+}
+
+function isFeeOrInterest(description: string): boolean {
+  return FEE_OR_INTEREST.test(description);
 }
 
 /**
@@ -51,16 +59,25 @@ export function detectTransferPairs(rows: PreviewTxn[]): TransferPair[] {
 
       const creditCents = amountToCents(credit.amountZAR);
       const diff = Math.abs(debitCents + creditCents);
-      if (diff > AMOUNT_TOLERANCE_CENTS) continue;
+      const debitHint = transferHintScore(debit.description);
+      const creditHint = transferHintScore(credit.description);
+      const eitherLooksLikeTransfer = debitHint > 0 || creditHint > 0;
+      const maxDiff = eitherLooksLikeTransfer ? LOOSE_TOLERANCE_CENTS : AMOUNT_TOLERANCE_CENTS;
+      if (diff > maxDiff) continue;
+      if (isFeeOrInterest(debit.description) || isFeeOrInterest(credit.description)) continue;
 
       const dayGap = daysBetween(debit.date, credit.date);
       if (dayGap > MAX_DATE_DAYS) continue;
 
-      let score = 50;
-      score += transferHintScore(debit.description);
-      score += transferHintScore(credit.description);
-      score += Math.max(0, 20 - dayGap * 5);
-      score += diff === 0 ? 20 : 10;
+      let score = 40;
+      score += debitHint;
+      score += creditHint;
+      score += Math.max(0, 20 - dayGap * 8);
+      score += diff === 0 ? 20 : 5;
+      if (!eitherLooksLikeTransfer) {
+        if (diff !== 0 || Math.abs(debitCents) < 50_000) continue;
+        score -= 15;
+      }
 
       if (!best || score > best.score) {
         best = { credit, score };

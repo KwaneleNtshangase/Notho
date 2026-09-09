@@ -37,7 +37,7 @@ export function reconcileBalanceChain(
       ok = false;
       const desc = row.description.slice(0, 48);
       warnings.push(
-        `Balance chain breaks at row ${i + 1} (${row.date} ${desc}): expected R${(expectedCents / 100).toFixed(2)}, statement R${row.balanceAfter.toFixed(2)}.`
+        `Balance chain breaks at row ${i + 1} (${row.date} ${desc}): expected R${(expectedCents / 100).toFixed(2)}, statement R${row.balanceAfter.toFixed(2)}. `
       );
       break;
     }
@@ -52,7 +52,7 @@ export function reconcileBalanceChain(
     ) {
       ok = false;
       warnings.push(
-        `Final row balance R${last.balanceAfter.toFixed(2)} does not match closing balance R${closingBalance.toFixed(2)}.`
+        `Final row balance R${last.balanceAfter.toFixed(2)} does not match closing balance R${closingBalance.toFixed(2)}. `
       );
     }
   } else if (ok && rows.length === 0) {
@@ -61,7 +61,7 @@ export function reconcileBalanceChain(
   }
 
   if (ok) {
-    warnings.push("Balance reconciles ✓");
+    warnings.push("Balance reconciles \u2713");
   }
 
   return {
@@ -82,12 +82,6 @@ type SignCheckRow = {
   uncertainAmount?: boolean;
 };
 
-/**
- * PDF text is emitted in page-coordinate order, and whether that runs top-to-
- * bottom or bottom-to-top depends on the producer. A running balance only makes
- * sense read forwards, so work out which direction this document is in by
- * seeing which one the bank's own arithmetic agrees with.
- */
 function chainAgreement(rows: SignCheckRow[]): number {
   let agreed = 0;
   let prev: number | undefined;
@@ -111,20 +105,34 @@ export function orientByBalanceChain<T extends SignCheckRow>(rows: T[]): {
   return { rows: reversed ? reversedRows : rows, reversed };
 }
 
-/**
- * Confirm each row's sign against the statement's own running balance.
- *
- * Reading Debit and Credit by column position is geometry, and geometry can be
- * wrong - a column anchor is an estimate, and a sign error silently corrupts a
- * budget rather than failing loudly. But a statement that prints a running
- * balance has already told us the answer: balance(n) - balance(n-1) IS the
- * signed amount. So we check every row against it.
- *
- * A row whose magnitude matches but whose sign is inverted is corrected outright
- * - the document outranks our column guess. A row that matches neither is left
- * alone and flagged, because that is also what a legitimate section boundary
- * looks like on a multi-account statement, where the chain restarts.
- */
+export function orderRowsFromOpening<T extends SignCheckRow>(
+  rows: T[],
+  openingBalance?: number
+): { rows: T[]; reversed: boolean } {
+  if (rows.length < 2) return { rows, reversed: false };
+  if (openingBalance === undefined) {
+    return orientByBalanceChain(rows);
+  }
+
+  const startError = (arr: T[]): number => {
+    const first = arr[0];
+    if (first.balanceAfter === undefined) return Number.POSITIVE_INFINITY;
+    return Math.abs(
+      amountToCents(openingBalance) +
+        amountToCents(first.amountZAR) -
+        amountToCents(first.balanceAfter)
+    );
+  };
+
+  const reversedList = [...rows].reverse();
+  const fwdErr = startError(rows);
+  const revErr = startError(reversedList);
+  if (fwdErr <= 1 && revErr > 1) return { rows, reversed: false };
+  if (revErr <= 1 && fwdErr > 1) return { rows: reversedList, reversed: true };
+
+  return orientByBalanceChain(rows);
+}
+
 export function verifySignsAgainstBalanceChain<T extends SignCheckRow>(
   rows: T[],
   openingBalance?: number,
@@ -134,13 +142,9 @@ export function verifySignsAgainstBalanceChain<T extends SignCheckRow>(
   corrected: number;
   unverified: number;
   verified: number;
-  /** True when the majority of checked rows have signs inverted relative to
-   *  the balance chain (credit-card convention or wrong column reading). */
   invertedMajority: boolean;
 } {
   const isCreditCard = options?.isCreditCard ?? false;
-
-  // ── First pass: classify each row without mutating ──────────────────
   type Classification = "verified" | "inverted" | "unverified" | "skip";
   const classes: Classification[] = [];
   let prev: number | undefined = openingBalance;
@@ -171,20 +175,8 @@ export function verifySignsAgainstBalanceChain<T extends SignCheckRow>(
   const totalInverted = classes.filter((c) => c === "inverted").length;
   const totalVerified = classes.filter((c) => c === "verified").length;
   const totalChecked = totalInverted + totalVerified + classes.filter((c) => c === "unverified").length;
-
-  // ── Inverted-majority detection ────────────────────────────────────
-  // If the audit would flip MOST or ALL checked rows, the balance convention
-  // is inverted relative to the column reading. Two possibilities:
-  //
-  // 1. Credit-card statement: purchases increase the outstanding balance, so
-  //    a purchase in the Debit column shows delta=+amount. The column reading
-  //    is correct; the chain convention is inverted. Treat as verified.
-  //
-  // 2. Unknown layout with wrong column assignment: genuinely ambiguous.
-  //    Flag for review — do not flip, do not verify.
   const invertedMajority = totalChecked > 0 && totalInverted > totalVerified;
 
-  // ── Second pass: apply corrections ─────────────────────────────────
   let corrected = 0;
   let unverified = 0;
   let verified = 0;
@@ -197,22 +189,16 @@ export function verifySignsAgainstBalanceChain<T extends SignCheckRow>(
     }
     if (cls === "inverted") {
       if (invertedMajority && isCreditCard) {
-        // Credit-card convention confirmed: the column reading is correct.
-        // The balance goes up on a purchase because it is outstanding debt,
-        // but the Debit column correctly says "money out". Verified.
         verified += 1;
         return row;
       }
       if (invertedMajority) {
-        // Inverted but no credit-card evidence — genuinely ambiguous.
-        // Flag for review; do not flip.
         unverified += 1;
         return { ...row, needsReview: true, uncertainAmount: true };
       }
       corrected += 1;
       return { ...row, amountZAR: -row.amountZAR };
     }
-    // unverified
     unverified += 1;
     return { ...row, needsReview: true, uncertainAmount: true };
   });
@@ -281,10 +267,6 @@ export function reconcileTransactions(
 
 type ImportRow = { amountZAR: number; skipReason?: "existing_import" | "user_removed" };
 
-/**
- * Re-run reconciliation after marking batch-overlap skips.
- * Surfaces cases where dedupe incorrectly dropped rows from the import set.
- */
 export function reconcileAfterImportSkips(
   allTransactions: NormalizedTxn[],
   rows: ImportRow[],
