@@ -186,13 +186,6 @@ export function CourseView({
   nextCourse?: Course | null;
   onGoToNextCourse?: () => void;
 }) {
-  // Scroll to top when course is loaded
-  React.useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-    const mainContent = document.querySelector(".main-content");
-    if (mainContent) mainContent.scrollTo({ top: 0, behavior: "instant" });
-  }, [course.id]);
-
   const colour = COURSE_COLOURS[courseIndex % COURSE_COLOURS.length];
   const [lockedModal, setLockedModal] = useState<{
     lessonTitle: string;
@@ -200,22 +193,14 @@ export function CourseView({
   } | null>(null);
 
   const router = useRouter();
-  // Best recorded attempt per lesson, so the map shows what the learner has
-  // proved they can do rather than their most recent off-day. Scoped by RLS to
-  // this user; `best` is empty while loading and for signed-out/first-time
-  // learners, and every read below tolerates a miss.
   const { results: allResults, best: bestResults } = useLessonResults(course.id);
   const isRe5 = course.id === RE5_COURSE_ID;
 
-  // One question-weighted score for the course, over the best attempt at each
-  // lesson. Null until something has been scored — 0% on an untouched course
-  // would be a lie, and this is the number a learner reads first.
   const overall = React.useMemo(
     () => courseScore(allResults, course.id),
     [allResults, course.id]
   );
 
-  /** Lessons that have content, i.e. the denominator a learner can actually reach. */
   const playableLessonCount = React.useMemo(
     () =>
       course.units.reduce(
@@ -231,12 +216,6 @@ export function CourseView({
     [course]
   );
 
-  // ── Progression logic ──────────────────────────────────────────────────────
-  // A lesson state is determined by LIVE PROGRESS, not the static comingSoon flag.
-  //   completed   → isLessonCompleted() is true
-  //   playable    → has steps AND (first in unit OR prev lesson completed)
-  //   locked      → has steps BUT prerequisite not yet done
-  //   coming_soon → no steps array at all (content not written yet)
   type LessonState = "completed" | "playable" | "locked" | "coming_soon";
 
   function getLessonState(
@@ -252,19 +231,9 @@ export function CourseView({
     if (isLessonCompleted(course.id, lesson.id)) return "completed";
     if (lessonIndex === 0) return "playable";
     const prevDone = isLessonCompleted(course.id, unitLessons[lessonIndex - 1].id);
-    const state = prevDone ? "playable" : "locked";
-    return state;
+    return prevDone ? "playable" : "locked";
   }
 
-  /**
-   * The grade chip under a lesson on the map.
-   *
-   * Score is FIRST-TRY accuracy (src/lib/results/score.ts): the mastery loop
-   * re-queues missed questions until they are right, so "% correct" would read
-   * 100% for every lesson and mean nothing. Mock exams lead with PASS/FAIL
-   * against the 33-of-50 mark, because that is the number a learner is
-   * actually deciding on.
-   */
   function lessonGrade(lessonId: string): ReactNode {
     const result = bestResults.get(`${course.id}:${lessonId}`);
     if (!result || result.totalQuestions === 0) return null;
@@ -322,11 +291,6 @@ export function CourseView({
           <p className="course-map-description">{course.description}</p>
         </div>
 
-        {/* Course score: the badge, and nothing to read. Question-weighted
-            over the best attempt at each lesson (courseScore in
-            src/lib/results/select.ts). The coverage fraction beside the label
-            is the one thing the percentage cannot carry on its own — 100%
-            built from one lesson out of fourteen is not a course score yet. */}
         {overall && (
           <div
             style={{
@@ -360,9 +324,6 @@ export function CourseView({
           </div>
         )}
 
-        {/* RE5 is a paid FSCA exam sitting — "am I ready to book?" is the
-            question this course exists to answer, so it gets a permanent
-            entry point rather than living only behind a finished mock. */}
         {isRe5 && (
           <button
             type="button"
@@ -419,7 +380,6 @@ export function CourseView({
                         '" first to unlock this lesson.',
                     });
                   } else {
-                    // "completed" or "playable", open the lesson
                     goToLesson(lesson.id);
                   }
                 };
@@ -428,6 +388,7 @@ export function CourseView({
                   <div key={lesson.id}>
                     <div
                       className={nodeClass}
+                      data-lesson-id={lesson.id}
                       onClick={handleClick}
                       style={{
                         cursor: state === "playable" || state === "completed" ? "pointer" : "default",
@@ -478,11 +439,10 @@ export function CourseView({
           </button>
         ) : (
           <p style={{ textAlign: "center", marginTop: 24, color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 600 }}>
-            You&apos;ve completed all courses!
+            You've completed all courses!
           </p>
         )}
 
-        {/* Lock / coming-soon modal */}
         {lockedModal && (
           <div
             onClick={() => setLockedModal(null)}
