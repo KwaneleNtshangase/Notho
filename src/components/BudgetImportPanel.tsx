@@ -69,6 +69,10 @@ const EXPENSE_CATS = [
   { id: "airtime", label: "Airtime & Data" },
   { id: "healthcare", label: "Healthcare" },
   { id: "education", label: "Education" },
+  { id: "shopping", label: "Shopping" },
+  { id: "travel", label: "Travel" },
+  { id: "transfers", label: "Transfers" },
+  { id: "business", label: "Business" },
   { id: "other", label: "Other" },
 ];
 
@@ -76,6 +80,7 @@ const INCOME_CATS = [
   { id: "salary", label: "Salary" },
   { id: "freelance", label: "Freelance" },
   { id: "business", label: "Business" },
+  { id: "transfers", label: "Transfers" },
   { id: "other-income", label: "Other Income" },
 ];
 
