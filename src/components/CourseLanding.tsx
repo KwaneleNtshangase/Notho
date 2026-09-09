@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { flattenCourseLessons, lastDoneLessonId, type CourseCursorInput } from "@/lib/courseCursor";
+import { lastDoneLessonId, type CourseCursorInput } from "@/lib/courseCursor";
 import { applyScroll, consumeCourseFocus, hasMeaningfulScroll, readScroll } from "@/lib/scrollMemory";
 
 /**
- * CourseView historically forced scroll-to-top on every visit. This companion
- * runs after that effect and puts the learner on the last lesson they
- * finished (Learn → Course) or on the exact map scroll they left
- * (Lesson → Course).
+ * Learn → Course: last completed lesson centered.
+ * Lesson → Course: exact map scroll from when the lesson was opened.
  */
 export function CourseLanding({
   course,
@@ -35,25 +33,25 @@ export function CourseLanding({
       if (cancelled) return;
       if (!fromLearn && hasMeaningfulScroll(saved) && saved) {
         applyScroll(saved);
-        return;
+        return true;
       }
       const focusId = lastDoneLessonId(course, isLessonCompleted);
-      if (!focusId) return;
-      const lessons = flattenCourseLessons(course);
-      const index = lessons.findIndex((lesson) => lesson.id === focusId);
-      if (index < 0) return;
-      const nodes = document.querySelectorAll(".course-map .lesson-node");
-      const node = nodes[index];
-      if (!(node instanceof HTMLElement)) return;
+      if (!focusId) return true;
+      const node = document.querySelector(
+        `.course-map .lesson-node[data-lesson-id="${CSS.escape(focusId)}"]`
+      );
+      if (!(node instanceof HTMLElement)) return false;
       node.scrollIntoView({ block: "center", behavior: "instant" });
+      return true;
     };
+
     run();
-    const later = window.setTimeout(run, 50);
+    const delays = [50, 150, 350, 700];
+    const timers = delays.map((ms) => window.setTimeout(run, ms));
     return () => {
       cancelled = true;
-      window.clearTimeout(later);
+      timers.forEach((id) => window.clearTimeout(id));
     };
-    // isLessonCompleted is represented by doneKey
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [course.id, doneKey, progressReady]);
 

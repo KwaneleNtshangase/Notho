@@ -5,6 +5,7 @@ import { CourseView } from "@/components/views/CourseView";
 import { CourseLanding } from "@/components/CourseLanding";
 import { useNotho } from "@/context/NothoContext";
 import { CONTENT_DATA } from "@/data/content";
+import { captureScroll, writeScroll } from "@/lib/scrollMemory";
 
 export default function CoursePage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = use(params);
@@ -22,6 +23,7 @@ export default function CoursePage({ params }: { params: Promise<{ courseId: str
         isLessonCompleted={isLessonCompleted}
         goBack={() => setRoute({ name: "learn" })}
         goToLesson={(lessonId) => {
+          writeScroll(`/course/${courseId}`, captureScroll());
           startLesson(courseId, lessonId);
         }}
       />
