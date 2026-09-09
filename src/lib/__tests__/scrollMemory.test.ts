@@ -10,8 +10,14 @@ import {
   writeScroll,
 } from "../scrollMemory";
 
-class MemoryStorage {
+class MemoryStorage implements Storage {
   private store = new Map<string, string>();
+  get length() {
+    return this.store.size;
+  }
+  key(index: number) {
+    return [...this.store.keys()][index] ?? null;
+  }
   getItem(key: string) {
     return this.store.has(key) ? this.store.get(key)! : null;
   }
@@ -28,12 +34,16 @@ class MemoryStorage {
 
 beforeAll(() => {
   const storage = new MemoryStorage();
-  const g = globalThis as typeof globalThis & {
-    window?: { sessionStorage: MemoryStorage };
-    sessionStorage?: MemoryStorage;
-  };
-  g.sessionStorage = storage;
-  g.window = { ...(g.window ?? {}), sessionStorage: storage };
+  Object.defineProperty(globalThis, "sessionStorage", {
+    value: storage,
+    configurable: true,
+    writable: true,
+  });
+  Object.defineProperty(globalThis, "window", {
+    value: { sessionStorage: storage },
+    configurable: true,
+    writable: true,
+  });
 });
 
 afterEach(() => {
