@@ -1,5 +1,6 @@
 import type { NormalizedTxn, ParsePdfResult } from "../types";
 import {
+  orderRowsFromOpening,
   orientByBalanceChain,
   reconcileBalanceChain,
   reconcileTransactions,
@@ -12,6 +13,7 @@ import {
   accountLabelFromBank,
   detectBankFromText,
   parseGenericPdfLayout,
+  refineAccountLabel,
 } from "./pdfGeneric";
 import {
   applyBankTemplate,
@@ -53,14 +55,6 @@ export async function parsePdfStatement(
     rows = mergeTemplateRows(generic.rows, templateRows, bankId);
   }
 
-  // Tier 3. Both tiers above need to RECOGNISE something - a known bank, or a
-  // column header we have seen before. A certified statement, a redesigned
-  // template or a bank we have never held an account at satisfies neither, and
-  // used to fall straight through as zero rows with no explanation.
-  //
-  // The last-resort parser assumes only that a transaction row has a date and
-  // an amount, which is what a statement is. It marks every row needsReview, so
-  // nothing it infers reaches the budget without the user confirming it.
   let usedLastResort = false;
   let refusedReason: string | undefined;
   if (rows.length === 0) {
@@ -72,9 +66,6 @@ export async function parsePdfStatement(
     }
   }
 
-  // Still nothing. Fail loudly, and attach the layout fingerprint so this is
-  // fixable from the bug report alone - see pdfFingerprint.ts for why we can
-  // send this without ever handling the statement itself.
   if (rows.length === 0) {
     const refused = refusedReason === "unreadable-signs";
     return {
@@ -88,29 +79,27 @@ export async function parsePdfStatement(
     };
   }
 
-  // The Discovery in-app layout has no per-row running balance - pull
-  // opening/closing from the account summary so reconciliation can still run.
   if (bankId === "discovery") {
     const dbal = extractDiscoveryBalances(lines);
     if (dbal.openingBalance !== undefined) generic.balances.openingBalance = dbal.openingBalance;
     if (dbal.closingBalance !== undefined) generic.balances.closingBalance = dbal.closingBalance;
   }
 
-  const accountLabel = accountLabelFromBank(bankId ?? detectBankFromText(fullText), options?.fileName);
+  const accountLabel = refineAccountLabel(
+    accountLabelFromBank(bankId ?? detectBankFromText(fullText), options?.fileName),
+    fullText
+  );
 
-  // Where the statement prints a running balance, let it audit our column
-  // reading: put the rows in the direction the chain agrees with, then check
-  // every sign against the bank's own arithmetic. Geometry proposes, the
-  // document disposes.
   const hasRunningBalance = rows.filter((r) => r.balanceAfter !== undefined).length >= 3;
   let signWarning: string | undefined;
 
-  // Detect credit-card statements from the document text. SA banks (Discovery,
-  // Capitec, FNB, Absa, Nedbank) all print at least one of these phrases.
   const isCreditCard = /credit\s*card|credit\s*limit|minimum\s*payment|available\s*credit|payment\s*due/i.test(fullText);
 
   if (hasRunningBalance) {
-    const oriented = orientByBalanceChain(rows);
+    const oriented =
+      generic.balances.openingBalance !== undefined
+        ? orderRowsFromOpening(rows, generic.balances.openingBalance)
+        : orientByBalanceChain(rows);
     const checked = verifySignsAgainstBalanceChain(
       oriented.rows,
       generic.balances.openingBalance,
@@ -131,12 +120,6 @@ export async function parsePdfStatement(
     }
   }
 
-  // Statements covering several accounts restart their balance chain at each
-  // account, so a single opening/closing pair does not describe the document.
-  //
-  // Counted by DISTINCT account number rather than by how often the words
-  // appear: "Account Number" is also a column heading in the summary table at
-  // the top, so counting occurrences flags an ordinary single-account statement.
   const accountNumbers = new Set(
     [...fullText.matchAll(/account\s+(?:number|no\.?)\s*:?\s*(\d[\d\s-]{5,})/gi)].map((m) =>
       m[1].replace(/[\s-]/g, "")
@@ -155,8 +138,6 @@ export async function parsePdfStatement(
     accountLabel,
   }));
 
-  // Standard Bank prints no closing-balance label - the last row's running
-  // balance IS the closing balance.
   let closingBalance = generic.balances.closingBalance;
   if (closingBalance === undefined && bankId === "standard-bank") {
     const last = transactions[transactions.length - 1];
@@ -165,19 +146,8 @@ export async function parsePdfStatement(
 
   const hasBalanceMeta =
     generic.balances.openingBalance !== undefined && closingBalance !== undefined;
-  // A last-resort parse is low confidence by definition: we recognised neither
-  // the bank nor the column layout, so the user must eyeball every row. A
-  // multi-account statement is low confidence for a different reason: the rows
-  // may be right, but nothing in the document verifies them end to end.
-  // When fewer than 3 rows carry a running balance, the chain audit could not
-  // run, so the sign assignment from column geometry is untested — low
-  // confidence even if the opening/closing arithmetic checks out.
   const lowConfidence = !hasBalanceMeta || usedLastResort || multiAccount || !hasRunningBalance;
 
-  // Chaining running balances is the strongest check available, but it only
-  // describes ONE account - a statement covering several restarts the chain at
-  // each, so asserting a single opening/closing pair over the whole document
-  // would report a break that is not there (or, worse, a false "reconciles").
   const canChainBalances =
     (bankId === "capitec" ||
       bankId === "fnb" ||
@@ -198,9 +168,6 @@ export async function parsePdfStatement(
         closingBalance: multiAccount ? undefined : closingBalance,
       });
 
-  // The Discovery in-app layout prints no per-row balance, so it reconciles on
-  // the signed sum instead (opening + sum = closing). The certified layout does
-  // print one and is chained above.
   if (
     bankId === "discovery" &&
     !hasRunningBalance &&
@@ -239,11 +206,6 @@ export async function parsePdfStatement(
     transactions,
     reconciliation,
     lowConfidence,
-    // Ship the layout fingerprint on a LOW-CONFIDENCE success too, not only on
-    // failure. This was the gap: a statement that parsed generically looked
-    // fine to the pipeline, so no diagnostics were sent, and the only way to
-    // support the layout properly was to ask the user for their statement.
-    // A parse we do not trust is exactly when we most need to see the shape.
     diagnostics: usedLastResort ? formatFingerprint(fingerprintLayout(lines)) : undefined,
   };
 }
