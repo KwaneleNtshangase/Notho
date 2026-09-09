@@ -18,6 +18,8 @@ export const STATIC_EXPENSE_CATEGORIES: Record<
   education: { name: "Education", color: "#2E7D32", group: "needs" },
   other: { name: "Other", color: "#9E9E9E", group: "unclassified" },
   transfers: { name: "Transfers", color: "#6B7280", group: "unclassified" },
+  shopping: { name: "Shopping", color: "#DB2777", group: "wants" },
+  travel: { name: "Travel", color: "#0891B2", group: "wants" },
 };
 
 export const STATIC_INCOME_CATEGORIES: Record<string, { name: string }> = {
