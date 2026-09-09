@@ -29,6 +29,12 @@ export const BUILT_IN_RULES: BuiltInRule[] = [
   { pattern: /\btapngo\b|\blift\b/i, category: "transport", type: "expense" },
   { pattern: /staff wages|village black|vb (staff|expenses)/i, category: "business", type: "expense" },
   { pattern: /pos cash|cshmr|autobank cash withdraw/i, category: "other", type: "expense" },
+  { pattern: /edreams|booking\.com|airbnb|\bflights?\b|kulula|flysafair|cemair|lift airlines/i, category: "travel", type: "expense" },
+  { pattern: /factory shop|fabric|curtain|decor|\btypo\b|\bpep\b|wholesale|logans|dryice/i, category: "shopping", type: "expense" },
+  { pattern: /bubble tea|\bpedros?\b|\beatery\b|\bcafe\b|cc fresh/i, category: "food", type: "expense" },
+  { pattern: /collision parts|panelbeat|\btyre\b|fitment/i, category: "transport", type: "expense" },
+  { pattern: /cash sent|immediate (business )?payment|\bdependants?\b/i, category: "Family", type: "expense" },
+  { pattern: /payshap payment received|external payshap|cellphone instant/i, category: "transfers", type: "expense" },
   { pattern: /\bfee[:\s]|bank charges?|service fee|admin fee|monthly (account )?(admin )?fee|cash (deposit|handling) fee|immediate payment fee|international (processing|transaction) fee|atm (fee|withdrawal fee)|external (payment|immediate) fee|cash sent fee|unpaid fee|other fees|notification fee|sms notification|value added service|balance enqu|card (replacement|delivery) fee|debit order (fee|dispute)|honou?ring fee|decline fee/i, category: "Bank Charges", type: "expense" },
   // ── Insurance ─────────────────────────────────────────────────────────
   { pattern: /insur|\binsure\b|outsurance|miway|mi way|king price|santam|hollard|dialdirect|naked insur|pineapple|budget insurance|1life|1 life|clientele|metropolitan.*(life|cover)|funeral (cover|plan)|life cover|short.?term cover|car insurance/i, category: "Insurance", type: "expense" },
@@ -58,7 +64,7 @@ export const BUILT_IN_RULES: BuiltInRule[] = [
   { pattern: /stokvel|\bsociety\b|grocery scheme|burial society/i, category: "Stokvel", type: "expense" },
   { pattern: /\btithe\b|\bchurch\b|\boffering\b|ministr|\bmosque\b|\bzakat\b/i, category: "Tithe", type: "expense" },
   { pattern: /\bgift\b|\bpresent\b|birthday|wedding gift|lobola/i, category: "Gifts", type: "expense" },
-  { pattern: /allowance|pocket money|black tax|school.*child|\bdependant\b/i, category: "Family", type: "expense" },
+  { pattern: /allowance|pocket money|black tax|school.*child|\bdependants?\b/i, category: "Family", type: "expense" },
   // ── Income ────────────────────────────────────────────────────────────
   { pattern: /salary|\bwages\b|payroll|stipend|remuneration|\bpay ?slip\b/i, category: "salary", type: "income" },
   { pattern: /freelance|\binvoice\b|consulting|commission/i, category: "freelance", type: "income" },
@@ -72,6 +78,7 @@ const UNCATEGORISED_INCOME = "other-income";
 const STATIC_IDS = new Set([
   "food", "transport", "housing", "debt", "savings", "entertainment",
   "airtime", "healthcare", "education", "other", "transfers",
+  "shopping", "travel",
   "salary", "freelance", "business", "other-income",
 ]);
 
@@ -96,13 +103,18 @@ function matchBuiltIn(text: string): BuiltInRule | null {
   return null;
 }
 
+const IGNORE_USER_PATTERN =
+  /^(transfer|transfers|trf|marsh|fee|fees|payment|debit|credit|bank|acc|int|ib)$/i;
+
 function matchUserRule(
   text: string,
   userRules: UserMerchantRule[]
 ): CategoriseResult | null {
   const norm = normaliseDescription(text);
   for (const rule of userRules) {
-    const pat = rule.merchant_pattern.toLowerCase();
+    const pat = rule.merchant_pattern.toLowerCase().trim();
+    // Branch names and bank verbs poison every row on a statement.
+    if (pat.length < 5 || IGNORE_USER_PATTERN.test(pat)) continue;
     if (norm.includes(pat) || text.toLowerCase().includes(pat)) {
       return { category: rule.category, type: rule.type, confidence: 0.95, source: "user" };
     }
@@ -111,7 +123,10 @@ function matchUserRule(
 }
 
 const TRANSFER_EITHER_WAY =
-  /fund transfers|int acnt trf|ib transfer|inter.?acc(?:ount| trans)|payshap pay by proxy|live better (round-?up|interest sweep)|own account transfer/i;
+  /fund transfers|int acnt trf|ib transfer|inter.?acc(?:ount| trans)|payshap pay by proxy|payshap payment received|live better (round-?up|interest sweep)|own account transfer|external payshap payment: kw/i;
+
+const HARD_BUSINESS = /staff wages|village black|vb (staff|expenses)/i;
+const HARD_FEE = /cash finance charge|#international|#electronic pmt|#inter acc|#fee - pos|\bbank charges?\b/i;
 
 export function categorise(
   txn: NormalizedTxn,
@@ -125,9 +140,8 @@ export function categorise(
   // or merchant words that don't reflect the money direction).
   const type: "income" | "expense" = txn.amountZAR >= 0 ? "income" : "expense";
 
-  const userMatch = matchUserRule(haystack, userRules);
-  if (userMatch && userMatch.type === type) return userMatch;
-
+  // Bank-operation text outranks Remember rules. A saved pattern like
+  // "marsh" or "transfer" would otherwise paint the whole statement.
   if (TRANSFER_EITHER_WAY.test(haystack)) {
     return {
       category: resolveCategory("transfers", type, customCategories),
@@ -136,6 +150,25 @@ export function categorise(
       source: "rule",
     };
   }
+  if (type === "expense" && HARD_FEE.test(haystack)) {
+    return {
+      category: resolveCategory("Bank Charges", type, customCategories),
+      type,
+      confidence: 0.9,
+      source: "rule",
+    };
+  }
+  if (type === "expense" && HARD_BUSINESS.test(haystack)) {
+    return {
+      category: resolveCategory("business", type, customCategories),
+      type,
+      confidence: 0.9,
+      source: "rule",
+    };
+  }
+
+  const userMatch = matchUserRule(haystack, userRules);
+  if (userMatch && userMatch.type === type) return userMatch;
 
   const builtIn = matchBuiltIn(haystack);
   if (builtIn && builtIn.type === type) {
