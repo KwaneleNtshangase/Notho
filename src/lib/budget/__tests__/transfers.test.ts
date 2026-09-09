@@ -66,6 +66,46 @@ describe("detectTransferPairs", () => {
     ];
     expect(detectTransferPairs(rows)).toHaveLength(0);
   });
+
+  it("does not pair an international fee with unrelated interest", () => {
+    const rows: PreviewTxn[] = [
+      previewTxn({
+        id: "d1",
+        amountZAR: -4.88,
+        date: "2026-08-31",
+        accountLabel: "Standard Bank",
+        description: "#INTERNATIONAL TXN FEE",
+      }),
+      previewTxn({
+        id: "c1",
+        amountZAR: 5.47,
+        date: "2026-08-31",
+        accountLabel: "Capitec",
+        description: "Interest Received",
+      }),
+    ];
+    expect(detectTransferPairs(rows)).toHaveLength(0);
+  });
+
+  it("does not pair two small same-day amounts with no transfer wording", () => {
+    const rows: PreviewTxn[] = [
+      previewTxn({
+        id: "d1",
+        amountZAR: -100,
+        date: "2026-08-24",
+        accountLabel: "Standard Bank",
+        description: "WOOLWORTHS CAPE",
+      }),
+      previewTxn({
+        id: "c1",
+        amountZAR: 100,
+        date: "2026-08-24",
+        accountLabel: "Capitec",
+        description: "Payment Received: Ukuthula Sithole",
+      }),
+    ];
+    expect(detectTransferPairs(rows)).toHaveLength(0);
+  });
 });
 
 describe("applyTransferPairs", () => {
