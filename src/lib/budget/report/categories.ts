@@ -17,6 +17,7 @@ export const STATIC_EXPENSE_CATEGORIES: Record<
   // same blue in the report chart. Now ΔE 39.6 from its nearest neighbour.
   education: { name: "Education", color: "#2E7D32", group: "needs" },
   other: { name: "Other", color: "#9E9E9E", group: "unclassified" },
+  transfers: { name: "Transfers", color: "#6B7280", group: "unclassified" },
 };
 
 export const STATIC_INCOME_CATEGORIES: Record<string, { name: string }> = {

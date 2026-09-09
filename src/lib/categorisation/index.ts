@@ -23,14 +23,20 @@ export type BuiltInRule = {
  */
 export const BUILT_IN_RULES: BuiltInRule[] = [
   // ── Bank charges & fees ───────────────────────────────────────────────
+  { pattern: /fund transfers|int acnt trf|ib transfer|inter.?acc(?:ount| trans)|payshap pay by proxy|live better (round-?up|interest sweep)|own account transfer/i, category: "transfers", type: "expense" },
+  { pattern: /cash finance charge|#international|#electronic pmt|#inter acc|#fee - pos/i, category: "Bank Charges", type: "expense" },
+  { pattern: /send money app/i, category: "Family", type: "expense" },
+  { pattern: /\btapngo\b|\blift\b/i, category: "transport", type: "expense" },
+  { pattern: /staff wages|village black|vb (staff|expenses)/i, category: "business", type: "expense" },
+  { pattern: /pos cash|cshmr|autobank cash withdraw/i, category: "other", type: "expense" },
   { pattern: /\bfee[:\s]|bank charges?|service fee|admin fee|monthly (account )?(admin )?fee|cash (deposit|handling) fee|immediate payment fee|international (processing|transaction) fee|atm (fee|withdrawal fee)|external (payment|immediate) fee|cash sent fee|unpaid fee|other fees|notification fee|sms notification|value added service|balance enqu|card (replacement|delivery) fee|debit order (fee|dispute)|honou?ring fee|decline fee/i, category: "Bank Charges", type: "expense" },
   // ── Insurance ─────────────────────────────────────────────────────────
   { pattern: /insur|\binsure\b|outsurance|miway|mi way|king price|santam|hollard|dialdirect|naked insur|pineapple|budget insurance|1life|1 life|clientele|metropolitan.*(life|cover)|funeral (cover|plan)|life cover|short.?term cover|car insurance/i, category: "Insurance", type: "expense" },
   // ── Healthcare / medical ──────────────────────────────────────────────
-  { pattern: /pharmacy|clicks|dis.?chem|medirite|hospital|mediclinic|netcare|life healthcare|\bdentist\b|\bdr[\.\s]|medical aid|discovery health|bonitas|momentum health|\bgems\b|optometr|physio|clinic/i, category: "healthcare", type: "expense" },
+  { pattern: /pharmacy|clicks|dis.?chem|medirite|hospital|mediclinic|netcare|life healthcare|\bdentist\b|\bdr\.\s+[a-z]|medical aid|discovery health|bonitas|momentum health|\bgems\b|optometr|physio|clinic/i, category: "healthcare", type: "expense" },
   // ── Groceries & food ──────────────────────────────────────────────────
   { pattern: /woolworth|woolies|checkers|pick ?n ?pay|\bpnp\b|shoprite|\bspar\b|superspar|kwikspar|\bboxer\b|food ?lover|\busave\b|\bmakro\b|game stores|fruit ?&? ?veg|butchery|spaza/i, category: "food", type: "expense" },
-  { pattern: /\bkfc\b|nando|mcdonald|steers|debonair|roman'?s pizza|chicken licken|\bwimpy\b|uber ?eats|\bmr ?d\b|\bspur\b|burger|pizza|takeaway|romans|fishaways|galito|ocean basket/i, category: "food", type: "expense" },
+  { pattern: /\bkfc\b|nando|mcdonald|steers|debonair|roman'?s pizza|chicken licken|\bwimpy\b|uber ?eats|\bmr ?d\b|\bspur\b|burger|pizza|takeaway|romans|fishaways|galito|ocean basket|\bkauai\b|juice guys|pick ?& ?save/i, category: "food", type: "expense" },
   // ── Fuel & transport ──────────────────────────────────────────────────
   { pattern: /\buber\b|\bbolt\b|gautrain|\btaxi\b|\bengen\b|\bshell\b|\bsasol\b|\bbp\b|caltex|total ?energies|astron|puma energy|\bpetrol\b|\bfuel\b|\bgarage\b|parking|\be.?toll\b|prepaid.*petrol/i, category: "transport", type: "expense" },
   // ── Airtime / data / telecoms ─────────────────────────────────────────
@@ -38,7 +44,7 @@ export const BUILT_IN_RULES: BuiltInRule[] = [
   // ── Streaming / entertainment ─────────────────────────────────────────
   { pattern: /netflix|\bdstv\b|multichoice|showmax|gogo dstv|disney|amazon prime|\bhbo\b|\bcinema\b|ster.?kinekor|nu metro|playstation|xbox|\bsteam\b|nintendo|spotify/i, category: "entertainment", type: "expense" },
   // ── Subscriptions / software ──────────────────────────────────────────
-  { pattern: /openai|chatgpt|apple\.com|\bitunes\b|google ?(play|storage|one)|\bicloud\b|microsoft|office ?365|\badobe\b|\bcanva\b|notion|github|dropbox|linkedin|\bzoom\b|grammarly|substack|patreon|subscription|recurring card purchase/i, category: "Subscriptions", type: "expense" },
+  { pattern: /openai|chatgpt|\bgrok\b|\bxai\b|apple\.com|\bitunes\b|google ?(play|storage|one)|\bicloud\b|microsoft|office ?365|\badobe\b|\bcanva\b|notion|github|dropbox|linkedin|\bzoom\b|grammarly|substack|patreon|subscription|recurring card purchase/i, category: "Subscriptions", type: "expense" },
   // ── Housing / utilities ───────────────────────────────────────────────
   { pattern: /\brent\b|lease|landlord|body corporate|\blevy\b|levies|municipal|\beskom\b|city of (cape town|joburg|johannesburg|tshwane|ekurhuleni|durban|ethekwini)|\brates\b|water (and|&) (lights|electricity)|prepaid electricity|home ?loan|\bbond\b/i, category: "housing", type: "expense" },
   // ── Education ─────────────────────────────────────────────────────────
@@ -65,7 +71,7 @@ const UNCATEGORISED_INCOME = "other-income";
 
 const STATIC_IDS = new Set([
   "food", "transport", "housing", "debt", "savings", "entertainment",
-  "airtime", "healthcare", "education", "other",
+  "airtime", "healthcare", "education", "other", "transfers",
   "salary", "freelance", "business", "other-income",
 ]);
 
@@ -104,6 +110,9 @@ function matchUserRule(
   return null;
 }
 
+const TRANSFER_EITHER_WAY =
+  /fund transfers|int acnt trf|ib transfer|inter.?acc(?:ount| trans)|payshap pay by proxy|live better (round-?up|interest sweep)|own account transfer/i;
+
 export function categorise(
   txn: NormalizedTxn,
   userRules: UserMerchantRule[] = [],
@@ -118,6 +127,15 @@ export function categorise(
 
   const userMatch = matchUserRule(haystack, userRules);
   if (userMatch && userMatch.type === type) return userMatch;
+
+  if (TRANSFER_EITHER_WAY.test(haystack)) {
+    return {
+      category: resolveCategory("transfers", type, customCategories),
+      type,
+      confidence: 0.9,
+      source: "rule",
+    };
+  }
 
   const builtIn = matchBuiltIn(haystack);
   if (builtIn && builtIn.type === type) {
