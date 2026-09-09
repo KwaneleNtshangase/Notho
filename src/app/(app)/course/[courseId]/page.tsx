@@ -2,12 +2,13 @@
 
 import React, { use } from "react";
 import { CourseView } from "@/components/views/CourseView";
+import { CourseLanding } from "@/components/CourseLanding";
 import { useNotho } from "@/context/NothoContext";
 import { CONTENT_DATA } from "@/data/content";
 
 export default function CoursePage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = use(params);
-  const { setRoute, isLessonCompleted, completedLessons, startLesson } = useNotho();
+  const { setRoute, isLessonCompleted, startLesson, progressReady } = useNotho();
   const course = CONTENT_DATA.courses.find(c => c.id === courseId);
 
   if (!course) {
@@ -15,16 +16,20 @@ export default function CoursePage({ params }: { params: Promise<{ courseId: str
   }
 
   return (
-    <CourseView
-      course={course}
-      isLessonCompleted={isLessonCompleted}
-      goBack={() => setRoute({ name: "learn" })}
-      goToLesson={(lessonId) => {
-        // startLesson resolves the lesson bank, tags question ids for the
-        // mastery loop, and navigates — every lesson entry point goes through
-        // it so banks + mastery behave identically everywhere.
-        startLesson(courseId, lessonId);
-      }}
-    />
+    <>
+      <CourseView
+        course={course}
+        isLessonCompleted={isLessonCompleted}
+        goBack={() => setRoute({ name: "learn" })}
+        goToLesson={(lessonId) => {
+          startLesson(courseId, lessonId);
+        }}
+      />
+      <CourseLanding
+        course={course}
+        isLessonCompleted={isLessonCompleted}
+        progressReady={progressReady}
+      />
+    </>
   );
 }
