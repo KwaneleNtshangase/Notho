@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ReactNode, MouseEvent } from "react";
+import Link from "next/link";
 
 type Item = {
   key: string;
@@ -8,7 +9,8 @@ type Item = {
   icon: ReactNode;
   isActive: boolean;
   onClick: () => void;
-  order: string; // tailwind order-* utility
+  order: string;
+  href?: string;
 };
 
 export function MobileBottomNav({
@@ -30,23 +32,47 @@ export function MobileBottomNav({
       aria-label="Bottom navigation"
     >
       <div className="nav-pill mx-auto flex max-w-[460px] flex-row items-stretch justify-between">
-        {items.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            className={["nav-pill-btn", item.order].join(" ")}
-            data-active={item.isActive ? "true" : "false"}
-            aria-current={item.isActive ? "page" : undefined}
-            onClick={item.onClick}
-          >
-            <span className="nav-ico" aria-hidden="true">
-              {item.icon}
-            </span>
-            <span className="nav-lbl">{item.label === "Quests" ? "Goals" : item.label}</span>
-          </button>
-        ))}
+        {items.map((item) => {
+          const className = ["nav-pill-btn", item.order].join(" ");
+          const handleClick = (e: MouseEvent<HTMLElement>) => {
+            e.preventDefault();
+            item.onClick();
+          };
+          if (item.href) {
+            return (
+              <Link
+                key={item.key}
+                href={item.href}
+                prefetch
+                className={className}
+                data-active={item.isActive ? "true" : "false"}
+                aria-current={item.isActive ? "page" : undefined}
+                onClick={handleClick}
+              >
+                <span className="nav-ico" aria-hidden="true">
+                  {item.icon}
+                </span>
+                <span className="nav-lbl">{item.label === "Quests" ? "Goals" : item.label}</span>
+              </Link>
+            );
+          }
+          return (
+            <button
+              key={item.key}
+              type="button"
+              className={className}
+              data-active={item.isActive ? "true" : "false"}
+              aria-current={item.isActive ? "page" : undefined}
+              onClick={item.onClick}
+            >
+              <span className="nav-ico" aria-hidden="true">
+                {item.icon}
+              </span>
+              <span className="nav-lbl">{item.label === "Quests" ? "Goals" : item.label}</span>
+            </button>
+          );
+        })}
       </div>
     </nav>
   );
 }
-

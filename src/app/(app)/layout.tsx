@@ -14,6 +14,8 @@ import {
 import { usePathname } from "next/navigation";
 import { StatsPanel } from "@/components/StatsPanel";
 import { NothoTopBar } from "@/components/NothoTopBar";
+import { PersistentAppTabs } from "@/components/PersistentAppTabs";
+import { isAppTabPath } from "@/lib/appTabs";
 import "../gestures.css";
 
 function AppNavigation() {
@@ -31,6 +33,7 @@ function AppNavigation() {
         {
           key: "learn",
           label: "Learn",
+          href: "/learn",
           icon: <NothoLearn size={24} className="text-current" />,
           isActive: is("/learn") || is("/course") || is("/lesson") || pathname === "/",
           onClick: () => handleNav("learn"),
@@ -39,6 +42,7 @@ function AppNavigation() {
         {
           key: "calculator",
           label: "Calculate",
+          href: "/calculator",
           icon: <NothoCalculate size={24} className="text-current" />,
           isActive: is("/calculator"),
           onClick: () => handleNav("calculator"),
@@ -47,6 +51,7 @@ function AppNavigation() {
         {
           key: "budget",
           label: "Budget",
+          href: "/budget",
           icon: <NothoBudget size={24} className="text-current" />,
           isActive: is("/budget"),
           onClick: () => handleNav("budget"),
@@ -55,6 +60,7 @@ function AppNavigation() {
         {
           key: "quests",
           label: "Goals",
+          href: "/quests",
           icon: <NothoGoals size={24} className="text-current" />,
           isActive: is("/quests"),
           onClick: () => handleNav("quests"),
@@ -63,6 +69,7 @@ function AppNavigation() {
         {
           key: "profile",
           label: "Profile",
+          href: "/profile",
           icon: <NothoProfile size={24} className="text-current" />,
           isActive: is("/profile") || is("/leaderboard"),
           onClick: () => handleNav("profile"),
@@ -84,6 +91,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isMockExam = /^\/lesson\/re5-exam-prep\/re5-mock-[ab](?:\/|$)/.test(
     pathname
   );
+  const onMainTab = isAppTabPath(pathname);
 
   return (
     <NothoProvider>
@@ -95,7 +103,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             style={{ display: 'flex', flexDirection: 'column' }}
           >
             {!isMockExam && <MobileTopBarWrapper />}
-            <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</div>
+            <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>
+              {onMainTab ? <PersistentAppTabs /> : children}
+            </div>
           </div>
           {(pathname === "/learn" || pathname === "/") && (
             <StatsPanelWrapper />
