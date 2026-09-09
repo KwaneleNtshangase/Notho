@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   COURSE_FOCUS_KEY,
   SCROLL_STORAGE_PREFIX,
@@ -10,12 +10,34 @@ import {
   writeScroll,
 } from "../scrollMemory";
 
-afterEach(() => {
-  try {
-    sessionStorage.clear();
-  } catch {
-    /* jsdom always has it */
+class MemoryStorage {
+  private store = new Map<string, string>();
+  getItem(key: string) {
+    return this.store.has(key) ? this.store.get(key)! : null;
   }
+  setItem(key: string, value: string) {
+    this.store.set(key, String(value));
+  }
+  removeItem(key: string) {
+    this.store.delete(key);
+  }
+  clear() {
+    this.store.clear();
+  }
+}
+
+beforeAll(() => {
+  const storage = new MemoryStorage();
+  const g = globalThis as typeof globalThis & {
+    window?: { sessionStorage: MemoryStorage };
+    sessionStorage?: MemoryStorage;
+  };
+  g.sessionStorage = storage;
+  g.window = { ...(g.window ?? {}), sessionStorage: storage };
+});
+
+afterEach(() => {
+  sessionStorage.clear();
 });
 
 describe("scrollStorageKey", () => {
