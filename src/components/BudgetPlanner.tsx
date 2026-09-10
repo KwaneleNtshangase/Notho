@@ -35,6 +35,7 @@ import {
   Building2,
   Car,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Copy,
@@ -282,6 +283,7 @@ export function BudgetView() {
   const [editDate, setEditDate] = useState("");
   const [editIsTransfer, setEditIsTransfer] = useState(false);
   const [editSaving, setEditSaving] = useState(false);
+  const [expandedBudgetCat, setExpandedBudgetCat] = useState<string | null>(null);
   // "Apply to similar" flow: after a category change, offer to recategorise
   // other transactions from the same merchant (and remember it for imports).
   const [similarPrompt, setSimilarPrompt] = useState<{
@@ -1453,22 +1455,35 @@ export function BudgetView() {
                     const pct = expenses > 0 ? (c.total / expenses) * 100 : 0;
                     const limit = budgetTargets[c.id];
                     const usagePct = limit ? (c.total / limit) * 100 : 0;
-                    const isAmber = limit && usagePct >= 80 && usagePct < 100;
-                    const isOver = limit && usagePct >= 100;
+                    const spentCents = Math.round(c.total * 100);
+                    const limitCents = limit ? Math.round(limit * 100) : 0;
+                    const isAmber = limitCents > 0 && spentCents >= Math.round(limitCents * 0.8) && spentCents < limitCents;
+                    const isOver = limitCents > 0 && spentCents > limitCents;
+                    const isOnBudget = limitCents > 0 && spentCents === limitCents;
+                    const catEntries = realEntries
+                      .filter((e) => e.type === "expense" && e.category === c.id)
+                      .sort((a, b) => b.entry_date.localeCompare(a.entry_date));
+                    const expanded = expandedBudgetCat === c.id;
                     return (
                       <div key={c.id} style={{ marginBottom: 14 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, fontSize: 13 }}>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedBudgetCat(expanded ? null : c.id)}
+                          style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, fontSize: 13, width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", textAlign: "left" }}
+                        >
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <ChevronDown size={14} style={{ transform: expanded ? "rotate(0deg)" : "rotate(-90deg)", transition: "transform 0.15s", color: "var(--color-text-secondary)", flexShrink: 0 }} />
                             <div style={{ width: 10, height: 10, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
                             <span style={{ fontWeight: 600 }}>{c.label}</span>
                             {isOver && <span style={{ fontSize: 10, fontWeight: 800, background: OVER_RED_SOFT, color: OVER_RED, borderRadius: 4, padding: "1px 5px" }}>OVER</span>}
+                            {isOnBudget && <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(0,122,133,0.12)", color: "#007A85", borderRadius: 4, padding: "1px 5px" }}>ON BUDGET</span>}
                             {isAmber && !isOver && <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(245,124,0,0.13)", color: "#F57C00", borderRadius: 4, padding: "1px 5px" }}>80%+</span>}
                           </div>
                           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                             <span style={{ fontSize: 11, fontWeight: 700, background: "var(--color-bg)", borderRadius: 6, padding: "2px 6px", color: "var(--color-text-secondary)" }}>{pct.toFixed(1)}%</span>
                             <span style={{ fontWeight: 800, color: isOver ? OVER_RED : "var(--color-text-primary)" }}>{formatRand(c.total)}</span>
                           </div>
-                        </div>
+                        </button>
                         {limit ? (
                           <div>
                             {/* Two-tone bar: the category colour fills up to the budget,
@@ -1487,13 +1502,38 @@ export function BudgetView() {
                             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3, fontSize: 11, color: "var(--color-text-secondary)" }}>
                               <span>{formatRand(c.total)} of {formatRand(limit)}</span>
                               <span style={{ color: isOver ? OVER_RED : isAmber ? "#F57C00" : "#007A85", fontWeight: 700 }}>
-                                {isOver ? `${formatRand(c.total - limit)} over` : `${formatRand(limit - c.total)} left`}
+                                {isOver ? `${formatRand(c.total - limit)} over` : isOnBudget ? "On budget" : `${formatRand(limit - c.total)} left`}
                               </span>
                             </div>
                           </div>
                         ) : (
                           <div style={{ height: 8, borderRadius: 4, background: "var(--color-border)", overflow: "hidden" }}>
                             <div style={{ height: "100%", borderRadius: 4, background: c.color, width: `${Math.min(100, pct)}%`, transition: "width 0.4s ease" }} />
+                          </div>
+                        )}
+                        {expanded && (
+                          <div style={{ marginTop: 8, border: "1px solid var(--color-border)", borderRadius: 10, overflow: "hidden" }}>
+                            {catEntries.length === 0 ? (
+                              <div style={{ padding: "10px 12px", fontSize: 12, color: "var(--color-text-secondary)" }}>No transactions in this category.</div>
+                            ) : catEntries.map((e) => (
+                              <button
+                                key={e.id}
+                                type="button"
+                                onClick={() => openEdit(e)}
+                                style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 12px", background: "var(--color-bg)", border: "none", borderBottom: "1px solid var(--color-border)", cursor: "pointer", textAlign: "left", color: "inherit" }}
+                              >
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {e.description || "No description"}
+                                  </div>
+                                  <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
+                                    {e.entry_date}
+                                  </div>
+                                </div>
+                                <div style={{ fontWeight: 800, fontSize: 12, flexShrink: 0 }}>-{formatRand(e.amount)}</div>
+                                <ChevronRight size={14} style={{ color: "var(--color-text-secondary)", flexShrink: 0 }} />
+                              </button>
+                            ))}
                           </div>
                         )}
                       </div>
