@@ -33,7 +33,7 @@ export const BUILT_IN_RULES: BuiltInRule[] = [
   { pattern: /factory shop|fabric|curtain|decor|\btypo\b|\bpep\b|wholesale|logans|dryice/i, category: "shopping", type: "expense" },
   { pattern: /bubble tea|\bpedros?\b|\beatery\b|\bcafe\b|cc fresh/i, category: "food", type: "expense" },
   { pattern: /collision parts|panelbeat|\btyre\b|fitment/i, category: "transport", type: "expense" },
-  { pattern: /cash sent|immediate (business )?payment|\bdependants?\b/i, category: "Family", type: "expense" },
+  { pattern: /cash sent|\bdependants?\b/i, category: "Family", type: "expense" },
   { pattern: /payshap payment received|external payshap|cellphone instant/i, category: "transfers", type: "expense" },
   { pattern: /\bfee[:\s]|bank charges?|service fee|admin fee|monthly (account )?(admin )?fee|cash (deposit|handling) fee|immediate payment fee|international (processing|transaction) fee|atm (fee|withdrawal fee)|external (payment|immediate) fee|cash sent fee|unpaid fee|other fees|notification fee|sms notification|value added service|balance enqu|card (replacement|delivery) fee|debit order (fee|dispute)|honou?ring fee|decline fee/i, category: "Bank Charges", type: "expense" },
   // ── Insurance ─────────────────────────────────────────────────────────
@@ -126,7 +126,7 @@ const TRANSFER_EITHER_WAY =
   /fund transfers|int acnt trf|ib transfer|inter.?acc(?:ount| trans)|payshap pay by proxy|payshap payment received|live better (round-?up|interest sweep)|own account transfer|external payshap payment: kw/i;
 
 const HARD_BUSINESS = /staff wages|village black|vb (staff|expenses)/i;
-const HARD_FEE = /cash finance charge|#international|#electronic pmt|#inter acc|#fee - pos|\bbank charges?\b/i;
+const HARD_FEE = /cash finance charge|#international|#electronic pmt|#inter acc|#fee - pos|\bbank charges?\b|fee immediate payment|immediate payment fee/i;
 
 export function categorise(
   txn: NormalizedTxn,

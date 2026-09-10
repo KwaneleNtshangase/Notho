@@ -159,14 +159,50 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
       const isIncome = row.categorisation.type === "income";
       const statics = isIncome ? INCOME_CATS : EXPENSE_CATS;
       const fallbackId = isIncome ? "other-income" : "other";
-      const custom = customCategories
-        .filter((c) => c.type === row.categorisation.type)
-        .map((c) => ({ id: c.id, label: c.name }));
-      const core = statics.filter((c) => c.id !== fallbackId);
+      // Custom categories with the same name as a built-in (e.g. "Business")
+      // replace the built-in so the dropdown does not list it twice.
+      const byLabel = new Map<string, { id: string; label: string }>();
+      for (const c of statics) {
+        if (c.id === fallbackId) continue;
+        byLabel.set(c.label.trim().toLowerCase(), c);
+      }
+      for (const c of customCategories.filter((c) => c.type === row.categorisation.type)) {
+        const key = c.name.trim().toLowerCase();
+        if (key === fallbackId.replace("-", " ") || key === "other" || key === "other income") continue;
+        byLabel.set(key, { id: c.id, label: c.name });
+      }
+      const list = [...byLabel.values()].sort((a, b) =>
+        a.label.localeCompare(b.label, undefined, { sensitivity: "base" })
+      );
       const fallback = statics.find((c) => c.id === fallbackId)!;
-      return [...core, ...custom, fallback];
+      return [...list, fallback];
     },
     [customCategories]
+  );
+
+  const categorySelectValue = useCallback(
+    (row: PreviewRow) => {
+      if (addingCategoryFor === row.id) return ADD_CATEGORY_VALUE;
+      const raw = row.categorisation.category;
+      const options = categoriesForRow(row);
+      if (options.some((o) => o.id === raw)) return raw;
+      const staticHit = [...EXPENSE_CATS, ...INCOME_CATS].find((c) => c.id === raw);
+      if (staticHit) {
+        const custom = customCategories.find(
+          (c) =>
+            c.type === row.categorisation.type &&
+            c.name.trim().toLowerCase() === staticHit.label.toLowerCase()
+        );
+        if (custom) return custom.id;
+      }
+      const byName = customCategories.find(
+        (c) =>
+          c.type === row.categorisation.type &&
+          c.name.trim().toLowerCase() === raw.trim().toLowerCase()
+      );
+      return byName?.id ?? raw;
+    },
+    [addingCategoryFor, categoriesForRow, customCategories]
   );
 
   const applyValidatedFiles = (incoming: File[]) => {
@@ -608,7 +644,50 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
   };
 
+  /** Strip bank-rail wording so "Payshap Off-Us Oledi" and "FNB App Payment To Oledi" compare as the same payee. */
+  const rememberPayload = (row: PreviewRow): string => {
+    const raw = `${row.rawMerchant ?? ""} ${row.description}`;
+    const stripped = raw.replace(
+      /\b(banking app|fnb app|payshap(id)?|account off-?us|external payshap|immediate (business )?payment|payment to|payment from|rtc pmt|send money app|cheque card purchase|pos purchase|debit|credit)\b/gi,
+      " "
+    );
+    return normaliseDescription(stripped);
+  };
+
+  const applyRememberAcrossImport = (source: PreviewRow, category: string) => {
+    const payload = rememberPayload(source);
+    setRows((prev) =>
+      prev.map((r) => {
+        if (r.id === source.id) {
+          return {
+            ...r,
+            categorisation: { ...r.categorisation, category },
+            categoryEdited: true,
+            rememberMerchant: true,
+          };
+        }
+        if (r.skipReason || r.isTransfer) return r;
+        if (r.categorisation.type !== source.categorisation.type) return r;
+        const other = rememberPayload(r);
+        const same =
+          (payload.length >= 5 && other.length >= 5 && (other === payload || other.includes(payload) || payload.includes(other))) ||
+          normaliseDescription(r.description) === normaliseDescription(source.description);
+        if (!same) return r;
+        return {
+          ...r,
+          categorisation: { ...r.categorisation, category },
+          categoryEdited: true,
+        };
+      })
+    );
+    setAddingCategoryFor(null);
+  };
+
   const handleCategoryChange = (row: PreviewRow, category: string) => {
+    if (row.rememberMerchant) {
+      applyRememberAcrossImport(row, category);
+      return;
+    }
     updateRow(row.id, {
       categorisation: { ...row.categorisation, category },
       categoryEdited: true,
@@ -887,11 +966,11 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                 ) : null
               ))}
               <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 0, lineHeight: 1.5 }}>
-                Edit a category below and tick <strong>Remember</strong> to teach future imports how to categorise that merchant.
+                Edit a category below and tick <strong>Remember</strong> to apply it to matching rows in this import and teach future imports.
               </p>
             </div>
 
-            <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "12px 20px 0", WebkitOverflowScrolling: "touch" }}>
+            <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "12px 20px 0", WebkitOverflowScrolling: "touch" }}>
 
             {transferPairs.length > 0 && (
               <div style={{ background: "rgba(0,122,133,0.06)", border: "1px solid rgba(0,122,133,0.25)", borderRadius: 10, padding: 14, marginBottom: 16 }}>
@@ -944,15 +1023,26 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                       }}
                     />
                   </div>
-                  <div style={{ overflowX: "auto" }}>
+                  <div>
                     <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
                       <thead>
-                        <tr style={{ textAlign: "left", borderBottom: "1px solid var(--color-border)" }}>
-                          <th style={{ padding: 8 }}>Date</th>
-                          <th style={{ padding: 8 }}>Description</th>
-                          <th style={{ padding: 8 }}>Amount</th>
-                          <th style={{ padding: 8 }}>Category</th>
-                          <th style={{ padding: 8 }} title="Save this merchant's category for next time.">Remember</th>
+                        <tr style={{ textAlign: "left" }}>
+                          {(["Date", "Description", "Amount", "Category", "Remember"] as const).map((label) => (
+                            <th
+                              key={label}
+                              title={label === "Remember" ? "Save this merchant's category for next time." : undefined}
+                              style={{
+                                padding: 8,
+                                position: "sticky",
+                                top: 0,
+                                zIndex: 2,
+                                background: "var(--color-surface)",
+                                boxShadow: "inset 0 -1px 0 var(--color-border)",
+                              }}
+                            >
+                              {label}
+                            </th>
+                          ))}
                         </tr>
                       </thead>
                       <tbody>
@@ -1002,11 +1092,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                               {!r.skipReason && !r.isTransfer && (
                                 <div>
                                   <select
-                                    value={
-                                      addingCategoryFor === r.id
-                                        ? ADD_CATEGORY_VALUE
-                                        : r.categorisation.category
-                                    }
+                                    value={categorySelectValue(r)}
                                     onChange={(e) => handleCategorySelect(r, e.target.value)}
                                     style={{ fontSize: 12, padding: 4, borderRadius: 6, maxWidth: 160, width: "100%" }}
                                   >
@@ -1049,7 +1135,13 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                                 <input
                                   type="checkbox"
                                   checked={r.rememberMerchant ?? false}
-                                  onChange={(e) => updateRow(r.id, { rememberMerchant: e.target.checked })}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      applyRememberAcrossImport(r, r.categorisation.category);
+                                    } else {
+                                      updateRow(r.id, { rememberMerchant: false });
+                                    }
+                                  }}
                                   aria-label={`Remember merchant for ${r.description}`}
                                 />
                               )}
