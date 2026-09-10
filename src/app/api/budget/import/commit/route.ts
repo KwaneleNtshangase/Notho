@@ -21,6 +21,68 @@ type CommitRow = {
   isTransfer?: boolean;
 };
 
+const OPTIONAL_COLUMNS = ["account_id", "entry_method"] as const;
+const PAGE = 1000;
+
+function isDuplicateError(e: { code?: string; message: string } | null): boolean {
+  if (!e) return false;
+  return e.code === "23505" || e.message.toLowerCase().includes("duplicate");
+}
+
+function isUnknownColumn(e: { code?: string; message: string }): string | null {
+  const m = e.message.match(/'([a-z_]+)' column|column [a-z_]+\.([a-z_]+) does not exist/i);
+  const named = m?.[1] ?? m?.[2] ?? null;
+  if (!named) return null;
+  return (OPTIONAL_COLUMNS as readonly string[]).includes(named) ? named : null;
+}
+
+async function loadExistingHashes(
+  admin: ReturnType<typeof createServiceSupabase>,
+  userId: string
+): Promise<Set<string>> {
+  const hashes = new Set<string>();
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await admin
+      .from("budget_entries")
+      .select("dedupe_hash")
+      .eq("user_id", userId)
+      .not("dedupe_hash", "is", null)
+      .range(from, from + PAGE - 1);
+    if (error) break;
+    const rows = data ?? [];
+    for (const r of rows) {
+      if (r.dedupe_hash) hashes.add(r.dedupe_hash as string);
+    }
+    if (rows.length < PAGE) break;
+  }
+  return hashes;
+}
+
+async function insertChunk(
+  admin: ReturnType<typeof createServiceSupabase>,
+  chunk: Record<string, unknown>[]
+): Promise<{ error: { code?: string; message: string } | null }> {
+  if (chunk.length === 0) return { error: null };
+  let { error } = await admin.from("budget_entries").insert(chunk);
+  if (error && isUnknownColumn(error)) {
+    const stripped = chunk.map((row) => {
+      const copy: Record<string, unknown> = { ...row };
+      for (const col of OPTIONAL_COLUMNS) delete copy[col];
+      return copy;
+    });
+    ({ error } = await admin.from("budget_entries").insert(stripped));
+  }
+  if (!error) return { error: null };
+  if (isDuplicateError(error)) {
+    if (chunk.length === 1) return { error: null };
+    const mid = Math.ceil(chunk.length / 2);
+    const left = await insertChunk(admin, chunk.slice(0, mid));
+    if (left.error && !isDuplicateError(left.error)) return left;
+    return insertChunk(admin, chunk.slice(mid));
+  }
+  return { error };
+}
+
 export async function POST(req: NextRequest) {
   const user = await getUserFromRequest(req);
   if (!user) {
@@ -40,16 +102,7 @@ export async function POST(req: NextRequest) {
 
   const allRows = body.rows ?? [];
   const admin = createServiceSupabase();
-
-  const { data: existingRows } = await admin
-    .from("budget_entries")
-    .select("dedupe_hash")
-    .eq("user_id", user.id)
-    .not("dedupe_hash", "is", null);
-
-  const existingHashes = new Set(
-    (existingRows ?? []).map((r) => r.dedupe_hash as string).filter(Boolean)
-  );
+  const existingHashes = await loadExistingHashes(admin, user.id);
 
   const rowsToInsert: CommitRow[] = [];
   const batchHashes = new Set<string>();
@@ -62,7 +115,11 @@ export async function POST(req: NextRequest) {
   }
 
   if (rowsToInsert.length === 0) {
-    return NextResponse.json({ error: "No new transactions to import" }, { status: 400 });
+    return NextResponse.json({
+      ok: true,
+      importedCount: 0,
+      skippedCount: allRows.length,
+    });
   }
 
   if (body.statementReconciliation && body.allTransactions) {
@@ -152,14 +209,19 @@ export async function POST(req: NextRequest) {
     .from("custom_budget_categories")
     .select("id")
     .eq("user_id", user.id);
-  const validCustomCatIds = new Set((customCats ?? []).map(c => c.id));
+  const validCustomCatIds = new Set((customCats ?? []).map((c) => c.id));
   const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
   const inserts = rowsToInsert.map((row) => {
     const { type, amount } = txnToBudgetEntryFields({ amountZAR: row.amountZAR });
 
     let safeCategory = row.category;
-    if (safeCategory && (safeCategory.toLowerCase().endsWith(".pdf") || safeCategory.toLowerCase().endsWith(".csv") || safeCategory.toLowerCase().endsWith(".ofx"))) {
+    if (
+      safeCategory &&
+      (safeCategory.toLowerCase().endsWith(".pdf") ||
+        safeCategory.toLowerCase().endsWith(".csv") ||
+        safeCategory.toLowerCase().endsWith(".ofx"))
+    ) {
       safeCategory = type === "income" ? "other-income" : "other";
     }
 
@@ -185,59 +247,13 @@ export async function POST(req: NextRequest) {
     };
   });
 
-  const OPTIONAL_COLUMNS = ["account_id", "entry_method"] as const;
-
-  const isUnknownColumn = (e: { code?: string; message: string }): string | null => {
-    const m = e.message.match(/'([a-z_]+)' column|column [a-z_]+\.([a-z_]+) does not exist/i);
-    const named = m?.[1] ?? m?.[2] ?? null;
-    if (!named) return null;
-    return (OPTIONAL_COLUMNS as readonly string[]).includes(named) ? named : null;
-  };
-
-  let insertError = (await admin.from("budget_entries").insert(inserts)).error;
-
-  if (insertError && (insertError.code === "23505" || insertError.message.toLowerCase().includes("duplicate"))) {
-    const { data: latest } = await admin
-      .from("budget_entries")
-      .select("dedupe_hash")
-      .eq("user_id", user.id)
-      .not("dedupe_hash", "is", null);
-    const nowExisting = new Set((latest ?? []).map((r) => r.dedupe_hash as string).filter(Boolean));
-    const retry = inserts.filter((row) => !nowExisting.has(row.dedupe_hash as string));
-    if (retry.length === 0) {
-      insertError = null;
-    } else {
-      insertError = (await admin.from("budget_entries").insert(retry)).error;
-    }
-  }
-
-  if (insertError && isUnknownColumn(insertError)) {
-    const missing = isUnknownColumn(insertError);
-    console.error(
-      `[schema-drift] budget_entries is missing '${missing}'. ` +
-        `Apply supabase/migrations/20260706122040_account_attribution.sql. ` +
-        `Saving ${inserts.length} entries without account attribution.`
-    );
-    const stripped = inserts.map((row) => {
-      const copy: Record<string, unknown> = { ...row };
-      for (const col of OPTIONAL_COLUMNS) delete copy[col];
-      return copy;
-    });
-    insertError = (await admin.from("budget_entries").insert(stripped)).error;
-  }
+  const { error: insertError } = await insertChunk(
+    admin,
+    inserts as unknown as Record<string, unknown>[]
+  );
 
   if (insertError) {
-    const isDuplicate =
-      insertError.code === "23505" ||
-      insertError.message.toLowerCase().includes("duplicate");
-    return NextResponse.json(
-      {
-        error: isDuplicate
-          ? "A transaction in this import already exists (dedupe conflict). Re-upload to refresh skips."
-          : insertError.message,
-      },
-      { status: isDuplicate ? 409 : 500 }
-    );
+    return NextResponse.json({ error: insertError.message }, { status: 500 });
   }
 
   const merchantRules = rowsToInsert
