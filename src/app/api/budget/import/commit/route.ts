@@ -51,9 +51,15 @@ export async function POST(req: NextRequest) {
     (existingRows ?? []).map((r) => r.dedupe_hash as string).filter(Boolean)
   );
 
-  const rowsToInsert = allRows.filter(
-    (r) => !r.skip && !r.skipReason && !existingHashes.has(r.dedupeHash)
-  );
+  const rowsToInsert: CommitRow[] = [];
+  const batchHashes = new Set<string>();
+  for (const r of allRows) {
+    if (r.skip || r.skipReason) continue;
+    if (!r.dedupeHash) continue;
+    if (existingHashes.has(r.dedupeHash) || batchHashes.has(r.dedupeHash)) continue;
+    batchHashes.add(r.dedupeHash);
+    rowsToInsert.push(r);
+  }
 
   if (rowsToInsert.length === 0) {
     return NextResponse.json({ error: "No new transactions to import" }, { status: 400 });
@@ -76,7 +82,6 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Block PDF import when statement reconciliation failed
   if (body.fileType === "pdf" && body.statementReconciliation && !body.statementReconciliation.ok) {
     return NextResponse.json(
       {
@@ -107,12 +112,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: batchError?.message ?? "Failed to create batch" }, { status: 500 });
   }
 
-  // Account attribution handling
   let accountId: string | null = null;
   const institutionName = body.accountLabel || "Unknown Bank";
-  
+
   if (institutionName) {
-    // 1. Try to find an existing bank account by name
     const { data: bankAccounts, error: findError } = await admin
       .from("bank_accounts")
       .select("id")
@@ -127,7 +130,6 @@ export async function POST(req: NextRequest) {
     if (bankAccounts && bankAccounts.length > 0) {
       accountId = bankAccounts[0].id;
     } else {
-      // 2. If it doesn't exist, create it
       const { data: newBank, error: createError } = await admin
         .from("bank_accounts")
         .insert({
@@ -137,7 +139,7 @@ export async function POST(req: NextRequest) {
         })
         .select("id")
         .single();
-        
+
       if (createError) {
         console.error("Error creating bank account:", createError);
       } else if (newBank) {
@@ -146,7 +148,6 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Fetch valid custom categories to prevent rogue UUIDs (like file/batch IDs) from being saved as categories
   const { data: customCats } = await admin
     .from("custom_budget_categories")
     .select("id")
@@ -156,23 +157,16 @@ export async function POST(req: NextRequest) {
 
   const inserts = rowsToInsert.map((row) => {
     const { type, amount } = txnToBudgetEntryFields({ amountZAR: row.amountZAR });
-    
-    // Prevent file names or UUID-like strings (like batch IDs) that end in extensions from being saved as categories
+
     let safeCategory = row.category;
     if (safeCategory && (safeCategory.toLowerCase().endsWith(".pdf") || safeCategory.toLowerCase().endsWith(".csv") || safeCategory.toLowerCase().endsWith(".ofx"))) {
       safeCategory = type === "income" ? "other-income" : "other";
     }
-    
-    // Prevent raw UUIDs that don't match a custom category ID (e.g. batch_id or file_id)
+
     if (safeCategory && UUID_REGEX.test(safeCategory) && !validCustomCatIds.has(safeCategory)) {
       safeCategory = type === "income" ? "other-income" : "other";
     }
 
-    // Belt and braces on every free-text field. PDF extraction is already
-    // sanitised at the source, but CSV and OFX exports arrive straight from the
-    // bank and can carry the same NUL bytes. One bad glyph anywhere in the
-    // batch makes Postgres reject ALL of it with "unsupported Unicode escape
-    // sequence", so a single stray character costs the user every row.
     const label = sanitiseText(row.accountLabel ?? body.accountLabel ?? "");
     return {
       user_id: user.id,
@@ -191,24 +185,9 @@ export async function POST(req: NextRequest) {
     };
   });
 
-  /**
-   * Schema-drift tolerance. This is not defensive programming for its own sake:
-   * migration 20260706122040_account_attribution.sql sat unapplied on
-   * production for four weeks, and because this insert named account_id and
-   * entry_method unconditionally, PostgREST rejected the ENTIRE batch. Every
-   * statement import in production failed at the final step, after parsing
-   * hundreds of rows correctly. The reads in BudgetPlanner already degraded
-   * gracefully for exactly this reason; the write did not, so the write is
-   * what broke.
-   *
-   * Account attribution is a nice-to-have. The transactions are the point. If
-   * the columns are missing we drop them and save the money, rather than
-   * throwing away a correct parse over metadata.
-   */
   const OPTIONAL_COLUMNS = ["account_id", "entry_method"] as const;
 
   const isUnknownColumn = (e: { code?: string; message: string }): string | null => {
-    // PGRST204 on write, 42703 from Postgres directly. Both name the column.
     const m = e.message.match(/'([a-z_]+)' column|column [a-z_]+\.([a-z_]+) does not exist/i);
     const named = m?.[1] ?? m?.[2] ?? null;
     if (!named) return null;
@@ -216,6 +195,21 @@ export async function POST(req: NextRequest) {
   };
 
   let insertError = (await admin.from("budget_entries").insert(inserts)).error;
+
+  if (insertError && (insertError.code === "23505" || insertError.message.toLowerCase().includes("duplicate"))) {
+    const { data: latest } = await admin
+      .from("budget_entries")
+      .select("dedupe_hash")
+      .eq("user_id", user.id)
+      .not("dedupe_hash", "is", null);
+    const nowExisting = new Set((latest ?? []).map((r) => r.dedupe_hash as string).filter(Boolean));
+    const retry = inserts.filter((row) => !nowExisting.has(row.dedupe_hash as string));
+    if (retry.length === 0) {
+      insertError = null;
+    } else {
+      insertError = (await admin.from("budget_entries").insert(retry)).error;
+    }
+  }
 
   if (insertError && isUnknownColumn(insertError)) {
     const missing = isUnknownColumn(insertError);
