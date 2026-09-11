@@ -123,6 +123,14 @@ type CustomBudgetCat = {
   type: "expense" | "income";
 };
 
+type BudgetCatOption = {
+  id: string;
+  label: string;
+  color: string;
+  tag: string;
+  Icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
+};
+
 // ─── Icon palette ─────────────────────────────────────────────────────────────
 
 const ICON_PICKER_OPTIONS: { name: string; Icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }> }[] = [
@@ -566,48 +574,53 @@ export function BudgetView() {
     if (editingCatId === id) resetCustomCatForm();
   };
 
-  const allExpCats = useMemo(() => {
-    const statics = BUDGET_EXPENSE_CATS.filter(c => c.id !== "other").map(c => ({ ...c }));
-    const custom = customCats.filter(c => c.type === "expense").map(c => ({
-      id: c.id, label: c.name, color: c.color, tag: "custom" as const, Icon: getIconByName(c.icon_name),
+  const allExpCats = useMemo((): BudgetCatOption[] => {
+    const statics: BudgetCatOption[] = BUDGET_EXPENSE_CATS.filter((c) => c.id !== "other").map((c) => ({
+      id: c.id, label: c.label, color: c.color, tag: c.tag, Icon: c.Icon,
     }));
-    const other = BUDGET_EXPENSE_CATS.find(c => c.id === "other")!;
+    const custom: BudgetCatOption[] = customCats.filter((c) => c.type === "expense").map((c) => ({
+      id: c.id, label: c.name, color: c.color, tag: "custom", Icon: getIconByName(c.icon_name),
+    }));
+    const other: BudgetCatOption = (() => {
+      const o = BUDGET_EXPENSE_CATS.find((c) => c.id === "other")!;
+      return { id: o.id, label: o.label, color: o.color, tag: o.tag, Icon: o.Icon };
+    })();
 
-    const knownIds = new Set([...statics.map(s => s.id), ...custom.map(c => c.id), "other", "transfer", "transfers"]);
-    const historicalIds = new Set(
-      yearEntries.filter(e => e.type === "expense" && !knownIds.has(e.category)).map(e => e.category)
-    );
-    const historical = Array.from(historicalIds).map(id => ({
-      id, label: id, color: "#9E9E9E", tag: "historical" as const, Icon: getIconByName("MoreHorizontal"),
+    const knownIds = new Set([...statics.map((s) => s.id), ...custom.map((c) => c.id), "other", "transfer", "transfers"]);
+    const historical: BudgetCatOption[] = Array.from(new Set(
+      yearEntries.filter((e) => e.type === "expense" && !knownIds.has(e.category)).map((e) => e.category)
+    )).map((id) => ({
+      id, label: id, color: "#9E9E9E", tag: "historical", Icon: getIconByName("MoreHorizontal"),
     }));
 
-    const byLabel = new Map<string, (typeof statics)[number] | (typeof custom)[number] | (typeof historical)[number]>();
+    const byLabel = new Map<string, BudgetCatOption>();
     for (const c of [...statics, ...historical, ...custom]) {
       const key = c.label.trim().toLowerCase();
       const prev = byLabel.get(key);
-      if (!prev || ("tag" in c && c.tag === "custom")) byLabel.set(key, c);
+      if (!prev || c.tag === "custom") byLabel.set(key, c);
     }
     const merged = [...byLabel.values()].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
     return [...merged, other];
   }, [customCats, yearEntries]);
 
-  const allIncCats = useMemo(() => {
-    const statics = BUDGET_INCOME_CATS.map(c => ({ ...c }));
-    const custom = customCats.filter(c => c.type === "income").map(c => ({
-      id: c.id, label: c.name, color: c.color, Icon: getIconByName(c.icon_name),
+  const allIncCats = useMemo((): BudgetCatOption[] => {
+    const statics: BudgetCatOption[] = BUDGET_INCOME_CATS.map((c) => ({
+      id: c.id, label: c.label, color: c.color, tag: "income", Icon: c.Icon,
     }));
-    const knownIds = new Set([...statics.map(s => s.id), ...custom.map(c => c.id), "transfer", "transfers"]);
-    const historicalIds = new Set(
-      yearEntries.filter(e => e.type === "income" && !knownIds.has(e.category)).map(e => e.category)
-    );
-    const historical = Array.from(historicalIds).map(id => ({
-      id, label: id, color: "#9E9E9E", Icon: getIconByName("MoreHorizontal"),
+    const custom: BudgetCatOption[] = customCats.filter((c) => c.type === "income").map((c) => ({
+      id: c.id, label: c.name, color: c.color, tag: "custom", Icon: getIconByName(c.icon_name),
     }));
-    const byLabel = new Map<string, { id: string; label: string; color?: string; Icon: (typeof statics)[number]["Icon"] }>();
+    const knownIds = new Set([...statics.map((s) => s.id), ...custom.map((c) => c.id), "transfer", "transfers"]);
+    const historical: BudgetCatOption[] = Array.from(new Set(
+      yearEntries.filter((e) => e.type === "income" && !knownIds.has(e.category)).map((e) => e.category)
+    )).map((id) => ({
+      id, label: id, color: "#9E9E9E", tag: "historical", Icon: getIconByName("MoreHorizontal"),
+    }));
+    const byLabel = new Map<string, BudgetCatOption>();
     for (const c of [...statics, ...historical, ...custom]) {
       const key = c.label.trim().toLowerCase();
       const prev = byLabel.get(key);
-      if (!prev || custom.some((x) => x.id === c.id)) byLabel.set(key, c);
+      if (!prev || c.tag === "custom") byLabel.set(key, c);
     }
     return [...byLabel.values()].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
   }, [customCats, yearEntries]);
@@ -1910,7 +1923,7 @@ export function BudgetView() {
               <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Category</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 {(editType === "expense" ? allExpCats : allIncCats).map((c) => {
-                  const color = ("color" in c && c.color) ? c.color : "#007A85";
+                  const color = c.color;
                   const selected = editCategory === c.id;
                   return (
                   <button key={c.id} type="button" onClick={() => setEditCategory(c.id)}
@@ -2098,7 +2111,7 @@ export function BudgetView() {
                   <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Category</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     {(addType === "expense" ? allExpCats : allIncCats).map((c) => {
-                      const color = ("color" in c && c.color) ? c.color : "#007A85";
+                      const color = c.color;
                       const selected = addCategory === c.id;
                       return (
                       <button key={c.id} type="button" onClick={() => setAddCategory(c.id)}
