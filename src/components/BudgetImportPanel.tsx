@@ -970,7 +970,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               </p>
             </div>
 
-            <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "12px 20px 0", WebkitOverflowScrolling: "touch" }}>
+            <div style={{ flexShrink: 0, padding: "8px 20px 0" }}>
 
             {transferPairs.length > 0 && (
               <div style={{ background: "rgba(0,122,133,0.06)", border: "1px solid rgba(0,122,133,0.25)", borderRadius: 10, padding: 14, marginBottom: 16 }}>
@@ -1003,11 +1003,36 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               </div>
             )}
 
+            </div>
+
+            <div
+              style={{
+                flexShrink: 0,
+                display: "grid",
+                gridTemplateColumns: "88px minmax(0,1fr) 96px 168px 72px",
+                gap: 0,
+                padding: "8px 20px",
+                background: "var(--color-surface)",
+                borderBottom: "1px solid var(--color-border)",
+                fontSize: 12,
+                fontWeight: 800,
+                color: "var(--color-text-secondary)",
+              }}
+            >
+              {(["Date", "Description", "Amount", "Category", "Remember"] as const).map((label) => (
+                <div key={label} title={label === "Remember" ? "Save this merchant's category for next time." : undefined}>
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "0 20px 8px", WebkitOverflowScrolling: "touch" }}>
+
             {[...groupedByFile.entries()].map(([fileName, fileRows]) => {
               const meta = fileMetas.find((m) => m.fileName === fileName);
               return (
                 <div key={fileName} style={{ marginBottom: 20 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0 6px", flexWrap: "wrap" }}>
                     <span style={{ fontWeight: 800, fontSize: 13 }}>{fileName}</span>
                     {meta?.bankHint && (
                       <span style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>({meta.bankHint})</span>
@@ -1024,32 +1049,18 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                     />
                   </div>
                   <div>
-                    <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr style={{ textAlign: "left" }}>
-                          {(["Date", "Description", "Amount", "Category", "Remember"] as const).map((label) => (
-                            <th
-                              key={label}
-                              title={label === "Remember" ? "Save this merchant's category for next time." : undefined}
-                              style={{
-                                padding: 8,
-                                position: "sticky",
-                                top: 0,
-                                zIndex: 2,
-                                background: "var(--color-surface)",
-                                boxShadow: "inset 0 -1px 0 var(--color-border)",
-                              }}
-                            >
-                              {label}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
+                    <div style={{ width: "100%", fontSize: 12 }}>
+                      <div>
                         {fileRows.map((r) => (
-                          <tr key={r.id} style={{ opacity: r.skipReason || r.isTransfer ? 0.45 : 1 }}>
-                            <td style={{ padding: 8 }}>{r.date}</td>
-                            <td style={{ padding: 8, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis" }}>
+                          <div key={r.id} style={{
+                            display: "grid",
+                            gridTemplateColumns: "88px minmax(0,1fr) 96px 168px 72px",
+                            alignItems: "center",
+                            opacity: r.skipReason || r.isTransfer ? 0.45 : 1,
+                            borderBottom: "1px solid var(--color-border)",
+                          }}>
+                            <div style={{ padding: 8 }}>{r.date}</div>
+                            <div style={{ padding: 8, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>
                               {r.description}
                               {r.possibleDuplicate ? (
                                 <span style={{ display: "block", fontSize: 10, color: "#F57C00", marginTop: 2 }}>
@@ -1072,8 +1083,8 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                               {selectiveNeedsReview(r, meta) && !r.skipReason && !r.possibleDuplicate && (
                                 <span style={{ display: "block", fontSize: 10, color: "#F57C00" }}>Needs review</span>
                               )}
-                            </td>
-                            <td
+                            </div>
+                            <div
                               style={{
                                 padding: 8,
                                 fontWeight: 700,
@@ -1087,8 +1098,8 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                             >
                               {r.amountZAR < 0 ? "-" : "+"}
                               {formatRand(Math.abs(r.amountZAR))}
-                            </td>
-                            <td style={{ padding: 8 }}>
+                            </div>
+                            <div style={{ padding: 8 }}>
                               {!r.skipReason && !r.isTransfer && (
                                 <div>
                                   <select
@@ -1129,8 +1140,8 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                                   )}
                                 </div>
                               )}
-                            </td>
-                            <td style={{ padding: 8, textAlign: "center" }}>
+                            </div>
+                            <div style={{ padding: 8, textAlign: "center" }}>
                               {!r.skipReason && !r.isTransfer && r.categoryEdited && (
                                 <input
                                   type="checkbox"
@@ -1145,11 +1156,11 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                                   aria-label={`Remember merchant for ${r.description}`}
                                 />
                               )}
-                            </td>
-                          </tr>
+                            </div>
+                          </div>
                         ))}
-                      </tbody>
-                    </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
