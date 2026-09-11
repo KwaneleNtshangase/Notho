@@ -33,7 +33,8 @@ const config: CapacitorConfig = {
 
   ios: {
     contentInset: "always",
-    backgroundColor: "#0a0a0a",
+    // Match the web splash so there is no dark flash while WKWebView paints.
+    backgroundColor: "#ffffff",
     // Identifies the shell in your server logs and lets you branch on native.
     appendUserAgent: "NothoApp/iOS",
     limitsNavigationsToAppBoundDomains: false,
@@ -47,8 +48,10 @@ const config: CapacitorConfig = {
 
   plugins: {
     SplashScreen: {
-      launchShowDuration: 1200,
-      backgroundColor: "#0a0a0a",
+      // iOS already shows LaunchScreen.storyboard while the process starts.
+      // Do not add a second timed native splash before AuthGate's Notho splash.
+      launchShowDuration: 0,
+      backgroundColor: "#ffffff",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
     },
