@@ -123,6 +123,14 @@ type CustomBudgetCat = {
   type: "expense" | "income";
 };
 
+type BudgetCatOption = {
+  id: string;
+  label: string;
+  color: string;
+  tag: string;
+  Icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
+};
+
 // ─── Icon palette ─────────────────────────────────────────────────────────────
 
 const ICON_PICKER_OPTIONS: { name: string; Icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }> }[] = [
@@ -196,15 +204,20 @@ const BUDGET_EXPENSE_CATS = [
   { id: "entertainment", label: "Entertainment",     color: "#7C4DFF", tag: "wants",   Icon: Tv },
   { id: "airtime",       label: "Airtime & Data",    color: "#F57C00", tag: "needs",   Icon: Smartphone },
   { id: "healthcare",    label: "Healthcare",        color: "#C2185B", tag: "needs",   Icon: Heart },
-  { id: "education",     label: "Education",         color: "#1976D2", tag: "needs",   Icon: GraduationCap },
+  { id: "education",     label: "Education",         color: "#2E7D32", tag: "needs",   Icon: GraduationCap },
+  { id: "shopping",      label: "Shopping",          color: "#DB2777", tag: "wants",   Icon: Shirt },
+  { id: "travel",        label: "Travel",            color: "#0891B2", tag: "wants",   Icon: Plane },
+  { id: "transfers",     label: "Transfers",         color: "#6B7280", tag: "other",   Icon: ArrowLeftRight },
+  { id: "business",      label: "Business",          color: "#6366F1", tag: "other",   Icon: Briefcase },
   { id: "other",         label: "Other",             color: "#9E9E9E", tag: "other",   Icon: MoreHorizontal },
 ] as const;
 
 const BUDGET_INCOME_CATS = [
-  { id: "salary",       label: "Salary / Wages",   Icon: Briefcase },
-  { id: "freelance",    label: "Freelance",         Icon: Zap },
-  { id: "business",     label: "Business Income",  Icon: Building2 },
-  { id: "other-income", label: "Other Income",     Icon: Wallet },
+  { id: "salary",       label: "Salary / Wages",  color: "#007A85", Icon: Briefcase },
+  { id: "freelance",    label: "Freelance",        color: "#7C4DFF", Icon: Zap },
+  { id: "business",     label: "Business Income", color: "#6366F1", Icon: Building2 },
+  { id: "transfers",    label: "Transfers",        color: "#6B7280", Icon: ArrowLeftRight },
+  { id: "other-income", label: "Other Income",    color: "#9E9E9E", Icon: Wallet },
 ] as const;
 
 // ─── Swipeable transaction row (mobile: swipe left to reveal Delete) ───────────
@@ -561,37 +574,55 @@ export function BudgetView() {
     if (editingCatId === id) resetCustomCatForm();
   };
 
-  const allExpCats = useMemo(() => {
-    const statics = BUDGET_EXPENSE_CATS.filter(c => c.id !== "other");
-    const custom = customCats.filter(c => c.type === "expense").map(c => ({
-      id: c.id, label: c.name, color: c.color, tag: "custom" as const, Icon: getIconByName(c.icon_name),
+  const allExpCats = useMemo((): BudgetCatOption[] => {
+    const statics: BudgetCatOption[] = BUDGET_EXPENSE_CATS.filter((c) => c.id !== "other").map((c) => ({
+      id: c.id, label: c.label, color: c.color, tag: c.tag, Icon: c.Icon,
     }));
-    const other = BUDGET_EXPENSE_CATS.find(c => c.id === "other")!;
+    const custom: BudgetCatOption[] = customCats.filter((c) => c.type === "expense").map((c) => ({
+      id: c.id, label: c.name, color: c.color, tag: "custom", Icon: getIconByName(c.icon_name),
+    }));
+    const other: BudgetCatOption = (() => {
+      const o = BUDGET_EXPENSE_CATS.find((c) => c.id === "other")!;
+      return { id: o.id, label: o.label, color: o.color, tag: o.tag, Icon: o.Icon };
+    })();
 
-    const knownIds = new Set([...statics.map(s => s.id), ...custom.map(c => c.id), "other", "transfer"]);
-    const historicalIds = new Set(
-      yearEntries.filter(e => e.type === "expense" && !knownIds.has(e.category)).map(e => e.category)
-    );
-    const historical = Array.from(historicalIds).map(id => ({
-      id, label: id, color: "#9E9E9E", tag: "historical" as const, Icon: getIconByName("MoreHorizontal"),
+    const knownIds = new Set([...statics.map((s) => s.id), ...custom.map((c) => c.id), "other", "transfer", "transfers"]);
+    const historical: BudgetCatOption[] = Array.from(new Set(
+      yearEntries.filter((e) => e.type === "expense" && !knownIds.has(e.category)).map((e) => e.category)
+    )).map((id) => ({
+      id, label: id, color: "#9E9E9E", tag: "historical", Icon: getIconByName("MoreHorizontal"),
     }));
 
-    return [...statics, ...custom, ...historical, other];
+    const byLabel = new Map<string, BudgetCatOption>();
+    for (const c of [...statics, ...historical, ...custom]) {
+      const key = c.label.trim().toLowerCase();
+      const prev = byLabel.get(key);
+      if (!prev || c.tag === "custom") byLabel.set(key, c);
+    }
+    const merged = [...byLabel.values()].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
+    return [...merged, other];
   }, [customCats, yearEntries]);
 
-  const allIncCats = useMemo(() => {
-    const custom = customCats.filter(c => c.type === "income").map(c => ({
-      id: c.id, label: c.name, Icon: getIconByName(c.icon_name),
+  const allIncCats = useMemo((): BudgetCatOption[] => {
+    const statics: BudgetCatOption[] = BUDGET_INCOME_CATS.map((c) => ({
+      id: c.id, label: c.label, color: c.color, tag: "income", Icon: c.Icon,
     }));
-    const knownIds = new Set([...BUDGET_INCOME_CATS.map(s => s.id), ...custom.map(c => c.id), "transfer"]);
-    const historicalIds = new Set(
-      yearEntries.filter(e => e.type === "income" && !knownIds.has(e.category)).map(e => e.category)
-    );
-    const historical = Array.from(historicalIds).map(id => ({
-      id, label: id, Icon: getIconByName("MoreHorizontal"),
+    const custom: BudgetCatOption[] = customCats.filter((c) => c.type === "income").map((c) => ({
+      id: c.id, label: c.name, color: c.color, tag: "custom", Icon: getIconByName(c.icon_name),
     }));
-
-    return [...BUDGET_INCOME_CATS, ...custom, ...historical];
+    const knownIds = new Set([...statics.map((s) => s.id), ...custom.map((c) => c.id), "transfer", "transfers"]);
+    const historical: BudgetCatOption[] = Array.from(new Set(
+      yearEntries.filter((e) => e.type === "income" && !knownIds.has(e.category)).map((e) => e.category)
+    )).map((id) => ({
+      id, label: id, color: "#9E9E9E", tag: "historical", Icon: getIconByName("MoreHorizontal"),
+    }));
+    const byLabel = new Map<string, BudgetCatOption>();
+    for (const c of [...statics, ...historical, ...custom]) {
+      const key = c.label.trim().toLowerCase();
+      const prev = byLabel.get(key);
+      if (!prev || c.tag === "custom") byLabel.set(key, c);
+    }
+    return [...byLabel.values()].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
   }, [customCats, yearEntries]);
 
   const openSetBudget = (scope: "default" | "month" = monthIsCustomised ? "month" : "default") => {
@@ -1891,13 +1922,17 @@ export function BudgetView() {
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Category</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                {(editType === "expense" ? allExpCats : allIncCats).map((c) => (
+                {(editType === "expense" ? allExpCats : allIncCats).map((c) => {
+                  const color = c.color;
+                  const selected = editCategory === c.id;
+                  return (
                   <button key={c.id} type="button" onClick={() => setEditCategory(c.id)}
-                    style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${editCategory === c.id ? "var(--color-primary)" : "var(--color-border)"}`, background: editCategory === c.id ? "rgba(0,122,133,0.08)" : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
-                    <c.Icon size={14} style={{ color: "var(--color-primary)", flexShrink: 0 }} aria-hidden />
+                    style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${selected ? color : "var(--color-border)"}`, background: selected ? `${color}22` : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
+                    <c.Icon size={14} style={{ color, flexShrink: 0 }} aria-hidden />
                     <span>{c.label}</span>
                   </button>
-                ))}
+                  );
+                })}
                 <button type="button" onClick={() => { resetCustomCatForm(); setNewCatType(editType === "income" ? "income" : "expense"); setShowAddCustomCat(true); }}
                   style={{ marginTop: 2, padding: "11px 12px", borderRadius: 10, cursor: "pointer", border: "2px dashed var(--color-border)", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontWeight: 700, fontSize: 13, color: "var(--color-text-secondary)" }}>
                   <Plus size={15} aria-hidden /> Add a category
@@ -2075,13 +2110,17 @@ export function BudgetView() {
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Category</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                    {(addType === "expense" ? allExpCats : allIncCats).map((c) => (
+                    {(addType === "expense" ? allExpCats : allIncCats).map((c) => {
+                      const color = c.color;
+                      const selected = addCategory === c.id;
+                      return (
                       <button key={c.id} type="button" onClick={() => setAddCategory(c.id)}
-                        style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${addCategory === c.id ? "var(--color-primary)" : "var(--color-border)"}`, background: addCategory === c.id ? "rgba(0,122,133,0.08)" : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
-                        <c.Icon size={14} style={{ color: "var(--color-primary)", flexShrink: 0 }} aria-hidden />
+                        style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${selected ? color : "var(--color-border)"}`, background: selected ? `${color}22` : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
+                        <c.Icon size={14} style={{ color, flexShrink: 0 }} aria-hidden />
                         <span>{c.label}</span>
                       </button>
-                    ))}
+                      );
+                    })}
                     <button type="button" onClick={() => { resetCustomCatForm(); setNewCatType(addType === "income" ? "income" : "expense"); setShowAddCustomCat(true); }}
                       style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: "2px dashed var(--color-border)", background: "transparent", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-secondary)", textAlign: "left" }}>
                       <Plus size={14} style={{ flexShrink: 0 }} aria-hidden /> <span>Add category</span>
