@@ -6,8 +6,8 @@ Before replying:
 
 1. Upload a screen recording made on the physical iPhone 13 Pro Max running iOS 26.5.2.
 2. Use the recording checklist below and begin with a cold launch from the Home Screen.
-3. Upload the corrected build after the launch-screen change. Xcode Cloud should assign the next available build number (expected: 4).
-4. Put the same seven answers in **App Review Information → Notes** so they remain available on future submissions.
+3. In Xcode, archive and upload the corrected build after the launch-screen change. Use the next available build number (expected: 4); Xcode Cloud is not currently configured for this app.
+4. Put the same six answers in **App Review Information → Notes** so they remain available on future submissions.
 5. Confirm that the demo credentials still work immediately before resubmitting.
 
 ## Response to paste in Resolution Center
@@ -22,17 +22,17 @@ Attached is a recording captured on an iPhone 13 Pro Max running iOS 26.5.2. It 
 
 Notho has no purchases or subscriptions and no public user-generated content. The recording also shows the Face ID prompt used to protect the Budget area. The app does not request location, contacts, camera, microphone, photo-library, or App Tracking Transparency access.
 
-**2. Tested devices and operating systems**
+Tested device and operating system:
 
 - Physical iPhone 13 Pro Max — iOS 26.5.2
 
-**3. Purpose and target audience**
+**2. Purpose and target audience**
 
 Notho is a financial-literacy education and personal budgeting app for South Africans aged 13 and older. It helps users learn practical money concepts in short interactive lessons, understand their spending by importing their own bank statements, build a budget, generate plain-language reports, and ask an optional AI education assistant questions about aggregate budget categories.
 
 The app addresses the lack of locally relevant financial education by using South African terminology, rands, local banking formats, and South African examples. Notho does not provide financial, investment, tax, or legal advice; recommend financial products; execute transactions; connect to bank accounts; or request banking credentials.
 
-**4. Setup and access instructions**
+**3. Setup and access instructions**
 
 No special hardware, VPN, organization membership, or regional configuration is required. Internet access is required for authentication and synchronization.
 
@@ -56,7 +56,7 @@ Suggested review path:
 
 Sign in with Apple, Google, and Facebook are optional alternatives to email sign-in. On iOS, these flows open the provider authorization page in the system browser and return to the app through its registered callback.
 
-**5. External services, tools, and platforms**
+**4. External services, tools, and platforms**
 
 - **Supabase:** email and OAuth authentication, PostgreSQL data storage, synchronization, and server-side functions.
 - **Apple Sign in with Apple:** optional authentication.
@@ -70,11 +70,11 @@ Sign in with Apple, Google, and Facebook are optional alternatives to email sign
 
 Notho has no advertising network, payment processor, in-app purchase provider, bank-data aggregator, or bank-account connection.
 
-**6. Regional differences**
+**5. Regional differences**
 
 The app’s functionality is consistent in every territory where it is available; it does not use geofencing or location-based feature restrictions. Its educational content and examples are intentionally designed for South Africa and use rands, South African terminology, and local regulatory context. Statement parsing is optimized for common South African bank formats, with a general parser for other supported PDF, CSV, OFX, and QFX files. These are content and format differences, not restrictions on access.
 
-**7. Regulated industry and protected third-party material**
+**6. Regulated industry and protected third-party material**
 
 Notho provides general financial education and personal budgeting tools only. The Solution Org (Pty) Ltd is not a financial services provider, and the app does not provide individualized financial advice, recommend or sell financial products, execute transactions, hold customer funds, connect to bank accounts, or request banking credentials. This limitation is disclosed in the app, App Store description, Terms, and Privacy Policy. Therefore, no financial-services authorization is required for the functionality provided.
 
@@ -109,4 +109,4 @@ Keep the video concise but complete (roughly 4–7 minutes), with no cuts that m
 - Because the launch storyboard was corrected after build 3, upload and select a new build rather than resubmitting build 3.
 - Keep the demo account active, populated, and exempt from expiring credentials for the entire review.
 - Make all backend services available to App Review.
-- If iPad remains in the supported device family, complete and record a separate physical-iPad smoke test when a device is available, then add its exact model and iPadOS version to answer 2.
+- If iPad remains in the supported device family, complete and record a separate physical-iPad smoke test when a device is available, then add its exact model and iPadOS version under answer 1.
