@@ -83,14 +83,14 @@ export function MobileBottomNav({
         }}
         aria-label="Bottom navigation"
         onTouchStart={(event) => {
-          if (event.changedTouches.length !== 1) return;
-          const t = event.changedTouches[0];
+          if (event.touches.length !== 1) return;
+          const t = event.touches[0];
           swipeRef.current = { x: t.clientX, y: t.clientY, locked: "none" };
         }}
         onTouchMove={(event) => {
           const start = swipeRef.current;
           if (!start || start.locked === "v") return;
-          const t = event.changedTouches[0];
+          const t = event.touches[0];
           if (!t) return;
           const dx = t.clientX - start.x;
           const dy = t.clientY - start.y;
