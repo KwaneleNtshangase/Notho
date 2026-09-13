@@ -31,7 +31,7 @@ export function TextSizeControl() {
         <div>
           <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>Text size</div>
           <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
-            System follows iPhone Display &amp; Text Size and Per-App Settings
+            Follows the phone, capped so buttons and tabs stay in place
           </div>
         </div>
       </div>

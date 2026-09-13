@@ -1,7 +1,53 @@
-/* Tailwind preflight sets -webkit-text-size-adjust: 100%, which blocks
-   iOS Settings → Display & Text Size and Per-App Settings. Override it. */
+/* Honour OS text size only up to 115%. Unbounded auto + document zoom
+   clipped CTAs and stacked tab/card copy one word per line. */
 html {
-  -webkit-text-size-adjust: auto !important;
-  text-size-adjust: auto !important;
-  font: -apple-system-body;
+  -webkit-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+html[data-text-scale="sm"] {
+  -webkit-text-size-adjust: 92% !important;
+  text-size-adjust: 92% !important;
+}
+html[data-text-scale="lg"] {
+  -webkit-text-size-adjust: 115% !important;
+  text-size-adjust: 115% !important;
+}
+
+/* Chrome / Android: a modest font bump without zooming the layout box. */
+html[data-text-scale="lg"] body {
+  font-size: 106%;
+}
+html[data-text-scale="sm"] body {
+  font-size: 96%;
+}
+
+/* Keep chrome intact when type grows. */
+.bottom-nav,
+.nav-pill,
+.nav-pill-btn,
+.nav-lbl {
+  white-space: nowrap;
+}
+.nav-pill-btn {
+  min-width: 0;
+  flex: 1 1 0;
+  overflow: hidden;
+}
+.nav-lbl {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+button,
+.btn,
+.option-button,
+[role="button"] {
+  white-space: nowrap;
+}
+.btn,
+button.btn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
