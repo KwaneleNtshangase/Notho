@@ -1,14 +1,11 @@
 /**
  * Follow the OS text size, but never at the cost of layout.
- *
  * Whole-page zoom + unbounded text-size-adjust:auto made cards, CTAs and
- * the tab bar fall apart (one word per line, clipped buttons). We honour
- * Dynamic Type only up to MAX_SCALE and we never zoom the document.
+ * the tab bar fall apart. Honour Dynamic Type only up to MAX_TEXT_SCALE.
  */
 
 export const TEXT_SCALE_KEY = "notho-text-scale";
 
-/** Hard cap. Above this, iOS accessibility sizes destroy composed layouts. */
 export const MAX_TEXT_SCALE = 1.15;
 
 export const TEXT_SCALES = ["system", "sm", "md", "lg"] as const;
@@ -59,8 +56,8 @@ function measureSystemScale(): number {
 
 function applyAdjust(root: HTMLElement, factor: number): void {
   const pct = `${Math.round(factor * 100)}%`;
-  root.style.setProperty("-webkit-text-size-adjust", pct);
-  root.style.setProperty("text-size-adjust", pct);
+  root.style.setProperty("-webkit-text-size-adjust", pct, "important");
+  root.style.setProperty("text-size-adjust", pct, "important");
   root.style.setProperty("--notho-text-scale", String(factor));
   const style = root.style as CSSStyleDeclaration & { zoom?: string };
   style.zoom = "";
@@ -85,7 +82,7 @@ export function persistTextScale(scale: TextScale): void {
 
 export const TEXT_SCALE_BOOT_SCRIPT = `(function(){try{
 var r=document.documentElement;
-r.style.setProperty("-webkit-text-size-adjust","100%");
-r.style.setProperty("text-size-adjust","100%");
+r.style.setProperty("-webkit-text-size-adjust","100%","important");
+r.style.setProperty("text-size-adjust","100%","important");
 r.style.zoom="";
 }catch(e){}})();`;
