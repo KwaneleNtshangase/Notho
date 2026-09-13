@@ -1,6 +1,5 @@
-/* Frosted-glass bottom nav.
-   Kills the white fade-scrim and drop-shadow glow. Content scrolls through
-   the pill the way WhatsApp, Instagram and YouVersion do. */
+/* YouVersion-style liquid glass bottom nav.
+   Floating capsule. Content shows through. Active tab is a sliding glass lens. */
 
 .bottom-nav {
   background: transparent !important;
@@ -19,25 +18,124 @@
 }
 
 .nav-pill {
+  position: relative;
   isolation: isolate;
-  background: rgba(255, 255, 255, 0.58) !important;
-  -webkit-backdrop-filter: saturate(180%) blur(22px) !important;
-  backdrop-filter: saturate(180%) blur(22px) !important;
-  border: 0.5px solid rgba(255, 255, 255, 0.42) !important;
-  box-shadow: none !important;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.42) !important;
+  -webkit-backdrop-filter: saturate(190%) blur(28px) !important;
+  backdrop-filter: saturate(190%) blur(28px) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.55) !important;
+  border-radius: 999px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.12) !important;
   filter: none !important;
+  padding: 4px !important;
+}
+
+.nav-lens {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 30% 18%, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.18) 42%, rgba(255, 255, 255, 0.08) 100%);
+  -webkit-backdrop-filter: saturate(200%) blur(16px);
+  backdrop-filter: saturate(200%) blur(16px);
+  border: 0.5px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 0 0 0.5px rgba(180, 140, 255, 0.18),
+    0 0 0 1px rgba(80, 210, 255, 0.12);
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 160ms ease;
+  will-change: transform, width, height;
+}
+
+.nav-lens::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 80, 180, 0.16),
+    transparent 28%,
+    transparent 62%,
+    rgba(60, 200, 255, 0.16)
+  );
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+
+.nav-press-lens {
+  position: absolute;
+  z-index: 0;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.08) 70%, transparent 100%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 0 0 0.5px rgba(255, 160, 220, 0.25),
+    0 0 0 1px rgba(80, 210, 255, 0.18);
+  animation: nav-press-pop 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes nav-press-pop {
+  0% { transform: scale(0.55); opacity: 0; }
+  40% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.55; }
+}
+
+.nav-pill-btn {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
 }
 
 .nav-pill-btn[data-active="true"] {
-  background: rgba(0, 122, 133, 0.14) !important;
+  background: transparent !important;
+  color: var(--color-text-primary) !important;
+}
+
+.nav-pill-btn[data-active="true"] .nav-ico {
+  transform: scale(1.06);
 }
 
 html.dark .nav-pill {
-  background: rgba(22, 22, 24, 0.55) !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
-  box-shadow: none !important;
+  background: rgba(28, 28, 30, 0.46) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.24) !important;
+}
+
+html.dark .nav-lens {
+  background:
+    radial-gradient(120% 90% at 30% 18%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.03) 100%);
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 html.dark .nav-pill-btn[data-active="true"] {
-  background: rgba(32, 211, 207, 0.16) !important;
+  color: #f4f4f5 !important;
+  background: transparent !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-lens,
+  .nav-press-lens {
+    transition: none !important;
+    animation: none !important;
+  }
 }
