@@ -13,7 +13,7 @@ export type ClassifiedError = {
 };
 
 const ABORT_MESSAGE =
-  /operation has been aborted|the operation was aborted|aborterror|registration aborted/i;
+  /operation has been aborted|the operation was aborted|aborterror|registration aborted|abort due to cancellation of share|share canceled|share cancelled/i;
 
 const NETWORK_BLIP =
   /^(a )?network error occurred\.?$|^failed to fetch$|^load failed$|^the internet connection appears to be offline\.?$|^networkerror when attempting to fetch resource\.?$/i;
