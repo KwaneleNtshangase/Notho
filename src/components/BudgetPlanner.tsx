@@ -1810,24 +1810,37 @@ export function BudgetView() {
                 <X size={20} />
               </button>
             </div>
-            <div style={{ flex: 1, position: "relative", minHeight: 240, background: "var(--color-bg)" }}>
-              {!pdfFrameReady && (
+            <div style={{ flex: 1, position: "relative", minHeight: 240, background: "var(--color-bg)", overflow: "auto" }}>
+              {typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches ? (
                 <div style={{
-                  position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-                  alignItems: "center", justifyContent: "center", gap: 8, padding: 24, textAlign: "center",
-                  color: "var(--color-text-secondary)", fontSize: 14, fontWeight: 600, zIndex: 1,
+                  minHeight: "100%", display: "flex", flexDirection: "column",
+                  alignItems: "center", justifyContent: "center", gap: 10, padding: 28, textAlign: "center",
                 }}>
-                  Preparing your report…
-                  <span style={{ fontWeight: 500, fontSize: 12 }}>This can take a few seconds on a phone.</span>
+                  <div style={{ fontWeight: 800, fontSize: 18 }}>Your report is ready</div>
+                  <p style={{ margin: 0, fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.45, maxWidth: 320 }}>
+                    Phones cannot paint the PDF pages in this sheet. Use Share or Save PDF to open, send, or keep the file.
+                  </p>
                 </div>
+              ) : (
+                <>
+                  {!pdfFrameReady && (
+                    <div style={{
+                      position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+                      alignItems: "center", justifyContent: "center", gap: 8, padding: 24, textAlign: "center",
+                      color: "var(--color-text-secondary)", fontSize: 14, fontWeight: 600, zIndex: 1,
+                    }}>
+                      Preparing your report…
+                    </div>
+                  )}
+                  <iframe
+                    title="Budget report preview"
+                    src={pdfPreview.url}
+                    sandbox="allow-same-origin"
+                    onLoad={() => setPdfFrameReady(true)}
+                    style={{ width: "100%", height: "100%", border: "none", background: "transparent", opacity: pdfFrameReady ? 1 : 0 }}
+                  />
+                </>
               )}
-              <iframe
-                title="Budget report preview"
-                src={pdfPreview.url}
-                sandbox="allow-same-origin"
-                onLoad={() => setPdfFrameReady(true)}
-                style={{ width: "100%", height: "100%", border: "none", background: "transparent", opacity: pdfFrameReady ? 1 : 0 }}
-              />
             </div>
             <div style={{ display: "flex", gap: 10, padding: "12px 16px max(16px, env(safe-area-inset-bottom))", borderTop: "1px solid var(--color-border)", flexShrink: 0 }}>
               <button
