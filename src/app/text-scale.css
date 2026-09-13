@@ -1,28 +1,10 @@
-/* Honour OS text size only up to 115%. Unbounded auto + document zoom
-   clipped CTAs and stacked tab/card copy one word per line. */
+/* Cap, do not zoom. Tailwind preflight uses 100%; we keep that as the
+   floor and let applyTextScale raise it only as far as 115%. */
 html {
-  -webkit-text-size-adjust: 100% !important;
-  text-size-adjust: 100% !important;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-html[data-text-scale="sm"] {
-  -webkit-text-size-adjust: 92% !important;
-  text-size-adjust: 92% !important;
-}
-html[data-text-scale="lg"] {
-  -webkit-text-size-adjust: 115% !important;
-  text-size-adjust: 115% !important;
-}
-
-/* Chrome / Android: a modest font bump without zooming the layout box. */
-html[data-text-scale="lg"] body {
-  font-size: 106%;
-}
-html[data-text-scale="sm"] body {
-  font-size: 96%;
-}
-
-/* Keep chrome intact when type grows. */
 .bottom-nav,
 .nav-pill,
 .nav-pill-btn,
