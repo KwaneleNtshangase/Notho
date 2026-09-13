@@ -1189,55 +1189,6 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                           </div>
                           );
                         })}
-                                    <option value={ADD_CATEGORY_VALUE}>+ Add category</option>
-                                  </select>
-                                  {addingCategoryFor === r.id && (
-                                    <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-                                      <input
-                                        type="text"
-                                        value={newCategoryName}
-                                        onChange={(e) => setNewCategoryName(e.target.value)}
-                                        placeholder="Category name"
-                                        style={{
-                                          flex: 1, fontSize: 12, padding: "6px 8px", borderRadius: 6,
-                                          border: "1px solid var(--color-border)",
-                                        }}
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") void handleSaveNewCategory(r);
-                                        }}
-                                      />
-                                      <button
-                                        type="button"
-                                        className="btn btn-primary"
-                                        style={{ padding: "6px 10px", fontSize: 11 }}
-                                        disabled={savingCategory || !newCategoryName.trim()}
-                                        onClick={() => void handleSaveNewCategory(r)}
-                                      >
-                                        <Plus size={12} aria-hidden />
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                            <div style={{ padding: 8, textAlign: "center" }}>
-                              {!r.skipReason && !r.isTransfer && r.categoryEdited && (
-                                <input
-                                  type="checkbox"
-                                  checked={r.rememberMerchant ?? false}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      applyRememberAcrossImport(r, r.categorisation.category);
-                                    } else {
-                                      updateRow(r.id, { rememberMerchant: false });
-                                    }
-                                  }}
-                                  aria-label={`Remember merchant for ${r.description}`}
-                                />
-                              )}
-                            </div>
-                          </div>
-                        ))}
                       </div>
                     </div>
                   </div>
