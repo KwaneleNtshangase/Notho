@@ -9,13 +9,8 @@ import { isNativeShell } from "@/lib/nativeShell";
  * This suppresses the browser's own install nudge (the `beforeinstallprompt`
  * mini-infobar / omnibox icon) so it can never surface inside the WebView.
  *
- * There's no custom "add to home screen" banner component in this codebase
- * today (only the pwaInstallPromptShown/pwaInstalled analytics events in
- * lib/analytics.ts, which are dead code until one exists) - if one is added
- * later, gate its render on `!isNativeShell()` the same way.
- *
- * Renders nothing; mount once near the root layout, alongside
- * NativeAuthDeepLink.
+ * Also pins the viewport so focusing a text field does not zoom the app
+ * the way Safari does on the open web.
  */
 export function NativeShellGuards() {
   useEffect(() => {
@@ -25,7 +20,18 @@ export function NativeShellGuards() {
       event.preventDefault();
     };
     window.addEventListener("beforeinstallprompt", suppressInstallPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", suppressInstallPrompt);
+
+    const meta = document.querySelector('meta[name="viewport"]');
+    const previous = meta?.getAttribute("content") ?? "";
+    meta?.setAttribute(
+      "content",
+      "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    );
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", suppressInstallPrompt);
+      if (meta && previous) meta.setAttribute("content", previous);
+    };
   }, []);
 
   return null;
