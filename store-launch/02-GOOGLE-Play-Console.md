@@ -67,8 +67,8 @@ Questions or feedback: support@notho.co.za
 
 | Asset | File |
 |---|---|
-| App icon (512×512) | `store-launch/03-icons/store/play-store-icon-512.png` |
-| Feature graphic (1024×500) | `store-launch/04-graphics/play-feature-graphic-1024x500.png` |
+| App icon (512×512) | `Logos/png/store/notho-play-store-icon-512.png` |
+| Feature graphic (1024×500) | Create from the current artwork and save under `store-launch/assets/` |
 | Phone screenshots (min 2, max 8) | `store-launch/05-screenshots/final/android-phone/` |
 
 ---

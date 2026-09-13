@@ -6,8 +6,8 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 RES = ROOT / "android" / "app" / "src" / "main" / "res"
-APP_ICON = ROOT / "brand" / "app-icon" / "notho-appicon-light-1024.png"
-MARK = ROOT / "brand" / "png" / "notho-icon-mark-1024w.png"
+APP_ICON = ROOT / "Logos" / "png" / "app-icon" / "notho-app-icon-light-1024.png"
+MARK = ROOT / "Logos" / "png" / "app-icon" / "notho-app-icon-dark-1024.png"
 
 
 def build() -> None:

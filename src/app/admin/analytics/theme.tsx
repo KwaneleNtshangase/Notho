@@ -9,7 +9,7 @@
  * needs. Everything here is scoped under .nv-root so it cannot leak into the
  * learner-facing app, which has its own theme variables.
  *
- * Colour comes from brand/BRAND.md. The dark theme is the default because this
+ * Colour comes from Logos/README.md. The dark theme is the default because this
  * is a screen you stare at late at night; the light theme is one click away and
  * is the one to use for screenshots in a funding deck.
  */

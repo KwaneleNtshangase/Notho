@@ -4,7 +4,7 @@ Use this for the September 2026 “Information Needed — New App Submission” 
 
 Before replying:
 
-1. Upload a screen recording made on the physical iPhone 13 Pro Max running iOS 26.5.2.
+1. Upload one compiled video whose footage was recorded on the physical iPhone 13 Pro Max running iOS 26.5.2.
 2. Use the recording checklist below and begin with a cold launch from the Home Screen.
 3. In Xcode, archive and upload the corrected build after the launch-screen change. Use the next available build number (expected: 4); Xcode Cloud is not currently configured for this app.
 4. Put the same six answers in **App Review Information → Notes** so they remain available on future submissions.
@@ -88,7 +88,7 @@ The Solution Org (Pty) Ltd
 
 ## Physical-device recording checklist
 
-Keep the video concise but complete (roughly 4–7 minutes), with no cuts that make the flow unclear.
+Keep the video concise but complete (roughly 4–7 minutes). It may be assembled from multiple physical-device recordings, but submit it as one file. Use short title cards or clean cuts between sections, keep actions in their original order within each demonstrated flow, and do not omit error states or edit the footage in a way that could misrepresent the app. Do not mix in simulator footage.
 
 - Start from the iPhone Home Screen and cold-launch Notho.
 - Show the corrected startup: no Capacitor logo; the first logo shown is Notho.

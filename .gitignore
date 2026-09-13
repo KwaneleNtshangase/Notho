@@ -36,6 +36,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Local Codex worktrees (separate checkouts, never part of the app)
+/.worktrees/
+
+# Xcode per-machine workspace checks
+**/IDEWorkspaceChecks.plist
+
 # Google OAuth credentials - never commit
 client_secret_*.json
 
