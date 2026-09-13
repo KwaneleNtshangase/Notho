@@ -4,7 +4,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
-import { cacheFilePreviewUrl, shareFileBlob } from "@/lib/nativeShare";
+import { shareFileBlob } from "@/lib/nativeShare";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
@@ -369,6 +369,7 @@ export function BudgetView() {
   const [exportLoading, setExportLoading] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [pdfPreview, setPdfPreview] = useState<{ url: string; fileName: string; blob: Blob } | null>(null);
+  const [pdfFrameReady, setPdfFrameReady] = useState(false);
   // Interactive in-app report (hover + drill-down); PDF stays as the export.
   const [showInteractiveReport, setShowInteractiveReport] = useState(false);
   const [reportPeriod, setReportPeriod] = useState<{ start: string; end: string }>(() => {
@@ -383,7 +384,7 @@ export function BudgetView() {
 
   // Escape closes the topmost open modal (keyboard parity with click-outside)
   useEffect(() => {
-    const anyOpen = showAdd || !!editEntry || showExportModal || showSetBudget || showAddCustomCat || !!similarPrompt;
+    const anyOpen = showAdd || !!editEntry || showExportModal || showSetBudget || showAddCustomCat || !!similarPrompt || !!pdfPreview || showInteractiveReport;
     if (!anyOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
@@ -396,7 +397,20 @@ export function BudgetView() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [showAdd, editEntry, showExportModal, showSetBudget, showAddCustomCat, similarPrompt]);
+  }, [showAdd, editEntry, showExportModal, showSetBudget, showAddCustomCat, similarPrompt, pdfPreview, showInteractiveReport]);
+
+  useEffect(() => {
+    const lock = !!(showAdd || editEntry || showExportModal || showSetBudget || showAddCustomCat || similarPrompt || pdfPreview || showInteractiveReport);
+    if (!lock) return;
+    const prevOverflow = document.body.style.overflow;
+    const prevTouch = document.body.style.touchAction;
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.body.style.touchAction = prevTouch;
+    };
+  }, [showAdd, editEntry, showExportModal, showSetBudget, showAddCustomCat, similarPrompt, pdfPreview, showInteractiveReport]);
 
   // Read the user's onboarding goal from localStorage to show as header context
   useEffect(() => {
@@ -1032,11 +1046,10 @@ export function BudgetView() {
 
       const blob = await res.blob();
       const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
-      let url = URL.createObjectURL(blob);
-      if (await isNativePlatform()) {
-        const nativeUrl = await cacheFilePreviewUrl({ blob, fileName });
-        if (nativeUrl) url = nativeUrl;
-      }
+      // Always blob: — a Capacitor file:// URL inside an iframe takes over
+      // WKWebView and the in-app Close button disappears.
+      const url = URL.createObjectURL(blob);
+      setPdfFrameReady(false);
       setPdfPreview({ url, fileName, blob });
       setShowExportModal(false);
     } catch {
@@ -1780,21 +1793,54 @@ export function BudgetView() {
       {pdfPreview && (
         <div className="fixed inset-0 z-[460] flex flex-col bg-black/70" role="dialog" aria-modal="true">
           <div style={{ background: "var(--color-surface)", width: "100%", maxWidth: 820, margin: "0 auto", height: "100%", maxHeight: "100dvh", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "14px 16px", borderBottom: "1px solid var(--color-border)", flexShrink: 0 }}>
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+              padding: "max(12px, env(safe-area-inset-top)) 16px 12px",
+              borderBottom: "1px solid var(--color-border)", flexShrink: 0, zIndex: 2,
+            }}>
               <h3 style={{ fontWeight: 900, fontSize: 16 }}>Budget report</h3>
               <button type="button" onClick={() => {
                 if (pdfPreview.url.startsWith("blob:")) URL.revokeObjectURL(pdfPreview.url);
                 setPdfPreview(null);
-              }} style={{ background: "none", border: "none", cursor: "pointer" }} aria-label="Close preview">
+              }} aria-label="Close preview" style={{
+                background: "var(--color-bg)", border: "1px solid var(--color-border)",
+                borderRadius: 999, cursor: "pointer", width: 44, height: 44,
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
                 <X size={20} />
               </button>
             </div>
-            <iframe
-              title="Budget report preview"
-              src={pdfPreview.url}
-              style={{ flex: 1, width: "100%", border: "none", background: "var(--color-bg)", minHeight: 240 }}
-            />
+            <div style={{ flex: 1, position: "relative", minHeight: 240, background: "var(--color-bg)" }}>
+              {!pdfFrameReady && (
+                <div style={{
+                  position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+                  alignItems: "center", justifyContent: "center", gap: 8, padding: 24, textAlign: "center",
+                  color: "var(--color-text-secondary)", fontSize: 14, fontWeight: 600, zIndex: 1,
+                }}>
+                  Preparing your report…
+                  <span style={{ fontWeight: 500, fontSize: 12 }}>This can take a few seconds on a phone.</span>
+                </div>
+              )}
+              <iframe
+                title="Budget report preview"
+                src={pdfPreview.url}
+                sandbox="allow-same-origin"
+                onLoad={() => setPdfFrameReady(true)}
+                style={{ width: "100%", height: "100%", border: "none", background: "transparent", opacity: pdfFrameReady ? 1 : 0 }}
+              />
+            </div>
             <div style={{ display: "flex", gap: 10, padding: "12px 16px max(16px, env(safe-area-inset-bottom))", borderTop: "1px solid var(--color-border)", flexShrink: 0 }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ padding: 12, minWidth: 88 }}
+                onClick={() => {
+                  if (pdfPreview.url.startsWith("blob:")) URL.revokeObjectURL(pdfPreview.url);
+                  setPdfPreview(null);
+                }}
+              >
+                Done
+              </button>
               <button
                 type="button"
                 className="btn btn-secondary"
@@ -1810,7 +1856,11 @@ export function BudgetView() {
                   const file = new File([pdfPreview.blob], pdfPreview.fileName, { type: "application/pdf" });
                   const nav = navigator as Navigator & { canShare?: (data: { files?: File[] }) => boolean };
                   if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: "Notho budget report" });
+                    try {
+                      await navigator.share({ files: [file], title: "Notho budget report" });
+                    } catch {
+                      /* user cancelled the sheet */
+                    }
                     return;
                   }
                   const a = document.createElement("a");

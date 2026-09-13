@@ -149,7 +149,15 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
       if (e.key === "Escape" && !loading && !committing) setOpen(false);
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    const prevTouch = document.body.style.touchAction;
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+      document.body.style.touchAction = prevTouch;
+    };
   }, [open, loading, committing]);
 
   const loadCustomCategories = useCallback(async () => {
@@ -1099,7 +1107,14 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                               <select
                                 value={categorySelectValue(r)}
                                 onChange={(e) => handleCategorySelect(r, e.target.value)}
-                                style={{ fontSize: 14, padding: "8px 10px", borderRadius: 8, width: "100%", maxWidth: narrow ? "100%" : 160 }}
+                                style={{
+                                  fontSize: 14, padding: "10px 12px", borderRadius: 10, width: "100%",
+                                  maxWidth: narrow ? "100%" : 160,
+                                  background: "var(--color-surface)",
+                                  color: "var(--color-text-primary)",
+                                  border: "1px solid var(--color-border)",
+                                  fontWeight: 600,
+                                }}
                               >
                                 {categoriesForRow(r).map((c) => (
                                   <option key={c.id} value={c.id}>{c.label}</option>
@@ -1154,8 +1169,11 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                             return (
                               <div key={r.id} style={{
                                 opacity: r.skipReason || r.isTransfer ? 0.55 : 1,
-                                borderBottom: "1px solid var(--color-border)",
-                                padding: "12px 0",
+                                background: "var(--color-bg)",
+                                border: "1px solid var(--color-border)",
+                                borderRadius: 12,
+                                padding: "12px 12px 10px",
+                                marginBottom: 8,
                               }}>
                                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
                                   <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}>{r.date}</div>
