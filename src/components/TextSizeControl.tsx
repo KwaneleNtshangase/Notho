@@ -10,7 +10,7 @@ import {
 } from "@/lib/textScale";
 
 export function TextSizeControl() {
-  const [textScale, setTextScale] = useState<TextScale>("md");
+  const [textScale, setTextScale] = useState<TextScale>("system");
 
   useEffect(() => {
     setTextScale(readTextScale());
@@ -30,7 +30,9 @@ export function TextSizeControl() {
         <span style={{ color: "var(--color-primary)", fontWeight: 800, fontSize: 16, width: 18, textAlign: "center" }}>Aa</span>
         <div>
           <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>Text size</div>
-          <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>Makes every screen smaller or larger</div>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
+            System follows iPhone Display &amp; Text Size and Per-App Settings
+          </div>
         </div>
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
