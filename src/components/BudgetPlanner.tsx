@@ -270,6 +270,40 @@ function SwipeableRow({
 
 // ─── BudgetView ───────────────────────────────────────────────────────────────
 
+
+async function accessTokenForApi(): Promise<string | null> {
+  let { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    const refreshed = await supabase.auth.refreshSession();
+    session = refreshed.data.session;
+  } else {
+    const exp = session.expires_at;
+    if (typeof exp === "number" && exp * 1000 < Date.now() + 30_000) {
+      const refreshed = await supabase.auth.refreshSession();
+      session = refreshed.data.session ?? session;
+    }
+  }
+  return session?.access_token ?? null;
+}
+
+async function postBudgetReport(body: Record<string, unknown>): Promise<Response> {
+  const token = await accessTokenForApi();
+  if (!token) {
+    const err = new Error("Please sign in to export a report.");
+    (err as Error & { status?: number }).status = 401;
+    throw err;
+  }
+  return fetch(`${window.location.origin}/api/budget/report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      "x-notho-access-token": token,
+    },
+    body: JSON.stringify(body),
+  });
+}
+
 export function BudgetView() {
   const now = new Date();
   const [viewMode, setViewMode] = useState<"month" | "year">("month");
@@ -986,25 +1020,7 @@ export function BudgetView() {
             })
           : resolvePeriod(exportPreset);
 
-      let { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        const refreshed = await supabase.auth.refreshSession();
-        session = refreshed.data.session;
-      }
-      const token = session?.access_token;
-      if (!token) {
-        setExportError("Please sign in to export a report.");
-        return;
-      }
-
-      const res = await fetch(`${window.location.origin}/api/budget/report`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ periodStart, periodEnd }),
-      });
+      const res = await postBudgetReport({ periodStart, periodEnd });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -1034,14 +1050,7 @@ export function BudgetView() {
   const downloadReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
     setExportLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) return;
-      const res = await fetch(`${window.location.origin}/api/budget/report`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ periodStart, periodEnd, redactNames }),
-      });
+      const res = await postBudgetReport({ periodStart, periodEnd, redactNames });
       if (!res.ok) return;
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -1066,14 +1075,7 @@ export function BudgetView() {
   const shareReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
     setExportLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) return;
-      const res = await fetch(`${window.location.origin}/api/budget/report`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ periodStart, periodEnd, redactNames }),
-      });
+      const res = await postBudgetReport({ periodStart, periodEnd, redactNames });
       if (!res.ok) return;
       const blob = await res.blob();
       const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
@@ -1091,7 +1093,7 @@ export function BudgetView() {
       }
 
       const file = new File([blob], fileName, { type: "application/pdf" });
-      const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+      const nav = navigator as Navigator & { canShare?: (data: { files?: File[] }) => boolean };
       if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: "Notho budget report" });
         return;
@@ -1806,7 +1808,7 @@ export function BudgetView() {
                   });
                   if (shared) return;
                   const file = new File([pdfPreview.blob], pdfPreview.fileName, { type: "application/pdf" });
-                  const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+                  const nav = navigator as Navigator & { canShare?: (data: { files?: File[] }) => boolean };
                   if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
                     await navigator.share({ files: [file], title: "Notho budget report" });
                     return;
