@@ -132,6 +132,15 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
   const [addingCategoryFor, setAddingCategoryFor] = useState<string | null>(null);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
+  const [narrow, setNarrow] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 720px)");
+    const apply = () => setNarrow(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
 
   // Escape closes the import dialog (unless a parse/import is mid-flight)
   useEffect(() => {
@@ -1005,6 +1014,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
 
             </div>
 
+            {!narrow && (
             <div
               style={{
                 flexShrink: 0,
@@ -1025,6 +1035,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                 </div>
               ))}
             </div>
+            )}
 
             <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "0 20px 8px", WebkitOverflowScrolling: "touch" }}>
 
@@ -1051,20 +1062,18 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                   <div>
                     <div style={{ width: "100%", fontSize: 12 }}>
                       <div>
-                        {fileRows.map((r) => (
-                          <div key={r.id} style={{
-                            display: "grid",
-                            gridTemplateColumns: "88px minmax(0,1fr) 96px 168px 72px",
-                            alignItems: "center",
-                            opacity: r.skipReason || r.isTransfer ? 0.45 : 1,
-                            borderBottom: "1px solid var(--color-border)",
-                          }}>
-                            <div style={{ padding: 8 }}>{r.date}</div>
-                            <div style={{ padding: 8, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>
-                              {r.description}
+                        {fileRows.map((r) => {
+                          const amountColor = r.isTransfer
+                            ? "var(--color-text-secondary)"
+                            : r.amountZAR < 0
+                              ? "#E03C31"
+                              : "#22C55E";
+                          const amountLabel = `${r.amountZAR < 0 ? "-" : "+"}${formatRand(Math.abs(r.amountZAR))}`;
+                          const notes = (
+                            <>
                               {r.possibleDuplicate ? (
-                                <span style={{ display: "block", fontSize: 10, color: "#F57C00", marginTop: 2 }}>
-                                  ⚠ Possible duplicate{r.duplicateOfDescription ? ` of "${r.duplicateOfDescription}"` : ""}
+                                <span style={{ display: "block", fontSize: 11, color: "#F57C00", marginTop: 4 }}>
+                                  Possible duplicate{r.duplicateOfDescription ? ` of "${r.duplicateOfDescription}"` : ""}
                                   <label style={{ display: "inline-flex", alignItems: "center", gap: 4, marginLeft: 6, color: "var(--color-text-secondary)", cursor: "pointer" }}>
                                     <input
                                       type="checkbox"
@@ -1075,90 +1084,111 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                                   </label>
                                 </span>
                               ) : r.skipReason === "existing_import" ? (
-                                <span style={{ display: "block", fontSize: 10, color: "#9E9E9E" }}>Already imported</span>
+                                <span style={{ display: "block", fontSize: 11, color: "#9E9E9E", marginTop: 4 }}>Already imported</span>
                               ) : null}
                               {r.isTransfer && (
-                                <span style={{ display: "block", fontSize: 10, color: "var(--color-primary)" }}>Transfer - excluded</span>
+                                <span style={{ display: "block", fontSize: 11, color: "var(--color-primary)", marginTop: 4 }}>Transfer - excluded</span>
                               )}
                               {selectiveNeedsReview(r, meta) && !r.skipReason && !r.possibleDuplicate && (
-                                <span style={{ display: "block", fontSize: 10, color: "#F57C00" }}>Needs review</span>
+                                <span style={{ display: "block", fontSize: 11, color: "#F57C00", marginTop: 4 }}>Needs review</span>
                               )}
-                            </div>
-                            <div
-                              style={{
-                                padding: 8,
-                                fontWeight: 700,
-                                whiteSpace: "nowrap",
-                                color: r.isTransfer
-                                  ? "var(--color-text-secondary)"
-                                  : r.amountZAR < 0
-                                    ? "#E03C31"
-                                    : "#22C55E",
-                              }}
-                            >
-                              {r.amountZAR < 0 ? "-" : "+"}
-                              {formatRand(Math.abs(r.amountZAR))}
-                            </div>
-                            <div style={{ padding: 8 }}>
-                              {!r.skipReason && !r.isTransfer && (
-                                <div>
-                                  <select
-                                    value={categorySelectValue(r)}
-                                    onChange={(e) => handleCategorySelect(r, e.target.value)}
-                                    style={{ fontSize: 12, padding: 4, borderRadius: 6, maxWidth: 160, width: "100%" }}
+                            </>
+                          );
+                          const categoryBlock = !r.skipReason && !r.isTransfer ? (
+                            <div>
+                              <select
+                                value={categorySelectValue(r)}
+                                onChange={(e) => handleCategorySelect(r, e.target.value)}
+                                style={{ fontSize: 14, padding: "8px 10px", borderRadius: 8, width: "100%", maxWidth: narrow ? "100%" : 160 }}
+                              >
+                                {categoriesForRow(r).map((c) => (
+                                  <option key={c.id} value={c.id}>{c.label}</option>
+                                ))}
+                                <option value={ADD_CATEGORY_VALUE}>+ Add category</option>
+                              </select>
+                              {addingCategoryFor === r.id && (
+                                <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                                  <input
+                                    type="text"
+                                    value={newCategoryName}
+                                    onChange={(e) => setNewCategoryName(e.target.value)}
+                                    placeholder="Category name"
+                                    style={{
+                                      flex: 1, fontSize: 14, padding: "8px 10px", borderRadius: 8,
+                                      border: "1px solid var(--color-border)",
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") void handleSaveNewCategory(r);
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    style={{ padding: "8px 10px", fontSize: 12 }}
+                                    disabled={savingCategory || !newCategoryName.trim()}
+                                    onClick={() => void handleSaveNewCategory(r)}
                                   >
-                                    {categoriesForRow(r).map((c) => (
-                                      <option key={c.id} value={c.id}>{c.label}</option>
-                                    ))}
-                                    <option value={ADD_CATEGORY_VALUE}>+ Add category</option>
-                                  </select>
-                                  {addingCategoryFor === r.id && (
-                                    <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-                                      <input
-                                        type="text"
-                                        value={newCategoryName}
-                                        onChange={(e) => setNewCategoryName(e.target.value)}
-                                        placeholder="Category name"
-                                        style={{
-                                          flex: 1, fontSize: 12, padding: "6px 8px", borderRadius: 6,
-                                          border: "1px solid var(--color-border)",
-                                        }}
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") void handleSaveNewCategory(r);
-                                        }}
-                                      />
-                                      <button
-                                        type="button"
-                                        className="btn btn-primary"
-                                        style={{ padding: "6px 10px", fontSize: 11 }}
-                                        disabled={savingCategory || !newCategoryName.trim()}
-                                        onClick={() => void handleSaveNewCategory(r)}
-                                      >
-                                        <Plus size={12} aria-hidden />
-                                      </button>
-                                    </div>
-                                  )}
+                                    <Plus size={12} aria-hidden />
+                                  </button>
                                 </div>
                               )}
                             </div>
-                            <div style={{ padding: 8, textAlign: "center" }}>
-                              {!r.skipReason && !r.isTransfer && r.categoryEdited && (
-                                <input
-                                  type="checkbox"
-                                  checked={r.rememberMerchant ?? false}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      applyRememberAcrossImport(r, r.categorisation.category);
-                                    } else {
-                                      updateRow(r.id, { rememberMerchant: false });
-                                    }
-                                  }}
-                                  aria-label={`Remember merchant for ${r.description}`}
-                                />
-                              )}
+                          ) : null;
+                          const rememberBox = !r.skipReason && !r.isTransfer && r.categoryEdited ? (
+                            <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", cursor: "pointer" }}>
+                              <input
+                                type="checkbox"
+                                checked={r.rememberMerchant ?? false}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    applyRememberAcrossImport(r, r.categorisation.category);
+                                  } else {
+                                    updateRow(r.id, { rememberMerchant: false });
+                                  }
+                                }}
+                              />
+                              Remember
+                            </label>
+                          ) : null;
+                          if (narrow) {
+                            return (
+                              <div key={r.id} style={{
+                                opacity: r.skipReason || r.isTransfer ? 0.55 : 1,
+                                borderBottom: "1px solid var(--color-border)",
+                                padding: "12px 0",
+                              }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}>{r.date}</div>
+                                  <div style={{ fontWeight: 800, whiteSpace: "nowrap", color: amountColor }}>{amountLabel}</div>
+                                </div>
+                                <div style={{ marginTop: 6, fontSize: 14, fontWeight: 600, lineHeight: 1.35, wordBreak: "break-word" }}>
+                                  {r.description}
+                                </div>
+                                {notes}
+                                <div style={{ marginTop: 10 }}>{categoryBlock}</div>
+                                {rememberBox && <div style={{ marginTop: 8 }}>{rememberBox}</div>}
+                              </div>
+                            );
+                          }
+                          return (
+                          <div key={r.id} style={{
+                            display: "grid",
+                            gridTemplateColumns: "88px minmax(0,1fr) 96px 168px 72px",
+                            alignItems: "center",
+                            opacity: r.skipReason || r.isTransfer ? 0.45 : 1,
+                            borderBottom: "1px solid var(--color-border)",
+                          }}>
+                            <div style={{ padding: 8 }}>{r.date}</div>
+                            <div style={{ padding: 8, minWidth: 0 }}>
+                              <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.description}</div>
+                              {notes}
                             </div>
+                            <div style={{ padding: 8, fontWeight: 700, whiteSpace: "nowrap", color: amountColor }}>{amountLabel}</div>
+                            <div style={{ padding: 8 }}>{categoryBlock}</div>
+                            <div style={{ padding: 8, textAlign: "center" }}>{rememberBox}</div>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
