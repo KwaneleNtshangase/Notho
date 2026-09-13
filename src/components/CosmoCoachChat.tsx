@@ -71,6 +71,25 @@ export function CosmoCoachChat() {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [messages, sending]);
 
+  useEffect(() => {
+    if (!open) return;
+    const prevOverflow = document.body.style.overflow;
+    const prevTouch = document.body.style.touchAction;
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    const block = (e: TouchEvent) => {
+      const list = listRef.current;
+      if (list && list.contains(e.target as Node)) return;
+      e.preventDefault();
+    };
+    document.addEventListener("touchmove", block, { passive: false });
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.body.style.touchAction = prevTouch;
+      document.removeEventListener("touchmove", block);
+    };
+  }, [open]);
+
   async function setConsent(value: boolean) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -164,25 +183,33 @@ export function CosmoCoachChat() {
           align-items: center;
           justify-content: center;
         }
+        .notho-chat-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 61;
+          background: rgba(0, 0, 0, 0.45);
+          overscroll-behavior: none;
+        }
         .notho-chat-panel {
           position: fixed;
-          right: 12px;
-          left: 12px;
-          bottom: calc(env(safe-area-inset-bottom, 0px) + 92px);
-          z-index: 61;
-          max-width: 400px;
-          margin-left: auto;
+          right: 0;
+          left: 0;
+          bottom: 0;
+          z-index: 62;
+          max-width: 440px;
+          margin: 0 auto;
           border: 1.5px solid var(--color-border);
-          border-radius: 16px;
+          border-radius: 16px 16px 0 0;
           background: var(--color-background, var(--color-surface, #fff));
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-          padding: 14px;
+          padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px));
           display: flex;
           flex-direction: column;
+          max-height: min(78dvh, 640px);
         }
         @media (min-width: 768px) {
           .notho-chat-fab { right: 24px; bottom: 24px; }
-          .notho-chat-panel { right: 24px; left: auto; bottom: 92px; width: 380px; }
+          .notho-chat-panel { right: 24px; left: auto; bottom: 24px; width: 380px; border-radius: 16px; }
         }
         .notho-chat-form {
           display: flex;
@@ -200,9 +227,11 @@ export function CosmoCoachChat() {
           border: none;
           outline: none;
           background: transparent !important;
-          font-size: 14px;
-          padding: 9px 0;
+          font-size: 16px;
+          line-height: 1.3;
+          padding: 10px 0;
           color: #111827 !important;
+          touch-action: manipulation;
         }
         .notho-chat-input::placeholder { color: #9ca3af !important; }
         .notho-chat-input:disabled { opacity: 0.6; }
@@ -220,9 +249,15 @@ export function CosmoCoachChat() {
       )}
 
       {open && (
-        <div className="notho-chat-panel" role="dialog" aria-label="Ask Cosmo, your money coach">
+        <>
+          <div
+            className="notho-chat-backdrop"
+            aria-hidden
+            onClick={() => setOpen(false)}
+          />
+          <div className="notho-chat-panel" role="dialog" aria-modal="true" aria-label="Ask Cosmo, your money coach">
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 800 }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 800 }}>
               Cosmo
             </span>
             <span
@@ -263,8 +298,8 @@ export function CosmoCoachChat() {
                 onClick={() => setOpen(false)}
                 style={{
                   background: "none", border: "none", cursor: "pointer",
-                  fontSize: 15, fontWeight: 700, color: "var(--color-text-secondary)",
-                  padding: 0,
+                  fontSize: 18, fontWeight: 700, color: "var(--color-text-secondary)",
+                  width: 36, height: 36,
                 }}
               >
                 ✕
@@ -301,7 +336,7 @@ export function CosmoCoachChat() {
                 onClick={() => setConsent(true)}
                 style={{
                   background: "var(--color-primary)", color: "#fff", border: "none",
-                  borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 700,
+                  borderRadius: 10, padding: "9px 16px", fontSize: 16, fontWeight: 700,
                   cursor: "pointer",
                 }}
               >
@@ -319,11 +354,11 @@ export function CosmoCoachChat() {
                 ref={listRef}
                 style={{
                   height: "min(300px, 45vh)", overflowY: "auto", display: "flex",
-                  flexDirection: "column", gap: 8, marginBottom: 10,
+                  flexDirection: "column", gap: 8, marginBottom: 10, WebkitOverflowScrolling: "touch",
                 }}
               >
                 {messages.length === 0 && !sending && (
-                  <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: 0 }}>
+                  <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}>
                     Ask about a category on this month&apos;s budget.
                   </p>
                 )}
@@ -335,7 +370,7 @@ export function CosmoCoachChat() {
                       maxWidth: "85%",
                       background: m.role === "user" ? "var(--color-primary)" : "var(--color-border)",
                       color: m.role === "user" ? "#fff" : "var(--color-text-primary)",
-                      borderRadius: 12, padding: "8px 12px", fontSize: 13, lineHeight: 1.45,
+                      borderRadius: 12, padding: "8px 12px", fontSize: 15, lineHeight: 1.45,
                       whiteSpace: "pre-wrap",
                     }}
                   >
@@ -347,7 +382,7 @@ export function CosmoCoachChat() {
                     aria-label="Cosmo is typing"
                     style={{
                       alignSelf: "flex-start", background: "var(--color-border)",
-                      borderRadius: 12, padding: "8px 12px", fontSize: 13,
+                      borderRadius: 12, padding: "8px 12px", fontSize: 15,
                       color: "var(--color-text-secondary)",
                     }}
                   >
@@ -357,7 +392,7 @@ export function CosmoCoachChat() {
               </div>
 
               {notice && (
-                <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "0 0 8px" }}>
+                <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: "0 0 8px" }}>
                   {notice}
                 </p>
               )}
@@ -373,6 +408,9 @@ export function CosmoCoachChat() {
                   placeholder="Ask about your month"
                   disabled={sending || remaining === 0}
                   className="notho-chat-input"
+                  autoCapitalize="sentences"
+                  autoCorrect="on"
+                  enterKeyHint="send"
                 />
                 <button
                   type="submit"
@@ -393,13 +431,14 @@ export function CosmoCoachChat() {
                 </button>
               </form>
 
-              <p style={{ fontSize: 10, color: "var(--color-text-secondary)", margin: "8px 0 0" }}>
+              <p style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "8px 0 0" }}>
                 AI-generated. Cosmo can make mistakes - check anything
                 important. Educational information, not financial advice.
               </p>
             </div>
           )}
-        </div>
+          </div>
+        </>
       )}
     </>
   );
