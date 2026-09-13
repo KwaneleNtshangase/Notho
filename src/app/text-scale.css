@@ -1,6 +1,7 @@
-/* Text size is user-controlled via html[data-text-scale].
-   Default 100% so OS / in-app scale can take effect. */
+/* Tailwind preflight sets -webkit-text-size-adjust: 100%, which blocks
+   iOS Settings → Display & Text Size and Per-App Settings. Override it. */
 html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+  -webkit-text-size-adjust: auto !important;
+  text-size-adjust: auto !important;
+  font: -apple-system-body;
 }

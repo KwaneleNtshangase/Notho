@@ -1,15 +1,23 @@
 /**
- * In-app text size. The UI is mostly hardcoded px, so OS font-size settings
- * and -webkit-text-size-adjust:none both leave Notho looking the same size.
- * We persist a named scale and apply it on <html> before paint.
+ * Text size follows the OS (iOS Dynamic Type / per-app text size, Android
+ * font scale) the same way dark mode follows the OS.
+ *
+ * Why this was broken:
+ * Tailwind preflight sets -webkit-text-size-adjust: 100%, which tells iOS
+ * to ignore Settings → Display & Text Size and Per-App Settings. Most of
+ * the UI is also hardcoded px, so rem-only tricks do nothing.
+ *
+ * Fix: force text-size-adjust: auto, size the root from -apple-system-body
+ * (that token tracks Dynamic Type), then apply the measured scale as zoom
+ * so px copy scales too. Manual Small/Default/Large remains an override.
  */
 
 export const TEXT_SCALE_KEY = "notho-text-scale";
 
-export const TEXT_SCALES = ["sm", "md", "lg", "xl"] as const;
+export const TEXT_SCALES = ["system", "sm", "md", "lg", "xl"] as const;
 export type TextScale = (typeof TEXT_SCALES)[number];
 
-export const TEXT_SCALE_FACTOR: Record<TextScale, number> = {
+export const TEXT_SCALE_FACTOR: Record<Exclude<TextScale, "system">, number> = {
   sm: 0.9,
   md: 1,
   lg: 1.15,
@@ -17,37 +25,74 @@ export const TEXT_SCALE_FACTOR: Record<TextScale, number> = {
 };
 
 export const TEXT_SCALE_LABEL: Record<TextScale, string> = {
+  system: "System",
   sm: "Small",
   md: "Default",
   lg: "Large",
   xl: "Extra large",
 };
 
+/** iOS default ("Large" in Settings) for -apple-system-body. */
+const SYSTEM_BODY_BASE_PX = 17;
+
 export function isTextScale(value: string | null): value is TextScale {
-  return value === "sm" || value === "md" || value === "lg" || value === "xl";
+  return value === "system" || value === "sm" || value === "md" || value === "lg" || value === "xl";
 }
 
 export function readTextScale(): TextScale {
-  if (typeof window === "undefined") return "md";
+  if (typeof window === "undefined") return "system";
   try {
     const raw = window.localStorage.getItem(TEXT_SCALE_KEY);
-    return isTextScale(raw) ? raw : "md";
+    // Previous build defaulted to "md" and wrote that on first visit.
+    // Treat missing / that first-run default as follow-system.
+    if (!raw || raw === "md") return "system";
+    return isTextScale(raw) ? raw : "system";
   } catch {
-    return "md";
+    return "system";
   }
 }
 
-export function applyTextScale(scale: TextScale): void {
+function measureSystemScale(): number {
+  if (typeof document === "undefined") return 1;
+  const probe = document.createElement("div");
+  probe.setAttribute("aria-hidden", "true");
+  probe.style.cssText =
+    "position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;font:-apple-system-body;";
+  document.documentElement.appendChild(probe);
+  const px = parseFloat(window.getComputedStyle(probe).fontSize || "");
+  probe.remove();
+  if (!Number.isFinite(px) || px <= 0) return 1;
+  const scale = px / SYSTEM_BODY_BASE_PX;
+  return Math.min(2.2, Math.max(0.75, scale));
+}
+
+function setAdjustAuto(root: HTMLElement): void {
+  root.style.setProperty("-webkit-text-size-adjust", "auto");
+  root.style.setProperty("text-size-adjust", "auto");
+}
+
+function setZoom(root: HTMLElement, factor: number): void {
+  const style = root.style as CSSStyleDeclaration & { zoom?: string };
+  if (Math.abs(factor - 1) < 0.03) {
+    style.zoom = "";
+    root.style.removeProperty("--notho-text-scale");
+    return;
+  }
+  style.zoom = String(factor);
+  root.style.setProperty("--notho-text-scale", String(factor));
+}
+
+export function applyTextScale(scale: TextScale = readTextScale()): void {
   if (typeof document === "undefined") return;
-  const factor = TEXT_SCALE_FACTOR[scale];
   const root = document.documentElement;
   root.dataset.textScale = scale;
-  root.style.setProperty("--notho-text-scale", String(factor));
-  // Chromium / Android WebView: scales px and rem together.
-  (root.style as CSSStyleDeclaration & { zoom?: string }).zoom = String(factor);
-  // iOS / WKWebView: percentage text-size-adjust scales text including px.
-  root.style.setProperty("-webkit-text-size-adjust", `${Math.round(factor * 100)}%`);
-  root.style.setProperty("text-size-adjust", `${Math.round(factor * 100)}%`);
+  setAdjustAuto(root);
+
+  if (scale === "system") {
+    setZoom(root, measureSystemScale());
+    return;
+  }
+  setZoom(root, TEXT_SCALE_FACTOR[scale]);
 }
 
 export function persistTextScale(scale: TextScale): void {
@@ -59,16 +104,10 @@ export function persistTextScale(scale: TextScale): void {
   applyTextScale(scale);
 }
 
-/** Blocking head script so the first paint is already at the saved size. */
+/** Before paint: unlock OS text size. Zoom is applied after DOM exists. */
 export const TEXT_SCALE_BOOT_SCRIPT = `(function(){try{
-var k=${JSON.stringify(TEXT_SCALE_KEY)};
-var v=window.localStorage.getItem(k);
-if(v!=="sm"&&v!=="md"&&v!=="lg"&&v!=="xl")v="md";
-var f={sm:0.9,md:1,lg:1.15,xl:1.3}[v];
 var r=document.documentElement;
-r.setAttribute("data-text-scale",v);
-r.style.setProperty("--notho-text-scale",String(f));
-r.style.zoom=String(f);
-r.style.setProperty("-webkit-text-size-adjust",Math.round(f*100)+"%");
-r.style.setProperty("text-size-adjust",Math.round(f*100)+"%");
+r.style.setProperty("-webkit-text-size-adjust","auto");
+r.style.setProperty("text-size-adjust","auto");
+r.setAttribute("data-text-scale","system");
 }catch(e){}})();`;
