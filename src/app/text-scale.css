@@ -1,0 +1,6 @@
+/* Text size is user-controlled via html[data-text-scale].
+   Default 100% so OS / in-app scale can take effect. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
