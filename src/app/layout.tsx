@@ -5,9 +5,12 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ErrorReportingInit } from "@/components/ErrorReportingInit";
 import { NativeAuthDeepLink } from "@/components/NativeAuthDeepLink";
 import { NativeShellGuards } from "@/components/NativeShellGuards";
+import { TextScaleInit } from "@/components/TextScaleInit";
 import { ServiceWorkerRegistration } from "@/lib/sw/ServiceWorkerRegistration";
 import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
+import { TEXT_SCALE_BOOT_SCRIPT } from "@/lib/textScale";
 import "./globals.css";
+import "./text-scale.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -73,6 +76,8 @@ export default function RootLayout({
             these keys on their first render, and without this every existing
             user reads empty notho-* keys and looks brand new. */}
         <script dangerouslySetInnerHTML={{ __html: STORAGE_MIGRATION_SCRIPT }} />
+        {/* Apply saved text size before first paint so the scale does not flash. */}
+        <script dangerouslySetInnerHTML={{ __html: TEXT_SCALE_BOOT_SCRIPT }} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -81,6 +86,7 @@ export default function RootLayout({
           <PostHogProvider>{children}</PostHogProvider>
           <ServiceWorkerRegistration />
           <ErrorReportingInit />
+          <TextScaleInit />
           {/* No-op on web; on native, exchanges the OAuth deep-link callback
               for a session. See NativeAuthDeepLink.tsx and AuthGate.tsx. */}
           <NativeAuthDeepLink />
