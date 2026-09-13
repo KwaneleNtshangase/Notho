@@ -4,7 +4,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
-import { shareFileBlob } from "@/lib/nativeShare";
+import { cacheFilePreviewUrl, shareFileBlob } from "@/lib/nativeShare";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
@@ -334,6 +334,7 @@ export function BudgetView() {
   const [exportCustomEnd, setExportCustomEnd] = useState(() => monthAlignedDefaults().periodEnd);
   const [exportLoading, setExportLoading] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [pdfPreview, setPdfPreview] = useState<{ url: string; fileName: string; blob: Blob } | null>(null);
   // Interactive in-app report (hover + drill-down); PDF stays as the export.
   const [showInteractiveReport, setShowInteractiveReport] = useState(false);
   const [reportPeriod, setReportPeriod] = useState<{ start: string; end: string }>(() => {
@@ -985,7 +986,11 @@ export function BudgetView() {
             })
           : resolvePeriod(exportPreset);
 
-      const { data: { session } } = await supabase.auth.getSession();
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        const refreshed = await supabase.auth.refreshSession();
+        session = refreshed.data.session;
+      }
       const token = session?.access_token;
       if (!token) {
         setExportError("Please sign in to export a report.");
@@ -1003,21 +1008,20 @@ export function BudgetView() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        const msg = (err as { error?: string }).error ?? "Failed to generate report.";
+        const msg = (err as { error?: string }).error ?? (res.status === 401 ? "Please sign in again, then export." : "Failed to generate report.");
         setExportError(msg);
         void reportClientError("report-download", new Error(`Report export failed (${res.status}): ${msg}`));
         return;
       }
 
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
+      let url = URL.createObjectURL(blob);
+      if (await isNativePlatform()) {
+        const nativeUrl = await cacheFilePreviewUrl({ blob, fileName });
+        if (nativeUrl) url = nativeUrl;
+      }
+      setPdfPreview({ url, fileName, blob });
       setShowExportModal(false);
     } catch {
       setExportError("Failed to generate report. Please try again.");
@@ -1765,8 +1769,83 @@ export function BudgetView() {
               onClick={handleExportReport}
             >
               <FileText size={16} aria-hidden />
-              {exportLoading ? "Generating PDF…" : "Download PDF"}
+              {exportLoading ? "Generating PDF…" : "Preview PDF"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {pdfPreview && (
+        <div className="fixed inset-0 z-[460] flex flex-col bg-black/70" role="dialog" aria-modal="true">
+          <div style={{ background: "var(--color-surface)", width: "100%", maxWidth: 820, margin: "0 auto", height: "100%", maxHeight: "100dvh", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "14px 16px", borderBottom: "1px solid var(--color-border)", flexShrink: 0 }}>
+              <h3 style={{ fontWeight: 900, fontSize: 16 }}>Budget report</h3>
+              <button type="button" onClick={() => {
+                if (pdfPreview.url.startsWith("blob:")) URL.revokeObjectURL(pdfPreview.url);
+                setPdfPreview(null);
+              }} style={{ background: "none", border: "none", cursor: "pointer" }} aria-label="Close preview">
+                <X size={20} />
+              </button>
+            </div>
+            <iframe
+              title="Budget report preview"
+              src={pdfPreview.url}
+              style={{ flex: 1, width: "100%", border: "none", background: "var(--color-bg)", minHeight: 240 }}
+            />
+            <div style={{ display: "flex", gap: 10, padding: "12px 16px max(16px, env(safe-area-inset-bottom))", borderTop: "1px solid var(--color-border)", flexShrink: 0 }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ flex: 1, padding: 12 }}
+                onClick={async () => {
+                  const shared = await shareFileBlob({
+                    blob: pdfPreview.blob,
+                    fileName: pdfPreview.fileName,
+                    title: "Notho budget report",
+                    dialogTitle: "Share or save your budget report",
+                  });
+                  if (shared) return;
+                  const file = new File([pdfPreview.blob], pdfPreview.fileName, { type: "application/pdf" });
+                  const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+                  if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: "Notho budget report" });
+                    return;
+                  }
+                  const a = document.createElement("a");
+                  a.href = pdfPreview.url;
+                  a.download = pdfPreview.fileName;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                }}
+              >
+                Share
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                style={{ flex: 1, padding: 12 }}
+                onClick={async () => {
+                  if (await isNativePlatform()) {
+                    const shared = await shareFileBlob({
+                      blob: pdfPreview.blob,
+                      fileName: pdfPreview.fileName,
+                      title: "Notho budget report",
+                      dialogTitle: "Save your budget report",
+                    });
+                    if (shared) return;
+                  }
+                  const a = document.createElement("a");
+                  a.href = pdfPreview.url;
+                  a.download = pdfPreview.fileName;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                }}
+              >
+                Save PDF
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -6,6 +6,54 @@
 // get `false` back until the native shell exists, same pattern as
 // isNativePlatform() in capacitorPlatform.ts.
 
+/** Filesystem.writeFile wants raw base64, not a data: URL. */
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result;
+      if (typeof result !== "string") { reject(new Error("Unexpected FileReader result")); return; }
+      resolve(result.split(",")[1] ?? "");
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("Failed to read blob"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function writeCacheUri(blob: Blob, fileName: string): Promise<string | null> {
+  try {
+    const { Filesystem, Directory } = await import("@capacitor/filesystem");
+    const base64Data = await blobToBase64(blob);
+    await Filesystem.writeFile({
+      path: fileName,
+      data: base64Data,
+      directory: Directory.Cache,
+    });
+    const { uri } = await Filesystem.getUri({
+      path: fileName,
+      directory: Directory.Cache,
+    });
+    return uri;
+  } catch {
+    return null;
+  }
+}
+
+/** Write a blob into the app cache and return a WebView-safe URL for iframe preview. */
+export async function cacheFilePreviewUrl(opts: {
+  blob: Blob;
+  fileName: string;
+}): Promise<string | null> {
+  try {
+    const uri = await writeCacheUri(opts.blob, opts.fileName);
+    if (!uri) return null;
+    const { Capacitor } = await import("@capacitor/core");
+    return Capacitor.convertFileSrc(uri);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Hand a locally-generated file (e.g. the budget report PDF) to the native
  * share sheet. @capacitor/share can't share a Blob directly - it only takes
@@ -24,22 +72,9 @@ export async function shareFileBlob(opts: {
   dialogTitle?: string;
 }): Promise<boolean> {
   try {
-    const [{ Share }, { Filesystem, Directory }] = await Promise.all([
-      import("@capacitor/share"),
-      import("@capacitor/filesystem"),
-    ]);
-
-    const base64Data = await blobToBase64(opts.blob);
-    await Filesystem.writeFile({
-      path: opts.fileName,
-      data: base64Data,
-      directory: Directory.Cache,
-    });
-    const { uri } = await Filesystem.getUri({
-      path: opts.fileName,
-      directory: Directory.Cache,
-    });
-
+    const { Share } = await import("@capacitor/share");
+    const uri = await writeCacheUri(opts.blob, opts.fileName);
+    if (!uri) return false;
     await Share.share({
       title: opts.title,
       dialogTitle: opts.dialogTitle,
@@ -49,18 +84,4 @@ export async function shareFileBlob(opts: {
   } catch {
     return false;
   }
-}
-
-/** Filesystem.writeFile wants raw base64, not a data: URL. */
-function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result;
-      if (typeof result !== "string") { reject(new Error("Unexpected FileReader result")); return; }
-      resolve(result.split(",")[1] ?? "");
-    };
-    reader.onerror = () => reject(reader.error ?? new Error("Failed to read blob"));
-    reader.readAsDataURL(blob);
-  });
 }
