@@ -4,7 +4,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
-import { cacheFilePreviewUrl, shareFileBlob } from "@/lib/nativeShare";
+import { shareFileBlob } from "@/lib/nativeShare";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
@@ -1032,11 +1032,9 @@ export function BudgetView() {
 
       const blob = await res.blob();
       const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
-      let url = URL.createObjectURL(blob);
-      if (await isNativePlatform()) {
-        const nativeUrl = await cacheFilePreviewUrl({ blob, fileName });
-        if (nativeUrl) url = nativeUrl;
-      }
+      // Always blob: — a Capacitor file:// URL inside an iframe takes over
+      // WKWebView and the in-app Close button disappears.
+      const url = URL.createObjectURL(blob);
       setPdfPreview({ url, fileName, blob });
       setShowExportModal(false);
     } catch {
@@ -1780,21 +1778,41 @@ export function BudgetView() {
       {pdfPreview && (
         <div className="fixed inset-0 z-[460] flex flex-col bg-black/70" role="dialog" aria-modal="true">
           <div style={{ background: "var(--color-surface)", width: "100%", maxWidth: 820, margin: "0 auto", height: "100%", maxHeight: "100dvh", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "14px 16px", borderBottom: "1px solid var(--color-border)", flexShrink: 0 }}>
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+              padding: "max(12px, env(safe-area-inset-top)) 16px 12px",
+              borderBottom: "1px solid var(--color-border)", flexShrink: 0, zIndex: 2,
+            }}>
               <h3 style={{ fontWeight: 900, fontSize: 16 }}>Budget report</h3>
               <button type="button" onClick={() => {
                 if (pdfPreview.url.startsWith("blob:")) URL.revokeObjectURL(pdfPreview.url);
                 setPdfPreview(null);
-              }} style={{ background: "none", border: "none", cursor: "pointer" }} aria-label="Close preview">
+              }} aria-label="Close preview" style={{
+                background: "var(--color-bg)", border: "1px solid var(--color-border)",
+                borderRadius: 999, cursor: "pointer", width: 44, height: 44,
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
                 <X size={20} />
               </button>
             </div>
             <iframe
               title="Budget report preview"
               src={pdfPreview.url}
+              sandbox="allow-same-origin allow-scripts"
               style={{ flex: 1, width: "100%", border: "none", background: "var(--color-bg)", minHeight: 240 }}
             />
             <div style={{ display: "flex", gap: 10, padding: "12px 16px max(16px, env(safe-area-inset-bottom))", borderTop: "1px solid var(--color-border)", flexShrink: 0 }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ padding: 12, minWidth: 88 }}
+                onClick={() => {
+                  if (pdfPreview.url.startsWith("blob:")) URL.revokeObjectURL(pdfPreview.url);
+                  setPdfPreview(null);
+                }}
+              >
+                Done
+              </button>
               <button
                 type="button"
                 className="btn btn-secondary"
