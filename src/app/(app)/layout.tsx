@@ -25,6 +25,7 @@ import {
 import "../gestures.css";
 import "../nav-glass.css";
 import { AuthGate } from "@/components/AuthGate";
+import { OnboardingGate } from "@/components/OnboardingGate";
 import { NotificationOptIn } from "@/components/NotificationOptIn";
 import { StreakRepairBanner } from "@/components/StreakRepairBanner";
 import { UsageTracker } from "@/components/UsageTracker";
@@ -124,27 +125,29 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <NothoProvider>
       <AuthGate>
-        <div className="app-container">
-          {!isMockExam && <DesktopSidebar />}
-          <div
-            className={`main-content ${isMockExam ? "mock-main-content" : ""} ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
-            style={{ display: 'flex', flexDirection: 'column' }}
-          >
-            {!isMockExam && <MobileTopBarWrapper />}
-            <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>
-              {!isMockExam && <PersistentAppTabs visible={showTabs} />}
-              {!showTabs && children}
+        <OnboardingGate>
+          <div className="app-container">
+            {!isMockExam && <DesktopSidebar />}
+            <div
+              className={`main-content ${isMockExam ? "mock-main-content" : ""} ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
+              style={{ display: 'flex', flexDirection: 'column' }}
+            >
+              {!isMockExam && <MobileTopBarWrapper />}
+              <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {!isMockExam && <PersistentAppTabs visible={showTabs} />}
+                {!showTabs && children}
+              </div>
             </div>
+            {(pathname === "/learn" || pathname === "/") && (
+              <StatsPanelWrapper />
+            )}
           </div>
-          {(pathname === "/learn" || pathname === "/") && (
-            <StatsPanelWrapper />
-          )}
-        </div>
-        {!isMockExam && <AppNavigation />}
-        {!isMockExam && <NotificationOptIn />}
-        {!isMockExam && <StreakRepairBanner />}
-        <UsageTracker />
-        <AppGestures />
+          {!isMockExam && <AppNavigation />}
+          {!isMockExam && <NotificationOptIn />}
+          {!isMockExam && <StreakRepairBanner />}
+          <UsageTracker />
+          <AppGestures />
+        </OnboardingGate>
       </AuthGate>
     </NothoProvider>
   );
