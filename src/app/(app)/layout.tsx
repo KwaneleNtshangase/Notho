@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NothoProvider, useNotho } from "@/context/NothoContext";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { DesktopSidebar } from "@/components/DesktopSidebar";
@@ -14,15 +14,44 @@ import {
 import { usePathname } from "next/navigation";
 import { StatsPanel } from "@/components/StatsPanel";
 import { NothoTopBar } from "@/components/NothoTopBar";
+import { PersistentAppTabs } from "@/components/PersistentAppTabs";
+import {
+  APP_TAB_EVENT,
+  isAppTabPath,
+  tabKeyFromHref,
+  tabKeyFromPath,
+  type AppTabKey,
+} from "@/lib/appTabs";
 import "../gestures.css";
 import "../nav-glass.css";
+import { AuthGate } from "@/components/AuthGate";
+import { NotificationOptIn } from "@/components/NotificationOptIn";
+import { StreakRepairBanner } from "@/components/StreakRepairBanner";
+import { UsageTracker } from "@/components/UsageTracker";
+import { AppGestures } from "@/components/AppGestures";
 
 function AppNavigation() {
   const { setRoute } = useNotho();
   const pathname = usePathname() || "/";
-  const is = (p: string) => pathname.startsWith(p);
+  const pathKey = tabKeyFromPath(pathname);
+  const [pendingKey, setPendingKey] = useState<AppTabKey | null>(null);
+  const activeKey = pendingKey ?? pathKey;
 
-  const handleNav = (name: string) => {
+  useEffect(() => {
+    if (pendingKey && pendingKey === pathKey) setPendingKey(null);
+  }, [pathKey, pendingKey]);
+
+  useEffect(() => {
+    const onTab = (event: Event) => {
+      const key = tabKeyFromHref((event as CustomEvent<string>).detail);
+      if (key) setPendingKey(key);
+    };
+    window.addEventListener(APP_TAB_EVENT, onTab);
+    return () => window.removeEventListener(APP_TAB_EVENT, onTab);
+  }, []);
+
+  const handleNav = (name: AppTabKey) => {
+    setPendingKey(name);
     setRoute({ name: name as never });
   };
 
@@ -33,7 +62,7 @@ function AppNavigation() {
           key: "learn",
           label: "Learn",
           icon: <NothoLearn size={24} className="text-current" />,
-          isActive: is("/learn") || is("/course") || is("/lesson") || pathname === "/",
+          isActive: activeKey === "learn",
           onClick: () => handleNav("learn"),
           order: "order-1",
         },
@@ -41,7 +70,7 @@ function AppNavigation() {
           key: "calculator",
           label: "Calculate",
           icon: <NothoCalculate size={24} className="text-current" />,
-          isActive: is("/calculator"),
+          isActive: activeKey === "calculator",
           onClick: () => handleNav("calculator"),
           order: "order-2",
         },
@@ -49,7 +78,7 @@ function AppNavigation() {
           key: "budget",
           label: "Budget",
           icon: <NothoBudget size={24} className="text-current" />,
-          isActive: is("/budget"),
+          isActive: activeKey === "budget",
           onClick: () => handleNav("budget"),
           order: "order-3",
         },
@@ -57,7 +86,7 @@ function AppNavigation() {
           key: "quests",
           label: "Goals",
           icon: <NothoGoals size={24} className="text-current" />,
-          isActive: is("/quests"),
+          isActive: activeKey === "quests",
           onClick: () => handleNav("quests"),
           order: "order-4",
         },
@@ -65,7 +94,7 @@ function AppNavigation() {
           key: "profile",
           label: "Profile",
           icon: <NothoProfile size={24} className="text-current" />,
-          isActive: is("/profile") || is("/leaderboard"),
+          isActive: activeKey === "profile",
           onClick: () => handleNav("profile"),
           order: "order-5",
         },
@@ -74,17 +103,23 @@ function AppNavigation() {
   );
 }
 
-import { AuthGate } from "@/components/AuthGate";
-import { NotificationOptIn } from "@/components/NotificationOptIn";
-import { StreakRepairBanner } from "@/components/StreakRepairBanner";
-import { UsageTracker } from "@/components/UsageTracker";
-import { AppGestures } from "@/components/AppGestures";
-
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "/";
   const isMockExam = /^\/lesson\/re5-exam-prep\/re5-mock-[ab](?:\/|$)/.test(
     pathname
   );
+  const pathIsTab = isAppTabPath(pathname);
+  const [showTabs, setShowTabs] = useState(pathIsTab);
+
+  useEffect(() => {
+    setShowTabs(isAppTabPath(pathname));
+  }, [pathname]);
+
+  useEffect(() => {
+    const onTab = () => setShowTabs(true);
+    window.addEventListener(APP_TAB_EVENT, onTab);
+    return () => window.removeEventListener(APP_TAB_EVENT, onTab);
+  }, []);
 
   return (
     <NothoProvider>
@@ -96,7 +131,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             style={{ display: 'flex', flexDirection: 'column' }}
           >
             {!isMockExam && <MobileTopBarWrapper />}
-            <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</div>
+            <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>
+              {!isMockExam && <PersistentAppTabs visible={showTabs} />}
+              {!showTabs && children}
+            </div>
           </div>
           {(pathname === "/learn" || pathname === "/") && (
             <StatsPanelWrapper />
