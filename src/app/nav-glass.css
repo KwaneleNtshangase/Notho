@@ -1,6 +1,6 @@
-/* Instagram-style floating glass rail.
-   Neutral frost so page colour (teal banners) cannot tint the bar green.
-   Labels stay readable in light and dark. */
+/* Quiet liquid glass — Expo GlassView regular, not a milky sticker.
+   Real UIGlassEffect only exists in native Expo. This is the web/Capacitor
+   stand-in: blur does the work, fill stays thin, no tint, no rainbow rim. */
 
 .bottom-nav {
   background: transparent !important;
@@ -20,14 +20,15 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: rgba(246, 246, 248, 0.78) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(120%) !important;
-  backdrop-filter: blur(24px) saturate(120%) !important;
-  border: 0.5px solid rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.28) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(140%) !important;
+  backdrop-filter: blur(40px) saturate(140%) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.38) !important;
   border-radius: 999px !important;
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.85) !important;
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -0.5px 0 rgba(255, 255, 255, 0.08),
+    0 10px 28px rgba(0, 0, 0, 0.06) !important;
   filter: none !important;
   padding: 3px 4px !important;
 }
@@ -39,9 +40,9 @@
   z-index: 0;
   border-radius: 999px;
   pointer-events: none;
-  background: rgba(255, 255, 255, 0.88);
-  border: 0.5px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.34);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.7);
   transition:
     transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
     width 380ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -53,7 +54,7 @@
   position: relative;
   z-index: 1;
   background: transparent !important;
-  color: #4b4b52 !important;
+  color: rgba(28, 28, 32, 0.72) !important;
 }
 
 .nav-pill-btn .nav-lbl {
@@ -72,25 +73,37 @@
 }
 
 html.dark .nav-pill {
-  background: rgba(36, 36, 40, 0.72) !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
+  background: rgba(18, 18, 20, 0.38) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.35),
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.16) !important;
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.28),
+    0 10px 28px rgba(0, 0, 0, 0.28) !important;
 }
 
 html.dark .nav-lens {
-  background: rgba(72, 72, 78, 0.92);
-  border-color: rgba(255, 255, 255, 0.22);
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.28);
 }
 
 html.dark .nav-pill-btn {
-  color: #c4c4cc !important;
+  color: rgba(235, 235, 240, 0.72) !important;
 }
 
 html.dark .nav-pill-btn[data-active="true"] {
   color: #ffffff !important;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav-pill {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+  }
+  html.dark .nav-pill {
+    background: rgba(28, 28, 30, 0.96) !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
