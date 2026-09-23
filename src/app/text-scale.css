@@ -21,14 +21,13 @@ html {
   text-overflow: ellipsis;
   max-width: 100%;
 }
-button,
+
+/* Chrome buttons only. Content cards (recommended courses, settings
+   rows) must be allowed to wrap so titles stay inside the box. */
 .btn,
-.option-button,
-[role="button"] {
+button.btn,
+.option-button {
   white-space: nowrap;
-}
-.btn,
-button.btn {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
