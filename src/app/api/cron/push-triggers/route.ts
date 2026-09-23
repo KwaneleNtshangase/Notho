@@ -7,7 +7,6 @@ import { computeCoachInsights, type CoachEntry } from "@/lib/coach/insights";
 import {
   streakAtRiskPush,
   coachAlertPush,
-  leaderboardDefencePush,
   pickPush,
   type PushMessage,
 } from "@/lib/push/triggers";
@@ -21,7 +20,7 @@ export const maxDuration = 60;
  * For every user with a push subscription, evaluates in priority order:
  *   1. streak at risk (3+ day streak, nothing done today)
  *   2. coach alert (a category just went over budget)
- *   3. leaderboard defence (Saturdays, top-10 with weekly XP)
+ * Leaderboard defence is parked with the public board.
  * and sends AT MOST ONE push per user per day. The push_notification_log
  * unique (user_id, key) constraint makes every send idempotent.
  */
@@ -61,15 +60,13 @@ export async function GET(req: NextRequest) {
   const monthKey = today.slice(0, 7);
   const prevMonthKey = prevMonthKeyOf(monthKey);
   const weekKey = sastWeekKey();
-  // 16:00 UTC = 18:00 SAST on the same calendar day.
-  const isSaturday = new Date().getUTCDay() === 6;
 
   // ── Who can we even push to? ───────────────────────────────────────────────
   const { data: subs } = await admin.from("push_subscriptions").select("user_id");
   const userIds = [...new Set((subs ?? []).map((s: { user_id: string }) => s.user_id))];
   if (userIds.length === 0) return NextResponse.json({ sent: 0, evaluated: 0 });
 
-  // ── Progress rows (streak + weekly XP) for subscribed users ───────────────
+  // ── Progress rows (streak) for subscribed users ───────────────
   const { data: progressRows } = await admin
     .from("user_progress")
     .select("user_id, streak, last_activity_date, weekly_xp, week_key")
@@ -80,19 +77,6 @@ export async function GET(req: NextRequest) {
       weekly_xp: number | null; week_key: string | null;
     }) => [r.user_id, r])
   );
-
-  // ── Weekly ranks (Saturdays only): computed over ALL users, not just subscribed
-  const ranks = new Map<string, number>();
-  if (isSaturday) {
-    const { data: ladder } = await admin
-      .from("user_progress")
-      .select("user_id, weekly_xp, week_key")
-      .eq("week_key", weekKey)
-      .gt("weekly_xp", 0)
-      .order("weekly_xp", { ascending: false })
-      .limit(100);
-    (ladder ?? []).forEach((r: { user_id: string }, i: number) => ranks.set(r.user_id, i + 1));
-  }
 
   const summary = { evaluated: userIds.length, sent: 0, skippedDuplicate: 0, failed: 0 };
 
@@ -145,15 +129,7 @@ export async function GET(req: NextRequest) {
         coachMsg = coachAlertPush(insights.find((i) => i.severity === "alert"));
       }
 
-      // 3. Leaderboard defence
-      const rankMsg = leaderboardDefencePush(
-        ranks.get(userId) ?? null,
-        Number(p?.week_key === weekKey ? p?.weekly_xp ?? 0 : 0),
-        weekKey,
-        isSaturday
-      );
-
-      const msg = pickPush([streakMsg, coachMsg, rankMsg]);
+      const msg = pickPush([streakMsg, coachMsg]);
       if (!msg) continue;
 
       // Dedupe: claim the (user_id, key) slot; only send if we inserted it.
