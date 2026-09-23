@@ -1,16 +1,15 @@
 "use client";
 
-import { LeaderboardView } from "@/components/LeaderboardView";
-import { useNotho } from "@/context/NothoContext";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
+/** Leaderboard is parked. Send leftover links to Learn. */
 export default function LeaderboardPage() {
-  const { userData, weeklyXp, userId } = useNotho();
+  const router = useRouter();
 
-  return (
-    <LeaderboardView
-      xp={userData?.xp ?? 0}
-      weeklyXp={weeklyXp}
-      currentUserId={userId ?? undefined}
-    />
-  );
+  useEffect(() => {
+    router.replace("/learn");
+  }, [router]);
+
+  return null;
 }
