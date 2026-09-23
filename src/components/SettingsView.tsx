@@ -119,11 +119,9 @@ export function SettingsView({
     supabase.auth.getUser().then(({ data }) => setIsAdmin(isAdminEmail(data.user?.email))).catch(() => {});
   }, []);
 
-  // Read initial values from Supabase-backed settings (with localStorage fallback)
   const [soundEnabled, setSoundEnabled] = useState<boolean>(userSettings.settings.soundEnabled);
   const [selectedGoal, setSelectedGoal] = useState<number>(userSettings.settings.dailyGoal);
 
-  // Sync when remote settings load
   useEffect(() => {
     if (userSettings.loaded) {
       setSoundEnabled(userSettings.settings.soundEnabled);
@@ -133,7 +131,6 @@ export function SettingsView({
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
 
-  // Check current push subscription status on mount
   useEffect(() => {
     (async () => {
       if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
@@ -166,28 +163,27 @@ export function SettingsView({
   const handleSoundToggle = () => {
     const next = !soundEnabled;
     setSoundEnabled(next);
-    // Persist to Supabase + localStorage via hook
     void userSettings.setSoundEnabled(next);
   };
 
   const handleGoal = (g: number) => {
     setSelectedGoal(g);
     setDailyGoal(g);
-    // Persist to Supabase + localStorage via hook
     void userSettings.setDailyGoal(g);
   };
 
   const Row = ({ icon, label, sub, children }: { icon: React.ReactNode; label: string; sub?: string; children?: React.ReactNode }) => (
     <div style={{
       display: "flex", alignItems: "center", justifyContent: "space-between",
+      gap: 12,
       background: "var(--color-surface)", border: "1px solid var(--color-border)",
       borderRadius: 12, padding: "14px 16px", marginBottom: 8,
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <span style={{ color: "var(--color-primary)" }}>{icon}</span>
-        <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0, flex: 1 }}>
+        <span style={{ color: "var(--color-primary)", flexShrink: 0 }}>{icon}</span>
+        <div style={{ minWidth: 0 }}>
           <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>{label}</div>
-          {sub && <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 1 }}>{sub}</div>}
+          {sub && <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 1, lineHeight: 1.4, overflowWrap: "anywhere" }}>{sub}</div>}
         </div>
       </div>
       {children}
@@ -199,13 +195,11 @@ export function SettingsView({
   }
 
   return (
-    <main >
+    <main style={{ paddingBottom: 28 }}>
       <h2 className="text-gray-900 dark:text-gray-100" style={{ fontSize: 32, fontWeight: 800, marginBottom: 24 }}>Settings</h2>
 
-      {/* ── Learning ── */}
       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 8 }}>Learning</div>
 
-      {/* Sound toggle */}
       <Row icon={<Zap size={18} />} label="Sound effects" sub="Plays on correct / incorrect answers">
         <button
           role="switch"
@@ -225,7 +219,6 @@ export function SettingsView({
         </button>
       </Row>
 
-      {/* Push notifications toggle */}
       {"serviceWorker" in (typeof navigator !== "undefined" ? navigator : {}) && (
         <Row icon={<Bell size={18} />} label="Push notifications" sub="Daily lesson reminders & budget alerts">
           <button
@@ -249,9 +242,6 @@ export function SettingsView({
         </Row>
       )}
 
-      {/* Dark mode now follows system preference automatically */}
-
-      {/* Daily goal */}
       <div style={{
         background: "var(--color-surface)", border: "1px solid var(--color-border)",
         borderRadius: 12, padding: "14px 16px", marginBottom: 8,
@@ -281,11 +271,9 @@ export function SettingsView({
         </div>
       </div>
 
-      {/* ── Account ── */}
       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Account</div>
       <SettingsAccountSection />
 
-      {/* ── Support ── */}
       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Support</div>
       <a href="https://wealthwithkwanele.co.za" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
         <Row icon={<Shield size={18} />} label="Help and consultations" sub="Book or enquire via the official site">
@@ -293,7 +281,6 @@ export function SettingsView({
         </Row>
       </a>
 
-      {/* ── Admin (only visible to allowlisted team accounts) ── */}
       {isAdmin && (
         <>
           <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Admin</div>
@@ -303,7 +290,7 @@ export function SettingsView({
                 <Bug size={16} style={{ color: "var(--color-primary)", flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}>Bug console</div>
-                  <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>Triage reported &amp; auto-captured bugs · notify users when fixed</div>
+                  <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>Triage reported & auto-captured bugs · notify users when fixed</div>
                 </div>
                 <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />
               </div>
@@ -312,8 +299,7 @@ export function SettingsView({
         </>
       )}
 
-      {/* ── Help & Legal ── */}
-      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Help &amp; Legal</div>
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Help & Legal</div>
       <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, marginBottom: 8, overflow: "hidden" }}>
         {[
           { label: "FAQ & Help", icon: <HelpCircle size={16} />, action: () => setShowLegalPage("faq") },
@@ -330,10 +316,9 @@ export function SettingsView({
         ))}
       </div>
 
-      {/* ── Account & Data ── */}
       {onDeleteAccount && (
         <>
-          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Account &amp; Data</div>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Account & Data</div>
           <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, marginBottom: 8, overflow: "hidden" }}>
             {onDownloadData && (
               <button type="button" onClick={onDownloadData}
@@ -357,7 +342,6 @@ export function SettingsView({
         </>
       )}
 
-      {/* Sign out */}
       {onSignOut && (
         <button type="button" onClick={onSignOut} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 600, color: "var(--color-danger)", background: "none", border: "none", cursor: "pointer", padding: "8px 0", marginTop: 4, marginBottom: 32 }}>
           <LogOut size={18} />
@@ -365,12 +349,6 @@ export function SettingsView({
         </button>
       )}
 
-      {/*
-        Delete flow. The bare confirm dialog that used to live here is now the
-        last of three steps inside ExitSurveyModal: ask why, offer the relevant
-        alternative, then confirm. Skip is on the first step, so nobody is made
-        to answer to get out.
-      */}
       <ExitSurveyModal
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -378,7 +356,6 @@ export function SettingsView({
         getAccessToken={async () => (await supabase.auth.getSession()).data.session?.access_token ?? null}
       />
 
-      {/* Feedback modal */}
       <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
     </main>
   );
