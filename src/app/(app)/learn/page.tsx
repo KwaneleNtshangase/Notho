@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { LearnView } from "@/components/views/LearnView";
-import { ThisWeekCard } from "@/components/ThisWeekCard";
 import { CONTENT_DATA, Lesson } from "@/data/content";
 import { useNotho } from "@/context/NothoContext";
 import { analytics } from "@/lib/analytics";
@@ -14,7 +13,6 @@ import { markCourseFocus } from "@/lib/scrollMemory";
 export default function LearnPage() {
   const {
     userId,
-    weeklyXp,
     isLessonCompleted,
     setRoute,
     progressReady,
@@ -80,23 +78,20 @@ export default function LearnPage() {
   );
 
   return (
-    <>
-      <ThisWeekCard weeklyXp={weeklyXp ?? 0} userId={userId ?? null} />
-      <LearnView
-        courses={CONTENT_DATA.courses}
-        isLessonCompleted={isLessonCompleted}
-        goToCourse={(courseId) => {
-          const c = CONTENT_DATA.courses.find((x) => x.id === courseId);
-          if (c) analytics.courseOpened(courseId, c.title);
-          markCourseFocus(courseId);
-          setRoute({ name: "course", courseId });
-        }}
-        contentLoaded={progressReady}
-        savedProgress={savedProgress}
-        onResumeLesson={resumeLesson}
-        userLevel={userData?.level ?? 1}
-        userXP={userData?.xp ?? 0}
-      />
-    </>
+    <LearnView
+      courses={CONTENT_DATA.courses}
+      isLessonCompleted={isLessonCompleted}
+      goToCourse={(courseId) => {
+        const c = CONTENT_DATA.courses.find((x) => x.id === courseId);
+        if (c) analytics.courseOpened(courseId, c.title);
+        markCourseFocus(courseId);
+        setRoute({ name: "course", courseId });
+      }}
+      contentLoaded={progressReady}
+      savedProgress={savedProgress}
+      onResumeLesson={resumeLesson}
+      userLevel={userData?.level ?? 1}
+      userXP={userData?.xp ?? 0}
+    />
   );
 }
