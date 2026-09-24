@@ -11,6 +11,7 @@ import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
 import { TEXT_SCALE_BOOT_SCRIPT } from "@/lib/textScale";
 import "./globals.css";
 import "./text-scale.css";
+import "./shell-layout.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,25 +29,25 @@ const geistMono = Geist_Mono({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export const metadata: Metadata = {
   title: "Notho - Master Your Money",
   description: "Interactive personal finance learning app built for South Africa.",
   manifest: "/manifest.json",
-  // www, not the apex. The apex 308-redirects to www, and social scrapers
-  // (WhatsApp, Twitter, LinkedIn) do not all follow redirects when fetching
-  // og:image — the share preview comes back blank. Point straight at the host
-  // that actually serves the file.
   metadataBase: new URL("https://www.notho.co.za"),
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Notho",
   },
   icons: {
-    // Square mark for icon slots. The wide lockup used to sit here, which
-    // meant browsers and iOS centre-cropped it down to a sliver of the "N".
     icon: [
       { url: "/favicon.ico", sizes: "any" },
       { url: "/notho-icon-192.png", type: "image/png", sizes: "192x192" },
@@ -56,12 +57,10 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    // OG wants the wide lockup, not the square mark.
     images: ["/notho-logo.png"],
     title: "Notho",
     description: "Learn to manage money the South African way",
   },
-  // mobile-web-app-capable is already emitted by appleWebApp.capable above
 };
 
 export default function RootLayout({
@@ -72,11 +71,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Rebrand storage migration. Must run before hydration: hooks read
-            these keys on their first render, and without this every existing
-            user reads empty notho-* keys and looks brand new. */}
         <script dangerouslySetInnerHTML={{ __html: STORAGE_MIGRATION_SCRIPT }} />
-        {/* Apply saved text size before first paint so the scale does not flash. */}
         <script dangerouslySetInnerHTML={{ __html: TEXT_SCALE_BOOT_SCRIPT }} />
       </head>
       <body
@@ -87,11 +82,7 @@ export default function RootLayout({
           <ServiceWorkerRegistration />
           <ErrorReportingInit />
           <TextScaleInit />
-          {/* No-op on web; on native, exchanges the OAuth deep-link callback
-              for a session. See NativeAuthDeepLink.tsx and AuthGate.tsx. */}
           <NativeAuthDeepLink />
-          {/* No-op on web; on native, suppresses the browser's own PWA
-              install nudge. See NativeShellGuards.tsx. */}
           <NativeShellGuards />
         </ErrorBoundary>
       </body>
