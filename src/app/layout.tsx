@@ -28,6 +28,12 @@ const geistMono = Geist_Mono({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -41,7 +47,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.notho.co.za"),
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Notho",
   },
   icons: {
@@ -90,8 +96,8 @@ export default function RootLayout({
           {/* No-op on web; on native, exchanges the OAuth deep-link callback
               for a session. See NativeAuthDeepLink.tsx and AuthGate.tsx. */}
           <NativeAuthDeepLink />
-          {/* No-op on web; on native, suppresses the browser's own PWA
-              install nudge. See NativeShellGuards.tsx. */}
+          {/* Syncs theme-color / status-bar chrome with light+dark. On native
+              also suppresses the browser PWA install nudge. */}
           <NativeShellGuards />
         </ErrorBoundary>
       </body>
