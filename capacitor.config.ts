@@ -32,9 +32,11 @@ const config: CapacitorConfig = {
   },
 
   ios: {
-    contentInset: "always",
-    // Match the web splash so there is no dark flash while WKWebView paints.
-    backgroundColor: "#ffffff",
+    // "always" reserved a white native strip above the WebView for the clock
+    // / battery. Dark mode then looked like Instagram-but-with-a-white-hat.
+    // Never: the page paints edge-to-edge and uses safe-area padding instead.
+    contentInset: "never",
+    backgroundColor: "#000000",
     // Identifies the shell in your server logs and lets you branch on native.
     appendUserAgent: "NothoApp/iOS",
     limitsNavigationsToAppBoundDomains: false,
