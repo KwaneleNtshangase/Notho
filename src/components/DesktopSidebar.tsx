@@ -53,7 +53,7 @@ export function DesktopSidebar() {
   return (
     <nav className="sidebar" style={{ background: "var(--color-bg)", border: "none" }}>
       <div style={{
-        padding: "20px 20px 16px",
+        padding: "16px 14px 12px",
         borderBottom: "1px solid var(--color-border)",
         marginBottom: 8,
       }}>
@@ -61,13 +61,13 @@ export function DesktopSidebar() {
           className="logo-light"
           src="/notho-logo.png"
           alt="Notho"
-          style={{ width: "100%", maxWidth: 190, height: "auto", objectFit: "contain", display: "block" }}
+          style={{ width: "100%", maxWidth: 132, height: "auto", objectFit: "contain", display: "block" }}
         />
         <img
           className="logo-dark"
           src="/notho-logo-on-dark.png"
           alt="Notho"
-          style={{ width: "100%", maxWidth: 190, height: "auto", objectFit: "contain" }}
+          style={{ width: "100%", maxWidth: 132, height: "auto", objectFit: "contain" }}
         />
       </div>
       <ul className="nav-menu">
