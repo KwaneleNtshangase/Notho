@@ -1,12 +1,5 @@
 /**
  * Shared web-push subscription helpers.
- *
- * Browsers require an explicit user grant for notifications, so "on by
- * default" is implemented as:
- *   - silent re-subscribe whenever permission is ALREADY granted (covers
- *     returning users and cleans up lost subscriptions), and
- *   - a soft in-app prompt (NotificationOptIn) that asks everyone else once.
- * Settings keeps the explicit on/off toggle as the opt-out.
  */
 
 import { supabase } from "@/lib/supabaseClient";
@@ -34,13 +27,6 @@ export function pushSupported(): boolean {
 
 export type EnsureResult = "subscribed" | "unsupported" | "denied" | "dismissed";
 
-/**
- * Ensure this device has a push subscription saved for the signed-in user.
- * - interactive=false: only proceeds if permission is already granted
- *   (silent auto-resubscribe; safe to call on every app load).
- * - interactive=true: triggers the browser permission prompt (must be called
- *   from a user gesture for Safari/iOS).
- */
 export async function ensurePushSubscription(interactive: boolean): Promise<EnsureResult> {
   if (!pushSupported()) return "unsupported";
 
@@ -76,12 +62,23 @@ export async function ensurePushSubscription(interactive: boolean): Promise<Ensu
         },
         { onConflict: "user_id,endpoint" }
       );
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        const token = session.session?.access_token;
+        if (token) {
+          await fetch("/api/push/hello", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        }
+      } catch {
+        /* ping is best-effort */
+      }
     }
   }
   return "subscribed";
 }
 
-/** Remove this device's subscription (Settings opt-out). */
 export async function disablePush(): Promise<void> {
   if (!pushSupported()) return;
   const reg = await navigator.serviceWorker.getRegistration("/sw.js");
