@@ -13,7 +13,6 @@ import "./globals.css";
 import "./text-scale.css";
 import "./shell-layout.css";
 import "./splash-static.css";
-import "./hide-advisor-cta.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
