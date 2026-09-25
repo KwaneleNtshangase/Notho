@@ -1,29 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceSupabase } from "@/lib/supabaseServer";
 import { sastToday } from "@/lib/dates";
-import { sastWeekKey } from "@/lib/dates";
 import { resolveMonthlyBudget, type BudgetTargetRow } from "@/lib/budget/budgetResolve";
 import { computeCoachInsights, type CoachEntry } from "@/lib/coach/insights";
 import {
   streakAtRiskPush,
   coachAlertPush,
+  routinePush,
   pickPush,
   type PushMessage,
 } from "@/lib/push/triggers";
+import { resolveNextLesson } from "@/lib/push/nextLesson";
+import { sendWebPush } from "@/lib/push/send";
+import { CONTENT_DATA } from "@/data/content";
+import { isTombstone } from "@/lib/sync/mergeRules";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
-
-/**
- * Evening push-trigger cron (vercel.json, 16:00 UTC = 18:00 SAST).
- *
- * For every user with a push subscription, evaluates in priority order:
- *   1. streak at risk (3+ day streak, nothing done today)
- *   2. coach alert (a category just went over budget)
- * Leaderboard defence is parked with the public board.
- * and sends AT MOST ONE push per user per day. The push_notification_log
- * unique (user_id, key) constraint makes every send idempotent.
- */
 
 const BUILT_IN_LABELS: Record<string, string> = {
   food: "Food & Groceries", transport: "Transport", housing: "Housing/Rent",
@@ -49,33 +42,39 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceKey) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
-  }
-
   const admin = createServiceSupabase();
   const today = sastToday();
   const monthKey = today.slice(0, 7);
   const prevMonthKey = prevMonthKeyOf(monthKey);
-  const weekKey = sastWeekKey();
+  const catalog = CONTENT_DATA.courses.map((c) => ({
+    id: c.id,
+    title: c.title,
+    units: c.units.map((u) => ({
+      lessons: u.lessons.map((l) => ({ id: l.id, title: l.title, comingSoon: l.comingSoon })),
+    })),
+  }));
 
-  // ── Who can we even push to? ───────────────────────────────────────────────
-  const { data: subs } = await admin.from("push_subscriptions").select("user_id");
-  const userIds = [...new Set((subs ?? []).map((s: { user_id: string }) => s.user_id))];
+  const { data: subs } = await admin.from("push_subscriptions").select("user_id, endpoint, p256dh, auth");
+  const byUser = new Map<string, { endpoint: string; p256dh: string; auth: string }[]>();
+  for (const s of subs ?? []) {
+    const uid = (s as { user_id: string }).user_id;
+    const list = byUser.get(uid) ?? [];
+    list.push({
+      endpoint: (s as { endpoint: string }).endpoint,
+      p256dh: (s as { p256dh: string }).p256dh,
+      auth: (s as { auth: string }).auth,
+    });
+    byUser.set(uid, list);
+  }
+  const userIds = [...byUser.keys()];
   if (userIds.length === 0) return NextResponse.json({ sent: 0, evaluated: 0 });
 
-  // ── Progress rows (streak) for subscribed users ───────────────
   const { data: progressRows } = await admin
     .from("user_progress")
-    .select("user_id, streak, last_activity_date, weekly_xp, week_key")
+    .select("user_id, streak, last_activity_date, completed_lessons, pinned_courses, lesson_resume")
     .in("user_id", userIds);
   const progress = new Map(
-    (progressRows ?? []).map((r: {
-      user_id: string; streak: number | null; last_activity_date: string | null;
-      weekly_xp: number | null; week_key: string | null;
-    }) => [r.user_id, r])
+    (progressRows ?? []).map((r: Record<string, unknown>) => [r.user_id as string, r])
   );
 
   const summary = { evaluated: userIds.length, sent: 0, skippedDuplicate: 0, failed: 0 };
@@ -83,17 +82,30 @@ export async function GET(req: NextRequest) {
   for (const userId of userIds) {
     try {
       const p = progress.get(userId);
+      const pinned = (p?.pinned_courses as { ids?: string[] } | null)?.ids ?? [];
+      const resumeRaw = p?.lesson_resume as { courseId?: string; lessonId?: string; cleared?: boolean } | null;
+      const resume = resumeRaw && !isTombstone(resumeRaw) ? resumeRaw : null;
+      const next = resolveNextLesson({
+        courses: catalog,
+        completedLessons: (p?.completed_lessons as string[] | null) ?? [],
+        pinnedCourseIds: pinned,
+        resume,
+      });
 
-      // 1. Streak at risk
       const streakMsg = streakAtRiskPush(
         Number(p?.streak ?? 0),
-        p?.last_activity_date ?? null,
-        today
+        (p?.last_activity_date as string | null) ?? null,
+        today,
+        next
+      );
+      const habitMsg = routinePush(
+        (p?.last_activity_date as string | null) ?? null,
+        today,
+        next
       );
 
-      // 2. Coach alert (only compute the heavier budget query when needed)
       let coachMsg: PushMessage | null = null;
-      if (!streakMsg) {
+      if (!streakMsg && !habitMsg) {
         const [entriesRes, targetsRes, catsRes] = await Promise.all([
           admin
             .from("budget_entries")
@@ -129,10 +141,9 @@ export async function GET(req: NextRequest) {
         coachMsg = coachAlertPush(insights.find((i) => i.severity === "alert"));
       }
 
-      const msg = pickPush([streakMsg, coachMsg]);
+      const msg = pickPush([streakMsg, habitMsg, coachMsg]);
       if (!msg) continue;
 
-      // Dedupe: claim the (user_id, key) slot; only send if we inserted it.
       const { data: claimed } = await admin
         .from("push_notification_log")
         .upsert(
@@ -145,21 +156,12 @@ export async function GET(req: NextRequest) {
         continue;
       }
 
-      const res = await fetch(`${supabaseUrl}/functions/v1/send-push-notifications`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${serviceKey}`,
-        },
-        body: JSON.stringify({
-          mode: "targeted",
-          user_id: userId,
-          title: msg.title,
-          body: msg.body,
-          url: msg.url,
-        }),
-      });
-      if (res.ok) summary.sent++;
+      let delivered = 0;
+      for (const sub of byUser.get(userId) ?? []) {
+        const result = await sendWebPush(sub, { title: msg.title, body: msg.body, url: msg.url });
+        if (result.ok) delivered++;
+      }
+      if (delivered > 0) summary.sent++;
       else summary.failed++;
     } catch (err) {
       console.error("[push-triggers]", userId, err);
