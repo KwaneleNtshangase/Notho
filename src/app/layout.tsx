@@ -26,12 +26,18 @@ const geistMono = Geist_Mono({
 
 const CANVAS_BOOT_SCRIPT = `(() => {
   try {
-    var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var c = dark ? '#000000' : '#ffffff';
-    var root = document.documentElement;
-    root.style.backgroundColor = c;
-    root.style.setProperty('--notho-canvas', c);
-    if (document.body) document.body.style.backgroundColor = c;
+    var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+    var apply = function (dark) {
+      var c = dark ? '#000000' : '#ffffff';
+      var root = document.documentElement;
+      root.style.backgroundColor = c;
+      root.style.setProperty('--notho-canvas', c);
+      root.classList.toggle('dark', !!dark);
+      if (document.body) document.body.style.backgroundColor = c;
+    };
+    apply(mq && mq.matches);
+    if (mq && mq.addEventListener) mq.addEventListener('change', function (e) { apply(e.matches); });
+    else if (mq && mq.addListener) mq.addListener(function (e) { apply(e.matches); });
   } catch (e) {}
 })();`;
 

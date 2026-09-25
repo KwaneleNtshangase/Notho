@@ -9,7 +9,7 @@ export function AppSplash() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#ffffff",
+        background: "var(--color-bg, #ffffff)",
       }}
     >
       <img
