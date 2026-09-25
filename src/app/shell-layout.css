@@ -1,14 +1,56 @@
-/* iPad / tablet shell + dark status chrome.
+/* iPad / tablet shell + dark status / overscroll chrome.
    Overrides only — keep tokens in globals.css. */
 
 :root {
   --sidebar-width: 0px;
+  --notho-canvas: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root { --notho-canvas: #000000; }
+}
+
+html.dark {
+  --notho-canvas: #000000;
+}
+
+html.light {
+  --notho-canvas: #ffffff;
+}
+
+html, body {
+  background-color: var(--notho-canvas) !important;
+  min-height: 100%;
+  min-height: 100dvh;
+  overscroll-behavior: none;
+}
+
+body {
+  /* iOS rubber-band reveals whatever is behind the scrolling layer.
+     A fixed full-viewport canvas stops the white flash. */
+  background-color: var(--notho-canvas) !important;
+}
+
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--notho-canvas);
+  pointer-events: none;
+}
+
+#__next,
+.app-container {
+  background-color: var(--notho-canvas);
+  min-height: 100dvh;
 }
 
 .sidebar {
   width: var(--sidebar-width) !important;
   height: 100dvh;
   padding-top: env(safe-area-inset-top, 0px);
+  background: var(--color-bg);
 }
 
 @media (min-width: 769px) {
@@ -22,6 +64,7 @@
 .main-content {
   min-width: 0;
   overflow-x: clip;
+  background: var(--color-bg);
 }
 
 @media (min-width: 768px) {
@@ -41,6 +84,7 @@
   min-height: 100dvh;
   background: var(--color-bg);
   padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .budget-page,
@@ -51,22 +95,12 @@
   margin-right: 0;
 }
 
-html, body {
-  background-color: var(--color-bg);
-}
-
 @media (prefers-color-scheme: dark) {
   html { color-scheme: dark; }
-  html, body { background-color: #000000; }
 }
 
 html.dark {
   color-scheme: dark;
-}
-
-html.dark,
-html.dark body {
-  background-color: #000000;
 }
 
 .mobile-top-bar {

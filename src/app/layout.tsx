@@ -23,9 +23,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Without this, mobile browsers render at ~980px virtual width and
-// CSS media queries like max-width: 1200px never match real phones.
-// Pinch-zoom stays enabled (WCAG 1.4.4) - never set maximumScale/userScalable.
+const CANVAS_BOOT_SCRIPT = `(() => {
+  try {
+    var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var c = dark ? '#000000' : '#ffffff';
+    var root = document.documentElement;
+    root.style.backgroundColor = c;
+    root.style.setProperty('--notho-canvas', c);
+    if (document.body) document.body.style.backgroundColor = c;
+  } catch (e) {}
+})();`;
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -73,6 +81,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: STORAGE_MIGRATION_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: TEXT_SCALE_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: CANVAS_BOOT_SCRIPT }} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

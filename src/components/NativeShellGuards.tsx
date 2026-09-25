@@ -28,12 +28,11 @@ function applyChrome(dark: boolean) {
     status.setAttribute("name", "apple-mobile-web-app-status-bar-style");
     document.head.appendChild(status);
   }
-  // black-translucent lets the page background paint behind the clock/battery
-  // strip — same idea as Instagram. "default" is always a white bar.
   status.setAttribute("content", dark ? "black-translucent" : "default");
 
   document.documentElement.style.backgroundColor = color;
   document.body.style.backgroundColor = color;
+  document.documentElement.style.setProperty("--notho-canvas", color);
 }
 
 export function NativeShellGuards() {
