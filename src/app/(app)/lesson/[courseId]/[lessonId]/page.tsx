@@ -38,7 +38,6 @@ import {
 import { fetchLessonResults, recordLessonResult } from "@/lib/results/store";
 import type { LessonResult } from "@/lib/results/types";
 
-/** Saved mid-lesson progress is honoured for this long after the last step. */
 const SAVED_PROGRESS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 type SavedMidLesson = {
@@ -73,13 +72,17 @@ function readSavedMidLesson(
   }
 }
 
+function warmRoute(router: { prefetch: (href: string) => void }, href: string) {
+  try {
+    router.prefetch(href);
+  } catch {
+    /* prefetch is best-effort */
+  }
+}
+
 export default function LessonPage({ params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const { courseId, lessonId } = use(params);
 
-  // RE5 mocks have a separate server-owned lifecycle. Keep them out of the
-  // generic lesson engine, whose browser-local answers, correctness feedback,
-  // mastery requeue and heart deductions are intentionally inappropriate for
-  // an examination sitting.
   if (courseId === RE5_COURSE_ID && isRe5MockExam(lessonId)) {
     return <MockAttemptExperience courseId={courseId} lessonId={lessonId} />;
   }
@@ -96,6 +99,7 @@ function StandardLessonPage({
 }) {
   const {
     userId,
+    userData,
     currentLessonState,
     setCurrentLessonState,
     setRoute,
@@ -109,18 +113,13 @@ function StandardLessonPage({
   const router = useRouter();
   const lessonStartTimeRef = React.useRef(Date.now());
   const isFinalizingRef = React.useRef(false);
-  const lessonHeartLostRef = React.useRef(false); // To track if a heart was lost during this lesson
+  const lessonHeartLostRef = React.useRef(false);
 
-  // Marked result for an RE5 mock exam. Rendered instead of LessonSummaryView,
-  // which has no room for a pass mark, a knowledge-area breakdown or a time.
   const [examResult, setExamResult] = React.useState<{
     attempt: ExamAttemptSummary;
     previousAttempts: LessonResult[];
   } | null>(null);
 
-  // State is only usable when it belongs to THIS URL. A stale state from the
-  // previous lesson (e.g. after "Continue to next lesson") must be re-inited,
-  // or the old lesson's steps render under the new URL.
   const hasLessonState = Boolean(
     currentLessonState &&
       currentLessonState.steps &&
@@ -129,12 +128,13 @@ function StandardLessonPage({
       currentLessonState.lessonId === lessonId
   );
 
-  // Arrived without matching in-memory state (page refresh, PWA relaunch,
-  // deep link, or next-lesson navigation). Restore the saved mid-lesson
-  // position if one exists for this exact lesson, otherwise start it fresh
-  // from content; only bail to the course page when the lesson is unknown.
-  // Runs in an effect — the previous version called setRoute during render,
-  // which is unsafe and dumped users back to the course on every refresh.
+  React.useEffect(() => {
+    warmRoute(router, `/course/${courseId}`);
+    warmRoute(router, "/learn");
+    const next = getNextLesson(courseId, lessonId);
+    if (next?.id) warmRoute(router, `/lesson/${courseId}/${next.id}`);
+  }, [router, courseId, lessonId]);
+
   React.useEffect(() => {
     if (hasLessonState) return;
     const course = CONTENT_DATA.courses.find((c) => c.id === courseId);
@@ -148,14 +148,8 @@ function StandardLessonPage({
       const saved = readSavedMidLesson(userId, courseId, lessonId);
       let workingSteps: WorkingStep[];
       if (saved?.steps && saved.steps.length > 0) {
-        // Prefer the persisted working steps — they include any re-queued
-        // copies from the mastery loop, which can't be re-derived from content.
         workingSteps = saved.steps;
       } else {
-        // Fresh (deep link / relaunch, no save): resolve the bank for this
-        // attempt, then shuffle with the same seed so answer indexes are stable.
-        // Fall back to static steps if bank resolution ever throws/empties, so
-        // the lesson still opens instead of hanging on "Loading lesson...".
         const attemptNo = nextAttemptNo(userId, lessonId);
         let resolved = lesson.steps ?? [];
         try {
@@ -197,127 +191,126 @@ function StandardLessonPage({
     return <div className="p-4">Loading lesson...</div>;
   }
 
-  const finalizeCurrentLesson = async (choice: "next" | "course") => {
-    // Prevent double-tap on Done from awarding XP multiple times
+  const finalizeCurrentLesson = (choice: "next" | "course") => {
     if (isFinalizingRef.current) return;
     isFinalizingRef.current = true;
 
-    const baseXP = 50;
-    const totalXP = baseXP + currentLessonState.correctCount * 10;
     if (!currentLessonState.courseId || !currentLessonState.lessonId) {
       isFinalizingRef.current = false;
       return;
     }
 
-    // Distinct questions in the lesson (re-queued copies share a qid, so this
-    // is not inflated by the mastery loop).
+    const doneCourseId = currentLessonState.courseId;
+    const doneLessonId = currentLessonState.lessonId;
+    const nextLesson = getNextLesson(doneCourseId, doneLessonId);
+
+    warmRoute(router, `/course/${doneCourseId}`);
+    if (choice === "next" && nextLesson?.id) {
+      warmRoute(router, `/lesson/${doneCourseId}/${nextLesson.id}`);
+    }
+
+    const baseXP = 50;
+    const totalXP = baseXP + currentLessonState.correctCount * 10;
     const totalQuestions = baseQids(currentLessonState.steps).length;
-    // With the mastery loop every question ends correct, so "perfect" can no
-    // longer mean "all correct" — it means the learner never missed on the
-    // first try.
     const isPerfect = totalQuestions > 0 && currentLessonState.mistakes === 0;
-
-    const lessonTitleDone =
-      getLessonTitle(currentLessonState.courseId, currentLessonState.lessonId) ?? "";
-    const { streak: streakAfterLesson, xpAwarded } = await completeLesson(
-      currentLessonState.courseId,
-      currentLessonState.lessonId,
-      totalXP,
-      isPerfect
-    );
-
-    analytics.lessonCompleted(
-      currentLessonState.courseId,
-      currentLessonState.lessonId,
-      lessonTitleDone,
-      {
-        xpEarned: xpAwarded,
-        isPerfect,
-        timeSeconds: Math.round((Date.now() - lessonStartTimeRef.current) / 1000),
-        heartLost: lessonHeartLostRef.current,
-      }
+    const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
+    const lessonTitleDone = getLessonTitle(doneCourseId, doneLessonId) ?? "";
+    const spec = examSpecFor(doneLessonId);
+    const scored = scoreAttempt(
+      currentLessonState.steps,
+      currentLessonState.mistakenQids,
+      spec ? re5AreaResolver(doneLessonId) : undefined
     );
 
     if (typeof window !== "undefined") {
       localStorage.removeItem("notho-lesson-progress");
     }
 
-    // ── Record the result ─────────────────────────────────────────────────
-    // Runs on EVERY finish, replays included. A re-sit of a mock exam is a
-    // replay by definition, and the old early-return for already-completed
-    // lessons meant a second attempt produced no score at all — and reported
-    // accuracy as correctCount/totalQuestions, which the mastery loop pins at
-    // 100% because every question ends correct. Score once, honestly, here.
-    const spec = examSpecFor(currentLessonState.lessonId);
-    const scored = scoreAttempt(
-      currentLessonState.steps,
-      currentLessonState.mistakenQids,
-      spec ? re5AreaResolver(currentLessonState.lessonId) : undefined
-    );
-    const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
-
-    // Read history BEFORE writing this attempt, so "previous best" on the exam
-    // result means previous.
-    const priorResults = spec
-      ? await fetchLessonResults(currentLessonState.courseId)
-      : [];
-
-    const savedResult = await recordLessonResult({
-      courseId: currentLessonState.courseId,
-      lessonId: currentLessonState.lessonId,
-      kind: spec ? "exam" : "lesson",
-      totalQuestions: scored.totalQuestions,
-      firstTryCorrect: scored.firstTryCorrect,
-      passMarkCorrect: spec?.passMarkCorrect ?? null,
-      durationSeconds: elapsedSeconds,
-      areaBreakdown: scored.areaBreakdown,
-    });
-
-    if (spec) {
-      setExamResult({
-        attempt: {
-          spec,
-          firstTryCorrect: scored.firstTryCorrect,
-          totalQuestions: scored.totalQuestions,
-          scorePct: scored.scorePct,
-          // Integer comparison against the pass mark as a COUNT, never a
-          // percentage one: 33 is written down in RE5_MOCK_EXAMS rather than
-          // re-derived from the published 65% threshold. See requiredCorrect()
-          // in src/lib/results/score.ts.
-          passed: scored.firstTryCorrect >= spec.passMarkCorrect,
-          durationSeconds: elapsedSeconds,
-          areaBreakdown: scored.areaBreakdown,
-          saved: savedResult !== null,
-        },
-        previousAttempts: priorResults,
+    if (!spec) {
+      setLessonSummary({
+        xpEarned: totalXP,
+        timeSeconds: elapsedSeconds,
+        accuracy: scored.scorePct,
+        streak: userData?.streak ?? 0,
+        isPerfect,
+        choice,
+        nextLessonId: nextLesson?.id ?? null,
+        courseId: doneCourseId,
+        lessonId: doneLessonId,
       });
-      isFinalizingRef.current = false;
-      return;
     }
 
-    setLessonSummary({
-      xpEarned: xpAwarded,
-      timeSeconds: elapsedSeconds,
-      accuracy: scored.scorePct,
-      streak: streakAfterLesson,
-      isPerfect,
-      choice,
-      nextLessonId: getNextLesson(currentLessonState.courseId, currentLessonState.lessonId)?.id ?? null,
-      courseId: currentLessonState.courseId,
-      lessonId: currentLessonState.lessonId,
-    });
+    void (async () => {
+      try {
+        const { streak: streakAfterLesson, xpAwarded } = await completeLesson(
+          doneCourseId,
+          doneLessonId,
+          totalXP,
+          isPerfect
+        );
 
-    isFinalizingRef.current = false;
+        analytics.lessonCompleted(doneCourseId, doneLessonId, lessonTitleDone, {
+          xpEarned: xpAwarded,
+          isPerfect,
+          timeSeconds: elapsedSeconds,
+          heartLost: lessonHeartLostRef.current,
+        });
+
+        const priorResults = spec ? await fetchLessonResults(doneCourseId) : [];
+
+        const savedResult = await recordLessonResult({
+          courseId: doneCourseId,
+          lessonId: doneLessonId,
+          kind: spec ? "exam" : "lesson",
+          totalQuestions: scored.totalQuestions,
+          firstTryCorrect: scored.firstTryCorrect,
+          passMarkCorrect: spec?.passMarkCorrect ?? null,
+          durationSeconds: elapsedSeconds,
+          areaBreakdown: scored.areaBreakdown,
+        });
+
+        if (spec) {
+          setExamResult({
+            attempt: {
+              spec,
+              firstTryCorrect: scored.firstTryCorrect,
+              totalQuestions: scored.totalQuestions,
+              scorePct: scored.scorePct,
+              passed: scored.firstTryCorrect >= spec.passMarkCorrect,
+              durationSeconds: elapsedSeconds,
+              areaBreakdown: scored.areaBreakdown,
+              saved: savedResult !== null,
+            },
+            previousAttempts: priorResults,
+          });
+        } else {
+          setLessonSummary((prev) =>
+            prev && prev.courseId === doneCourseId && prev.lessonId === doneLessonId
+              ? { ...prev, xpEarned: xpAwarded, streak: streakAfterLesson }
+              : prev
+          );
+        }
+      } catch {
+        /* persistence failed; the local completion screen already showed */
+      } finally {
+        isFinalizingRef.current = false;
+      }
+    })();
   };
 
   const handleLessonSummaryClose = () => {
     if (!lessonSummary) return;
-    const { choice, nextLessonId, courseId } = lessonSummary;
+    const { choice, nextLessonId, courseId: summaryCourseId } = lessonSummary;
+    if (choice === "next" && nextLessonId) {
+      warmRoute(router, `/lesson/${summaryCourseId}/${nextLessonId}`);
+    } else {
+      warmRoute(router, `/course/${summaryCourseId}`);
+    }
     setLessonSummary(null);
     if (choice === "next" && nextLessonId) {
-      setRoute({ name: "lesson", courseId, lessonId: nextLessonId });
+      setRoute({ name: "lesson", courseId: summaryCourseId, lessonId: nextLessonId });
     } else {
-      setRoute({ name: "course", courseId });
+      setRoute({ name: "course", courseId: summaryCourseId });
     }
   };
 
@@ -328,6 +321,7 @@ function StandardLessonPage({
         previousAttempts={examResult.previousAttempts}
         onBackToCourse={() => {
           setExamResult(null);
+          warmRoute(router, `/course/${courseId}`);
           setRoute({ name: "course", courseId });
         }}
         onViewReadiness={() => {
@@ -336,8 +330,6 @@ function StandardLessonPage({
         }}
         onRetake={() => {
           setExamResult(null);
-          // Clear the finished attempt so the effect above re-resolves the
-          // exam from content instead of restoring the completed step list.
           setCurrentLessonState((prev) => ({ ...prev, courseId: null, lessonId: null, steps: [] }));
           setRoute({ name: "lesson", courseId, lessonId });
         }}
@@ -364,10 +356,6 @@ function StandardLessonPage({
     return next?.title ?? undefined;
   })();
 
-  // Single source of truth for answering any question type. On a wrong answer
-  // it (1) re-queues a fresh copy of the question to the end of the session so
-  // the learner must return to it, and (2) pulls the linked concept's next
-  // review sooner via SM-2 so it resurfaces in future sessions.
   const recordAnswer = (isCorrect: boolean, answerValue: unknown) => {
     const answeredStep = currentLessonState.steps[currentLessonState.stepIndex] as
       | (WorkingStep & { conceptId?: string })
@@ -377,11 +365,6 @@ function StandardLessonPage({
       const qid = step?.__qid;
       const answers = { ...prev.answers, [prev.stepIndex]: answerValue };
 
-      // Ungraded steps record the interaction and stop there. An action step is
-      // self-reported completion, not a question with a right answer, so it must
-      // not touch correctCount, mistakes, hearts or the re-queue. Before this,
-      // "Done - I did it!" fell through to the wrong-answer branch below and the
-      // step re-queued itself forever — see src/lib/lessonScoring.ts.
       if (!isScorableStep(step?.type)) {
         return { ...prev, answers };
       }
@@ -420,15 +403,10 @@ function StandardLessonPage({
       });
     }
     if (isCorrect) {
-      // Learner finally got this exact item right — stop resurfacing it.
       clearMissedVariant(userId, slotId, variantId);
     } else {
-      // Gamification: a wrong answer costs a heart (loseHeart shows the
-      // out-of-hearts state when it hits zero).
       loseHeart();
       lessonHeartLostRef.current = true;
-      // Resurface this exact variant in future plays, and shorten the concept's
-      // SM-2 interval so the idea returns in reviews too.
       recordMissedVariant(userId, slotId, variantId);
       if (answeredStep?.conceptId) void recordConceptResult(answeredStep.conceptId, false);
     }
@@ -457,9 +435,6 @@ function StandardLessonPage({
       canFinalize={canFinalize}
       answerQuestion={(index: number) => {
         const step = currentLessonState.steps[currentLessonState.stepIndex];
-        // Scenario steps render through the same option UI but were never
-        // counted (type check was mcq-only) — perfect scores were impossible
-        // on lessons containing scenarios.
         const isCorrect =
           (step.type === "mcq" || step.type === "scenario") && index === step.correct;
         recordAnswer(isCorrect, index);
@@ -481,8 +456,6 @@ function StandardLessonPage({
       nextLessonTitle={nextTitle}
       lessonTitle={getLessonTitle(courseId, lessonId) || `${courseId} ${lessonId}`}
       lessonStartTimeRef={lessonStartTimeRef}
-      // Was counting non-existent types ("question", "action-check") — must
-      // match the scoreable set used in finalize, or accuracy is misstated.
       totalQuestions={currentLessonState.steps.filter((s: any) => s.type === "mcq" || s.type === "true-false" || s.type === "scenario" || s.type === "fill-blank").length}
     />
   );

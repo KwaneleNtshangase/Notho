@@ -10,17 +10,21 @@ import { APP_TAB_HREFS, announceTab, hrefForRouteName } from "@/lib/appTabs";
 
 export const NothoContext = createContext<NothoState | null>(null);
 
+function warm(router: { prefetch: (href: string) => void }, href: string) {
+  try {
+    router.prefetch(href);
+  } catch {
+    /* prefetch is best-effort */
+  }
+}
+
 export function NothoProvider({ children }: { children: React.ReactNode }) {
   const state = useNothoStateInternal();
   const router = useRouter();
 
   React.useEffect(() => {
     for (const href of APP_TAB_HREFS) {
-      try {
-        router.prefetch(href);
-      } catch {
-        /* prefetch is best-effort */
-      }
+      warm(router, href);
     }
   }, [router]);
 
@@ -39,6 +43,7 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
       }
 
       const go = (href: string, tab = false) => {
+        warm(router, href);
         startTransition(() => {
           router.push(href, { scroll: !tab });
         });
@@ -71,6 +76,7 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
           break;
         case "lesson":
           if (newRoute.courseId && newRoute.lessonId) {
+            warm(router, `/course/${newRoute.courseId}`);
             go(`/lesson/${newRoute.courseId}/${newRoute.lessonId}`);
           }
           break;
@@ -87,6 +93,7 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
 
   const startLesson = React.useCallback(
     (courseId: string, lessonId: string): boolean => {
+      warm(router, `/lesson/${courseId}/${lessonId}`);
       if (courseId === RE5_COURSE_ID && isRe5MockExam(lessonId)) {
         state.setRoute({ name: "lesson", courseId, lessonId });
         router.push(`/lesson/${courseId}/${lessonId}`);
