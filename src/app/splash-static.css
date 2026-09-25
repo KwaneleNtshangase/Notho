@@ -12,3 +12,9 @@
   width: 88px !important;
   height: 88px !important;
 }
+
+/* Follow system scheme even if html.dark is late. */
+@media (prefers-color-scheme: dark) {
+  html:not(.light) .logo-light { display: none; }
+  html:not(.light) .logo-dark { display: block; }
+}
