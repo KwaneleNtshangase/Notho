@@ -29,7 +29,7 @@ async function compressAvatarFile(file: File): Promise<Blob> {
 
 function cacheChosen(url: string | null) {
   try {
-    if (url) localStorage.setItem("notho-avatar-url", url);
+    if (url && !url.startsWith("data:")) localStorage.setItem("notho-avatar-url", url);
     else localStorage.removeItem("notho-avatar-url");
   } catch {
     /* ignore */
@@ -45,9 +45,55 @@ function isGoogleHosted(url: string): boolean {
   }
 }
 
+function publicAvatarUrl(userId: string): string {
+  const { data } = supabase.storage.from("avatars").getPublicUrl(`${userId}/avatar.jpg`);
+  return data.publicUrl;
+}
+
 async function persistAvatarUrl(userId: string, url: string | null): Promise<void> {
-  await supabase.from("profiles").upsert({ user_id: userId, avatar_url: url }, { onConflict: "user_id" });
+  const { error: rowErr } = await supabase
+    .from("profiles")
+    .upsert({ user_id: userId, avatar_url: url }, { onConflict: "user_id" });
+  if (rowErr) {
+    const { error: updErr } = await supabase
+      .from("profiles")
+      .update({ avatar_url: url })
+      .eq("user_id", userId);
+    if (updErr) throw new Error(updErr.message || rowErr.message);
+  }
+  await supabase.auth.updateUser({
+    data: { notho_avatar_url: url, avatar_url: url },
+  });
   cacheChosen(url);
+}
+
+async function resolveSavedAvatar(userId: string): Promise<string | null> {
+  try {
+    const cached = localStorage.getItem("notho-avatar-url");
+    if (cached && !cached.startsWith("data:") && !isGoogleHosted(cached)) return cached;
+  } catch {
+    /* ignore */
+  }
+
+  const { data: row } = await supabase
+    .from("profiles")
+    .select("avatar_url")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const fromRow = (row as { avatar_url?: string | null } | null)?.avatar_url?.trim() || "";
+  if (fromRow && !fromRow.startsWith("data:") && !isGoogleHosted(fromRow)) return fromRow;
+
+  const { data: listed } = await supabase.storage.from("avatars").list(userId, { limit: 10 });
+  const hasFile = (listed ?? []).some((obj) => obj.name === "avatar.jpg" || obj.name.startsWith("avatar."));
+  if (hasFile) return `${publicAvatarUrl(userId)}?v=${Date.now()}`;
+
+  const { data: userData } = await supabase.auth.getUser();
+  const meta = userData.user?.user_metadata as { notho_avatar_url?: string; avatar_url?: string } | undefined;
+  const fromMeta = (meta?.notho_avatar_url || "").trim();
+  if (fromMeta && !fromMeta.startsWith("data:") && !isGoogleHosted(fromMeta)) return fromMeta;
+
+  if (fromRow && !fromRow.startsWith("data:")) return fromRow;
+  return null;
 }
 
 export async function uploadProfileAvatar(file: File): Promise<string> {
@@ -60,18 +106,8 @@ export async function uploadProfileAvatar(file: File): Promise<string> {
   const { error: upErr } = await supabase.storage
     .from("avatars")
     .upload(path, blob, { upsert: true, contentType: "image/jpeg", cacheControl: "3600" });
-  let url: string;
-  if (!upErr) {
-    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-    url = `${data.publicUrl}?v=${Date.now()}`;
-  } else {
-    url = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = () => reject(new Error("Could not read the photo."));
-      reader.readAsDataURL(blob);
-    });
-  }
+  if (upErr) throw new Error(upErr.message || "Could not save the photo.");
+  const url = `${publicAvatarUrl(user.id)}?v=${Date.now()}`;
   await persistAvatarUrl(user.id, url);
   return url;
 }
@@ -138,31 +174,15 @@ export function ProfilePhotoGate() {
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    try {
-      const cached = localStorage.getItem("notho-avatar-url");
-      if (cached && !isGoogleHosted(cached)) setAvatarUrl(cached);
-      else if (cached && isGoogleHosted(cached)) localStorage.removeItem("notho-avatar-url");
-    } catch {
-      /* ignore */
-    }
     let cancelled = false;
     void supabase.auth.getUser().then(async ({ data }) => {
       const user = data.user;
       if (!user || cancelled) return;
       const meta = user.user_metadata as { avatar_url?: string; picture?: string } | undefined;
-      const google =
-        (typeof meta?.picture === "string" && meta.picture) ||
-        (typeof meta?.avatar_url === "string" && isGoogleHosted(meta.avatar_url) ? meta.avatar_url : "") ||
-        "";
+      const google = typeof meta?.picture === "string" ? meta.picture : "";
       if (google && isGoogleHosted(google)) setGoogleUrl(google);
-      const { data: row } = await supabase
-        .from("profiles")
-        .select("avatar_url")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      const fromRow = (row as { avatar_url?: string | null } | null)?.avatar_url?.trim() || "";
-      if (cancelled) return;
-      if (fromRow && !isGoogleHosted(fromRow)) setAvatarUrl(fromRow);
+      const saved = await resolveSavedAvatar(user.id);
+      if (!cancelled && saved) setAvatarUrl(saved);
     });
     return () => {
       cancelled = true;
@@ -218,7 +238,7 @@ export function ProfilePhotoGate() {
       const url = await uploadProfileAvatar(file);
       setAvatarUrl(url);
       paintCircle(circleRef.current, url);
-      flash("Photo updated");
+      flash("Photo saved");
     } catch (e) {
       flash(e instanceof Error ? e.message : "Could not update your photo.");
     } finally {
@@ -378,7 +398,7 @@ export function ProfilePhotoGate() {
             whiteSpace: "nowrap",
           }}
         >
-          {busy ? "Updating photo…" : hint}
+          {busy ? "Saving photo…" : hint}
         </div>
       )}
     </>
