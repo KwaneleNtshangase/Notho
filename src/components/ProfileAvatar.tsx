@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabaseClient";
 
 async function compressAvatarFile(file: File): Promise<Blob> {
@@ -77,96 +78,185 @@ export async function removeProfileAvatar(): Promise<void> {
   }
 }
 
-export function ProfileAvatar({
-  avatarUrl,
-  initials,
-  busy,
-  onFile,
-}: {
-  avatarUrl: string | null;
-  initials: string;
-  busy: boolean;
-  onFile: (file: File) => void;
-}) {
+function findInitialsCircle(): HTMLElement | null {
+  const mains = document.querySelectorAll("main");
+  for (const main of mains) {
+    const divs = main.querySelectorAll("div");
+    for (const el of divs) {
+      const node = el as HTMLElement;
+      if (node.childElementCount !== 0) continue;
+      const text = (node.textContent ?? "").trim();
+      if (text.length < 1 || text.length > 3) continue;
+      const w = node.offsetWidth;
+      const h = node.offsetHeight;
+      if (w < 64 || w > 88 || h < 64 || h > 88) continue;
+      const radius = getComputedStyle(node).borderRadius;
+      if (!radius.includes("%") && !radius.startsWith("50") && !radius.startsWith("999")) continue;
+      return node;
+    }
+  }
+  return null;
+}
+
+export function ProfilePhotoGate() {
   const inputRef = useRef<HTMLInputElement>(null);
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        aria-hidden="true"
-        tabIndex={-1}
-        style={{ display: "none" }}
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) onFile(file);
-          if (inputRef.current) inputRef.current.value = "";
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        disabled={busy}
-        aria-label={avatarUrl ? "Change profile photo" : "Add a profile photo"}
-        style={{
-          position: "relative",
-          width: 80,
-          height: 80,
-          borderRadius: "50%",
-          marginBottom: 8,
-          padding: 0,
-          border: "none",
-          cursor: busy ? "wait" : "pointer",
-          background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
-          boxShadow: "0 4px 16px rgba(0,122,133,0.25)",
-          overflow: "hidden",
-        }}
-      >
-        {avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-        ) : (
+  const [host, setHost] = useState<HTMLElement | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [hint, setHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem("notho-avatar-url");
+      if (cached) setAvatarUrl(cached);
+    } catch {
+      /* ignore */
+    }
+    let cancelled = false;
+    void supabase.auth.getUser().then(async ({ data }) => {
+      const user = data.user;
+      if (!user || cancelled) return;
+      const meta = user.user_metadata as { avatar_url?: string; picture?: string } | undefined;
+      const { data: row } = await supabase
+        .from("profiles")
+        .select("avatar_url")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const fromRow = (row as { avatar_url?: string | null } | null)?.avatar_url?.trim();
+      const fromMeta = meta?.avatar_url || meta?.picture || "";
+      const next = fromRow || fromMeta || null;
+      if (next && !cancelled) setAvatarUrl(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let lives = true;
+    const attach = () => {
+      if (!lives) return;
+      const found = findInitialsCircle();
+      if (found && found !== host) {
+        found.style.position = "relative";
+        found.style.overflow = "hidden";
+        found.style.cursor = "pointer";
+        setHost(found);
+      }
+    };
+    attach();
+    const t = window.setInterval(attach, 400);
+    return () => {
+      lives = false;
+      window.clearInterval(t);
+    };
+  }, [host]);
+
+  const onFile = async (file: File) => {
+    setBusy(true);
+    setHint(null);
+    try {
+      const url = await uploadProfileAvatar(file);
+      setAvatarUrl(url);
+      setHint("Photo updated");
+      window.setTimeout(() => setHint(null), 2000);
+    } catch (e) {
+      setHint(e instanceof Error ? e.message : "Could not update your photo.");
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  const picker = (
+    <input
+      ref={inputRef}
+      type="file"
+      accept="image/*"
+      aria-hidden="true"
+      tabIndex={-1}
+      style={{ display: "none" }}
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) void onFile(file);
+      }}
+    />
+  );
+
+  const overlay = host
+    ? createPortal(
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={busy}
+          aria-label={avatarUrl ? "Change profile photo" : "Add a profile photo"}
+          style={{
+            position: "absolute",
+            inset: 0,
+            border: "none",
+            padding: 0,
+            margin: 0,
+            background: avatarUrl ? "transparent" : "transparent",
+            cursor: busy ? "wait" : "pointer",
+          }}
+        >
+          {avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "50%" }} />
+          ) : null}
           <span
             style={{
+              position: "absolute",
+              right: -2,
+              bottom: -2,
+              width: 24,
+              height: 24,
+              borderRadius: "50%",
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: "100%",
-              height: "100%",
-              fontSize: 28,
-              fontWeight: 900,
-              color: "white",
+              color: "var(--color-text-primary)",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.18)",
             }}
           >
-            {initials}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
           </span>
-        )}
-        <span
+        </button>,
+        host,
+      )
+    : null;
+
+  return (
+    <>
+      {picker}
+      {overlay}
+      {hint ? (
+        <div
+          role="status"
           style={{
-            position: "absolute",
-            right: 2,
-            bottom: 2,
-            width: 26,
-            height: 26,
-            borderRadius: "50%",
+            position: "fixed",
+            left: "50%",
+            bottom: 96,
+            transform: "translateX(-50%)",
+            zIndex: 80,
             background: "var(--color-surface)",
-            border: "1px solid var(--color-border)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             color: "var(--color-text-primary)",
+            border: "1px solid var(--color-border)",
+            borderRadius: 999,
+            padding: "8px 14px",
+            fontSize: 13,
+            fontWeight: 600,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
           }}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-            <circle cx="12" cy="13" r="4" />
-          </svg>
-        </span>
-      </button>
-      <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 8 }}>
-        {busy ? "Updating photo…" : "Tap the photo to change it"}
-      </div>
-    </div>
+          {busy ? "Updating photo…" : hint}
+        </div>
+      ) : null}
+    </>
   );
 }
