@@ -4,6 +4,30 @@ import {
   signupEmailAlreadyTaken,
 } from "@/lib/signupEmailAlreadyTaken";
 
+let guardInstalled = false;
+
+/** Rewrite existing-email signup results so AuthGate can show a clear error. */
+export function installSignupEmailGuard(): void {
+  if (guardInstalled) return;
+  guardInstalled = true;
+  const originalSignUp = supabase.auth.signUp.bind(supabase.auth);
+  type SignUpFn = typeof supabase.auth.signUp;
+  supabase.auth.signUp = (async (...args: Parameters<SignUpFn>) => {
+    const result = await originalSignUp(...args);
+    if (signupEmailAlreadyTaken(result.error?.message, result.data?.user)) {
+      return {
+        data: { user: null, session: null },
+        error: {
+          name: result.error?.name || "AuthApiError",
+          message: EXISTING_EMAIL_SIGNUP_MESSAGE,
+          status: 422,
+        },
+      } as Awaited<ReturnType<SignUpFn>>;
+    }
+    return result;
+  }) as SignUpFn;
+}
+
 export async function signUpWithExistingEmailCheck(input: {
   email: string;
   password: string;
