@@ -10,6 +10,7 @@ import {
   normalizeTabPath,
   type AppTabHref,
 } from "@/lib/appTabs";
+import { warmHeavyShell, whenIdle } from "@/lib/speculativeWarm";
 
 const LearnPage = dynamic(() => import("@/app/(app)/learn/page"), {
   ssr: false,
@@ -105,9 +106,9 @@ export function PersistentAppTabs({ visible }: { visible: boolean }) {
       void import("@/app/(app)/budget/page");
       void import("@/app/(app)/quests/page");
       void import("@/app/(app)/profile/page");
+      warmHeavyShell();
     };
-    const idle = window.setTimeout(warm, 600);
-    return () => window.clearTimeout(idle);
+    return whenIdle(warm, 900);
   }, []);
 
   return (
