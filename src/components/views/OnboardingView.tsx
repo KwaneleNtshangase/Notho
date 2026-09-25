@@ -11,9 +11,7 @@ import {
 
 export function OnboardingView({
   onComplete,
-  returningUser = false,
 }: {
-  returningUser?: boolean;
   onComplete: (payload: {
     goal?: string;
     goals?: string[];
@@ -22,10 +20,9 @@ export function OnboardingView({
     username: string;
   }) => void;
 }) {
-  const [screen, setScreen] = React.useState(returningUser ? 1 : 0);
+  const [screen, setScreen] = React.useState(0);
   const [selectedGoals, setSelectedGoals] = React.useState<string[]>([]);
   const [goalDescription, setGoalDescription] = React.useState("");
-  const [ageConfirmed, setAgeConfirmed] = React.useState(returningUser);
   const [username, setUsername] = React.useState("");
   const [usernameError, setUsernameError] = React.useState<string | null>(null);
   const [usernameChecking, setUsernameChecking] = React.useState(false);
@@ -40,7 +37,7 @@ export function OnboardingView({
   };
 
   React.useEffect(() => {
-    if (screen !== 1) return;
+    if (screen !== 0) return;
     const normalized = normalizeUsername(username);
     if (!normalized) {
       setUsernameError("Username is required.");
@@ -73,14 +70,11 @@ export function OnboardingView({
     };
   }, [screen, username]);
 
-  const otherRequired = selectedGoals.includes("other") && !goalDescription.trim();
-  const canLeaveGoals = returningUser
-    ? !otherRequired
-    : ageConfirmed && selectedGoals.length > 0 && !otherRequired;
+  const otherNeedsText = selectedGoals.includes("other") && !goalDescription.trim();
 
   const finish = () => {
     if (!usernameAvailable || usernameChecking) return;
-    if (!returningUser && selectedGoals.length === 0) return;
+    if (otherNeedsText) return;
     onComplete({
       goal: selectedGoals[0],
       goals: selectedGoals,
@@ -91,19 +85,17 @@ export function OnboardingView({
 
   const screensMeta = [
     {
-      title: "What are you working toward?",
-      body: returningUser
-        ? "Optional. Pick one or more money goals, or skip."
-        : "Pick one or more money goals. You can write your own if none of these fit.",
+      title: "Choose your username",
+      body: "Required. This is your public name — you cannot skip it.",
       cta: "Next",
       action: () => {
-        if (canLeaveGoals) setScreen(1);
+        if (usernameAvailable && !usernameChecking) setScreen(1);
       },
     },
     {
-      title: "Choose your username",
-      body: "Required. This is your public name — you cannot skip it.",
-      cta: returningUser ? "Continue \u2192" : "Start learning \u2192",
+      title: "What are you working toward?",
+      body: "Optional. Pick one or more money goals, or skip and set this later on the Goals tab.",
+      cta: selectedGoals.length > 0 ? "Start learning \u2192" : "Skip for now",
       action: finish,
     },
   ];
@@ -146,6 +138,42 @@ export function OnboardingView({
         </p>
 
         {screen === 0 && (
+          <div style={{ marginBottom: 16, textAlign: "left" }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>
+              Username
+            </label>
+            <input
+              type="text"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder="e.g. notho_learner"
+              value={username}
+              onChange={(e) => setUsername(normalizeUsername(e.target.value))}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                borderRadius: 12,
+                border: `2px solid ${usernameError ? "var(--color-danger)" : usernameAvailable ? "var(--color-primary)" : "var(--color-border)"}`,
+                fontSize: 14,
+                boxSizing: "border-box",
+                background: "var(--color-surface)",
+                color: "var(--color-text-primary)",
+              }}
+            />
+            <div style={{ minHeight: 20, marginTop: 6, fontSize: 12, color: usernameError ? "var(--color-danger)" : "var(--color-text-secondary)" }}>
+              {usernameChecking
+                ? "Checking availability..."
+                : usernameError
+                  ? usernameError
+                  : usernameAvailable
+                    ? "Username is available."
+                    : "3–20 chars: letters, numbers, underscores."}
+            </div>
+          </div>
+        )}
+
+        {screen === 1 && (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12, textAlign: "left" }}>
               {ONBOARDING_GOAL_OPTIONS.map((g) => {
@@ -200,78 +228,28 @@ export function OnboardingView({
           </>
         )}
 
-        {screen === 0 && !returningUser && (
-          <label style={{
-            display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 20,
-            textAlign: "left", cursor: "pointer",
-            padding: "14px 16px", borderRadius: 12,
-            background: ageConfirmed ? "rgba(0,122,133,0.06)" : "var(--color-surface)",
-            border: `1.5px solid ${ageConfirmed ? "var(--color-primary)" : "var(--color-border)"}`,
-          }}>
-            <input
-              type="checkbox"
-              checked={ageConfirmed}
-              onChange={(e) => setAgeConfirmed(e.target.checked)}
-              style={{ marginTop: 2, accentColor: "var(--color-primary)", width: 18, height: 18, flexShrink: 0, cursor: "pointer" }}
-            />
-            <span style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.5, fontWeight: 500 }}>
-              I confirm I am <strong>18 or older</strong>. Notho is a financial education platform for adults.
-            </span>
-          </label>
-        )}
-
-        {screen === 1 && (
-          <div style={{ marginBottom: 16, textAlign: "left" }}>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>
-              Username
-            </label>
-            <input
-              type="text"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              placeholder="e.g. notho_learner"
-              value={username}
-              onChange={(e) => setUsername(normalizeUsername(e.target.value))}
-              style={{
-                width: "100%",
-                padding: "12px 14px",
-                borderRadius: 12,
-                border: `2px solid ${usernameError ? "var(--color-danger)" : usernameAvailable ? "var(--color-primary)" : "var(--color-border)"}`,
-                fontSize: 14,
-                boxSizing: "border-box",
-                background: "var(--color-surface)",
-                color: "var(--color-text-primary)",
-              }}
-            />
-            <div style={{ minHeight: 20, marginTop: 6, fontSize: 12, color: usernameError ? "var(--color-danger)" : "var(--color-text-secondary)" }}>
-              {usernameChecking
-                ? "Checking availability..."
-                : usernameError
-                  ? usernameError
-                  : usernameAvailable
-                    ? "\u2713 Username is available."
-                    : "3\u201320 chars: letters, numbers, underscores."}
-            </div>
-          </div>
-        )}
-
         <button
           className="btn btn-primary"
           style={{ width: "100%", padding: "14px", fontSize: 16, fontWeight: 700 }}
           onClick={current.action}
           disabled={
-            (screen === 0 && !canLeaveGoals) ||
-            (screen === 1 && (!usernameAvailable || usernameChecking || (!returningUser && selectedGoals.length === 0)))
+            (screen === 0 && (!usernameAvailable || usernameChecking)) ||
+            (screen === 1 && otherNeedsText)
           }
         >
           {current.cta}
         </button>
 
-        {screen === 0 && returningUser && (
+        {screen === 1 && selectedGoals.length > 0 && (
           <button
             type="button"
-            onClick={() => setScreen(1)}
+            onClick={() => {
+              setSelectedGoals([]);
+              setGoalDescription("");
+              onComplete({
+                username: normalizeUsername(username),
+              });
+            }}
             style={{
               marginTop: 12, background: "none", border: "none",
               color: "var(--color-text-secondary)", cursor: "pointer", fontSize: 14, width: "100%",
@@ -281,16 +259,12 @@ export function OnboardingView({
           </button>
         )}
 
-        {screen === 0 && !canLeaveGoals && !returningUser && (
+        {screen === 1 && otherNeedsText && (
           <div style={{
             marginTop: 10, fontSize: 12, fontWeight: 600,
             color: "var(--color-text-secondary)", textAlign: "center",
           }}>
-            {selectedGoals.length === 0
-              ? "Choose at least one goal to continue."
-              : otherRequired
-                ? "Write down your goal to continue."
-                : "Tick the 18-or-older confirmation above to continue."}
+            Write down that goal, or skip for now.
           </div>
         )}
 
@@ -303,7 +277,7 @@ export function OnboardingView({
               color: "var(--color-text-secondary)", cursor: "pointer", fontSize: 14,
             }}
           >
-            \u2190 {returningUser ? "Add a goal" : "Back"}
+            Back
           </button>
         )}
       </div>
