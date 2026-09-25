@@ -20,7 +20,7 @@ import {
   solveForInitial,
 } from "@/lib/calculators";
 import { CalcNumberRow, InputPanel, type SolveMode } from "@/components/calculator/fields";
-import { BudgetAsk, CompareTable, GrowthChart, ResultCard } from "@/components/calculator/results";
+import { CompareTable, GrowthChart, ResultCard } from "@/components/calculator/results";
 
 export type { CalcInputs };
 export { calcGrowth };
@@ -62,7 +62,6 @@ export function CalculatorView() {
   const [calcStartYearB, setCalcStartYearB] = useState(0);
   const [projectionSaved, setProjectionSaved] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const [budgetAsk, setBudgetAsk] = useState<"hidden" | "offer" | "dismissed">("hidden");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -124,7 +123,6 @@ export function CalculatorView() {
     setHasCalculated(true);
     setProjectionSaved(false);
     setSolveResult(result);
-    setBudgetAsk("offer");
     analytics.calculatorSolveModeUsed(solveMode, { monthly: inputsA.monthly, rate: inputsA.rate, years: inputsA.years, principal: inputsA.principal });
   };
 
@@ -182,7 +180,7 @@ export function CalculatorView() {
           {SOLVE_OPTIONS.map((opt) => (
             <button
               key={opt.id}
-              onClick={() => { setSolveMode(opt.id); setHasCalculated(false); setSolveResult(null); setBudgetAsk("hidden"); }}
+              onClick={() => { setSolveMode(opt.id); setHasCalculated(false); setSolveResult(null); }}
               style={{ padding: "10px 8px", borderRadius: 10, border: `2px solid ${solveMode === opt.id ? "var(--color-primary)" : "var(--color-border)"}`, background: solveMode === opt.id ? "rgba(0,122,133,0.08)" : "var(--color-bg)", cursor: "pointer", textAlign: "center" }}
             >
               <div style={{ display: "flex", justifyContent: "center", marginBottom: 4, color: solveMode === opt.id ? "var(--color-primary)" : "var(--color-text-secondary)" }}><opt.Icon size={18} /></div>
@@ -256,7 +254,6 @@ export function CalculatorView() {
         </>
       )}
       {hasCalculated && <GrowthChart chartData={chartData} mode={mode} showReal={showReal} />}
-      {hasCalculated && budgetAsk === "offer" && <BudgetAsk monthly={calcA.monthly} onDismiss={() => setBudgetAsk("dismissed")} />}
       {hasCalculated && !projectionSaved && (
         <button
           onClick={() => {
