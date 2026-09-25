@@ -6,6 +6,7 @@ import { ErrorReportingInit } from "@/components/ErrorReportingInit";
 import { NativeAuthDeepLink } from "@/components/NativeAuthDeepLink";
 import { NativeShellGuards } from "@/components/NativeShellGuards";
 import { TextScaleInit } from "@/components/TextScaleInit";
+import { AppleAuthGuard } from "@/components/AppleAuthGuard";
 import { ServiceWorkerRegistration } from "@/lib/sw/ServiceWorkerRegistration";
 import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
 import { TEXT_SCALE_BOOT_SCRIPT } from "@/lib/textScale";
@@ -13,6 +14,7 @@ import "./globals.css";
 import "./text-scale.css";
 import "./shell-layout.css";
 import "./splash-static.css";
+import "./apple-signin.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -94,6 +96,7 @@ export default function RootLayout({
           <TextScaleInit />
           <NativeAuthDeepLink />
           <NativeShellGuards />
+          <AppleAuthGuard />
         </ErrorBoundary>
       </body>
     </html>

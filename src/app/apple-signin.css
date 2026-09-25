@@ -1,0 +1,35 @@
+/* The Apple button in AuthGate used appleid.cdn-apple.com as the label.
+   That image is often several seconds behind the Google/Facebook text on
+   SA mobile networks. Hide the remote image and paint the label locally. */
+
+button[data-testid="apple-oauth"] {
+  position: relative;
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+button[data-testid="apple-oauth"] img {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+button[data-testid="apple-oauth"]::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: -3px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M16.365 1.43c0 1.14-.42 2.2-1.18 3.02-.78.85-2.05 1.5-3.18 1.41-.13-1.1.4-2.26 1.16-3.08.8-.87 2.2-1.52 3.2-1.35zM20.5 17.2c-.55 1.27-.82 1.84-1.54 2.96-1 1.55-2.4 3.48-4.14 3.5-1.54.02-1.94-1-4.04-1-2.1 0-2.54.97-4.07 1.02-1.73.05-3.05-1.68-4.06-3.22-2.83-4.33-3.13-9.42-1.38-12.12 1.24-1.92 3.2-3.04 5.04-3.04 1.87 0 3.05 1.03 4.6 1.03 1.5 0 2.42-1.04 4.58-1.04 1.63 0 3.36.89 4.58 2.43-4.02 2.2-3.37 7.93.43 9.48z'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M16.365 1.43c0 1.14-.42 2.2-1.18 3.02-.78.85-2.05 1.5-3.18 1.41-.13-1.1.4-2.26 1.16-3.08.8-.87 2.2-1.52 3.2-1.35zM20.5 17.2c-.55 1.27-.82 1.84-1.54 2.96-1 1.55-2.4 3.48-4.14 3.5-1.54.02-1.94-1-4.04-1-2.1 0-2.54.97-4.07 1.02-1.73.05-3.05-1.68-4.06-3.22-2.83-4.33-3.13-9.42-1.38-12.12 1.24-1.92 3.2-3.04 5.04-3.04 1.87 0 3.05 1.03 4.6 1.03 1.5 0 2.42-1.04 4.58-1.04 1.63 0 3.36.89 4.58 2.43-4.02 2.2-3.37 7.93.43 9.48z'/></svg>") center / contain no-repeat;
+}
+
+button[data-testid="apple-oauth"]::after {
+  content: "Continue with Apple";
+}

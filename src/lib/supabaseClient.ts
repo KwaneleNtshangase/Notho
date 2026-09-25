@@ -11,3 +11,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+const signInWithOAuth = supabase.auth.signInWithOAuth.bind(supabase.auth);
+supabase.auth.signInWithOAuth = ((params, ...rest) => {
+  if (params?.provider === "apple") {
+    params = {
+      ...params,
+      options: {
+        ...params.options,
+        scopes: params.options?.scopes ?? "name email",
+      },
+    };
+  }
+  return signInWithOAuth(params, ...rest);
+}) as typeof supabase.auth.signInWithOAuth;
