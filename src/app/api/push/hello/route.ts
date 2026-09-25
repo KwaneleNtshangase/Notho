@@ -4,9 +4,16 @@ import { createServiceSupabase } from "@/lib/supabaseServer";
 import { sendWebPush } from "@/lib/push/send";
 import { resolveNextLesson } from "@/lib/push/nextLesson";
 import { CONTENT_DATA } from "@/data/content";
-import { isTombstone } from "@/lib/sync/mergeRules";
 
 export const runtime = "nodejs";
+
+function resumeFrom(raw: unknown): { courseId?: string; lessonId?: string; cleared?: boolean } | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as { courseId?: string; lessonId?: string; cleared?: boolean };
+  if (r.cleared) return null;
+  if (!r.courseId || !r.lessonId) return null;
+  return r;
+}
 
 export async function POST(req: NextRequest) {
   const user = await getUserFromRequest(req).catch(() => null);
@@ -32,12 +39,11 @@ export async function POST(req: NextRequest) {
       lessons: u.lessons.map((l) => ({ id: l.id, title: l.title, comingSoon: l.comingSoon })),
     })),
   }));
-  const resumeRaw = progress?.lesson_resume as { courseId?: string; lessonId?: string; cleared?: boolean } | null;
   const next = resolveNextLesson({
     courses: catalog,
     completedLessons: (progress?.completed_lessons as string[] | null) ?? [],
     pinnedCourseIds: (progress?.pinned_courses as { ids?: string[] } | null)?.ids ?? [],
-    resume: resumeRaw && !isTombstone(resumeRaw) ? resumeRaw : null,
+    resume: resumeFrom(progress?.lesson_resume),
   });
 
   const payload = {

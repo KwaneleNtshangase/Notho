@@ -13,7 +13,6 @@ import {
 import { resolveNextLesson } from "@/lib/push/nextLesson";
 import { sendWebPush } from "@/lib/push/send";
 import { CONTENT_DATA } from "@/data/content";
-import { isTombstone } from "@/lib/sync/mergeRules";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -33,6 +32,14 @@ function prevMonthKeyOf(monthKey: string): string {
 function daysInMonthOf(monthKey: string): number {
   const [y, m] = monthKey.split("-").map(Number);
   return new Date(Date.UTC(y, m, 0)).getUTCDate();
+}
+
+function resumeFrom(raw: unknown): { courseId?: string; lessonId?: string; cleared?: boolean } | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as { courseId?: string; lessonId?: string; cleared?: boolean };
+  if (r.cleared) return null;
+  if (!r.courseId || !r.lessonId) return null;
+  return r;
 }
 
 export async function GET(req: NextRequest) {
@@ -83,13 +90,11 @@ export async function GET(req: NextRequest) {
     try {
       const p = progress.get(userId);
       const pinned = (p?.pinned_courses as { ids?: string[] } | null)?.ids ?? [];
-      const resumeRaw = p?.lesson_resume as { courseId?: string; lessonId?: string; cleared?: boolean } | null;
-      const resume = resumeRaw && !isTombstone(resumeRaw) ? resumeRaw : null;
       const next = resolveNextLesson({
         courses: catalog,
         completedLessons: (p?.completed_lessons as string[] | null) ?? [],
         pinnedCourseIds: pinned,
-        resume,
+        resume: resumeFrom(p?.lesson_resume),
       });
 
       const streakMsg = streakAtRiskPush(
