@@ -12,6 +12,7 @@ import { TEXT_SCALE_BOOT_SCRIPT } from "@/lib/textScale";
 import "./globals.css";
 import "./text-scale.css";
 import "./shell-layout.css";
+import "./splash-static.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
