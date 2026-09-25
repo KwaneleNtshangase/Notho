@@ -505,11 +505,6 @@ export function ProfileView({
     } catch { /* ignore */ }
   }, []);
 
-  const showQuizResult = investorQuizOpen && quizIdx >= INVESTOR_QUIZ_QUESTIONS.length;
-  useEffect(() => {
-    if (showQuizResult) analytics.advisorCtaShown("investor_quiz");
-  }, [showQuizResult]);
-
   const handleSaveProfile = async () => {
     const firstName = editFirstName.trim();
     const lastName = editLastName.trim();
@@ -913,14 +908,6 @@ export function ProfileView({
                     <button type="button" className="btn btn-secondary w-full" onClick={() => { setQuizIdx(0); setQuizScores([]); setQuizSelected(null); }}>Retake Quiz</button>
                     <button type="button" className="btn btn-secondary w-full" onClick={() => setInvestorQuizOpen(false)}>Close</button>
                   </div>
-                  <div className="mt-4 bg-gradient-to-br from-green-600 to-green-800 rounded-2xl p-5 text-white">
-                    <p className="text-xs font-bold uppercase tracking-widest text-green-200 mb-1">Built for your profile</p>
-                    <p className="text-green-100 text-sm mb-4 leading-relaxed">As a {res.profile} investor, here&apos;s what a portfolio could look like for you.</p>
-                    <button type="button" onClick={() => { analytics.advisorCtaClicked("investor_quiz"); window.open("https://wealthwithkwanele.co.za", "_blank", "noopener,noreferrer"); }}
-                      className="block w-full py-3 bg-white text-green-800 rounded-xl font-bold text-center hover:bg-green-50 transition-colors">
-                      Get Your {res.profile} Investment Plan
-                    </button>
-                  </div>
                 </div>
               );
             })() : (
@@ -951,19 +938,6 @@ export function ProfileView({
           </div>
         </div>
       )}
-
-      {/* Advisor CTA */}
-      <div className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-green-700 to-green-900 p-5 text-white">
-        <div className="mb-3 flex items-center gap-2">
-          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-green-400 shrink-0" />
-          <span className="text-xs font-semibold uppercase tracking-wide text-green-100/90">Available</span>
-        </div>
-        <p className="mb-4 text-sm leading-relaxed text-green-100">Turn what you&apos;ve learned into a real plan. Book a free session to map out your money goals.</p>
-        <button type="button" onClick={() => { analytics.advisorCtaClicked("profile_cta"); window.open("https://wealthwithkwanele.co.za", "_blank", "noopener,noreferrer"); }}
-          className="block w-full rounded-xl bg-white py-3 text-center text-sm font-bold text-green-800 transition-colors hover:bg-green-50">
-          Get Your Free Money Plan
-        </button>
-      </div>
 
       {/* Earned badges */}
       <div style={{ marginBottom: 24 }}>
