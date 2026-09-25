@@ -1,6 +1,7 @@
 {
   "crons": [
     { "path": "/api/cron/lifecycle", "schedule": "30 7 * * *" },
+    { "path": "/api/cron/push-triggers", "schedule": "0 11 * * *" },
     { "path": "/api/cron/push-triggers", "schedule": "0 16 * * *" }
   ],
   "redirects": [
