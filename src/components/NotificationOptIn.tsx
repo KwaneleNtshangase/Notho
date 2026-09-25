@@ -1,50 +1,57 @@
 "use client";
 
 /**
- * Notifications "on by default", the browser-legal way:
- *  - Permission already granted → silently (re)subscribe on load. Covers new
- *    devices and expired subscriptions with zero UI.
- *  - Permission never asked → show a soft banner to every signed-in user.
- *    One tap fires the real browser prompt (user gesture, so iOS Safari
- *    accepts it). "Later" snoozes the banner for 14 days.
- *  - Permission denied → stay silent (the browser blocks re-asking anyway).
- * Users can switch off anytime in Settings (existing toggle).
+ * Ask once, after the first real lesson — not on launch, not in Settings.
+ * Settings remains an off switch only.
  */
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ensurePushSubscription, pushSupported } from "@/lib/push/subscribe";
+import { useNotho } from "@/context/NothoContext";
 
-const SNOOZE_KEY = "notho-notif-prompt-snoozed-until";
-const SNOOZE_DAYS = 14;
+const DECIDED_KEY = "notho-notif-decided";
+const OLD_SNOOZE = "notho-notif-prompt-snoozed-until";
 
 export function NotificationOptIn() {
+  const pathname = usePathname() || "/";
+  const { userData } = useNotho();
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  const doneALesson = (userData?.totalCompleted ?? 0) > 0 || (userData?.lessonsToday ?? 0) > 0;
+  const onQuietPath =
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/lesson/") ||
+    pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/admin");
+
   useEffect(() => {
     if (!pushSupported()) return;
-
     if (Notification.permission === "granted") {
-      // Auto: keep every granted device subscribed without asking anything.
       void ensurePushSubscription(false).catch(() => {});
       return;
     }
     if (Notification.permission === "denied") return;
-
+    if (!doneALesson || onQuietPath) return;
     try {
-      const until = Number(localStorage.getItem(SNOOZE_KEY) ?? 0);
-      if (Date.now() < until) return;
-    } catch { /* storage unavailable */ }
-
-    // Let the app settle before asking (also keeps setState async in effects).
-    const t = setTimeout(() => setShow(true), 1500);
+      if (localStorage.getItem(DECIDED_KEY) === "1") return;
+    } catch {
+      /* storage unavailable */
+    }
+    const t = setTimeout(() => setShow(true), 800);
     return () => clearTimeout(t);
-  }, []);
+  }, [doneALesson, onQuietPath]);
 
-  const snooze = () => {
-    try {
-      localStorage.setItem(SNOOZE_KEY, String(Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1000));
-    } catch { /* storage unavailable */ }
+  const close = (remember: boolean) => {
+    if (remember) {
+      try {
+        localStorage.setItem(DECIDED_KEY, "1");
+        localStorage.removeItem(OLD_SNOOZE);
+      } catch {
+        /* storage unavailable */
+      }
+    }
     setShow(false);
   };
 
@@ -54,7 +61,7 @@ export function NotificationOptIn() {
       await ensurePushSubscription(true);
     } finally {
       setBusy(false);
-      setShow(false);
+      close(true);
     }
   };
 
@@ -63,7 +70,7 @@ export function NotificationOptIn() {
   return (
     <div
       role="dialog"
-      aria-label="Enable notifications"
+      aria-label="Lesson reminders"
       style={{
         position: "fixed",
         left: 12,
@@ -72,48 +79,52 @@ export function NotificationOptIn() {
         zIndex: 55,
         maxWidth: 440,
         margin: "0 auto",
-        background: "var(--color-surface, #fff)",
+        background: "var(--color-surface, #111)",
         border: "1.5px solid var(--color-border)",
-        borderRadius: 14,
-        padding: "12px 16px",
-        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        flexWrap: "wrap",
+        borderRadius: 16,
+        padding: "16px 18px",
+        boxShadow: "0 12px 32px rgba(0, 0, 0, 0.28)",
       }}
     >
-      <div style={{ flex: 1, minWidth: 200 }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)" }}>
-          Streak reminder
-        </div>
-        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>
-          Optional reminder before a streak drops, and when a budget category runs hot.
-        </div>
+      <div style={{ fontSize: 16, fontWeight: 800, color: "var(--color-text-primary)" }}>
+        Want a tap when it's time for the next lesson?
       </div>
-      <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+      <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginTop: 6, lineHeight: 1.45 }}>
+        One reminder a day, after you've already started. Off whenever you like.
+      </div>
+      <div style={{ display: "flex", gap: 8, marginTop: 14, justifyContent: "flex-end" }}>
         <button
           type="button"
-          onClick={snooze}
+          onClick={() => close(true)}
           style={{
-            background: "none", border: "none", cursor: "pointer",
-            fontSize: 13, fontWeight: 700, color: "var(--color-text-secondary)",
-            padding: "8px 10px",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: 14,
+            fontWeight: 700,
+            color: "var(--color-text-secondary)",
+            padding: "10px 12px",
           }}
         >
-          Later
+          Not now
         </button>
         <button
           type="button"
-          onClick={enable}
+          onClick={() => void enable()}
           disabled={busy}
           style={{
-            background: "var(--color-primary)", color: "#fff", border: "none",
-            borderRadius: 10, padding: "8px 16px", fontSize: 13, fontWeight: 700,
-            cursor: "pointer", opacity: busy ? 0.6 : 1,
+            background: "var(--color-primary)",
+            color: "#fff",
+            border: "none",
+            borderRadius: 12,
+            padding: "10px 16px",
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: "pointer",
+            opacity: busy ? 0.6 : 1,
           }}
         >
-          {busy ? "Turning on…" : "Turn on"}
+          {busy ? "One sec…" : "Yes, remind me"}
         </button>
       </div>
     </div>
