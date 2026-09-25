@@ -3,7 +3,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Brain, CheckCircle2, X } from "@/components/icons/NothoIcons";
 import { CONCEPTS } from "@/data/concepts";
-import { applyReview, getDueCards, saveMastery } from "@/lib/spaced-repetition";
+import { promptForReview } from "@/lib/reviewCards";
+import { applyReview, getReviewSessionQueue, saveMastery } from "@/lib/spaced-repetition";
 import type { MasteryRecord } from "@/lib/spaced-repetition";
 import { hashSeed, seededPermutation } from "@/lib/lessonShuffle";
 import { useReviewCompletion, NOT_COUNTED, type ReviewOutcome } from "@/hooks/useReviewCompletion";
@@ -27,27 +28,24 @@ export function ReviewSession({
   const completeReview = useReviewCompletion();
 
   useEffect(() => {
-    void getDueCards().then(setQueue);
+    void getReviewSessionQueue().then(setQueue);
   }, []);
 
   const current = queue[currentIdx];
   const concept = current ? CONCEPTS.find((c) => c.id === current.concept_id) : null;
+  const card = concept && current ? promptForReview(concept, current) : null;
 
-  // Review cards aren't run through the lesson option-shuffle, so the authored
-  // correct index would otherwise always show in the same position. Shuffle the
-  // four options per concept (seeded, so it's stable within a card view) and
-  // remap the correct index.
   const shuffled = React.useMemo(() => {
-    if (!concept) return null;
+    if (!concept || !card) return null;
     const perm = seededPermutation(
-      concept.reviewCard.options.length,
-      hashSeed(`review:${concept.id}`)
+      card.options.length,
+      hashSeed(`review:${concept.id}:${card.question}`)
     );
     return {
-      options: perm.map((oldIdx) => concept.reviewCard.options[oldIdx]),
-      correct: perm.indexOf(concept.reviewCard.correct),
+      options: perm.map((oldIdx) => card.options[oldIdx]),
+      correct: perm.indexOf(card.correct),
     };
-  }, [concept]);
+  }, [concept, card]);
   const correctIdx = shuffled ? shuffled.correct : -1;
 
   const handleAnswer = (idx: number) => {
@@ -69,14 +67,6 @@ export function ReviewSession({
     const updated = applyReview(current, isCorrect ? 4 : 1);
     void saveMastery(updated);
     if (currentIdx + 1 >= queue.length) {
-      // ── Review-complete handler ────────────────────────────────────────
-      // Guarded by a ref: this is the only place credit is applied, and it
-      // must happen exactly once per session even if React re-invokes the
-      // handler. The XP used to be computed here and displayed next to the
-      // words "Streak saved" while nothing was ever awarded and the streak
-      // was never touched. Credit now goes through the same path a lesson
-      // takes (sync-streak + the daily counters), and what the screen says
-      // is whatever actually happened.
       if (!completedRef.current) {
         completedRef.current = true;
         const finalCorrect = correctCount;
@@ -122,11 +112,11 @@ export function ReviewSession({
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">
             <div
               className="h-2 rounded-full bg-green-500"
-              style={{ width: `${Math.round((correctCount / queue.length) * 100)}%` }}
+              style={{ width: `${Math.round((correctCount / Math.max(queue.length, 1)) * 100)}%` }}
             />
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
-            Cards are rescheduled. Keep it up daily to master your finances!
+            Got it right? That card comes back later. Missed it? You will see it tomorrow.
           </p>
           <button
             type="button"
@@ -140,12 +130,11 @@ export function ReviewSession({
     );
   }
 
-  if (!concept) {
+  if (!concept || !card) {
     onClose();
     return null;
   }
 
-  const card = concept.reviewCard;
   const displayOptions = shuffled ? shuffled.options : card.options;
   const optionLetters = ["A", "B", "C", "D"];
 
@@ -164,7 +153,7 @@ export function ReviewSession({
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
             <div
               className="h-1.5 rounded-full bg-purple-500 transition-all"
-              style={{ width: `${Math.round(((currentIdx) / queue.length) * 100)}%` }}
+              style={{ width: `${Math.round((currentIdx / Math.max(queue.length, 1)) * 100)}%` }}
             />
           </div>
         </div>
@@ -187,10 +176,10 @@ export function ReviewSession({
         <div className="space-y-3">
           {displayOptions.map((opt, i) => {
             const isSelected = selected === i;
-            const isCorrect = i === correctIdx;
+            const isCorrectOpt = i === correctIdx;
             let bg = "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white";
             if (selected !== null) {
-              if (isCorrect) bg = "bg-green-50 dark:bg-green-900/30 border-green-400 text-green-900 dark:text-green-200";
+              if (isCorrectOpt) bg = "bg-green-50 dark:bg-green-900/30 border-green-400 text-green-900 dark:text-green-200";
               else if (isSelected) bg = "bg-red-50 dark:bg-red-900/30 border-red-400 text-red-900 dark:text-red-200";
               else bg = "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500";
             }
@@ -206,10 +195,10 @@ export function ReviewSession({
                   {optionLetters[i]}
                 </span>
                 <span className="text-sm font-medium">{opt}</span>
-                {selected !== null && isCorrect && (
+                {selected !== null && isCorrectOpt && (
                   <CheckCircle2 size={16} className="ml-auto text-green-500 shrink-0" aria-hidden />
                 )}
-                {isSelected && !isCorrect && (
+                {isSelected && !isCorrectOpt && (
                   <X size={16} className="ml-auto text-red-500 shrink-0" aria-hidden />
                 )}
               </button>
