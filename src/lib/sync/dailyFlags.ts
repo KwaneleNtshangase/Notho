@@ -16,6 +16,7 @@
  */
 
 import { emptyDailyFlags, type DailyFlags } from "@/lib/sync/mergeRules";
+import { emitDailyChallengeFlag } from "@/lib/dailyChallengeFlags";
 
 const BOOL_KEYS = {
   conceptReviewed: (d: string) => `notho-concept-reviewed-${d}`,
@@ -68,6 +69,7 @@ export function writeLocalDailyFlags(flags: DailyFlags): void {
       const value = flags[field as keyof typeof COUNT_KEYS];
       if (value > 0) localStorage.setItem(key(flags.day), String(value));
     }
+    emitDailyChallengeFlag();
   } catch {
     /* best-effort */
   }
