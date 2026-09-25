@@ -1,14 +1,9 @@
 /**
  * Notho - SM-2 Spaced Repetition Engine
  *
- * Based on the SuperMemo SM-2 algorithm (Anki-style).
- *
- * Each concept tracks:
- *  - interval_days    : days until next review (starts at 1)
- *  - ease_factor      : how "easy" the card is (starts at 2.5, min 1.3)
- *  - repetitions      : how many times reviewed consecutively with quality ≥ 3
- *  - next_review_date : ISO date string when the card is due
- *  - last_reviewed_at : ISO timestamp of last review
+ * Based on the SuperMemo SM-2 algorithm (Anki-style) plus the spacing and
+ * testing effects: first exposure schedules a delayed review; only the review
+ * session graduates the card; a failed retrieval resets the interval to 1 day.
  */
 
 export type MasteryRecord = {
@@ -37,6 +32,9 @@ import { isReviewPoolConceptId } from "@/lib/reviewPool";
 
 const MIN_EASE = 1.3;
 
+/** Cap a single Learn review sitting so due piles do not become a cram session. */
+export const REVIEW_SESSION_CAP = 20;
+
 /**
  * Apply the SM-2 algorithm to an existing mastery record.
  * Returns a NEW record (immutable update).
@@ -47,7 +45,6 @@ export function applyReview(
 ): MasteryRecord {
   const { ease_factor, repetitions, interval_days } = record;
 
-  // New ease factor: EF' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))
   const newEase = Math.max(
     MIN_EASE,
     ease_factor + 0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)
@@ -57,11 +54,9 @@ export function applyReview(
   let newRepetitions: number;
 
   if (quality < 3) {
-    // Incorrect - reset repetitions, short interval
     newRepetitions = 0;
     newInterval = 1;
   } else {
-    // Correct
     newRepetitions = repetitions + 1;
     if (newRepetitions === 1) {
       newInterval = 1;
@@ -88,7 +83,7 @@ export function applyReview(
 
 /**
  * Create a brand-new mastery record for a concept (first exposure).
- * Scheduled for review tomorrow.
+ * Scheduled for review tomorrow — the first successful retrieval is delayed.
  */
 export function createMasteryRecord(conceptId: string): MasteryRecord {
   const tomorrow = new Date();
@@ -103,21 +98,17 @@ export function createMasteryRecord(conceptId: string): MasteryRecord {
   };
 }
 
-/** Returns true if the card is due for review today or overdue */
 export function isDue(record: MasteryRecord): boolean {
   return record.next_review_date <= sastToday();
 }
 
-/** Format a Date as YYYY-MM-DD */
 export function toDateString(date: Date): string {
-  // Use local date parts to avoid UTC rollbacks that can keep cards "due" too long.
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
-/** Load all mastery records from Supabase */
 export async function loadMastery(): Promise<Record<string, MasteryRecord>> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return {};
@@ -139,15 +130,10 @@ export async function loadMastery(): Promise<Record<string, MasteryRecord>> {
   return out;
 }
 
-/** Save a single mastery record to Supabase */
 export async function saveMastery(record: MasteryRecord): Promise<void> {
   await syncMasteryToSupabase(record);
 }
 
-/**
- * Upsert a single mastery record to the concept_mastery table.
- * Called from saveMastery - does not block the UI.
- */
 async function syncMasteryToSupabase(record: MasteryRecord): Promise<void> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -170,10 +156,8 @@ async function syncMasteryToSupabase(record: MasteryRecord): Promise<void> {
 }
 
 /**
- * Schedule all concepts for a just-completed course.
- * - Creates a new record for concepts not yet seen (due tomorrow)
- * - Leaves existing records untouched (don't reset progress)
- * - Drops exam-only (RE5) concept ids so they never enter the Learn queue
+ * Introduce concepts after a lesson (or course) without resetting mastery.
+ * New cards are due tomorrow. Existing cards keep their SM-2 schedule.
  */
 export async function scheduleConceptsForCourse(conceptIds: string[]): Promise<void> {
   const reviewable = conceptIds.filter(isReviewPoolConceptId);
@@ -191,7 +175,6 @@ export async function scheduleConceptsForCourse(conceptIds: string[]): Promise<v
   }
 }
 
-/** Get all due cards (today or overdue), sorted oldest-due first */
 export async function getDueCards(): Promise<MasteryRecord[]> {
   const all = await loadMastery();
   const today = toDateString(new Date());
@@ -207,25 +190,24 @@ export async function getDueCards(): Promise<MasteryRecord[]> {
     });
 }
 
-/** Count of due cards */
+/** Due cards for one sitting. Banner count still uses the full due list. */
+export async function getReviewSessionQueue(): Promise<MasteryRecord[]> {
+  const due = await getDueCards();
+  return due.slice(0, REVIEW_SESSION_CAP);
+}
+
 export async function getDueCount(): Promise<number> {
   const due = await getDueCards();
   return due.length;
 }
 
 /**
- * Record a single lesson answer against a concept's spaced-repetition schedule.
+ * Lesson encounter of a concept.
  *
- * This is the link between playing a lesson and the review system: a WRONG
- * answer (quality 1) resets the concept to a 1-day interval, so the concept —
- * and therefore the idea the learner just got wrong — resurfaces in their
- * reviews almost immediately. A CORRECT answer (quality 4) advances it on the
- * normal SM-2 curve. First exposure lazily creates the record.
- *
- * Fire-and-forget by design: it must never block or break a lesson. Callers
- * should `void` it. Only questions authored with a `conceptId` reach here.
- * Exam-only concepts (RE5) are ignored so the Learn banner never becomes a
- * second FAIS paper.
+ * Study is not review. A first exposure only inserts a card due tomorrow.
+ * A later miss in a lesson pulls the card back to a 1-day interval so the
+ * idea is retrieved again soon. A later hit in a lesson does not graduate
+ * the card — that would collapse the spacing effect.
  */
 export async function recordConceptResult(
   conceptId: string,
@@ -248,20 +230,22 @@ export async function recordConceptResult(
       .eq("concept_id", conceptId)
       .maybeSingle();
 
-    const current: MasteryRecord = data
-      ? {
-          concept_id: (data as any).concept_id,
-          interval_days: (data as any).interval_days,
-          ease_factor: (data as any).ease_factor,
-          repetitions: (data as any).repetitions,
-          next_review_date: (data as any).next_review_date,
-          last_reviewed_at: (data as any).last_reviewed_at,
-        }
-      : createMasteryRecord(conceptId);
+    if (!data) {
+      await syncMasteryToSupabase(createMasteryRecord(conceptId));
+      return;
+    }
 
-    // Notho mapping (see ReviewQuality): correct → 4, wrong → 1.
-    const quality: ReviewQuality = isCorrect ? 4 : 1;
-    await syncMasteryToSupabase(applyReview(current, quality));
+    if (isCorrect) return;
+
+    const current: MasteryRecord = {
+      concept_id: (data as any).concept_id,
+      interval_days: (data as any).interval_days,
+      ease_factor: (data as any).ease_factor,
+      repetitions: (data as any).repetitions,
+      next_review_date: (data as any).next_review_date,
+      last_reviewed_at: (data as any).last_reviewed_at,
+    };
+    await syncMasteryToSupabase(applyReview(current, 1));
   } catch {
     // Silent fail — a review-schedule write must never break a lesson.
   }
