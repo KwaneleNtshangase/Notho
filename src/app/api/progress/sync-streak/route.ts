@@ -1,24 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getUserFromRequest } from "@/lib/apiAuth";
-
-// South Africa Standard Time is UTC+2 with no daylight saving.
-// All streak dates must be computed in SAST - not UTC - or a lesson done
-// between 22:00 and 23:59 SA time gets stamped with the next UTC date,
-// causing false streak gaps or frozen counts the following day.
-function sastDate(offsetDays = 0): string {
-  const SAST_OFFSET_MS = 2 * 60 * 60 * 1000; // UTC+2, no DST
-  const d = new Date(Date.now() + SAST_OFFSET_MS + offsetDays * 24 * 60 * 60 * 1000);
-  return d.toISOString().split("T")[0];
-}
-
-function isoToday() {
-  return sastDate(0);
-}
-
-function isoYesterday() {
-  return sastDate(-1);
-}
+import { applyLessonToStreak, sastToday } from "@/lib/dates";
 
 export async function POST(req: NextRequest) {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -49,51 +32,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
-  const today = isoToday();
+  const today = sastToday();
   const lastActive = data?.last_activity_date ? String(data.last_activity_date) : null;
   const current = Number(data?.streak ?? 0);
   const freezeCount = Math.max(0, Number(data?.streak_freeze_count ?? 0));
   const prevLongest = Number(data?.longest_streak ?? 0);
 
-  // Evaluate the streak state before applying today's lesson completion
-  const { sastDateDiffDays, evaluateStreak } = require("@/lib/dates");
-  const evalResult = evaluateStreak(current, freezeCount, lastActive, today);
+  const next = applyLessonToStreak(current, freezeCount, lastActive, today);
 
-  let nextStreak = evalResult.streak;
-  let nextFreezeCount = evalResult.freezeCount;
-
-  if (evalResult.freezeCount < freezeCount) {
+  if (next.freezeCount < freezeCount) {
     console.info("[sync-streak] Consumed streak freeze(s)", {
       userId,
       previousStreak: current,
-      remainingFreezes: nextFreezeCount,
-      used: freezeCount - nextFreezeCount
+      remainingFreezes: next.freezeCount,
+      used: freezeCount - next.freezeCount,
     });
   }
 
-  // Now apply today's lesson completion
-  const gapAfterEval = evalResult.lastActivityDate ? sastDateDiffDays(today, evalResult.lastActivityDate) : null;
-
-  if (!evalResult.lastActivityDate) {
-    // First ever lesson - start streak at 1
-    nextStreak = 1;
-  } else if (gapAfterEval === 0) {
-    // Already did a lesson today - keep streak (at least 1)
-    nextStreak = Math.max(evalResult.streak, 1);
-  } else if (gapAfterEval === 1) {
-    // Consecutive day - increment
-    nextStreak = evalResult.streak + 1;
-  } else {
-    // Should only reach here if gap > 1 and streak was reset to 0 in evaluateStreak
-    nextStreak = 1;
-  }
-
-  const nextLongest = Math.max(nextStreak, prevLongest);
+  const nextLongest = Math.max(next.streak, prevLongest);
 
   const { error: upsertError } = await admin.from("user_progress").upsert({
     user_id: userId,
-    streak: nextStreak,
-    streak_freeze_count: nextFreezeCount,
+    streak: next.streak,
+    streak_freeze_count: next.freezeCount,
     longest_streak: nextLongest,
     last_activity_date: today,
   }, { onConflict: "user_id" });
@@ -105,9 +66,10 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    streak: nextStreak,
+    streak: next.streak,
     longestStreak: nextLongest,
     lastActivityDate: today,
-    freezeCount: nextFreezeCount,
+    freezeCount: next.freezeCount,
+    extended: next.extended,
   });
 }
