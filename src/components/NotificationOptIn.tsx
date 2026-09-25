@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * Ask once, after the first real lesson — not on launch, not in Settings.
- * Settings remains an off switch only.
- */
-
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ensurePushSubscription, pushSupported } from "@/lib/push/subscribe";
@@ -22,18 +17,22 @@ export function NotificationOptIn() {
   const doneALesson = (userData?.totalCompleted ?? 0) > 0 || (userData?.lessonsToday ?? 0) > 0;
   const onQuietPath =
     pathname.startsWith("/settings") ||
-    pathname.startsWith("/lesson/") ||
+    pathname.startsWith("/lesson") ||
     pathname.startsWith("/onboarding") ||
     pathname.startsWith("/admin");
 
   useEffect(() => {
+    if (onQuietPath) {
+      setShow(false);
+      return;
+    }
     if (!pushSupported()) return;
     if (Notification.permission === "granted") {
       void ensurePushSubscription(false).catch(() => {});
       return;
     }
     if (Notification.permission === "denied") return;
-    if (!doneALesson || onQuietPath) return;
+    if (!doneALesson) return;
     try {
       if (localStorage.getItem(DECIDED_KEY) === "1") return;
     } catch {
@@ -70,63 +69,63 @@ export function NotificationOptIn() {
   return (
     <div
       role="dialog"
-      aria-label="Lesson reminders"
+      aria-label="Reminders"
       style={{
         position: "fixed",
         left: 12,
         right: 12,
         bottom: "calc(env(safe-area-inset-bottom, 0px) + 92px)",
         zIndex: 55,
-        maxWidth: 440,
+        maxWidth: 400,
         margin: "0 auto",
         background: "var(--color-surface, #111)",
         border: "1.5px solid var(--color-border)",
         borderRadius: 16,
-        padding: "16px 18px",
+        padding: "14px 16px",
         boxShadow: "0 12px 32px rgba(0, 0, 0, 0.28)",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
       }}
     >
-      <div style={{ fontSize: 16, fontWeight: 800, color: "var(--color-text-primary)" }}>
-        Want a tap when it's time for the next lesson?
+      <div style={{ flex: 1, fontSize: 15, fontWeight: 700, color: "var(--color-text-primary)", lineHeight: 1.3 }}>
+        Remind you for the next lesson?
       </div>
-      <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginTop: 6, lineHeight: 1.45 }}>
-        One reminder a day, after you've already started. Off whenever you like.
-      </div>
-      <div style={{ display: "flex", gap: 8, marginTop: 14, justifyContent: "flex-end" }}>
-        <button
-          type="button"
-          onClick={() => close(true)}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontSize: 14,
-            fontWeight: 700,
-            color: "var(--color-text-secondary)",
-            padding: "10px 12px",
-          }}
-        >
-          Not now
-        </button>
-        <button
-          type="button"
-          onClick={() => void enable()}
-          disabled={busy}
-          style={{
-            background: "var(--color-primary)",
-            color: "#fff",
-            border: "none",
-            borderRadius: 12,
-            padding: "10px 16px",
-            fontSize: 14,
-            fontWeight: 700,
-            cursor: "pointer",
-            opacity: busy ? 0.6 : 1,
-          }}
-        >
-          {busy ? "One sec…" : "Yes, remind me"}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => close(true)}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          fontSize: 14,
+          fontWeight: 700,
+          color: "var(--color-text-secondary)",
+          padding: "8px 10px",
+          flexShrink: 0,
+        }}
+      >
+        No
+      </button>
+      <button
+        type="button"
+        onClick={() => void enable()}
+        disabled={busy}
+        style={{
+          background: "var(--color-primary)",
+          color: "#fff",
+          border: "none",
+          borderRadius: 10,
+          padding: "8px 14px",
+          fontSize: 14,
+          fontWeight: 700,
+          cursor: "pointer",
+          opacity: busy ? 0.6 : 1,
+          flexShrink: 0,
+        }}
+      >
+        {busy ? "…" : "Remind me"}
+      </button>
     </div>
   );
 }
