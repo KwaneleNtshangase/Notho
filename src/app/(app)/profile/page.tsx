@@ -1,7 +1,6 @@
 "use client";
 
 import { ProfileView } from "@/components/ProfileView";
-import { ProfilePhotoGate } from "@/components/ProfileAvatar";
 import { useNotho } from "@/context/NothoContext";
 import { useProfileHandlers } from "@/hooks/useProfileHandlers";
 import { CONTENT_DATA } from "@/data/content";
@@ -18,27 +17,24 @@ export default function ProfilePage() {
   };
 
   return (
-    <>
-      <ProfilePhotoGate />
-      <ProfileView
-        userData={userData as any}
-        onSignOut={handleProfileSignOut}
-        onDeleteAccount={handleDeleteAccount}
-        onDownloadData={handleDownloadData}
-        onGoToSettings={() => setRoute({ name: "settings" })}
-        currentUser={null}
-        dailyGoal={dailyGoal}
-        setDailyGoal={setDailyGoal}
-        courseBadgeIds={getCourseBadgeIds()}
-        courses={CONTENT_DATA.courses}
-        completedLessons={completedLessons}
-        perfectLessons={perfectLessons}
-        calcSaved={userSettings.settings.calcSaved as any}
-        onClearCalcSaved={() => {
-          localStorage.removeItem("notho-calc-saved");
-          void userSettings.setCalcSaved(null as any);
-        }}
-      />
-    </>
+    <ProfileView
+      userData={userData as any}
+      onSignOut={handleProfileSignOut}
+      onDeleteAccount={handleDeleteAccount}
+      onDownloadData={handleDownloadData}
+      onGoToSettings={() => setRoute({ name: "settings" })}
+      currentUser={null}
+      dailyGoal={dailyGoal}
+      setDailyGoal={setDailyGoal}
+      courseBadgeIds={getCourseBadgeIds()}
+      courses={CONTENT_DATA.courses}
+      completedLessons={completedLessons}
+      perfectLessons={perfectLessons}
+      calcSaved={userSettings.settings.calcSaved as any}
+      onClearCalcSaved={() => {
+        localStorage.removeItem("notho-calc-saved");
+        void userSettings.setCalcSaved(null as any);
+      }}
+    />
   );
 }
