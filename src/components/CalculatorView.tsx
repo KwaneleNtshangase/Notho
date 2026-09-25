@@ -272,16 +272,6 @@ export function CalculatorView() {
           <span>Projection pinned to your Profile - tap Profile to view it.</span>
         </div>
       )}
-      <div className="relative overflow-hidden bg-gradient-to-br from-green-700 to-green-900 rounded-2xl p-5 text-white mb-8" style={{ marginBottom: 32 }}>
-        <div className="mb-3 flex items-center gap-2">
-          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-green-400 shrink-0" />
-          <span className="text-xs font-semibold uppercase tracking-wide text-green-100/90">Available</span>
-        </div>
-        <p className="text-green-100 text-sm leading-relaxed mb-4">See how your investments could grow with projections built around your numbers.</p>
-        <button type="button" onClick={() => { analytics.advisorCtaClicked("calculator_cta"); window.open("https://wealthwithkwanele.co.za", "_blank", "noopener,noreferrer"); }} className="block w-full py-3 bg-white text-green-800 rounded-xl font-bold text-center text-sm hover:bg-green-50 transition-colors">
-          Get Your Free Investment Plan
-        </button>
-      </div>
     </main>
   );
 }
