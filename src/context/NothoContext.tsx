@@ -7,6 +7,7 @@ import type { NothoState } from "@/hooks/useNothoState";
 import type { Route } from "@/app/pageViews.types";
 import { RE5_COURSE_ID, isRe5MockExam } from "@/lib/results/re5";
 import { APP_TAB_HREFS, announceTab, hrefForRouteName } from "@/lib/appTabs";
+import { registerRoutePrefetch, warmHeavyShell, whenIdle } from "@/lib/speculativeWarm";
 
 export const NothoContext = createContext<NothoState | null>(null);
 
@@ -23,9 +24,15 @@ export function NothoProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   React.useEffect(() => {
+    registerRoutePrefetch((href) => warm(router, href));
     for (const href of APP_TAB_HREFS) {
       warm(router, href);
     }
+    return whenIdle(() => {
+      warm(router, "/settings");
+      warm(router, "/re5-readiness");
+      warmHeavyShell();
+    }, 1200);
   }, [router]);
 
   const setRoute = React.useCallback(

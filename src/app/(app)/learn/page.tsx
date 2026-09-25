@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { LearnView } from "@/components/views/LearnView";
 import { CONTENT_DATA, Lesson } from "@/data/content";
 import { useNotho } from "@/context/NothoContext";
@@ -9,6 +9,7 @@ import { shuffleLessonSteps, lessonShuffleSeed } from "@/lib/lessonShuffle";
 import { assignQids, type WorkingStep } from "@/lib/lessonMastery";
 import type { SavedLessonProgress } from "@/app/pageViews.types";
 import { markCourseFocus } from "@/lib/scrollMemory";
+import { warmCourse, warmLesson, whenIdle } from "@/lib/speculativeWarm";
 
 export default function LearnPage() {
   const {
@@ -76,6 +77,17 @@ export default function LearnPage() {
     },
     [hearts, userId, setCurrentLessonState, setRoute, setShowNoHearts]
   );
+
+  useEffect(() => {
+    return whenIdle(() => {
+      if (lessonResume?.courseId && lessonResume?.lessonId) {
+        warmLesson(lessonResume.courseId, lessonResume.lessonId);
+      }
+      for (const course of CONTENT_DATA.courses.slice(0, 4)) {
+        warmCourse(course.id);
+      }
+    }, 1600);
+  }, [lessonResume]);
 
   return (
     <LearnView
