@@ -30,6 +30,7 @@ import { NotificationOptIn } from "@/components/NotificationOptIn";
 import { StreakRepairBanner } from "@/components/StreakRepairBanner";
 import { UsageTracker } from "@/components/UsageTracker";
 import { AppGestures } from "@/components/AppGestures";
+import { ShakeToReport } from "@/components/ShakeToReport";
 
 function AppNavigation() {
   const { setRoute } = useNotho();
@@ -147,6 +148,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {!isMockExam && <StreakRepairBanner />}
           <UsageTracker />
           <AppGestures />
+          <ShakeToReport />
         </OnboardingGate>
       </AuthGate>
     </NothoProvider>
