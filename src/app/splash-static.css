@@ -1,0 +1,14 @@
+/* Meta-style launch: kill AuthGate motion and lighting. */
+.splash-logo-wrap {
+  animation: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+.splash-bg-glow {
+  display: none !important;
+  animation: none !important;
+}
+.splash-logo-wrap img {
+  width: 88px !important;
+  height: 88px !important;
+}
