@@ -18,7 +18,8 @@ import {
   baseQids,
   type WorkingStep,
 } from "@/lib/lessonMastery";
-import { recordConceptResult } from "@/lib/spaced-repetition";
+import { recordConceptResult, scheduleConceptsForCourse } from "@/lib/spaced-repetition";
+import { conceptIdsFromLessonSteps } from "@/lib/reviewIntro";
 import {
   resolveLessonSteps,
   nextAttemptNo,
@@ -256,6 +257,10 @@ function StandardLessonPage({
           heartLost: lessonHeartLostRef.current,
         });
 
+        void scheduleConceptsForCourse(
+          conceptIdsFromLessonSteps(currentLessonState.steps)
+        );
+
         const priorResults = spec ? await fetchLessonResults(doneCourseId) : [];
 
         const savedResult = await recordLessonResult({
@@ -402,13 +407,15 @@ function StandardLessonPage({
         isCorrect,
       });
     }
+    if (answeredStep?.conceptId) {
+      void recordConceptResult(answeredStep.conceptId, isCorrect);
+    }
     if (isCorrect) {
       clearMissedVariant(userId, slotId, variantId);
     } else {
       loseHeart();
       lessonHeartLostRef.current = true;
       recordMissedVariant(userId, slotId, variantId);
-      if (answeredStep?.conceptId) void recordConceptResult(answeredStep.conceptId, false);
     }
   };
 
