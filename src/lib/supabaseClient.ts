@@ -17,19 +17,21 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const client = createClient(supabaseUrl, supabaseAnonKey);
 const originalSignUp = client.auth.signUp.bind(client.auth);
 
-client.auth.signUp = (async (credentials, options) => {
-  const result = await originalSignUp(credentials, options);
+type SignUpFn = typeof client.auth.signUp;
+
+client.auth.signUp = (async (...args: Parameters<SignUpFn>) => {
+  const result = await originalSignUp(...args);
   if (signupEmailAlreadyTaken(result.error?.message, result.data?.user)) {
     return {
       data: { user: null, session: null },
       error: {
         name: result.error?.name || "AuthApiError",
         message: EXISTING_EMAIL_SIGNUP_MESSAGE,
-        status: result.error && "status" in result.error ? (result.error as { status?: number }).status : 422,
+        status: 422,
       },
-    } as typeof result;
+    } as Awaited<ReturnType<SignUpFn>>;
   }
   return result;
-}) as typeof client.auth.signUp;
+}) as SignUpFn;
 
 export const supabase = client;
