@@ -33,6 +33,7 @@ export type MasteryRecord = {
 export type ReviewQuality = 0 | 1 | 2 | 3 | 4 | 5;
 import { supabase } from "@/lib/supabaseClient";
 import { sastToday } from "@/lib/dates";
+import { isReviewPoolConceptId } from "@/lib/reviewPool";
 
 const MIN_EASE = 1.3;
 
@@ -172,11 +173,14 @@ async function syncMasteryToSupabase(record: MasteryRecord): Promise<void> {
  * Schedule all concepts for a just-completed course.
  * - Creates a new record for concepts not yet seen (due tomorrow)
  * - Leaves existing records untouched (don't reset progress)
+ * - Drops exam-only (RE5) concept ids so they never enter the Learn queue
  */
 export async function scheduleConceptsForCourse(conceptIds: string[]): Promise<void> {
+  const reviewable = conceptIds.filter(isReviewPoolConceptId);
+  if (reviewable.length === 0) return;
   const all = await loadMastery();
   const newRecords: MasteryRecord[] = [];
-  for (const id of conceptIds) {
+  for (const id of reviewable) {
     if (!all[id]) {
       all[id] = createMasteryRecord(id);
       newRecords.push(all[id]);
@@ -192,6 +196,7 @@ export async function getDueCards(): Promise<MasteryRecord[]> {
   const all = await loadMastery();
   const today = toDateString(new Date());
   return Object.values(all)
+    .filter((r) => isReviewPoolConceptId(r.concept_id))
     .filter((r) => r.next_review_date <= today)
     .sort((a, b) => {
       const dueDateCmp = a.next_review_date.localeCompare(b.next_review_date);
@@ -219,12 +224,16 @@ export async function getDueCount(): Promise<number> {
  *
  * Fire-and-forget by design: it must never block or break a lesson. Callers
  * should `void` it. Only questions authored with a `conceptId` reach here.
+ * Exam-only concepts (RE5) are ignored so the Learn banner never becomes a
+ * second FAIS paper.
  */
 export async function recordConceptResult(
   conceptId: string,
   isCorrect: boolean
 ): Promise<void> {
   try {
+    if (!isReviewPoolConceptId(conceptId)) return;
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
