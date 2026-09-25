@@ -27,19 +27,27 @@ async function compressAvatarFile(file: File): Promise<Blob> {
   return blob;
 }
 
-async function persistAvatarUrl(userId: string, url: string | null): Promise<void> {
-  await supabase.from("profiles").upsert({ user_id: userId, avatar_url: url }, { onConflict: "user_id" });
-  if (url && !url.startsWith("data:")) {
-    await supabase.auth.updateUser({ data: { avatar_url: url } });
-  } else if (!url) {
-    await supabase.auth.updateUser({ data: { avatar_url: null } });
-  }
+function cacheChosen(url: string | null) {
   try {
     if (url) localStorage.setItem("notho-avatar-url", url);
     else localStorage.removeItem("notho-avatar-url");
   } catch {
-    /* ignore quota / private mode */
+    /* ignore */
   }
+}
+
+function isGoogleHosted(url: string): boolean {
+  try {
+    const host = new URL(url).hostname;
+    return host.endsWith("googleusercontent.com") || host.endsWith("ggpht.com") || host === "lh3.google.com";
+  } catch {
+    return false;
+  }
+}
+
+async function persistAvatarUrl(userId: string, url: string | null): Promise<void> {
+  await supabase.from("profiles").upsert({ user_id: userId, avatar_url: url }, { onConflict: "user_id" });
+  cacheChosen(url);
 }
 
 export async function uploadProfileAvatar(file: File): Promise<string> {
@@ -74,13 +82,13 @@ export async function removeProfileAvatar(): Promise<void> {
     await supabase.storage.from("avatars").remove([`${user.id}/avatar.jpg`]);
     await persistAvatarUrl(user.id, null);
   } else {
-    try { localStorage.removeItem("notho-avatar-url"); } catch { /* ignore */ }
+    cacheChosen(null);
   }
 }
 
 function findInitialsCircle(): HTMLElement | null {
   const marked = document.querySelector<HTMLElement>("[data-notho-avatar-host]");
-  if (marked) return marked;
+  if (marked && marked.isConnected) return marked;
   const mains = document.querySelectorAll("main");
   for (const main of mains) {
     const divs = main.querySelectorAll("div");
@@ -101,23 +109,39 @@ function findInitialsCircle(): HTMLElement | null {
   return null;
 }
 
+function paintCircle(node: HTMLElement | null, url: string | null) {
+  if (!node) return;
+  if (url) {
+    node.style.backgroundImage = `url("${url.replace(/"/g, "")}")`;
+    node.style.backgroundSize = "cover";
+    node.style.backgroundPosition = "center";
+    node.style.color = "transparent";
+    node.style.backgroundColor = "transparent";
+  } else {
+    node.style.backgroundImage = "";
+    node.style.color = "white";
+    node.style.backgroundColor = "";
+  }
+}
+
 export function ProfilePhotoGate() {
   const inputRef = useRef<HTMLInputElement>(null);
   const circleRef = useRef<HTMLElement | null>(null);
   const [box, setBox] = useState<{ top: number; left: number; size: number } | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [googleUrl, setGoogleUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [sheet, setSheet] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     try {
       const cached = localStorage.getItem("notho-avatar-url");
-      if (cached) setAvatarUrl(cached);
+      if (cached && !isGoogleHosted(cached)) setAvatarUrl(cached);
+      else if (cached && isGoogleHosted(cached)) localStorage.removeItem("notho-avatar-url");
     } catch {
       /* ignore */
     }
@@ -126,15 +150,19 @@ export function ProfilePhotoGate() {
       const user = data.user;
       if (!user || cancelled) return;
       const meta = user.user_metadata as { avatar_url?: string; picture?: string } | undefined;
+      const google =
+        (typeof meta?.picture === "string" && meta.picture) ||
+        (typeof meta?.avatar_url === "string" && isGoogleHosted(meta.avatar_url) ? meta.avatar_url : "") ||
+        "";
+      if (google && isGoogleHosted(google)) setGoogleUrl(google);
       const { data: row } = await supabase
         .from("profiles")
         .select("avatar_url")
         .eq("user_id", user.id)
         .maybeSingle();
-      const fromRow = (row as { avatar_url?: string | null } | null)?.avatar_url?.trim();
-      const fromMeta = meta?.avatar_url || meta?.picture || "";
-      const next = fromRow || fromMeta || null;
-      if (next && !cancelled) setAvatarUrl(next);
+      const fromRow = (row as { avatar_url?: string | null } | null)?.avatar_url?.trim() || "";
+      if (cancelled) return;
+      if (fromRow && !isGoogleHosted(fromRow)) setAvatarUrl(fromRow);
     });
     return () => {
       cancelled = true;
@@ -142,55 +170,95 @@ export function ProfilePhotoGate() {
   }, []);
 
   useEffect(() => {
-    const measure = () => {
+    let raf = 0;
+    let lives = true;
+    const tick = () => {
+      if (!lives) return;
       const node = findInitialsCircle();
       circleRef.current = node;
-      if (!node) {
-        setBox((prev) => (prev ? null : prev));
-        return;
-      }
-      const r = node.getBoundingClientRect();
-      if (r.width < 40 || r.height < 40) {
-        setBox(null);
-        return;
-      }
-      const next = { top: r.top, left: r.left, size: r.width };
-      setBox((prev) => {
-        if (
-          prev &&
-          Math.abs(prev.top - next.top) < 0.5 &&
-          Math.abs(prev.left - next.left) < 0.5 &&
-          Math.abs(prev.size - next.size) < 0.5
-        ) {
-          return prev;
+      paintCircle(node, avatarUrl);
+      if (node) {
+        const r = node.getBoundingClientRect();
+        if (r.width >= 40 && r.height >= 40) {
+          const next = { top: r.top, left: r.left, size: r.width };
+          setBox((prev) => {
+            if (
+              prev &&
+              Math.abs(prev.top - next.top) < 0.4 &&
+              Math.abs(prev.left - next.left) < 0.4 &&
+              Math.abs(prev.size - next.size) < 0.4
+            ) {
+              return prev;
+            }
+            return next;
+          });
+        } else {
+          setBox(null);
         }
-        return next;
-      });
+      } else {
+        setBox(null);
+      }
+      raf = window.requestAnimationFrame(tick);
     };
-    measure();
-    const interval = window.setInterval(measure, 250);
-    window.addEventListener("resize", measure);
-    window.addEventListener("scroll", measure, true);
+    raf = window.requestAnimationFrame(tick);
     return () => {
-      window.clearInterval(interval);
-      window.removeEventListener("resize", measure);
-      window.removeEventListener("scroll", measure, true);
+      lives = false;
+      window.cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [avatarUrl]);
+
+  const flash = (msg: string) => {
+    setHint(msg);
+    window.setTimeout(() => setHint(null), 2200);
+  };
 
   const onFile = async (file: File) => {
     setBusy(true);
-    setHint(null);
     try {
       const url = await uploadProfileAvatar(file);
       setAvatarUrl(url);
-      setHint("Photo updated");
-      window.setTimeout(() => setHint(null), 2000);
+      paintCircle(circleRef.current, url);
+      flash("Photo updated");
     } catch (e) {
-      setHint(e instanceof Error ? e.message : "Could not update your photo.");
+      flash(e instanceof Error ? e.message : "Could not update your photo.");
     } finally {
       setBusy(false);
+      setSheet(false);
       if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  const useGoogle = async () => {
+    if (!googleUrl) return;
+    setBusy(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) await persistAvatarUrl(user.id, googleUrl);
+      else cacheChosen(googleUrl);
+      setAvatarUrl(googleUrl);
+      paintCircle(circleRef.current, googleUrl);
+      flash("Using your Google photo");
+    } catch (e) {
+      flash(e instanceof Error ? e.message : "Could not save that photo.");
+    } finally {
+      setBusy(false);
+      setSheet(false);
+    }
+  };
+
+  const remove = async () => {
+    setBusy(true);
+    try {
+      await removeProfileAvatar();
+      setAvatarUrl(null);
+      paintCircle(circleRef.current, null);
+      flash("Photo removed");
+    } catch {
+      setAvatarUrl(null);
+      paintCircle(circleRef.current, null);
+    } finally {
+      setBusy(false);
+      setSheet(false);
     }
   };
 
@@ -198,75 +266,35 @@ export function ProfilePhotoGate() {
   const overlay =
     mounted && box && typeof document !== "undefined"
       ? createPortal(
-          <div
+          <button
+            type="button"
+            onClick={() => setSheet(true)}
+            disabled={busy}
+            aria-label={avatarUrl ? "Change profile photo" : "Add a profile photo"}
             style={{
               position: "fixed",
-              top: box.top,
-              left: box.left,
-              width: box.size,
-              height: box.size,
+              top: box.top + box.size - badge + 4,
+              left: box.left + box.size - badge + 4,
+              width: badge,
+              height: badge,
+              borderRadius: "50%",
               zIndex: 40,
-              pointerEvents: "none",
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--color-text-primary)",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+              padding: 0,
+              cursor: busy ? "wait" : "pointer",
             }}
           >
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              disabled={busy}
-              aria-label={avatarUrl ? "Change profile photo" : "Add a profile photo"}
-              style={{
-                position: "absolute",
-                inset: 0,
-                border: "none",
-                padding: 0,
-                margin: 0,
-                borderRadius: "50%",
-                overflow: "hidden",
-                background: avatarUrl ? "transparent" : "transparent",
-                cursor: busy ? "wait" : "pointer",
-                pointerEvents: "auto",
-              }}
-            >
-              {avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={avatarUrl}
-                  alt=""
-                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                />
-              ) : null}
-            </button>
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              disabled={busy}
-              aria-label="Change profile photo"
-              style={{
-                position: "absolute",
-                right: -4,
-                bottom: -4,
-                width: badge,
-                height: badge,
-                borderRadius: "50%",
-                background: "var(--color-surface)",
-                border: "1px solid var(--color-border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--color-text-primary)",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-                padding: 0,
-                cursor: busy ? "wait" : "pointer",
-                pointerEvents: "auto",
-                zIndex: 1,
-              }}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                <circle cx="12" cy="13" r="4" />
-              </svg>
-            </button>
-          </div>,
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </button>,
           document.body,
         )
       : null;
@@ -286,7 +314,51 @@ export function ProfilePhotoGate() {
         }}
       />
       {overlay}
-      {hint ? (
+      {sheet && (
+        <div
+          onClick={() => setSheet(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.45)",
+            zIndex: 520,
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: 480,
+              background: "var(--color-surface)",
+              borderRadius: "20px 20px 0 0",
+              padding: "12px 16px 28px",
+            }}
+          >
+            <div style={{ width: 36, height: 4, borderRadius: 99, background: "var(--color-border)", margin: "4px auto 14px" }} />
+            <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 10 }}>Profile photo</div>
+            <button type="button" className="btn btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={busy} onClick={() => inputRef.current?.click()}>
+              Choose a photo
+            </button>
+            {googleUrl && (
+              <button type="button" className="btn btn-secondary" style={{ width: "100%", marginBottom: 8 }} disabled={busy} onClick={() => { void useGoogle(); }}>
+                Use my Google photo
+              </button>
+            )}
+            {avatarUrl && (
+              <button type="button" className="btn btn-secondary" style={{ width: "100%", marginBottom: 8, color: "#dc2626" }} disabled={busy} onClick={() => { void remove(); }}>
+                Remove photo
+              </button>
+            )}
+            <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={() => setSheet(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+      {hint && (
         <div
           role="status"
           style={{
@@ -294,7 +366,7 @@ export function ProfilePhotoGate() {
             left: "50%",
             bottom: 96,
             transform: "translateX(-50%)",
-            zIndex: 80,
+            zIndex: 530,
             background: "var(--color-surface)",
             color: "var(--color-text-primary)",
             border: "1px solid var(--color-border)",
@@ -303,11 +375,12 @@ export function ProfilePhotoGate() {
             fontSize: 13,
             fontWeight: 600,
             boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+            whiteSpace: "nowrap",
           }}
         >
           {busy ? "Updating photo…" : hint}
         </div>
-      ) : null}
+      )}
     </>
   );
 }
