@@ -1,6 +1,0 @@
-/* Advisor sales cards on Profile + investor-quiz result.
-   Settings → Support row is a normal list row and is not targeted. */
-.from-green-700.to-green-900,
-.from-green-600.to-green-800 {
-  display: none !important;
-}
