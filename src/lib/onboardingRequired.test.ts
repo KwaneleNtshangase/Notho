@@ -8,17 +8,9 @@ describe("onboarding required identity", () => {
     expect(hasValidUsername({ username: "ok_name" })).toBe(true);
   });
 
-  it("requires a goal for first-time users", () => {
-    expect(isOnboardingComplete({ username: "ok_name" })).toBe(false);
+  it("is complete with a valid username even if there is no goal", () => {
+    expect(isOnboardingComplete({ username: "ok_name" })).toBe(true);
     expect(isOnboardingComplete({ username: "ok_name", goal: "emergency" })).toBe(true);
-  });
-
-  it("lets returning users skip the goal", () => {
-    expect(
-      isOnboardingComplete({ username: "ok_name" }, { requireGoal: false }),
-    ).toBe(true);
-    expect(
-      isOnboardingComplete({ username: "ab" }, { requireGoal: false }),
-    ).toBe(false);
+    expect(isOnboardingComplete({ username: "ab", goal: "emergency" })).toBe(false);
   });
 });

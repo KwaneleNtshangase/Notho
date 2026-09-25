@@ -9,11 +9,7 @@ import {
   readLocalOnboarding,
 } from "@/lib/onboardingRequired";
 
-/**
- * Signed-in users cannot use the app without a unique username.
- * First-time accounts also need at least one money goal.
- * Returning accounts that already used the app can skip the goal.
- */
+/** Signed-in users cannot use the app without a unique username. Goals are optional. */
 export function OnboardingGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "/";
   const router = useRouter();
@@ -41,17 +37,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
         goal: profile?.goal || local.goal,
       };
 
-      const createdAt = Date.parse(data.session.user.created_at || "");
-      const accountIsOld =
-        Number.isFinite(createdAt) && Date.now() - createdAt > 60 * 60 * 1000;
-      const returning = Boolean(
-        local.onboarded || profile?.username || profile?.goal || accountIsOld,
-      );
-      const complete = isOnboardingComplete(identity, {
-        requireGoal: !returning,
-      });
-
-      if (complete && hasValidUsername(identity)) {
+      if (isOnboardingComplete(identity) && hasValidUsername(identity)) {
         if (typeof window !== "undefined") {
           if (identity.username) {
             window.localStorage.setItem("notho-username", identity.username);
@@ -66,8 +52,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
       }
 
       if (pathname !== "/onboarding") {
-        const qs = returning ? "?returning=1" : "";
-        router.replace(`/onboarding${qs}`);
+        router.replace("/onboarding");
         return;
       }
       if (!cancelled) setReady(true);

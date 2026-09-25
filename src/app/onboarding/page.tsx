@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useSearchParams } from "next/navigation";
 import { OnboardingView } from "@/components/views/OnboardingView";
 import { AuthGate } from "@/components/AuthGate";
 import { supabase } from "@/lib/supabaseClient";
@@ -12,8 +11,6 @@ import { useNotho, NothoProvider } from "@/context/NothoContext";
 
 function OnboardingContent() {
   const { setRoute, startLesson } = useNotho();
-  const searchParams = useSearchParams();
-  const returningUser = searchParams.get("returning") === "1";
 
   const handleOnboardingComplete = async (payload: {
     goal?: string;
@@ -28,7 +25,6 @@ function OnboardingContent() {
     const primaryGoal = goals[0];
     const username = normalizeUsername(payload.username);
     if (!username) return;
-    if (!returningUser && !primaryGoal) return;
 
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -91,16 +87,14 @@ function OnboardingContent() {
     setRoute({ name: "learn" });
   };
 
-  return <OnboardingView onComplete={handleOnboardingComplete} returningUser={returningUser} />;
+  return <OnboardingView onComplete={handleOnboardingComplete} />;
 }
 
 export default function OnboardingPage() {
   return (
     <NothoProvider>
       <AuthGate>
-        <React.Suspense fallback={null}>
-          <OnboardingContent />
-        </React.Suspense>
+        <OnboardingContent />
       </AuthGate>
     </NothoProvider>
   );

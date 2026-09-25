@@ -10,18 +10,9 @@ export function hasValidUsername(identity: OnboardingIdentity): boolean {
   return validateUsername(username) === null;
 }
 
-/**
- * Username is always required.
- * Goal is required for first-time onboarding only. Returning accounts
- * that already used the app can skip the goal step.
- */
-export function isOnboardingComplete(
-  identity: OnboardingIdentity,
-  options: { requireGoal?: boolean } = { requireGoal: true },
-): boolean {
-  if (!hasValidUsername(identity)) return false;
-  if (options.requireGoal === false) return true;
-  return (identity.goal ?? "").trim().length > 0;
+/** Username is the only gate. Goals are optional and live on the Goals tab. */
+export function isOnboardingComplete(identity: OnboardingIdentity): boolean {
+  return hasValidUsername(identity);
 }
 
 export function readLocalOnboarding(): OnboardingIdentity & { onboarded: boolean } {
