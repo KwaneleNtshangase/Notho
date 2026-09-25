@@ -79,6 +79,8 @@ export async function removeProfileAvatar(): Promise<void> {
 }
 
 function findInitialsCircle(): HTMLElement | null {
+  const marked = document.querySelector<HTMLElement>("[data-notho-avatar-host]");
+  if (marked) return marked;
   const mains = document.querySelectorAll("main");
   for (const main of mains) {
     const divs = main.querySelectorAll("div");
@@ -92,6 +94,7 @@ function findInitialsCircle(): HTMLElement | null {
       if (w < 64 || w > 88 || h < 64 || h > 88) continue;
       const radius = getComputedStyle(node).borderRadius;
       if (!radius.includes("%") && !radius.startsWith("50") && !radius.startsWith("999")) continue;
+      node.setAttribute("data-notho-avatar-host", "1");
       return node;
     }
   }
@@ -100,10 +103,16 @@ function findInitialsCircle(): HTMLElement | null {
 
 export function ProfilePhotoGate() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [host, setHost] = useState<HTMLElement | null>(null);
+  const circleRef = useRef<HTMLElement | null>(null);
+  const [box, setBox] = useState<{ top: number; left: number; size: number } | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     try {
@@ -133,24 +142,41 @@ export function ProfilePhotoGate() {
   }, []);
 
   useEffect(() => {
-    let lives = true;
-    const attach = () => {
-      if (!lives) return;
-      const found = findInitialsCircle();
-      if (found && found !== host) {
-        found.style.position = "relative";
-        found.style.overflow = "hidden";
-        found.style.cursor = "pointer";
-        setHost(found);
+    const measure = () => {
+      const node = findInitialsCircle();
+      circleRef.current = node;
+      if (!node) {
+        setBox((prev) => (prev ? null : prev));
+        return;
       }
+      const r = node.getBoundingClientRect();
+      if (r.width < 40 || r.height < 40) {
+        setBox(null);
+        return;
+      }
+      const next = { top: r.top, left: r.left, size: r.width };
+      setBox((prev) => {
+        if (
+          prev &&
+          Math.abs(prev.top - next.top) < 0.5 &&
+          Math.abs(prev.left - next.left) < 0.5 &&
+          Math.abs(prev.size - next.size) < 0.5
+        ) {
+          return prev;
+        }
+        return next;
+      });
     };
-    attach();
-    const t = window.setInterval(attach, 400);
+    measure();
+    const interval = window.setInterval(measure, 250);
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", measure, true);
     return () => {
-      lives = false;
-      window.clearInterval(t);
+      window.clearInterval(interval);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", measure, true);
     };
-  }, [host]);
+  }, []);
 
   const onFile = async (file: File) => {
     setBusy(true);
@@ -168,72 +194,97 @@ export function ProfilePhotoGate() {
     }
   };
 
-  const picker = (
-    <input
-      ref={inputRef}
-      type="file"
-      accept="image/*"
-      aria-hidden="true"
-      tabIndex={-1}
-      style={{ display: "none" }}
-      onChange={(e) => {
-        const file = e.target.files?.[0];
-        if (file) void onFile(file);
-      }}
-    />
-  );
-
-  const overlay = host
-    ? createPortal(
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={busy}
-          aria-label={avatarUrl ? "Change profile photo" : "Add a profile photo"}
-          style={{
-            position: "absolute",
-            inset: 0,
-            border: "none",
-            padding: 0,
-            margin: 0,
-            background: avatarUrl ? "transparent" : "transparent",
-            cursor: busy ? "wait" : "pointer",
-          }}
-        >
-          {avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "50%" }} />
-          ) : null}
-          <span
+  const badge = 26;
+  const overlay =
+    mounted && box && typeof document !== "undefined"
+      ? createPortal(
+          <div
             style={{
-              position: "absolute",
-              right: -2,
-              bottom: -2,
-              width: 24,
-              height: 24,
-              borderRadius: "50%",
-              background: "var(--color-surface)",
-              border: "1px solid var(--color-border)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--color-text-primary)",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.18)",
+              position: "fixed",
+              top: box.top,
+              left: box.left,
+              width: box.size,
+              height: box.size,
+              zIndex: 40,
+              pointerEvents: "none",
             }}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-              <circle cx="12" cy="13" r="4" />
-            </svg>
-          </span>
-        </button>,
-        host,
-      )
-    : null;
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={busy}
+              aria-label={avatarUrl ? "Change profile photo" : "Add a profile photo"}
+              style={{
+                position: "absolute",
+                inset: 0,
+                border: "none",
+                padding: 0,
+                margin: 0,
+                borderRadius: "50%",
+                overflow: "hidden",
+                background: avatarUrl ? "transparent" : "transparent",
+                cursor: busy ? "wait" : "pointer",
+                pointerEvents: "auto",
+              }}
+            >
+              {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={avatarUrl}
+                  alt=""
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              ) : null}
+            </button>
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={busy}
+              aria-label="Change profile photo"
+              style={{
+                position: "absolute",
+                right: -4,
+                bottom: -4,
+                width: badge,
+                height: badge,
+                borderRadius: "50%",
+                background: "var(--color-surface)",
+                border: "1px solid var(--color-border)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--color-text-primary)",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                padding: 0,
+                cursor: busy ? "wait" : "pointer",
+                pointerEvents: "auto",
+                zIndex: 1,
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+            </button>
+          </div>,
+          document.body,
+        )
+      : null;
 
   return (
     <>
-      {picker}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        aria-hidden="true"
+        tabIndex={-1}
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void onFile(file);
+        }}
+      />
       {overlay}
       {hint ? (
         <div
