@@ -34,6 +34,7 @@ export function NothoTopBar({
   const regen = heartsRegenInfo ? heartsRegenInfo() : null;
 
   const streakSafeToday = lessonsToday > 0;
+  const flameOpacity = streakSafeToday || streak === 0 ? 1 : 0.55;
 
   return (
     <>
@@ -63,8 +64,8 @@ export function NothoTopBar({
             }}
             aria-label="Streak and freeze info"
           >
-            <NothoStreak size={20} style={{ color: "#EFB343" }} />
-            <span style={{ fontWeight: 700, fontSize: 15, color: "#EFB343" }}>{streak}</span>
+            <NothoStreak size={20} style={{ color: "#EFB343", opacity: flameOpacity }} />
+            <span style={{ fontWeight: 700, fontSize: 15, color: "#EFB343", opacity: flameOpacity }}>{streak}</span>
           </button>
           <button
             type="button"
@@ -212,15 +213,15 @@ export function NothoTopBar({
 
             {streakSafeToday ? (
               <p style={{ color: "#22C55E", fontWeight: 700, marginBottom: 20, fontSize: 14 }}>
-                ✓ Lesson done today - streak is safe!
+                ✓ Lesson done today — streak is safe!
               </p>
             ) : freezeUsedToday ? (
               <p style={{ color: "#3B82F6", fontWeight: 700, marginBottom: 20, fontSize: 14 }}>
-                Freeze used - streak protected today
+                Freeze used — streak protected today
               </p>
             ) : (
               <p style={{ color: "var(--color-text-secondary)", marginBottom: 20, fontSize: 14 }}>
-                Do a lesson today to keep your streak alive.
+                Do a lesson today to keep your streak alive. The number only goes up after that lesson, same as Duolingo.
               </p>
             )}
 
