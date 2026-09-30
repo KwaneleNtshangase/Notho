@@ -10,6 +10,15 @@ import { AppleAuthGuard } from "@/components/AppleAuthGuard";
 import { ServiceWorkerRegistration } from "@/lib/sw/ServiceWorkerRegistration";
 import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
 import { TEXT_SCALE_BOOT_SCRIPT } from "@/lib/textScale";
+import { JsonLd } from "@/components/JsonLd";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+  organizationJsonLd,
+  softwareJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 import "./globals.css";
 import "./text-scale.css";
 import "./shell-layout.css";
@@ -49,14 +58,37 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Notho - Master Your Money",
-  description: "Interactive personal finance learning app built for South Africa.",
+  title: {
+    default: "Notho — Learn personal finance in South Africa",
+    template: "%s | Notho",
+  },
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "Notho",
+    "personal finance South Africa",
+    "financial literacy",
+    "investment calculator",
+    "TFSA calculator",
+    "budget app South Africa",
+    "RE5 prep",
+    "Fundi Finance",
+  ],
+  authors: [{ name: "The Solution Org (Pty) Ltd", url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: "The Solution Org (Pty) Ltd",
+  category: "education",
   manifest: "/manifest.json",
-  metadataBase: new URL("https://www.notho.co.za"),
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: SITE_URL },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Notho",
+    title: SITE_NAME,
   },
   icons: {
     icon: [
@@ -68,9 +100,19 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
+    type: "website",
+    locale: "en_ZA",
+    siteName: SITE_NAME,
+    url: SITE_URL,
     images: ["/notho-logo.png"],
-    title: "Notho",
-    description: "Learn to manage money the South African way",
+    title: "Notho — Learn personal finance in South Africa",
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Notho — Learn personal finance in South Africa",
+    description: SITE_DESCRIPTION,
+    images: ["/notho-logo.png"],
   },
 };
 
@@ -80,11 +122,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en-ZA">
       <head>
         <script dangerouslySetInnerHTML={{ __html: STORAGE_MIGRATION_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: TEXT_SCALE_BOOT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CANVAS_BOOT_SCRIPT }} />
+        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
+        <JsonLd data={softwareJsonLd()} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
