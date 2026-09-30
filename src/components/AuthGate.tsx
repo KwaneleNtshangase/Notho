@@ -65,7 +65,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [oauthBlocked, setOauthBlocked] = useState(false);
 
-  const { t } = useLocale();
+  const { locale, setLocale, t } = useLocale();
 
   const handleForgotPassword = async () => {
     if (!forgotEmail.trim()) { setError(t("auth.errorEmailRequired")); return; }
@@ -355,6 +355,17 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             width: "100%", maxWidth: 400, paddingBottom: 48,
             display: "flex", flexDirection: "column", gap: 12,
           }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 4 }}>
+              <button type="button" onClick={() => setLocale("en")}
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: locale === "en" ? 700 : 500, color: locale === "en" ? "#007A85" : "#6B7280" }}>
+                {t("settings.languageEn")}
+              </button>
+              <span style={{ color: "#D1D5DB", fontSize: 12 }}>|</span>
+              <button type="button" onClick={() => setLocale("zu")}
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: locale === "zu" ? 700 : 500, color: locale === "zu" ? "#007A85" : "#6B7280" }}>
+                {t("settings.languageZu")}
+              </button>
+            </div>
             <button
               onClick={() => setMode("signup")}
               style={{
