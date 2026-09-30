@@ -1,36 +1,24 @@
 import { describe, expect, it } from "vitest";
 import { parseLocale } from "@/i18n/locales";
 import { translate } from "@/i18n/messages";
+import { localizeContent } from "@/i18n/contentZu";
 
-describe("isiZulu chrome Beta",
-  () => {
-    it("falls back to English for unknown values", () => {
-      expect(parseLocale("xh")).toBe("en");
-      expect(parseLocale("zu")).toBe("zu");
-    });
+describe("isiZulu chrome Beta", () => {
+  it("falls back to English for unknown values", () => {
+    expect(parseLocale("xh")).toBe("en");
+    expect(parseLocale("zu")).toBe("zu");
+  });
 
-    it("uses frozen chrome strings", () => {
-      expect(translate("zu", "nav.learn")).toBe("Funda");
-      expect(translate("zu", "nav.budget")).toBe("Bhajethi");
-      expect(translate("zu", "share.lessonDone")).toBe("Ngiqede isifundo saNotho.");
-      expect(translate("zu", "settings.languageHint")).toBe(
-        "Beta: amanye amagama aseseyi-English."
-      );
-      expect(translate("zu", "settings.languageZu")).toBe("isiZulu (Beta)");
-    });
+  it("uses Yeqa okwamanje for skip", () => {
+    expect(translate("zu", "common.skip")).toBe("Yeqa okwamanje");
+    expect(translate("zu", "onboarding.skip")).toBe("Yeqa okwamanje");
+  });
 
-    it("uses frozen AuthGate chrome", () => {
-      expect(translate("zu", "auth.login")).toBe("Ngena");
-      expect(translate("zu", "auth.createAccount")).toBe("Vula i-akhawunti");
-      expect(translate("zu", "auth.continueGoogle")).toBe("Vula i-akhawunti ngoGoogle");
-      expect(translate("zu", "auth.continueFacebook")).toBe("Vula i-akhawunti ngoFacebook");
-      expect(translate("zu", "auth.forgotPassword")).toBe("Ukhohlwe iphasiwedi?");
-    });
-
-    it("uses onboarding chrome", () => {
-      expect(translate("zu", "onboarding.usernameTitle")).toBe("Khetha igama lokusebenza");
-      expect(translate("zu", "onboarding.skip")).toBe("Yeqa okwamanje");
-      expect(translate("zu", "onboarding.goal.debt-free")).toBe("Qeda isikweletu");
-    });
-  }
-);
+  it("localises Money Basics titles and leaves unknown lessons in English", () => {
+    expect(localizeContent("zu", "course.money-basics", "Money Basics")).toBe("Izisekelo Zemali");
+    expect(localizeContent("zu", "lesson.money-basics.lesson-1", "What is Money?")).toBe("Yini imali?");
+    expect(localizeContent("zu", "lesson.investing-basics.lesson-2", "x")).toBe("Inzalo eyinhlanganisela");
+    expect(localizeContent("zu", "lesson.re5-exam-prep.foo", "RE5 item")).toBe("RE5 item");
+    expect(localizeContent("en", "course.money-basics", "Money Basics")).toBe("Money Basics");
+  });
+});

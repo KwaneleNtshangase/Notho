@@ -1,5 +1,7 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
+import { useLocale } from "@/i18n/LocaleProvider";
+import { localizeContent } from "@/i18n/contentZu";
+/* eslint-disable @next/next/no-html-link-for-pages */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -799,6 +801,7 @@ export function LearnView({
   /** Current total XP. Used to show how much XP is still needed to unlock gated courses. */
   userXP?: number;
 }) {
+  const { locale, t } = useLocale();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [userGoal, setUserGoal] = useState<string | null>(null);
@@ -908,7 +911,7 @@ export function LearnView({
               Continue where you left off
             </p>
             <p className="text-blue-600 dark:text-blue-400 text-xs">
-              {savedProgress.lessonTitle || "Resume lesson"}
+              {savedProgress.lessonTitle || t("learn.resume")}
             </p>
           </div>
           <span className="ml-auto text-blue-400" aria-hidden>
@@ -1008,7 +1011,7 @@ export function LearnView({
                   <div className="mb-2 flex justify-center text-[var(--color-primary)]" aria-hidden>
                     <CourseIcon name={course.icon} size={40} />
                   </div>
-                  <p className="text-sm font-bold leading-tight text-gray-900 dark:text-white">{course.title}</p>
+                  <p className="text-sm font-bold leading-tight text-gray-900 dark:text-white">{localizeContent(locale, `course.${course.id}`, course.title)}</p>
                   <p className="mt-1 text-xs font-medium text-green-600 dark:text-green-400">Start here →</p>
                 </button>
               );
@@ -1135,7 +1138,7 @@ export function LearnView({
 
                 <div className="course-card-body">
                   <div className="course-title" style={{ color: isLocked ? "var(--color-text-primary)" : colour.accent }}>
-                    {course.title}
+                    {localizeContent(locale, `course.${course.id}`, course.title)}
                   </div>
                   {/* One secondary line at most — the course description lives
                       on the course page, so it's dropped here. */}
@@ -1180,7 +1183,7 @@ export function LearnView({
                         togglePin(course.id);
                       }}
                       aria-pressed={pinnedNow}
-                      aria-label={pinnedNow ? `Unpin ${course.title}` : `Pin ${course.title} to the top`}
+                      aria-label={pinnedNow ? `Unpin ${localizeContent(locale, `course.${course.id}`, course.title)}` : `Pin ${localizeContent(locale, `course.${course.id}`, course.title)} to the top`}
                       title={pinnedNow ? "Unpin" : "Pin to top"}
                       style={{
                         width: 30,

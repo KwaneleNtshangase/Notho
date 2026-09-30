@@ -1,5 +1,6 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
+import { useLocale } from "@/i18n/LocaleProvider";
+/* eslint-disable @next/next/no-html-link-for-pages */
 import DOMPurify from 'dompurify';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -182,6 +183,7 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
     onSubmit(val.trim());
   };
 
+  const { t } = useLocale();
   const parts = (step.prompt as string).split("___");
 
   return (
@@ -229,7 +231,7 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
         <>
           <div className={"feedback " + (isCorrect ? "correct" : "incorrect")}>
             {isCorrect
-              ? (step.feedback?.correct || "Correct! Well done.")
+              ? (step.feedback?.correct || t("lesson.wellDone"))
               : (step.feedback?.incorrect || `The correct answer is ${formatWithSpaces(step.correct)}. ${step.explanation || ""}`)}
           </div>
           <div className="lesson-actions">
@@ -247,7 +249,7 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
                         style={{ width: "100%", padding: "14px 16px", fontSize: 17, fontWeight: 800 }}
                         onClick={() => finalizeLesson("next")}
                       >
-                        Next Lesson: {nextLessonTitle} →
+                        {t("lesson.nextLesson")}: {nextLessonTitle} →
                       </button>
                     ) : (
                       <div className="flex items-center justify-center gap-2" style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
@@ -269,7 +271,7 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
                       }}
                       onClick={() => finalizeLesson("course")}
                     >
-                      ✓ Done - Back to Course
+                      ✓ Done - {t("lesson.backToCourse")}
                     </button>
                     {lessonTitle ? (
                       <ShareResultButton
@@ -279,11 +281,11 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
                     ) : null}
                   </div>
                 ) : (
-                  <button className="btn btn-primary" onClick={onNext}>Continue</button>
+                  <button className="btn btn-primary" onClick={onNext}>{t("lesson.continue")}</button>
                 )}
               </div>
             ) : (
-              <button className="btn btn-primary" onClick={onNext}>Continue</button>
+              <button className="btn btn-primary" onClick={onNext}>{t("lesson.continue")}</button>
             )}
           </div>
         </>
@@ -337,6 +339,7 @@ export function LessonView({
   lessonStartTimeRef?: React.MutableRefObject<number>;
   totalQuestions?: number;
 }) {
+  const { t } = useLocale();
   const step = lessonState.steps[lessonState.stepIndex];
   const progress =
     ((lessonState.stepIndex + 1) / lessonState.steps.length) * 100;
@@ -418,7 +421,7 @@ export function LessonView({
             <div className="flex flex-col gap-3" style={{ width: "100%" }}>
               {nextLessonTitle ? (
                 <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>
-                  Next Lesson: {nextLessonTitle} →
+                  {t("lesson.nextLesson")}: {nextLessonTitle} →
                 </button>
               ) : null}
               <button
@@ -426,11 +429,11 @@ export function LessonView({
                 style={{ width: "100%", background: "var(--color-bg)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }}
                 onClick={() => finalizeLesson("course")}
               >
-                <span className="inline-flex items-center justify-center gap-2"><CheckCircle2 size={18} aria-hidden /> Done - Back to Course</span>
+                <span className="inline-flex items-center justify-center gap-2"><CheckCircle2 size={18} aria-hidden /> Done - {t("lesson.backToCourse")}</span>
               </button>
             </div>
           ) : (
-            <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => goBack?.()}>Back to Course</button>
+            <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => goBack?.()}>{t("lesson.backToCourse")}</button>
           )}
         </div>
       );
@@ -492,17 +495,17 @@ export function LessonView({
               finalizeLesson ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
                   {nextLessonTitle ? (
-                    <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>Next Lesson: {nextLessonTitle} →</button>
+                    <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>{t("lesson.nextLesson")}: {nextLessonTitle} →</button>
                   ) : null}
                   <button className="btn btn-secondary" style={{ width: "100%", background: "var(--color-bg)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }} onClick={() => finalizeLesson("course")}>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={18} /> Done - Back to Course</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={18} /> Done - {t("lesson.backToCourse")}</span>
                   </button>
                 </div>
               ) : (
                 <button className="btn btn-primary" onClick={nextStep}>Finish</button>
               )
             ) : (
-              <button className="btn btn-primary" onClick={nextStep}>Continue</button>
+              <button className="btn btn-primary" onClick={nextStep}>{t("lesson.continue")}</button>
             )}
           </div>
         </>
@@ -535,17 +538,17 @@ export function LessonView({
               finalizeLesson ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
                   {nextLessonTitle ? (
-                    <button type="button" className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>Next Lesson: {nextLessonTitle} →</button>
+                    <button type="button" className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>{t("lesson.nextLesson")}: {nextLessonTitle} →</button>
                   ) : null}
                   <button type="button" className="btn btn-secondary" style={{ width: "100%", background: "var(--color-bg)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }} onClick={() => finalizeLesson("course")}>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={18} /> Done - Back to Course</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={18} /> Done - {t("lesson.backToCourse")}</span>
                   </button>
                 </div>
               ) : (
                 <button type="button" className="btn btn-primary" onClick={nextStep}>Finish</button>
               )
             ) : (
-              <button type="button" className="btn btn-primary" onClick={nextStep}>Continue</button>
+              <button type="button" className="btn btn-primary" onClick={nextStep}>{t("lesson.continue")}</button>
             )}
           </div>
         </div>
@@ -610,7 +613,7 @@ export function LessonView({
                   answerQuestion(0);
                 }}
               >
-                Skip for now
+                {t("common.skip")}
               </button>
             </div>
           ) : (
@@ -640,7 +643,7 @@ export function LessonView({
                         <button type="button" className="btn btn-primary"
                           style={{ width: "100%", padding: "14px 16px", fontSize: 17, fontWeight: 800 }}
                           onClick={() => finalizeLesson("next")}
-                        >Next Lesson: {nextLessonTitle} →</button>
+                        >{t("lesson.nextLesson")}: {nextLessonTitle} →</button>
                       ) : (
                         <div className="flex items-center justify-center gap-2" style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
                           <Sparkles size={22} className="text-[#EFB343]" aria-hidden /> Course Complete!
@@ -653,7 +656,7 @@ export function LessonView({
                         }}
                         onClick={() => finalizeLesson("course")}>
                         <span className="inline-flex items-center justify-center gap-2">
-                          <CheckCircle2 size={18} aria-hidden /> Done - Back to Course
+                          <CheckCircle2 size={18} aria-hidden /> Done - {t("lesson.backToCourse")}
                         </span>
                       </button>
                       {lessonTitle && (
@@ -664,11 +667,11 @@ export function LessonView({
                       )}
                     </div>
                   ) : (
-                    <button className="btn btn-primary" onClick={nextStep}>Continue</button>
+                    <button className="btn btn-primary" onClick={nextStep}>{t("lesson.continue")}</button>
                   )}
                 </div>
               ) : (
-                <button className="btn btn-primary" onClick={nextStep}>Continue</button>
+                <button className="btn btn-primary" onClick={nextStep}>{t("lesson.continue")}</button>
               )}
             </div>
           )}
@@ -762,7 +765,7 @@ export function LessonView({
                             style={{ width: "100%", padding: "14px 16px", fontSize: 17, fontWeight: 800 }}
                             onClick={() => finalizeLesson("next")}
                           >
-                            Next Lesson: {nextLessonTitle} →
+                            {t("lesson.nextLesson")}: {nextLessonTitle} →
                           </button>
                         ) : (
                           <div className="flex items-center justify-center gap-2" style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
@@ -786,7 +789,7 @@ export function LessonView({
                         >
                           <span className="inline-flex items-center justify-center gap-2">
                             <CheckCircle2 size={18} aria-hidden />
-                            Done - Back to Course
+                            Done - {t("lesson.backToCourse")}
                           </span>
                         </button>
                         {lessonTitle ? (
@@ -805,7 +808,7 @@ export function LessonView({
                           </div>
                         )}
                         <button className="btn btn-primary" onClick={nextStep}>
-                          {nextLessonTitle ? "Next Lesson →" : "Back to Course"}
+                          {nextLessonTitle ? t("lesson.nextLesson") + " →" : t("lesson.backToCourse")}
                         </button>
                       </>
                     )}
@@ -889,7 +892,7 @@ export function LessonView({
                             style={{ width: "100%", padding: "14px 16px", fontSize: 17, fontWeight: 800 }}
                             onClick={() => finalizeLesson("next")}
                           >
-                            Next Lesson: {nextLessonTitle} →
+                            {t("lesson.nextLesson")}: {nextLessonTitle} →
                           </button>
                         ) : (
                           <div className="flex items-center justify-center gap-2" style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
@@ -913,7 +916,7 @@ export function LessonView({
                         >
                           <span className="inline-flex items-center justify-center gap-2">
                             <CheckCircle2 size={18} aria-hidden />
-                            Done - Back to Course
+                            Done - {t("lesson.backToCourse")}
                           </span>
                         </button>
                         {lessonTitle ? (
@@ -1056,6 +1059,7 @@ export function LessonView({
 }
 
 function CalculatorEmbedStep({ step, onNext }: { step: any; onNext: () => void }) {
+  const { t } = useLocale();
   const [embedCalcDone, setEmbedCalcDone] = React.useState(false);
   const preset = step.preset ?? {};
   const embedInputs: CalcInputs = {
@@ -1156,7 +1160,7 @@ function CalculatorEmbedStep({ step, onNext }: { step: any; onNext: () => void }
       )}
 
       <div className="lesson-actions">
-        <button className="btn btn-primary" onClick={onNext}>Continue</button>
+        <button className="btn btn-primary" onClick={onNext}>{t("lesson.continue")}</button>
       </div>
     </div>
   );
