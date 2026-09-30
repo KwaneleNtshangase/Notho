@@ -3,6 +3,7 @@
 import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useLocale } from "@/i18n/LocaleProvider";
 import {
   hasValidUsername,
   isOnboardingComplete,
@@ -13,6 +14,7 @@ import {
 export function OnboardingGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || "/";
   const router = useRouter();
+  const { t } = useLocale();
   const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
@@ -77,7 +79,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
           fontSize: 14,
         }}
       >
-        Setting up your profile…
+        {t("onboarding.settingUp")}
       </div>
     );
   }
