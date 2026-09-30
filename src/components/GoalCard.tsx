@@ -6,6 +6,8 @@ import {
   GOAL_OPTIONS,
   persistUserGoalToStorageAndSupabase,
 } from "@/app/pageViews.types";
+import { useLocale } from "@/i18n/LocaleProvider";
+import type { MessageKey } from "@/i18n/messages";
 
 // Self-contained savings-goal card + picker.
 // Originally lived only on the Learn page; now also the primary home for the
@@ -13,6 +15,7 @@ import {
 // Manages its own state (localStorage + cross-device storage sync) so it can be
 // dropped in anywhere without prop plumbing.
 export function GoalCard() {
+  const { t } = useLocale();
   const [userGoal, setUserGoal] = useState<string | null>(null);
   const [goalDescription, setGoalDescription] = useState<string>("");
   const [showGoalPicker, setShowGoalPicker] = useState(false);
@@ -58,7 +61,7 @@ export function GoalCard() {
                 <Target size={18} className="text-green-600 dark:text-green-400" aria-hidden />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-green-600 dark:text-green-500">Your goal</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-green-600 dark:text-green-500">{t("goals.yourGoal")}</p>
                 <p className="text-sm font-bold text-green-900 dark:text-green-200 leading-tight">
                   {GOAL_OPTIONS.find((g) => g.id === userGoal)?.label ?? userGoal}
                 </p>
@@ -74,7 +77,7 @@ export function GoalCard() {
               onClick={openPicker}
               className="shrink-0 rounded-lg border border-green-300 bg-white px-3 py-1.5 text-xs font-bold text-green-700 hover:bg-green-100 dark:border-green-700 dark:bg-transparent dark:text-green-400 dark:hover:bg-green-900/40"
             >
-              Edit
+              {t("common.edit")}
             </button>
           </div>
         </div>
@@ -89,9 +92,9 @@ export function GoalCard() {
             <Target size={18} className="text-green-600 dark:text-green-400" aria-hidden />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-green-600 dark:text-green-500">Your goal</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-green-600 dark:text-green-500">{t("goals.yourGoal")}</p>
             <p className="text-sm font-bold text-green-900 dark:text-green-200 leading-tight">
-              Set a money goal
+              {t("goals.setMoney")}
             </p>
             <p className="mt-0.5 text-xs text-green-700 dark:text-green-400 opacity-80">
               We&apos;ll prioritise courses that match it.
@@ -113,7 +116,7 @@ export function GoalCard() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 id="goalcard-picker-title" className="mb-1 text-lg font-bold text-gray-900 dark:text-white">
-              Your money goal
+              {t("goals.pickerTitle")}
             </h2>
             <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
               We&apos;ll prioritise courses that match what you want to achieve.
@@ -134,7 +137,7 @@ export function GoalCard() {
                   }`}
                 >
                   <g.Icon size={16} className="mr-1 inline align-text-bottom text-green-600 dark:text-green-400" aria-hidden />
-                  {g.label}
+                  {t(("onboarding.goal." + g.id) as MessageKey)}
                 </button>
               ))}
             </div>
@@ -162,7 +165,7 @@ export function GoalCard() {
                 className="flex-1 rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200"
                 onClick={() => setShowGoalPicker(false)}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 type="button"
@@ -177,7 +180,7 @@ export function GoalCard() {
                   setShowGoalPicker(false);
                 }}
               >
-                Save
+                {t("common.save")}
               </button>
             </div>
           </div>
