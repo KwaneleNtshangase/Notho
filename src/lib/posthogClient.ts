@@ -8,6 +8,8 @@
  * Email, name, phone, statement text and rand amounts never belong here.
  */
 
+import type posthog from "posthog-js";
+
 /** Same-origin ingest path. Deliberately not /analytics or /posthog. */
 export const POSTHOG_PROXY_PATH = "/nk-in";
 
@@ -31,6 +33,10 @@ export function resolvePosthogApiHost(): string {
     return POSTHOG_PROXY_PATH;
   }
   return override || POSTHOG_INGEST_HOST;
+}
+
+export function isPosthogLoaded(client: typeof posthog): boolean {
+  return Boolean((client as unknown as { __loaded?: boolean }).__loaded);
 }
 
 export function isDeskPath(pathname: string): boolean {
