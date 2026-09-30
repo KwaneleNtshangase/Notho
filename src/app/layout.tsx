@@ -7,6 +7,7 @@ import { NativeAuthDeepLink } from "@/components/NativeAuthDeepLink";
 import { NativeShellGuards } from "@/components/NativeShellGuards";
 import { TextScaleInit } from "@/components/TextScaleInit";
 import { AppleAuthGuard } from "@/components/AppleAuthGuard";
+import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { ServiceWorkerRegistration } from "@/lib/sw/ServiceWorkerRegistration";
 import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
 import { TEXT_SCALE_BOOT_SCRIPT } from "@/lib/textScale";
@@ -43,6 +44,9 @@ const CANVAS_BOOT_SCRIPT = `(() => {
     root.style.backgroundColor = c;
     root.style.setProperty('--notho-canvas', c);
     if (document.body) document.body.style.backgroundColor = c;
+    var loc = '';
+    try { loc = localStorage.getItem('notho-locale') || ''; } catch (e) {}
+    if (loc === 'zu') root.lang = 'zu-ZA';
   } catch (e) {}
 })();`;
 
@@ -135,7 +139,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ErrorBoundary>
-          <PostHogProvider>{children}</PostHogProvider>
+          <LocaleProvider>
+            <PostHogProvider>{children}</PostHogProvider>
+          </LocaleProvider>
           <ServiceWorkerRegistration />
           <ErrorReportingInit />
           <TextScaleInit />
