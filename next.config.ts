@@ -15,6 +15,7 @@ const securityHeaders = [
       "default-src 'self'",
       // Scripts: self + PostHog + CDN. notho.co.za is the canonical domain;
       // fundiapp.co.za 301-redirects to it via vercel.json.
+      // The first-party /nk-in rewrite means most ingest traffic stays on self.
       "script-src 'self' 'unsafe-inline' https://us-assets.i.posthog.com https://us.i.posthog.com https://app.posthog.com https://cdn.jsdelivr.net",
       // Styles: self + inline (JSX style={{}}) + Google Fonts
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
@@ -117,6 +118,10 @@ const nextConfig: NextConfig = {
     : {}),
   // unpdf ships a serverless PDF.js build (no separate worker file) — keep it external so Vercel bundles it correctly for the import parse route.
   serverExternalPackages: ["unpdf"],
+  // PostHog's /e and /decide endpoints 302 onto a trailing slash. Next would
+  // otherwise bounce those and drop the event. Safe for the rest of the app:
+  // we do not rely on slash-forced canonical URLs.
+  skipTrailingSlashRedirect: true,
   async headers() {
     return [
       {
@@ -150,6 +155,25 @@ const nextConfig: NextConfig = {
       { source: "/signin", destination: "/", permanent: false },
       { source: "/signup", destination: "/", permanent: false },
       { source: "/register", destination: "/", permanent: false },
+    ];
+  },
+  // First-party PostHog proxy. Path is /nk-in on purpose — blockers list
+  // /analytics, /tracking, /telemetry and /posthog. Swap us → eu in all three
+  // destinations if the PostHog project is ever created on EU cloud.
+  async rewrites() {
+    return [
+      {
+        source: "/nk-in/static/:path*",
+        destination: "https://us-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/nk-in/array/:path*",
+        destination: "https://us-assets.i.posthog.com/array/:path*",
+      },
+      {
+        source: "/nk-in/:path*",
+        destination: "https://us.i.posthog.com/:path*",
+      },
     ];
   },
   // PostHog + OAuth callback redirects occasionally hit old paths; allow
