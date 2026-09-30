@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // Security headers — OWASP top-10 mitigation + POPIA hardening.
 // These apply to every response served by the Next.js app.
@@ -21,8 +22,9 @@ const securityHeaders = [
       "font-src 'self' data: https://fonts.gstatic.com",
       // Images: self + data URIs (emojis, canvas exports) + OAuth avatars
       "img-src 'self' data: blob: https://*.supabase.co https://*.googleusercontent.com https://*.fbcdn.net https://platform-lookaside.fbsbx.com https://appleid.cdn-apple.com",
-      // XHR / fetch / websocket
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com https://app.posthog.com https://notho.co.za https://www.notho.co.za https://wealthwithkwanele.co.za",
+      // XHR / fetch / websocket. Sentry ingest is a fallback; the SDK prefers
+      // the same-origin /monitoring tunnel so ad blockers do not eat events.
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com https://app.posthog.com https://notho.co.za https://www.notho.co.za https://wealthwithkwanele.co.za https://*.ingest.sentry.io https://*.ingest.de.sentry.io",
       // Service worker scope
       "worker-src 'self' blob:",
       // Frames: deny embedding us; allow YouTube for lessons if needed
@@ -158,4 +160,14 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // Source-map upload only runs when SENTRY_AUTH_TOKEN is present on the
+  // build. Without it the wrapper is a no-op besides the /monitoring tunnel.
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  disableLogger: true,
+});
