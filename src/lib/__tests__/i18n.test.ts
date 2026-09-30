@@ -18,5 +18,12 @@ describe("isiZulu chrome Beta",
       );
       expect(translate("zu", "settings.languageZu")).toBe("isiZulu (Beta)");
     });
+
+    it("uses frozen AuthGate chrome", () => {
+      expect(translate("zu", "auth.login")).toBe("Ngena");
+      expect(translate("zu", "auth.createAccount")).toBe("Vula i-akhawunti");
+      expect(translate("zu", "auth.forgotPassword")).toBe("Ukhohlwe iphasiwedi?");
+      expect(translate("zu", "auth.continueGoogle")).toBe("Qhubeka nge-Google");
+    });
   }
 );
