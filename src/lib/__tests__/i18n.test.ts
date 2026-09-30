@@ -22,8 +22,15 @@ describe("isiZulu chrome Beta",
     it("uses frozen AuthGate chrome", () => {
       expect(translate("zu", "auth.login")).toBe("Ngena");
       expect(translate("zu", "auth.createAccount")).toBe("Vula i-akhawunti");
+      expect(translate("zu", "auth.continueGoogle")).toBe("Vula i-akhawunti ngoGoogle");
+      expect(translate("zu", "auth.continueFacebook")).toBe("Vula i-akhawunti ngoFacebook");
       expect(translate("zu", "auth.forgotPassword")).toBe("Ukhohlwe iphasiwedi?");
-      expect(translate("zu", "auth.continueGoogle")).toBe("Qhubeka nge-Google");
+    });
+
+    it("uses onboarding chrome", () => {
+      expect(translate("zu", "onboarding.usernameTitle")).toBe("Khetha igama lokusebenza");
+      expect(translate("zu", "onboarding.skip")).toBe("Yeqa okwamanje");
+      expect(translate("zu", "onboarding.goal.debt-free")).toBe("Qeda isikweletu");
     });
   }
 );
