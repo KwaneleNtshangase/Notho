@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import {
   POSTHOG_PROXY_PATH,
   POSTHOG_UI_HOST,
+  isPosthogLoaded,
   posthogKey,
 } from "@/lib/posthogClient";
 
@@ -21,7 +22,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") return;
     const key = posthogKey();
     if (!key) return;
-    if (posthog.__loaded) return;
+    if (isPosthogLoaded(posthog)) return;
 
     posthog.init(key, {
       api_host: POSTHOG_PROXY_PATH,

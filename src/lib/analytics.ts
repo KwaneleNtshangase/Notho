@@ -1,5 +1,6 @@
 import posthog from "posthog-js";
 import { recordFeatureEvent, sanitiseProps } from "@/lib/usageTracking";
+import { isPosthogLoaded, posthogKey } from "@/lib/posthogClient";
 
 /**
  * Every analytics event goes to two places:
@@ -19,7 +20,7 @@ const track = (event: string, props?: Record<string, unknown>) => {
   if (typeof window === "undefined") return;
   const safe = sanitiseProps(props);
   try {
-    if (process.env.NEXT_PUBLIC_POSTHOG_KEY && posthog.__loaded) {
+    if (posthogKey() && isPosthogLoaded(posthog)) {
       posthog.capture(event, safe);
     }
   } catch {

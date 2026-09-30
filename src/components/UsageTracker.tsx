@@ -24,14 +24,19 @@ import {
 } from "@/lib/usageTracking";
 import { supabase } from "@/lib/supabaseClient";
 import { APP_TAB_EVENT } from "@/lib/appTabs";
-import { identifyProperties, pageviewPath, posthogKey } from "@/lib/posthogClient";
+import {
+  identifyProperties,
+  isPosthogLoaded,
+  pageviewPath,
+  posthogKey,
+} from "@/lib/posthogClient";
 import { analytics } from "@/lib/analytics";
 
 function capturePage(path: string | null) {
   if (!path) return;
   if (!posthogKey()) return;
   try {
-    if (!posthog.__loaded) return;
+    if (!isPosthogLoaded(posthog)) return;
     posthog.capture("$pageview", { $current_url: path });
     analytics.pageViewed(path);
   } catch {
@@ -44,7 +49,7 @@ function identifyUser(
 ) {
   if (!posthogKey()) return;
   try {
-    if (!posthog.__loaded) return;
+    if (!isPosthogLoaded(posthog)) return;
     if (!user) {
       posthog.reset();
       return;
@@ -56,7 +61,10 @@ function identifyUser(
       (typeof user.user_metadata?.notho_username === "string"
         ? user.user_metadata.notho_username
         : null);
-    posthog.identify(user.id, identifyProperties({ userId: user.id, username, platform: "web" }));
+    posthog.identify(
+      user.id,
+      identifyProperties({ userId: user.id, username, platform: "web" })
+    );
   } catch {
     /* ignore */
   }
