@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Mail, KeyRound, AlertTriangle, ClipboardCopy, CheckCircle, NothoLearn, NothoBudget, NothoCalculate } from "@/components/icons/NothoIcons";
 import { supabase } from "@/lib/supabaseClient";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 // Google OAuth is blocked only in LinkedIn's in-app browser.
 // All other in-app browsers (Instagram, Facebook, WhatsApp, etc.) either use
@@ -64,8 +65,10 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [oauthBlocked, setOauthBlocked] = useState(false);
 
+  const { locale, setLocale, t } = useLocale();
+
   const handleForgotPassword = async () => {
-    if (!forgotEmail.trim()) { setError("Please enter your email."); return; }
+    if (!forgotEmail.trim()) { setError(t("auth.errorEmailRequired")); return; }
     setError(null);
     const { error: e } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
       redirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
@@ -78,8 +81,8 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     // Keep the splash just long enough to avoid a flash of unstyled logo.
     // Returning users on slow SA mobile networks shouldn't wait on branding -
     // the previous 1500ms minimum added 1.1s+ of pure dead time per load.
-    const t = setTimeout(() => setSplashMinElapsed(true), 400);
-    return () => clearTimeout(t);
+    const splashTimer = setTimeout(() => setSplashMinElapsed(true), 400);
+    return () => clearTimeout(splashTimer);
   }, []);
 
   useEffect(() => {
@@ -120,7 +123,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   const handleSignIn = async () => {
     setError(null);
-    if (!isValidEmailFormat(email)) { setError("Please enter a valid email address."); return; }
+    if (!isValidEmailFormat(email)) { setError(t("auth.errorEmailInvalid")); return; }
     const { error: e } = await supabase.auth.signInWithPassword({ email, password });
     if (e) {
       if (e.message.toLowerCase().includes("email not confirmed") ||
@@ -128,7 +131,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
         setVerificationEmail(email);
         setAwaitingVerification(true);
       } else {
-        setError("Incorrect email or password. Please try again.");
+        setError(t("auth.errorCredentials"));
       }
     }
   };
@@ -182,19 +185,19 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   const handleSignUp = async () => {
     setError(null);
-    if (!firstName.trim()) { setError("Please enter your first name."); return; }
-    if (!lastName.trim()) { setError("Please enter your last name."); return; }
-    if (!isValidEmailFormat(email)) { setError("Please enter a valid email address."); return; }
+    if (!firstName.trim()) { setError(t("auth.errorFirstName")); return; }
+    if (!lastName.trim()) { setError(t("auth.errorLastName")); return; }
+    if (!isValidEmailFormat(email)) { setError(t("auth.errorEmailInvalid")); return; }
     if (isBlockedEmailDomain(email)) {
-      setError("Please sign up with a real email address. Temporary or disposable emails are not allowed.");
+      setError(t("auth.errorDisposable"));
       return;
     }
     const ageNum = parseInt(age, 10);
     if (!age || isNaN(ageNum) || ageNum < 13 || ageNum > 120) {
-      setError("Please enter a valid age (13+).");
+      setError(t("auth.errorAge"));
       return;
     }
-    if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
+    if (password.length < 8) { setError(t("auth.errorPasswordLen")); return; }
     const fullName = firstName.trim() + " " + lastName.trim();
     const { data, error: e } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
@@ -324,14 +327,14 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               fontSize: 15, color: "#374151", textAlign: "center",
               lineHeight: 1.55, maxWidth: 300, margin: "0 0 22px", fontWeight: 500,
             }}>
-              Money lessons written for South Africa. Payslips, debit orders, SARS, TFSAs.
+              {t("auth.landingTagline")}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 340, width: "100%" }}>
               {[
-                { Icon: NothoLearn, text: "Short lessons on how money actually works here." },
-                { Icon: NothoBudget, text: "Import a statement. We read it in memory and do not keep the file." },
-                { Icon: NothoCalculate, text: "Calculators and a budget you can check against real numbers." },
+                { Icon: NothoLearn, text: "{t("auth.landingLesson")}" },
+                { Icon: NothoBudget, text: "{t("auth.landingBudget")}" },
+                { Icon: NothoCalculate, text: "{t("auth.landingCalc")}" },
               ].map((f) => (
                 <div key={f.text} style={{
                   display: "flex", alignItems: "center", gap: 12,
@@ -342,7 +345,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 </div>
               ))}
               <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center", margin: "10px 0 0" }}>
-                Free. Education only, not advice.
+                {t("auth.landingFree")}
               </p>
             </div>
           </div>
@@ -352,6 +355,17 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             width: "100%", maxWidth: 400, paddingBottom: 48,
             display: "flex", flexDirection: "column", gap: 12,
           }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 4 }}>
+              <button type="button" onClick={() => setLocale("en")}
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: locale === "en" ? 700 : 500, color: locale === "en" ? "#007A85" : "#6B7280" }}>
+                {t("settings.languageEn")}
+              </button>
+              <span style={{ color: "#D1D5DB", fontSize: 12 }}>|</span>
+              <button type="button" onClick={() => setLocale("zu")}
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: locale === "zu" ? 700 : 500, color: locale === "zu" ? "#007A85" : "#6B7280" }}>
+                {t("settings.languageZu")}
+              </button>
+            </div>
             <button
               onClick={() => setMode("signup")}
               style={{
@@ -360,7 +374,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 borderRadius: 14, cursor: "pointer", letterSpacing: 0.4,
               }}
             >
-              Create an account
+              {t("auth.createAccount")}
             </button>
             <button
               onClick={() => setMode("signin")}
@@ -371,7 +385,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 letterSpacing: 0.2,
               }}
             >
-              Sign in
+              {t("auth.login")}
             </button>
           </div>
         </div>
@@ -389,29 +403,29 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               </div>
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, color: "var(--color-text-primary)" }}>
-              Check your email
+              {t("auth.checkEmail")}
             </h2>
             <p style={{ color: "var(--color-text-secondary)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>
-              We sent a verification link to
+              {t("auth.sentLinkTo")}
             </p>
             <p style={{ fontWeight: 700, fontSize: 15, color: "var(--color-primary)", marginBottom: 20 }}>
               {verificationEmail}
             </p>
             <p style={{ color: "var(--color-text-secondary)", fontSize: 13, marginBottom: 24, lineHeight: 1.6 }}>
-              Click the link in that email to activate your account. Check your spam folder if you don&apos;t see it.
+              {t("auth.clickLink")}
             </p>
             {error && <p style={{ color: "var(--error-red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
             <button
               className="btn btn-primary" style={{ width: "100%", marginBottom: 10 }}
               onClick={handleResendVerification}
             >
-              Resend verification email
+              {t("auth.resend")}
             </button>
             <button
               onClick={() => { setAwaitingVerification(false); setMode("signin"); setError(null); }}
               style={{ background: "none", border: "none", color: "var(--color-text-secondary)", cursor: "pointer", fontSize: 13, textDecoration: "underline" }}
             >
-              Back to Sign In
+              {t("auth.backToSignIn")}
             </button>
           </div>
         </div>
@@ -427,7 +441,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
                 <KeyRound size={48} style={{ color: "var(--color-primary)" }} aria-hidden />
               </div>
-              <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>Reset your password</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{t("auth.resetTitle")}</h2>
               <p style={{ color: "#888", fontSize: 14 }}>We&apos;ll send you a reset link</p>
             </div>
             {forgotSent ? (
@@ -435,27 +449,27 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
                   <Mail size={48} style={{ color: "var(--color-primary)" }} aria-hidden />
                 </div>
-                <p style={{ fontWeight: 700, marginBottom: 4 }}>Email sent!</p>
+                <p style={{ fontWeight: 700, marginBottom: 4 }}>{t("auth.emailSent")}</p>
                 <p style={{ color: "#888", fontSize: 13, marginBottom: 20 }}>
-                  Check your inbox for a password reset link.
+{t("auth.checkInbox")}
                 </p>
                 <button className="btn btn-primary" style={{ width: "100%" }}
                   onClick={() => { setForgotMode(false); setForgotSent(false); setForgotEmail(""); }}>
-                  Back to Sign In
+                  {t("auth.backToSignIn")}
                 </button>
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <input type="email" placeholder="Your email address" value={forgotEmail}
+                <input type="email" placeholder={t("auth.yourEmail")} value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   style={{ padding: 12, borderRadius: 8, border: "1px solid var(--border-light)", fontSize: 14, width: "100%", boxSizing: "border-box" as const }} />
                 {error && <p style={{ color: "var(--error-red)", fontSize: 13, margin: 0 }}>{error}</p>}
                 <button className="btn btn-primary" style={{ width: "100%" }} onClick={handleForgotPassword}>
-                  Send Reset Link
+                  {t("auth.sendReset")}
                 </button>
                 <button onClick={() => { setForgotMode(false); setError(null); }}
                   style={{ background: "none", border: "none", color: "#888", cursor: "pointer", fontSize: 13, textAlign: "center" }}>
-                  Back to Sign In
+                  {t("auth.backToSignIn")}
                 </button>
               </div>
             )}
@@ -492,7 +506,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                   boxShadow: mode === m ? "0 1px 4px rgba(0,0,0,0.1)" : "none",
                   transition: "all 0.15s",
                 }}>
-                {m === "signin" ? "Sign In" : "Create Account"}
+                {m === "signin" ? t("auth.signIn") : t("auth.createAccount")}
               </button>
             ))}
           </div>
@@ -507,10 +521,10 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 <AlertTriangle size={18} style={{ color: "#D97706", flexShrink: 0, marginTop: 1 }} />
                 <div>
                   <p style={{ fontSize: 13, fontWeight: 700, color: "#92400E", margin: "0 0 3px" }}>
-                    Google sign-in is blocked in LinkedIn
+                    {t("auth.linkedinTitle")}
                   </p>
                   <p style={{ fontSize: 12, color: "#78350F", margin: 0, lineHeight: 1.55 }}>
-                    LinkedIn&apos;s browser blocks Google. Use Apple, Facebook, email, or copy the link and open it in Chrome or Safari.
+                    {t("auth.linkedinBody")}
                   </p>
                 </div>
               </div>
@@ -552,7 +566,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               >
                 {linkCopied
                   ? <><CheckCircle size={16} /> Link copied &mdash; paste in Chrome or Safari</>
-                  : <><ClipboardCopy size={16} /> Copy link to open in your browser</>
+                  : <><ClipboardCopy size={16} /> {t("auth.copyLink")}</>
                 }
               </button>
               <p style={{ fontSize: 11, color: "#92400E", margin: "8px 0 0", textAlign: "center", opacity: 0.7 }}>
@@ -566,7 +580,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               data-testid="apple-oauth"
-              aria-label="Continue with Apple"
+              aria-label={t("auth.continueApple")}
               onClick={() => handleOAuthSignIn("apple")}
               style={{
                 width: "100%", minHeight: 44, padding: 0, borderRadius: 10,
@@ -599,7 +613,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                 <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
               </svg>
-              Continue with Google
+              {t("auth.continueGoogle")}
             </button>
             <button
               type="button"
@@ -614,13 +628,13 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" aria-hidden="true">
                 <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.93-1.956 1.886v2.288h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
               </svg>
-              Continue with Facebook
+              {t("auth.continueFacebook")}
             </button>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "4px 0" }}>
             <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
-            <span style={{ fontSize: 12, color: "var(--color-text-secondary)", fontWeight: 500 }}>or</span>
+            <span style={{ fontSize: 12, color: "var(--color-text-secondary)", fontWeight: 500 }}>{t("auth.or")}</span>
             <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
           </div>
 
@@ -628,23 +642,23 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             {mode === "signup" && (
               <>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <input type="text" placeholder="First name" value={firstName}
+                  <input type="text" placeholder={t("auth.firstName")} value={firstName}
                     onChange={(e) => setFirstName(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
-                  <input type="text" placeholder="Last name" value={lastName}
+                  <input type="text" placeholder={t("auth.lastName")} value={lastName}
                     onChange={(e) => setLastName(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
                 </div>
-                <input type="number" placeholder="Age" value={age} min={13} max={120}
+                <input type="number" placeholder={t("auth.age")} value={age} min={13} max={120}
                   inputMode="numeric"
                   onKeyDown={(e) => { if (["e","E","+","-","."].includes(e.key)) e.preventDefault(); }}
                   onChange={(e) => setAge(e.target.value.replace(/D/g, ""))} style={inputStyle} />
               </>
             )}
-            <input type="email" placeholder="Email" value={email}
+            <input type="email" placeholder={t("auth.email")} value={email}
               onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
             <div style={{ position: "relative" }}>
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                placeholder={t("auth.password")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{ ...inputStyle, paddingRight: 44 }}
@@ -657,9 +671,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                   background: "none", border: "none", cursor: "pointer",
                   color: "#888", fontSize: 13, fontWeight: 600, padding: "2px 4px",
                 }}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? t("auth.hide") : t("auth.show")}
               </button>
             </div>
             {error && <p style={{ color: "var(--error-red)", fontSize: 13, margin: 0 }}>{error}</p>}
@@ -669,19 +683,19 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               style={{ width: "100%", marginTop: 4 }}
               onClick={mode === "signin" ? handleSignIn : handleSignUp}
             >
-              {mode === "signin" ? "Sign In" : "Create Account"}
+              {mode === "signin" ? t("auth.signIn") : t("auth.createAccount")}
             </button>
             {mode === "signin" && (
               <div style={{ textAlign: "center" }}>
                 <button onClick={() => { setForgotMode(true); setError(null); }}
                   style={{ background: "none", border: "none", color: "#888", cursor: "pointer", fontSize: 13 }}>
-                  Forgot password?
+                  {t("auth.forgotPassword")}
                 </button>
                 <p style={{ fontSize: 13, color: "#888", margin: "8px 0 0" }}>
-                  New here?{" "}
+                  {t("auth.newHere")}{" "}
                   <button onClick={() => setMode("signup")}
                     style={{ background: "none", border: "none", color: "var(--color-primary)", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
-                    Create a free account
+                    {t("auth.createFree")}
                   </button>
                 </p>
               </div>
