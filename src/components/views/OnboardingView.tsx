@@ -8,6 +8,8 @@ import {
   isUsernameAvailable,
   ONBOARDING_GOAL_OPTIONS,
 } from "@/app/pageViews.types";
+import { useLocale } from "@/i18n/LocaleProvider";
+import type { MessageKey } from "@/i18n/messages";
 
 export function OnboardingView({
   onComplete,
@@ -27,6 +29,20 @@ export function OnboardingView({
   const [usernameError, setUsernameError] = React.useState<string | null>(null);
   const [usernameChecking, setUsernameChecking] = React.useState(false);
   const [usernameAvailable, setUsernameAvailable] = React.useState(false);
+  const { t } = useLocale();
+
+  const usernameErrorText = (raw: string | null) => {
+    if (!raw) return null;
+    const map: Record<string, MessageKey> = {
+      "Username is required.": "onboarding.errRequired",
+      "Username must be at least 3 characters.": "onboarding.errMin",
+      "Username must be 20 characters or less.": "onboarding.errMax",
+      "Use only lowercase letters, numbers, and underscores.": "onboarding.errChars",
+      "That username is already taken.": "onboarding.errTaken",
+    };
+    return map[raw] ? t(map[raw]) : raw;
+  };
+
 
   const toggleGoal = (id: string) => {
     setSelectedGoals((prev) => {
@@ -85,17 +101,17 @@ export function OnboardingView({
 
   const screensMeta = [
     {
-      title: "Choose your username",
-      body: "Required. This is your public name — you cannot skip it.",
-      cta: "Next",
+      title: t("onboarding.usernameTitle"),
+      body: t("onboarding.usernameBody"),
+      cta: t("common.next"),
       action: () => {
         if (usernameAvailable && !usernameChecking) setScreen(1);
       },
     },
     {
-      title: "What are you working toward?",
-      body: "Optional. Pick one or more money goals, or skip and set this later on the Goals tab.",
-      cta: selectedGoals.length > 0 ? "Start learning \u2192" : "Skip for now",
+      title: t("onboarding.goalTitle"),
+      body: t("onboarding.goalBody"),
+      cta: selectedGoals.length > 0 ? t("onboarding.startLearning") : t("onboarding.skip"),
       action: finish,
     },
   ];
@@ -140,7 +156,7 @@ export function OnboardingView({
         {screen === 0 && (
           <div style={{ marginBottom: 16, textAlign: "left" }}>
             <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>
-              Username
+              {t("onboarding.username")}
             </label>
             <input
               type="text"
@@ -163,12 +179,12 @@ export function OnboardingView({
             />
             <div style={{ minHeight: 20, marginTop: 6, fontSize: 12, color: usernameError ? "var(--color-danger)" : "var(--color-text-secondary)" }}>
               {usernameChecking
-                ? "Checking availability..."
+                ? t("onboarding.checking")
                 : usernameError
-                  ? usernameError
+                  ? usernameErrorText(usernameError)
                   : usernameAvailable
-                    ? "Username is available."
-                    : "3–20 chars: letters, numbers, underscores."}
+                    ? t("onboarding.available")
+                    : t("onboarding.usernameRules")}
             </div>
           </div>
         )}
@@ -199,14 +215,14 @@ export function OnboardingView({
                     }}
                   >
                     <g.Icon size={18} className="shrink-0" style={{ color: "var(--color-primary)" }} aria-hidden />
-                    {g.label}
+                    {t(("onboarding.goal." + g.id) as MessageKey)}
                   </button>
                 );
               })}
             </div>
             {selectedGoals.includes("other") && (
               <textarea
-                placeholder="Write your goal — e.g. save for my child's education"
+                placeholder={t("onboarding.goalOtherHint")}
                 value={goalDescription}
                 onChange={(e) => setGoalDescription(e.target.value)}
                 rows={3}
@@ -255,7 +271,7 @@ export function OnboardingView({
               color: "var(--color-text-secondary)", cursor: "pointer", fontSize: 14, width: "100%",
             }}
           >
-            Skip for now
+            {t("onboarding.skip")}
           </button>
         )}
 
@@ -264,7 +280,7 @@ export function OnboardingView({
             marginTop: 10, fontSize: 12, fontWeight: 600,
             color: "var(--color-text-secondary)", textAlign: "center",
           }}>
-            Write down that goal, or skip for now.
+            {t("onboarding.writeOrSkip")}
           </div>
         )}
 
@@ -277,7 +293,7 @@ export function OnboardingView({
               color: "var(--color-text-secondary)", cursor: "pointer", fontSize: 14,
             }}
           >
-            Back
+            {t("onboarding.back")}
           </button>
         )}
       </div>
