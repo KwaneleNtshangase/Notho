@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
-import { sastOffset } from "@/lib/dates";
+import { formatLearningSince, sastOffset } from "@/lib/dates";
 import {
   COURSE_BADGES,
   getInvestorProfile,
@@ -431,6 +431,7 @@ export function ProfileView({
   const [showProfileGoalEdit, setShowProfileGoalEdit] = useState(false);
   const [profileGoalEditId, setProfileGoalEditId] = useState<string>("");
   const [profileGoalEditDesc, setProfileGoalEditDesc] = useState<string>("");
+  const [learningSince, setLearningSince] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -455,6 +456,7 @@ export function ProfileView({
       const user = data.user;
       if (!user) return;
       setProfileEmail(user.email ?? "");
+      setLearningSince(formatLearningSince(user.created_at));
       const meta = user.user_metadata;
       const fullName = meta?.full_name ?? "";
       const { data: prof } = await supabase
@@ -641,6 +643,9 @@ export function ProfileView({
         }}>{initials}</div>
         <div style={{ fontWeight: 800, fontSize: 22, marginBottom: 2 }}>{displayName.split(" ")[0]}</div>
         <div style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>Financial Learner · Level {userData.level}</div>
+        {learningSince && (
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 4 }}>{learningSince}</div>
+        )}
         {profileEmail && (
           <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 4 }}>{profileEmail}</div>
         )}

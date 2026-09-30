@@ -78,6 +78,26 @@ export function sastSundayDate(): string {
   return `${y}-${m}-${d}`;
 }
 
+
+const MONTHS_EN = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+/**
+ * Quiet Profile line: "Learning since September 2026".
+ * Uses the auth account created_at instant, rendered in SAST month + year.
+ */
+export function formatLearningSince(iso: string | null | undefined): string | null {
+  if (iso == null || String(iso).trim() === "") return null;
+  const t = Date.parse(String(iso));
+  if (!Number.isFinite(t)) return null;
+  const sast = new Date(t + SAST_OFFSET_MS);
+  const month = MONTHS_EN[sast.getUTCMonth()];
+  const year = sast.getUTCFullYear();
+  if (!month || !Number.isFinite(year)) return null;
+  return `Learning since ${month} ${year}`;
+}
 /**
  * Calculates the number of days between two SAST date strings (YYYY-MM-DD).
  * e.g., if dateA is tomorrow and dateB is today, returns 1.

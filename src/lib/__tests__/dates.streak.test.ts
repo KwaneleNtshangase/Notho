@@ -3,6 +3,7 @@ import {
   addSastDays,
   applyLessonToStreak,
   evaluateStreak,
+  formatLearningSince,
   normaliseSastDay,
   sastDateDiffDays,
 } from "../dates";
@@ -95,5 +96,17 @@ describe("applyLessonToStreak (Duolingo increment rules)", () => {
     }
     expect(snap.streak).toBe(5);
     expect(snap.lastActivityDate).toBe("2026-09-24");
+  });
+});
+
+describe("formatLearningSince", () => {
+  it("renders SAST month and year from an auth created_at", () => {
+    expect(formatLearningSince("2026-09-02T18:00:00.000Z")).toBe("Learning since September 2026");
+  });
+
+  it("returns null for missing or invalid values", () => {
+    expect(formatLearningSince(null)).toBeNull();
+    expect(formatLearningSince("")).toBeNull();
+    expect(formatLearningSince("not-a-date")).toBeNull();
   });
 });
