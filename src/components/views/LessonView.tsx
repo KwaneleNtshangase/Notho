@@ -1,5 +1,6 @@
 "use client";
 import { useLocale } from "@/i18n/LocaleProvider";
+import { localizeString } from "@/i18n/stringZu";
 /* eslint-disable @next/next/no-html-link-for-pages */
 import DOMPurify from 'dompurify';
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -171,6 +172,7 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
   nextLessonTitle?: string;
   lessonTitle?: string;
 }) {
+  const { locale, t } = useLocale();
   const [val, setVal] = React.useState("");
   React.useEffect(() => {
     (window as any).__fillBlankSubmit = (v: string, correct: boolean) => {
@@ -183,12 +185,12 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
     onSubmit(val.trim());
   };
 
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const parts = (step.prompt as string).split("___");
 
   return (
     <>
-      <h2 className="step-title">{step.title || "Fill in the blank"}</h2>
+      <h2 className="step-title">{localizeString(locale, step.title || "Fill in the blank")}</h2>
       <div className="step-content" style={{ fontSize: 16, lineHeight: 1.7, marginBottom: 20 }}>
         {parts[0]}
         {!isAnswered ? (
@@ -231,7 +233,7 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
         <>
           <div className={"feedback " + (isCorrect ? "correct" : "incorrect")}>
             {isCorrect
-              ? (step.feedback?.correct || t("lesson.wellDone"))
+              ? (localizeString(locale, step.feedback?.correct) || t("lesson.wellDone"))
               : (step.feedback?.incorrect || `The correct answer is ${formatWithSpaces(step.correct)}. ${step.explanation || ""}`)}
           </div>
           <div className="lesson-actions">
@@ -339,7 +341,7 @@ export function LessonView({
   lessonStartTimeRef?: React.MutableRefObject<number>;
   totalQuestions?: number;
 }) {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const step = lessonState.steps[lessonState.stepIndex];
   const progress =
     ((lessonState.stepIndex + 1) / lessonState.steps.length) * 100;
@@ -485,10 +487,10 @@ export function LessonView({
     if (step.type === "info") {
       return (
         <>
-          <h2 className="step-title">{step.title}</h2>
+          <h2 className="step-title">{localizeString(locale, step.title)}</h2>
           <div
             className="step-content"
-            dangerouslySetInnerHTML={{ __html: typeof window !== 'undefined' ? DOMPurify.sanitize(step.content) : step.content }}
+            dangerouslySetInnerHTML={{ __html: typeof window !== 'undefined' ? DOMPurify.sanitize(localizeString(locale, step.content)) : localizeString(locale, step.content) }}
           />
           <div className="lesson-actions">
             {showFinish ? (
@@ -519,7 +521,7 @@ export function LessonView({
             <Zap className="h-8 w-8 shrink-0 text-white" strokeWidth={2} aria-hidden />
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-green-100">Do This Now</p>
-              <p className="text-lg font-bold leading-tight text-white">{step.title}</p>
+              <p className="text-lg font-bold leading-tight text-white">{localizeString(locale, step.title)}</p>
             </div>
           </div>
           <div className="rounded-xl border border-green-200 bg-green-50 p-5 dark:border-green-800 dark:bg-green-900/20">
@@ -691,18 +693,18 @@ export function LessonView({
       const isCorrect = selectedAnswer === step.correct;
       return (
         <>
-          <h2 className="step-title">{step.question}</h2>
+          <h2 className="step-title">{localizeString(locale, step.question)}</h2>
           {step.content ? (
             <div
               className="step-content"
-              dangerouslySetInnerHTML={{ __html: typeof window !== 'undefined' ? DOMPurify.sanitize(step.content) : step.content }}
+              dangerouslySetInnerHTML={{ __html: typeof window !== 'undefined' ? DOMPurify.sanitize(localizeString(locale, step.content)) : localizeString(locale, step.content) }}
             />
           ) : null}
           <div className="flex flex-col gap-3 my-4">
             {step.options.map((option, index) => {
               return (
                 <button
-                  key={option}
+                  key={localizeString(locale, option)}
                   className={`option-button w-full text-left p-5 mb-3 rounded-2xl border-2 transition-all ${answered
                     ? index === step.correct
                       ? "correct font-bold"
@@ -714,7 +716,7 @@ export function LessonView({
                   onClick={() => answerQuestion(index)}
                   disabled={answered}
                 >
-                  {option}
+                  {localizeString(locale, option)}
                 </button>
               );
             })}
@@ -724,7 +726,7 @@ export function LessonView({
               <div
                 className={`feedback ${isCorrect ? "correct" : "incorrect"}`}
               >
-                {isCorrect ? step.feedback.correct : step.feedback.incorrect}
+                {isCorrect ? localizeString(locale, step.feedback.correct) : localizeString(locale, step.feedback.incorrect)}
               </div>
               <div className="lesson-actions">
                 {showFinish ? (
@@ -832,9 +834,9 @@ export function LessonView({
       const isCorrect = selectedAnswer === step.correct;
       return (
         <>
-          <h2 className="step-title">True or False?</h2>
+          <h2 className="step-title">{localizeString(locale, "True or False?")}</h2>
           <div className="step-content">
-            <p>{step.statement}</p>
+            <p>{localizeString(locale, step.statement)}</p>
           </div>
           <div className="flex flex-col gap-3 my-4">
             {[true, false].map((value) => {
@@ -852,7 +854,7 @@ export function LessonView({
                   onClick={() => answerTrueFalse(value)}
                   disabled={answered}
                 >
-                  {value ? "True" : "False"}
+                  {value ? localizeString(locale, "True") : localizeString(locale, "False")}
                 </button>
               );
             })}
@@ -862,7 +864,7 @@ export function LessonView({
               <div
                 className={`feedback ${isCorrect ? "correct" : "incorrect"}`}
               >
-                {isCorrect ? step.feedback.correct : step.feedback.incorrect}
+                {isCorrect ? localizeString(locale, step.feedback.correct) : localizeString(locale, step.feedback.incorrect)}
               </div>
               <div className="lesson-actions">
                 {showFinish ? (
@@ -1090,7 +1092,7 @@ function CalculatorEmbedStep({ step, onNext }: { step: any; onNext: () => void }
             Interactive Calculator
           </span>
         </div>
-        <h3 style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.3, marginBottom: 6 }}>{step.title}</h3>
+        <h3 style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.3, marginBottom: 6 }}>{localizeString(locale, step.title)}</h3>
         <p style={{ fontSize: 13, opacity: 0.9, lineHeight: 1.5 }}>{step.description}</p>
       </div>
 

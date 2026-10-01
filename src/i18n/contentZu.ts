@@ -19,7 +19,7 @@ export const contentZu: Record<string, string> = {
   "course.business-finance": "Imali yebhizinisi",
 
   "unit.money-basics.unit-1": "Ukuqonda imali",
-  "unit.money-basics.unit-2": "Ukuthenga ngobuhlakani",
+  "unit.money-basics.unit-2": "Ukuthenga okuhlakaniphile",
   "lesson.money-basics.lesson-1": "Yini imali?",
   "lesson.money-basics.lesson-2": "Izidingo nezifiso",
   "lesson.money-basics.lesson-3": "Ukwakha ibhajethi",

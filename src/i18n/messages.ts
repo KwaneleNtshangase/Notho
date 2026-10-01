@@ -171,7 +171,7 @@ export const messages = {
     "auth.errorDisposable": "Sicela usebenzise i-imeyili yangempela. Ama-email esikhashana awavunyelwe.",
     "auth.errorAge": "Faka iminyaka elungile (13+).",
     "auth.errorPasswordLen": "Iphasiwedi kumele ibe nezinhlamvu eziyi-8 noma ngaphezulu.",
-    "common.next": "Landela",
+    "common.next": "Okulandelayo",
     "common.skip": "Yeqa okwamanje",
     "onboarding.usernameTitle": "Khetha igama lokusebenza",
     "onboarding.usernameBody": "Kuyadingeka. Yileli gama ozobonakala ngalo — awukwazi ukuyeqa.",
@@ -218,7 +218,7 @@ export const messages = {
     "learn.resume": "Qhubeka nesifundo",
     "lesson.continue": "Qhubeka",
     "lesson.nextLesson": "Isifundo esilandelayo",
-    "lesson.backToCourse": "Buyela ekhosi",
+    "lesson.backToCourse": "Buyela kwikhosi",
     "lesson.wellDone": "Kulungile! Kuhle.",
   },
 } as const satisfies Record<Locale, Record<string, string>>;
