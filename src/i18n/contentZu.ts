@@ -23,9 +23,9 @@ export const contentZu: Record<string, string> = {
   "lesson.money-basics.lesson-1": "Yini imali?",
   "lesson.money-basics.lesson-2": "Izidingo nezifiso",
   "lesson.money-basics.lesson-3": "Ukwakha ibhajethi",
-  "lesson.money-basics.lesson-4": "Ukulandelela izindleko",
+  "lesson.money-basics.lesson-4": "Ukulandelela indlela osebenzisa ngayo imali",
   "lesson.money-basics.lesson-5": "Ukuqhathanisa amanani",
-  "lesson.money-basics.lesson-6": "Ukugwema ukuthenga nje",
+  "lesson.money-basics.lesson-6": "Ukugwema ukuthenga ngezifiso noma ngokushesha",
 
   "unit.salary-payslip.unit-1": "Ukuqonda i-payslip yakho",
   "lesson.salary-payslip.lesson-1": "I-Gross ne-Net Pay",
