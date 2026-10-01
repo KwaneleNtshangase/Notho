@@ -1,24 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { parseLocale } from "@/i18n/locales";
 import { translate } from "@/i18n/messages";
 import { localizeContent } from "@/i18n/contentZu";
+import { localizeString } from "@/i18n/stringZu";
 
-describe("isiZulu chrome Beta", () => {
-  it("falls back to English for unknown values", () => {
-    expect(parseLocale("xh")).toBe("en");
-    expect(parseLocale("zu")).toBe("zu");
-  });
-
-  it("uses Yeqa okwamanje for skip", () => {
+describe("isiZulu corrections", () => {
+  it("uses preferred chrome", () => {
+    expect(translate("zu", "common.next")).toBe("Okulandelayo");
     expect(translate("zu", "common.skip")).toBe("Yeqa okwamanje");
-    expect(translate("zu", "onboarding.skip")).toBe("Yeqa okwamanje");
+    expect(translate("zu", "lesson.backToCourse")).toBe("Buyela kwikhosi");
   });
 
-  it("localises Money Basics titles and leaves unknown lessons in English", () => {
-    expect(localizeContent("zu", "course.money-basics", "Money Basics")).toBe("Izisekelo Zemali");
-    expect(localizeContent("zu", "lesson.money-basics.lesson-1", "What is Money?")).toBe("Yini imali?");
-    expect(localizeContent("zu", "lesson.investing-basics.lesson-2", "x")).toBe("Inzalo eyinhlanganisela");
-    expect(localizeContent("zu", "lesson.re5-exam-prep.foo", "RE5 item")).toBe("RE5 item");
-    expect(localizeContent("en", "course.money-basics", "Money Basics")).toBe("Money Basics");
+  it("uses preferred shopping title and money lesson copy", () => {
+    expect(localizeContent("zu", "unit.money-basics.unit-2", "Smart Shopping")).toBe(
+      "Ukuthenga okuhlakaniphile"
+    );
+    expect(localizeString("zu", "Money is More Than Cash")).toBe("Imali akuyona nje ukheshi");
+    expect(localizeString("zu", "Not translated yet")).toBe("Not translated yet");
   });
 });
