@@ -1060,7 +1060,7 @@ export function LessonView({
 }
 
 function CalculatorEmbedStep({ step, onNext }: { step: any; onNext: () => void }) {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const [embedCalcDone, setEmbedCalcDone] = React.useState(false);
   const preset = step.preset ?? {};
   const embedInputs: CalcInputs = {
