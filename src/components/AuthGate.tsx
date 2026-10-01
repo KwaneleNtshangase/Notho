@@ -332,9 +332,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 340, width: "100%" }}>
               {[
-                { Icon: NothoLearn, text: "{t("auth.landingLesson")}" },
-                { Icon: NothoBudget, text: "{t("auth.landingBudget")}" },
-                { Icon: NothoCalculate, text: "{t("auth.landingCalc")}" },
+                { Icon: NothoLearn, text: t("auth.landingLesson") },
+                { Icon: NothoBudget, text: t("auth.landingBudget") },
+                { Icon: NothoCalculate, text: t("auth.landingCalc") },
               ].map((f) => (
                 <div key={f.text} style={{
                   display: "flex", alignItems: "center", gap: 12,

@@ -61,6 +61,20 @@ export const stringZu: Record<string, string> = {
   "True or False?": "Iqiniso noma amanga?",
   "True": "Iqiniso",
   "False": "Amanga",
+
+  "Why a Budget Changes Everything": "Kungani ibhajethi ishintsha konke",
+  "<p>Without a budget, money disappears and you never know where it went. With one, every rand has a job - and you stop wondering why you're always short before month-end.</p><p>A budget is not restriction. It's control. Step 1: write your monthly net income. Step 2: list all fixed expenses. Step 3: list variable expenses. Step 4: whatever's left is discretionary - spend it guilt-free because everything important is already covered.</p>":
+    "<p>Ngaphandle kwebhajethi, imali iyanyamalala ungazi ukuthi iyephi. Nayo, wonke u-rand unomsebenzi — uyayeka ukuzibuza ukuthi kungani uphelelwa ngaphambi kokuphela kwenyanga.</p><p>Ibhajethi akukona ukuvinjelwa. Kungukulawula. Isinyathelo 1: bhala imali engenayo ngemuva kwezinkokhelo. Isinyathelo 2: bhala izindleko ezingashintshi. Isinyathelo 3: bhala izindleko ezishintshayo. Isinyathelo 4: okusele ungakuchitha ngaphandle kokuzisola, ngoba okubalulekile sekuhlanganisiwe.</p>",
+  "What should you base your budget on?": "Ibhajethi yakho kumele isekelwe kukuphi?",
+  "Your gross salary": "Umholo wakho ongakakhishwa",
+  "Your net (take-home) salary": "Umholo wakho osufikile ku-akhawunti",
+  "Your expected bonus": "Ibhonasi oyalindele",
+  "Your salary from last year": "Umholo wakho wonyaka odlule",
+  "Always budget on net salary, the money that actually reaches your account.": "Hlala usebenzisa umholo osufikile, imali efika ku-akhawunti yakho.",
+  "Never budget on gross. Deductions happen before you see a cent.": "Ungasebenzisi umholo ongakakhishwa. Izinkokhelo ziyasuswa ngaphambi kokuba ubone u-cent.",
+  "True or False: You should allocate money to wants first, and fit fixed expenses like rent and insurance around whatever is left.": "Iqiniso noma amanga: kufanele uqale ngezifiso, bese ufaka irenti nomshwalense kulokho okusele.",
+  "Right. Non-negotiable fixed expenses come first, then you budget wants from what remains.": "Kulungile. Izindleko ezingashintshi ziya kuqala, bese izifiso zivela kulokho okusele.",
+  "Fixed expenses are non-negotiable. Cover rent, insurance and repayments first, then fund wants.": "Izindleko ezingashintshi azixoxiswani. Qala ngerenti, umshwalense, nokukhokha isikweletu, bese izifiso.",
 };
 
 

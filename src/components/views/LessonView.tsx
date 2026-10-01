@@ -185,7 +185,6 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
     onSubmit(val.trim());
   };
 
-  const { locale, t } = useLocale();
   const parts = (step.prompt as string).split("___");
 
   return (
