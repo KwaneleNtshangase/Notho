@@ -11,8 +11,8 @@ import {
   type PushMessage,
 } from "@/lib/push/triggers";
 import { resolveNextLesson } from "@/lib/push/nextLesson";
-import { sendWebPush } from "@/lib/push/send";
 import { CONTENT_DATA } from "@/data/content";
+import { deliverPush } from "@/lib/push/deliver";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -112,16 +112,8 @@ export async function GET(req: NextRequest) {
       let coachMsg: PushMessage | null = null;
       if (!streakMsg && !habitMsg) {
         const [entriesRes, targetsRes, catsRes] = await Promise.all([
-          admin
-            .from("budget_entries")
-            .select("type, category, amount, entry_date, is_transfer")
-            .eq("user_id", userId)
-            .gte("entry_date", `${prevMonthKey}-01`)
-            .lte("entry_date", today),
-          admin
-            .from("budget_targets")
-            .select("category, monthly_limit, month_year")
-            .eq("user_id", userId),
+          admin.from("budget_entries").select("type, category, amount, entry_date, is_transfer").eq("user_id", userId).gte("entry_date", `${prevMonthKey}-01`).lte("entry_date", today),
+          admin.from("budget_targets").select("category, monthly_limit, month_year").eq("user_id", userId),
           admin.from("custom_budget_categories").select("id, name").eq("user_id", userId),
         ]);
         const targetRows = (targetsRes.data ?? []) as BudgetTargetRow[];
@@ -131,9 +123,7 @@ export async function GET(req: NextRequest) {
           if (limit > 0) budgets[c] = limit;
         }
         const categoryLabels: Record<string, string> = { ...BUILT_IN_LABELS };
-        for (const c of (catsRes.data ?? []) as { id: string; name: string }[]) {
-          categoryLabels[c.id] = c.name;
-        }
+        for (const c of (catsRes.data ?? []) as { id: string; name: string }[]) categoryLabels[c.id] = c.name;
         const insights = computeCoachInsights({
           monthKey,
           prevMonthKey,
@@ -151,21 +141,15 @@ export async function GET(req: NextRequest) {
 
       const { data: claimed } = await admin
         .from("push_notification_log")
-        .upsert(
-          { user_id: userId, key: msg.key },
-          { onConflict: "user_id,key", ignoreDuplicates: true }
-        )
+        .upsert({ user_id: userId, key: msg.key }, { onConflict: "user_id,key", ignoreDuplicates: true })
         .select("id");
-      if (!claimed || claimed.length === 0) {
+      const id = (claimed?.[0] as { id?: string } | undefined)?.id;
+      if (!id) {
         summary.skippedDuplicate++;
         continue;
       }
 
-      let delivered = 0;
-      for (const sub of byUser.get(userId) ?? []) {
-        const result = await sendWebPush(sub, { title: msg.title, body: msg.body, url: msg.url });
-        if (result.ok) delivered++;
-      }
+      const delivered = await deliverPush(admin, userId, id, msg, byUser.get(userId) ?? []);
       if (delivered > 0) summary.sent++;
       else summary.failed++;
     } catch (err) {
