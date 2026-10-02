@@ -1024,7 +1024,7 @@ export function LearnView({
       <div style={{ position: "relative", marginBottom: 24 }}>
         <input
           type="text"
-          placeholder="Search courses..."
+          placeholder="Search courses in any language"
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{

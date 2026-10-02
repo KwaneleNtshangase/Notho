@@ -205,3 +205,19 @@ describe("getSuggestion", () => {
     expect(suggestion).toBeNull();
   });
 });
+
+describe("cross-lingual course search", () => {
+  it("matches a Zulu lesson word and a Zulu course title onto the English course", async () => {
+    const { CONTENT_DATA } = await import("@/data/content");
+    const index = buildSearchIndex(CONTENT_DATA.courses, []);
+
+    const cash = fuzzySearch("ukheshi", index);
+    expect(cash.some((r) => r.courseId === "money-basics")).toBe(true);
+
+    const titled = fuzzySearch("izisekelo zemali", index);
+    expect(titled[0]?.courseId).toBe("money-basics");
+
+    const englishStillWorks = fuzzySearch("cash", index);
+    expect(englishStillWorks.some((r) => r.courseId === "money-basics")).toBe(true);
+  });
+});
