@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
 import { NothoStreak, NothoHeart, NothoLevel, NothoXP, NothoFreeze } from "@/components/icons/NothoIcons";
+import { streakExtendedToday } from "@/lib/dates";
 import { formatWithSpaces } from "@/lib/formatters";
 import { generateShareText, type UserData } from "@/app/pageViews.types";
 import { StreakFreezeBody } from "@/components/StreakFreezeControl";
@@ -23,7 +24,10 @@ export function StatsPanel({
   onBuyFreeze?: () => Promise<FreezePurchase> | FreezePurchase;
   signedIn?: boolean;
 }) {
-  // If the user already did a lesson today their streak is already safe
+  // Lit when the streak just moved, or last activity is already today.
+  // lessonsToday alone stays 0 on a replay that still stamps the day.
+  const streakSafeToday =
+    userData.lessonsToday > 0 || streakExtendedToday(userData.lastActivityDate);
   const [showFreeze, setShowFreeze] = useState(false);
   const goalProgress = Math.min(
     (userData.dailyXP / userData.dailyGoal) * 100,
@@ -39,8 +43,8 @@ export function StatsPanel({
             <NothoStreak
               size={28}
               style={{
-                color: userData.lessonsToday > 0 ? "#FF9500" : undefined,
-                filter: userData.lessonsToday > 0 ? "none" : "grayscale(1) opacity(0.4)",
+                color: streakSafeToday ? "#FF9500" : undefined,
+                filter: streakSafeToday ? "none" : "grayscale(1) opacity(0.4)",
                 transition: "filter 0.3s, color 0.3s",
               }}
             />
@@ -48,14 +52,14 @@ export function StatsPanel({
           <div className="stat-content" style={{ flex: 1 }}>
             <div
               className="stat-label"
-              style={{ color: userData.lessonsToday > 0 ? undefined : "var(--text-muted, #888)" }}
+              style={{ color: streakSafeToday ? undefined : "var(--text-muted, #888)" }}
             >
               Day Streak
             </div>
             <div
               className="stat-value"
               id="streakValue"
-              style={{ color: userData.lessonsToday > 0 ? undefined : "var(--text-muted, #888)" }}
+              style={{ color: streakSafeToday ? undefined : "var(--text-muted, #888)" }}
             >
               {userData.streak}
             </div>

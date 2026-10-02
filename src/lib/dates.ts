@@ -182,6 +182,15 @@ export function evaluateStreak(
  *   4. A gap bigger than the freeze stock breaks the streak; this lesson
  *      starts a new streak at 1.
  */
+/** True when today's SAST streak has already been extended (flame should be lit). */
+export function streakExtendedToday(
+  lastActivityDate: string | null | undefined,
+  currentDate: string = sastToday()
+): boolean {
+  const today = normaliseSastDay(currentDate) ?? sastToday();
+  return normaliseSastDay(lastActivityDate) === today;
+}
+
 export function applyLessonToStreak(
   streak: number,
   freezeCount: number,

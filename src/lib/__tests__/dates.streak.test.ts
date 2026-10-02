@@ -3,6 +3,7 @@ import {
   addSastDays,
   applyLessonToStreak,
   evaluateStreak,
+  streakExtendedToday,
   formatLearningSince,
   normaliseSastDay,
   sastDateDiffDays,
@@ -108,5 +109,14 @@ describe("formatLearningSince", () => {
     expect(formatLearningSince(null)).toBeNull();
     expect(formatLearningSince("")).toBeNull();
     expect(formatLearningSince("not-a-date")).toBeNull();
+  });
+});
+
+describe("streakExtendedToday", () => {
+  it("is lit only when last activity is today, including ISO leftovers", () => {
+    expect(streakExtendedToday("2026-10-02", "2026-10-02")).toBe(true);
+    expect(streakExtendedToday("2026-10-02T00:00:00.000Z", "2026-10-02")).toBe(true);
+    expect(streakExtendedToday("2026-10-01", "2026-10-02")).toBe(false);
+    expect(streakExtendedToday(null, "2026-10-02")).toBe(false);
   });
 });

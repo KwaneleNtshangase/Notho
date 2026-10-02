@@ -887,11 +887,15 @@ export function useProgress() {
         localStorage.removeItem("notho-pending-streak-sync");
       }
       setState((prev) => {
+        const extended = Boolean(json.extended);
         const next = {
           ...prev,
           streak: json.streak,
           longestStreak: Math.max(json.longestStreak ?? json.streak, prev.longestStreak),
           lastActivityDate: json.lastActivityDate,
+          // Same update as the +1. A replay can extend the streak without
+          // bumping lessonsToday, which is what left the flame grey.
+          dailyLessons: extended ? Math.max(prev.dailyLessons, 1) : prev.dailyLessons,
         };
         writeProgressCache(next, userId);
         return next;

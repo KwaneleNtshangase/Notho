@@ -19,6 +19,8 @@ export type UserData = {
   dailyGoal: number;
   badges: string[];
   lessonsToday: number;
+  /** SAST civil date the streak was last extended. Drives the lit flame. */
+  lastActivityDate?: string | null;
   /** Equipped streak freezes, 0–2. Optional so older callers still typecheck. */
   freezeCount?: number;
 };

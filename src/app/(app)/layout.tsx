@@ -171,6 +171,7 @@ function MobileTopBarWrapper() {
         freezeCount={freezeCount}
         onBuyFreeze={() => buyStreakFreeze()}
         lessonsToday={userData.lessonsToday}
+        lastActivityDate={userData.lastActivityDate}
         signedIn={Boolean(userId)}
       />
     </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
 import { NothoStreak, NothoXP, NothoHeart } from "@/components/icons/NothoIcons";
 import { generateShareText } from "@/app/pageViews.types";
+import { streakExtendedToday } from "@/lib/dates";
 import { formatWithSpaces } from "@/lib/formatters";
 import { StreakFreezeBody, StreakFreezeChip } from "@/components/StreakFreezeControl";
 import type { FreezePurchase } from "@/lib/streakFreeze";
@@ -17,6 +18,7 @@ export function NothoTopBar({
   freezeCount = 0,
   onBuyFreeze,
   lessonsToday = 0,
+  lastActivityDate = null,
   signedIn = true,
 }: {
   streak: number;
@@ -27,13 +29,14 @@ export function NothoTopBar({
   freezeCount?: number;
   onBuyFreeze?: () => Promise<FreezePurchase> | FreezePurchase;
   lessonsToday?: number;
+  lastActivityDate?: string | null;
   signedIn?: boolean;
 }) {
   const [showHeartsModal, setShowHeartsModal] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const regen = heartsRegenInfo ? heartsRegenInfo() : null;
 
-  const streakSafeToday = lessonsToday > 0;
+  const streakSafeToday = lessonsToday > 0 || streakExtendedToday(lastActivityDate);
   const flameOpacity = streakSafeToday || streak === 0 ? 1 : 0.55;
 
   return (
