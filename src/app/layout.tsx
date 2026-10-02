@@ -12,6 +12,7 @@ import { ServiceWorkerRegistration } from "@/lib/sw/ServiceWorkerRegistration";
 import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
 import { TEXT_SCALE_BOOT_SCRIPT } from "@/lib/textScale";
 import { JsonLd } from "@/components/JsonLd";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -65,7 +66,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Notho — Learn personal finance in South Africa",
+    default: "Notho \u2014 Learn personal finance in South Africa",
     template: "%s | Notho",
   },
   description: SITE_DESCRIPTION,
@@ -111,12 +112,12 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     url: SITE_URL,
     images: ["/notho-logo.png"],
-    title: "Notho — Learn personal finance in South Africa",
+    title: "Notho \u2014 Learn personal finance in South Africa",
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Notho — Learn personal finance in South Africa",
+    title: "Notho \u2014 Learn personal finance in South Africa",
     description: SITE_DESCRIPTION,
     images: ["/notho-logo.png"],
   },
@@ -136,6 +137,7 @@ export default function RootLayout({
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
         <JsonLd data={softwareJsonLd()} />
+        <GoogleAnalytics />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
