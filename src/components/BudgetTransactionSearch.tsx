@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { formatRand } from "@/lib/viewHelpers";
-import { Search, X, ArrowLeftRight, TrendingUp } from "@/components/icons/NothoIcons";
+import { Search, ArrowLeftRight, TrendingUp } from "@/components/icons/NothoIcons";
 import {
   budgetEntrySearchOrs,
   entryMatchesQuery,
@@ -158,30 +158,33 @@ export function BudgetTransactionSearch() {
   }
 
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto", width: "100%", padding: "12px 0 0" }}>
-      <label htmlFor="budget-txn-search" style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>
-        Search transactions
-      </label>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 12, padding: "10px 12px" }}>
-        <Search size={16} style={{ color: "var(--color-text-secondary)", flexShrink: 0 }} aria-hidden />
+    <div style={{ maxWidth: 760, margin: "0 auto", width: "100%", padding: "16px 0 0" }}>
+      <div style={{ position: "relative", marginBottom: 16 }}>
         <input
           id="budget-txn-search"
-          type="search"
+          type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Employer, reference, or description"
+          placeholder="Search transactions"
           autoComplete="off"
-          enterKeyHint="search"
-          style={{ flex: 1, border: "none", outline: "none", background: "transparent", color: "var(--color-text-primary)", fontSize: 15, fontWeight: 600, minWidth: 0 }}
+          aria-label="Search transactions"
+          style={{
+            width: "100%",
+            padding: "12px 40px 12px 16px",
+            borderRadius: 12,
+            border: "1.5px solid var(--color-border)",
+            fontSize: 14,
+            background: "var(--color-surface)",
+            color: "var(--color-text-primary)",
+            boxSizing: "border-box",
+          }}
         />
-        {query && (
-          <button type="button" onClick={() => setQuery("")} aria-label="Clear search" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", display: "flex", padding: 2 }}>
-            <X size={16} />
-          </button>
-        )}
+        <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-secondary)", display: "flex", pointerEvents: "none" }}>
+          <Search size={18} aria-hidden />
+        </span>
       </div>
       {query.trim().length >= TXN_SEARCH_MIN && (
-        <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, overflow: "hidden", marginTop: 10, marginBottom: 8 }}>
+        <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, overflow: "hidden", marginBottom: 8 }}>
           <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--color-border)", display: "flex", justifyContent: "space-between", gap: 8, alignItems: "baseline" }}>
             <div style={{ fontWeight: 800, fontSize: 14 }}>Results across your whole budget</div>
             <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", flexShrink: 0 }}>
