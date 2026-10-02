@@ -21,6 +21,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { isAdminEmail, isAdminUser } from "@/lib/admin";
+import { loadOutcomes } from "./outcomes";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -98,11 +99,28 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const view = url.searchParams.get("view") ?? "overview";
   const fn = VIEWS[view];
-  if (!fn) {
+  if (view !== "outcomes" && !fn) {
     return NextResponse.json(
       { error: `Unknown view "${view}".`, allowed: Object.keys(VIEWS) },
       { status: 400 }
     );
+  }
+
+  if (view === "outcomes") {
+    try {
+      const data = await loadOutcomes(admin);
+      return NextResponse.json(
+        { view, days: 0, data, generatedAt: data.generatedAt },
+        { headers: { "Cache-Control": "no-store" } }
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Could not load outcomes.";
+      console.error("[admin/analytics] outcomes failed:", message);
+      return NextResponse.json(
+        { error: 'Could not load "outcomes".', detail: message, hint: "This view reads lesson_results, budget_entries and profiles with the service role. It is not an RPC." },
+        { status: 500 }
+      );
+    }
   }
 
   const days = clampDays(url.searchParams.get("days"), 30);
@@ -119,8 +137,6 @@ export async function GET(req: NextRequest) {
     };
   } else if (view === "user") {
     const id = url.searchParams.get("userId");
-    // Validate shape before it reaches the RPC so a malformed id is a clean 400
-    // rather than a Postgres cast error surfacing as a 500.
     if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
       return NextResponse.json({ error: "A valid userId is required." }, { status: 400 });
     }
@@ -144,11 +160,6 @@ export async function GET(req: NextRequest) {
 
   if (error) {
     console.error(`[admin/analytics] ${view} failed:`, error.message);
-    // The caller is already a verified admin, so hiding the cause from them
-    // buys nothing and costs a debugging session - the previous version of this
-    // route returned a bare 'Could not load "user"' for a missing column, which
-    // took a database dump to diagnose. Admins see the real error; nobody else
-    // can reach this line.
     const missingFn = /(does not exist|schema cache)/i.test(error.message ?? "");
     return NextResponse.json(
       {
