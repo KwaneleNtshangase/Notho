@@ -57,7 +57,13 @@ function deltaLabel(n: number | null): string {
   return `${sign}${n} pp`;
 }
 
-export function OutcomesPanel({ nonce }: { nonce: number }) {
+export function OutcomesPanel({
+  nonce,
+  onOpenUser,
+}: {
+  nonce: number;
+  onOpenUser?: (id: string) => void;
+}) {
   const p = usePalette();
   const view = useView<Payload>("outcomes", {}, nonce);
   const [open, setOpen] = useState<string>("needs-vs-wants");
@@ -65,7 +71,20 @@ export function OutcomesPanel({ nonce }: { nonce: number }) {
   if (view.error) return <ErrorNote message={view.error} />;
   return (
     <Gate loading={view.loading && !view.data} error={view.error} empty={!view.data} emptyTitle="No outcome data yet" skeleton={220}>
-      {view.data && <OutcomesBody data={view.data} open={open} setOpen={setOpen} ink={p.ink} muted={p.muted} green={p.green} red={p.red} gold={p.gold} teal={p.teal} />}
+      {view.data && (
+        <OutcomesBody
+          data={view.data}
+          open={open}
+          setOpen={setOpen}
+          onOpenUser={onOpenUser}
+          ink={p.ink}
+          muted={p.muted}
+          green={p.green}
+          red={p.red}
+          gold={p.gold}
+          teal={p.teal}
+        />
+      )}
     </Gate>
   );
 }
@@ -74,6 +93,7 @@ function OutcomesBody({
   data,
   open,
   setOpen,
+  onOpenUser,
   ink,
   muted,
   green,
@@ -84,6 +104,7 @@ function OutcomesBody({
   data: Payload;
   open: string;
   setOpen: (id: string) => void;
+  onOpenUser?: (id: string) => void;
   ink: string;
   muted: string;
   green: string;
@@ -103,7 +124,8 @@ function OutcomesBody({
         <p className="nv-card-sub">
           {data.coverage.classifiedNote} {fmt(data.coverage.budgetUsers)} people have budget rows.{" "}
           {fmt(data.coverage.lessonUsers)} have a recorded lesson. A person only counts as improved
-          when both windows have real spend. This is not proof the lesson caused the change.
+          when both windows have real spend. This is not proof the lesson caused the change. Names
+          open the person view. Do not copy those rows into a deck.
         </p>
       </Card>
       <StatGrid>
@@ -158,7 +180,15 @@ function OutcomesBody({
                 <tbody>
                   {active.pairs.slice(0, 40).map((pair) => (
                     <tr key={pair.userId} style={{ borderTop: "1px solid var(--border, rgba(255,255,255,0.08))" }}>
-                      <td style={{ padding: "8px 6px", fontWeight: 700 }}>{pair.username || "No username"}</td>
+                      <td style={{ padding: "8px 6px", fontWeight: 700 }}>
+                        {onOpenUser ? (
+                          <button type="button" onClick={() => onOpenUser(pair.userId)} style={{ background: "none", border: "none", padding: 0, color: teal, fontWeight: 800, cursor: "pointer" }}>
+                            {pair.username || "Open person"}
+                          </button>
+                        ) : (
+                          pair.username || "No username"
+                        )}
+                      </td>
                       <td style={{ padding: "8px 6px", color: tone(pair.call.verdict), fontWeight: 800 }}>{pair.call.verdict}</td>
                       <td style={{ padding: "8px 6px" }}>{fmtPct(pair.call.before.wantSharePct)}</td>
                       <td style={{ padding: "8px 6px" }}>{fmtPct(pair.call.after.wantSharePct)}</td>
