@@ -87,7 +87,7 @@ const NOTHO_FAQ = [
   {
     section: "Using Notho",
     items: [
-      { q: "What is a streak?", a: "A streak counts how many days in a row you've completed at least one lesson. Streaks help build a daily learning habit - miss a day and your streak resets to zero." },
+      { q: "What is a streak?", a: "A streak counts how many days in a row you've completed at least one lesson. The number goes up by one on the first lesson of a SAST day. A streak freeze covers one missed day and does not add a day. You can equip up to 2, bought with 200 XP. They apply on their own. Miss more days than you have equipped and the streak breaks; the freezes stay in your pocket." },
       { q: "How does the XP system work?", a: "You earn XP (experience points) by completing lessons, getting correct answers, and claiming daily challenges. XP increases your level and your position on the leaderboard." },
       { q: "What are Daily Challenges?", a: "Every day, three challenges appear on your home screen. Complete the required action first (e.g. finish a lesson, log an expense), then tap Claim to receive bonus XP. Challenges reset at midnight." },
       { q: "What are Leaderboards?", a: "Leaderboards rank all Notho users by XP. Your position updates in real time as you and others complete lessons. Use it to track your progress relative to other learners." },
@@ -789,6 +789,13 @@ export function ProfileView({
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{stat.label}</div>
           </div>
         ))}
+      </div>
+      <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, marginBottom: 16, padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Streak freezes</div>
+          <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginTop: 2 }}>Apply automatically if you miss a day. 200 XP each.</div>
+        </div>
+        <div style={{ fontSize: 18, fontWeight: 900, color: (userData.freezeCount ?? 0) > 0 ? "#3B82F6" : "var(--color-text-secondary)", whiteSpace: "nowrap" }}>{userData.freezeCount ?? 0}/2</div>
       </div>
 
       {saveToast && (

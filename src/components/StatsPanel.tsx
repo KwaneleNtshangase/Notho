@@ -1,9 +1,11 @@
 "use client";
 
 import { Share2 } from "@/components/icons/NothoIcons";
-import { NothoStreak, NothoHeart, NothoFreeze, NothoLevel, NothoXP } from "@/components/icons/NothoIcons";
+import { NothoStreak, NothoHeart, NothoLevel, NothoXP } from "@/components/icons/NothoIcons";
 import { formatWithSpaces } from "@/lib/formatters";
 import { generateShareText, type UserData } from "@/app/pageViews.types";
+import { StreakFreezeBody } from "@/components/StreakFreezeControl";
+import type { FreezePurchase } from "@/lib/streakFreeze";
 
 export function StatsPanel({
   userData,
@@ -11,19 +13,16 @@ export function StatsPanel({
   maxHearts = 5,
   freezeCount = 0,
   onBuyFreeze,
-  onUseFreeze,
-  freezeUsedToday = false,
+  signedIn = true,
 }: {
   userData: UserData;
   hearts?: number;
   maxHearts?: number;
   freezeCount?: number;
-  onBuyFreeze?: () => void;
-  onUseFreeze?: () => void;
-  freezeUsedToday?: boolean;
+  onBuyFreeze?: () => Promise<FreezePurchase> | FreezePurchase;
+  signedIn?: boolean;
 }) {
   // If the user already did a lesson today their streak is already safe
-  const streakSafeToday = userData.lessonsToday > 0;
   const goalProgress = Math.min(
     (userData.dailyXP / userData.dailyGoal) * 100,
     100
@@ -110,52 +109,19 @@ export function StatsPanel({
           </div>
         </div>
 
-        {/* Streak Freeze */}
+        {/* Streak Freeze — same control as the phone chip */}
         <div className="stat-item" style={{ alignItems: "flex-start" }}>
-          <div className="stat-icon" style={{ color: "#3B82F6" }}>
-            <NothoFreeze size={28} />
-          </div>
           <div className="stat-content" style={{ flex: 1 }}>
             <div className="stat-label">Streak Freezes</div>
-            <div className="stat-value" style={{ color: freezeCount > 0 ? "#3B82F6" : "var(--color-text-secondary)" }}>
-              {freezeCount}
-            </div>
-            {streakSafeToday && (
-              <div style={{ fontSize: 11, color: "#22C55E", marginTop: 4, fontWeight: 600 }}>
-                ✓ Lesson done. Streak safe!
-              </div>
-            )}
-            {!streakSafeToday && freezeUsedToday && (
-              <div style={{ fontSize: 11, color: "#3B82F6", marginTop: 4, fontWeight: 600 }}>
-                ✓ Streak protected today
-              </div>
-            )}
-            {!streakSafeToday && !freezeUsedToday && freezeCount > 0 && onUseFreeze && (
-              <button
-                type="button"
-                onClick={onUseFreeze}
-                style={{
-                  marginTop: 6,
-                  background: "#3B82F6",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "5px 12px",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  width: "100%",
-                }}
-                title="Protect your streak for today if you can't do a lesson"
-              >
-                Use Freeze
-              </button>
-            )}
-            {!streakSafeToday && freezeCount === 0 && !freezeUsedToday && (
-              <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
-                Buy with XP to protect your streak
-              </div>
-            )}
+            <StreakFreezeBody
+              compact
+              freezeCount={freezeCount}
+              xp={userData.xp}
+              lessonsToday={userData.lessonsToday}
+              streak={userData.streak}
+              signedIn={signedIn}
+              onBuy={onBuyFreeze}
+            />
           </div>
         </div>
 

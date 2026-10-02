@@ -257,6 +257,7 @@ export type UserData = {
   dailyXP: number;
   dailyGoal: number;
   badges: string[];
+  freezeCount?: number;
 };
 
 export type Route =

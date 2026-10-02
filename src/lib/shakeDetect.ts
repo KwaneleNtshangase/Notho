@@ -25,7 +25,7 @@ export type ShakeState = {
 };
 
 export function createShakeState(): ShakeState {
-  return { last: null, hits: [], lastFire: 0 };
+  return { last: null, hits: [], lastFire: Number.NEGATIVE_INFINITY };
 }
 
 function force(a: ShakeSample, b: ShakeSample): number {

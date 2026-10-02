@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { sastOffset, sastToday, sastWeekKey } from "@/lib/dates";
+import { normaliseSastDay, sastOffset, sastToday, sastWeekKey } from "@/lib/dates";
+import { STREAK_FREEZE_COST, STREAK_FREEZE_MAX, type FreezePurchase } from "@/lib/streakFreeze";
 import { clearWeeklyStats } from "@/lib/weeklyStats";
 import {
   isTombstone,
@@ -1050,34 +1051,99 @@ export function useProgress() {
     };
   };
 
-  const MAX_FREEZE_COUNT = 2;
+  const freezeBuyLock = useRef(false);
+  const buyStreakFreeze = async (cost = STREAK_FREEZE_COST): Promise<FreezePurchase> => {
+    if (freezeBuyLock.current) return { ok: false, reason: "busy" };
+    if (!userId) return { ok: false, reason: "signed_out" };
+    if (state.freezeCount >= STREAK_FREEZE_MAX) return { ok: false, reason: "full" };
+    if (state.xp < cost) return { ok: false, reason: "xp" };
+    freezeBuyLock.current = true;
 
-  const buyStreakFreeze = (cost = 200): boolean => {
-    if (state.freezeCount >= MAX_FREEZE_COUNT) return false;
-    if (!tryDeductXp(cost)) return false;
-    let nextFreeze = 0;
+    const nextFreeze = state.freezeCount + 1;
     setState((prev) => {
-      if (prev.freezeCount >= MAX_FREEZE_COUNT) return prev;
-      nextFreeze = prev.freezeCount + 1;
-      const next = { ...prev, freezeCount: nextFreeze };
+      if (prev.freezeCount >= STREAK_FREEZE_MAX || prev.xp < cost) return prev;
+      const next = {
+        ...prev,
+        xp: prev.xp - cost,
+        xpSpent: prev.xpSpent + cost,
+        freezeCount: prev.freezeCount + 1,
+      };
       writeProgressCache(next, userId);
       return next;
     });
-    if (nextFreeze === 0) return false;
-    if (userId) {
-      void supabase
-        .from("user_progress")
-        .update({ streak_freeze_count: nextFreeze, updated_at: new Date().toISOString() })
-        .eq("user_id", userId);
+
+    const rollback = () => {
+      setState((prev) => {
+        const next = {
+          ...prev,
+          xp: prev.xp + cost,
+          xpSpent: Math.max(0, prev.xpSpent - cost),
+          freezeCount: Math.max(0, prev.freezeCount - 1),
+        };
+        writeProgressCache(next, userId);
+        return next;
+      });
+    };
+
+    const { data, error } = await supabase.rpc("spend_xp", {
+      p_user_id: userId,
+      p_amount: cost,
+    });
+    const res = data as { ok?: boolean; balance?: number; spent?: number } | null;
+    if (error || !res?.ok) {
+      rollback();
+      freezeBuyLock.current = false;
+      return { ok: false, reason: "xp" };
     }
-    return true;
+
+    const { error: upErr } = await supabase
+      .from("user_progress")
+      .update({
+        streak_freeze_count: nextFreeze,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", userId);
+    if (upErr) {
+      rollback();
+      if (typeof res.balance === "number" && typeof res.spent === "number") {
+        await supabase
+          .from("user_progress")
+          .update({
+            xp: res.balance + cost,
+            xp_spent: Math.max(0, res.spent - cost),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("user_id", userId);
+      }
+      freezeBuyLock.current = false;
+      return { ok: false, reason: "save_failed" };
+    }
+
+    setState((prev) => {
+      const next = {
+        ...prev,
+        xp: typeof res.balance === "number" ? res.balance : prev.xp,
+        xpSpent: typeof res.spent === "number" ? res.spent : prev.xpSpent,
+        freezeCount: nextFreeze,
+      };
+      writeProgressCache(next, userId);
+      return next;
+    });
+    freezeBuyLock.current = false;
+    return { ok: true, freezeCount: nextFreeze };
   };
 
-  // Consume one of the weekly streak_freeze_count tokens via DB RPC.
-  // Returns { ok, streak, freezesLeft } or { ok: false, reason }.
+  // Manual cover for a gap the nightly job has not stamped yet. Refuses when
+  // yesterday or today is already on the books, so a tap cannot burn a freeze.
   const useFreeze = async (): Promise<{ ok: boolean; streak?: number; freezesLeft?: number; reason?: string }> => {
     if (!userId) return { ok: false, reason: "not_logged_in" };
     if (state.freezeCount <= 0) return { ok: false, reason: "no_freezes_left" };
+    if (state.streak <= 0) return { ok: false, reason: "no_streak" };
+    const yesterday = sastOffset(-1);
+    const last = normaliseSastDay(state.lastActivityDate);
+    if (last && last >= yesterday) {
+      return { ok: false, reason: "already_safe" };
+    }
     const { data, error } = await supabase.rpc("use_streak_freeze", { p_user_id: userId });
     if (error) {
       console.warn("[useFreeze] RPC error", error.message);

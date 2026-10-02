@@ -2,9 +2,11 @@
 // v2 - streak freeze, hearts, share
 import { useState } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
-import { NothoStreak, NothoXP, NothoFreeze, NothoHeart } from "@/components/icons/NothoIcons";
+import { NothoStreak, NothoXP, NothoHeart } from "@/components/icons/NothoIcons";
 import { generateShareText } from "@/app/pageViews.types";
 import { formatWithSpaces } from "@/lib/formatters";
+import { StreakFreezeBody, StreakFreezeChip } from "@/components/StreakFreezeControl";
+import type { FreezePurchase } from "@/lib/streakFreeze";
 
 export function NothoTopBar({
   streak,
@@ -14,9 +16,8 @@ export function NothoTopBar({
   heartsRegenInfo,
   freezeCount = 0,
   onBuyFreeze,
-  onUseFreeze,
-  freezeUsedToday = false,
   lessonsToday = 0,
+  signedIn = true,
 }: {
   streak: number;
   xp: number;
@@ -24,10 +25,9 @@ export function NothoTopBar({
   maxHearts: number;
   heartsRegenInfo?: () => { nextHeartIn: string; minutesLeft: number } | null;
   freezeCount?: number;
-  onBuyFreeze?: () => void;
-  onUseFreeze?: () => Promise<void>;
-  freezeUsedToday?: boolean;
+  onBuyFreeze?: () => Promise<FreezePurchase> | FreezePurchase;
   lessonsToday?: number;
+  signedIn?: boolean;
 }) {
   const [showHeartsModal, setShowHeartsModal] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
@@ -67,6 +67,7 @@ export function NothoTopBar({
             <NothoStreak size={20} style={{ color: "#EFB343", opacity: flameOpacity }} />
             <span style={{ fontWeight: 700, fontSize: 15, color: "#EFB343", opacity: flameOpacity }}>{streak}</span>
           </button>
+          <StreakFreezeChip count={freezeCount} onClick={() => setShowStreakModal(true)} />
           <button
             type="button"
             onClick={async () => {
@@ -130,7 +131,7 @@ export function NothoTopBar({
             position: "fixed",
             inset: 0,
             background: "rgba(0,0,0,0.45)",
-            zIndex: 300,
+            zIndex: 400,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -185,7 +186,7 @@ export function NothoTopBar({
             position: "fixed",
             inset: 0,
             background: "rgba(0,0,0,0.45)",
-            zIndex: 300,
+            zIndex: 420,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -207,101 +208,21 @@ export function NothoTopBar({
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
               <NothoStreak size={52} style={{ color: "#FF9500" }} />
             </div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: "#EFB343", marginBottom: 4 }}>
+            <div style={{ fontSize: 28, fontWeight: 900, color: "#EFB343", marginBottom: 12 }}>
               {streak} day streak
             </div>
-
-            {streakSafeToday ? (
-              <p style={{ color: "#22C55E", fontWeight: 700, marginBottom: 20, fontSize: 14 }}>
-                ✓ Lesson done today — streak is safe!
-              </p>
-            ) : freezeUsedToday ? (
-              <p style={{ color: "#3B82F6", fontWeight: 700, marginBottom: 20, fontSize: 14 }}>
-                Freeze used — streak protected today
-              </p>
-            ) : (
-              <p style={{ color: "var(--color-text-secondary)", marginBottom: 20, fontSize: 14 }}>
-                Do a lesson today to keep your streak alive. The number only goes up after that lesson, same as Duolingo.
-              </p>
-            )}
-
-            {/* Freeze count */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                background: "var(--color-bg)",
-                borderRadius: 12,
-                padding: "12px 16px",
-                marginBottom: 16,
-              }}
-            >
-              <NothoFreeze size={22} style={{ color: freezeCount > 0 ? "#3B82F6" : "#aaa" }} />
-              <span style={{ fontWeight: 700, fontSize: 16, color: freezeCount > 0 ? "#3B82F6" : "var(--color-text-secondary)" }}>
-                {freezeCount} {freezeCount === 1 ? "Streak Freeze" : "Streak Freezes"}
-              </span>
-            </div>
-
-            <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 16, lineHeight: 1.5 }}>
-              A streak freeze protects your streak for one day you miss. Buy them with XP before you need them.
-            </p>
-
-            {/* Use freeze button - only show if freeze available, no lesson today, not already used */}
-            {!streakSafeToday && !freezeUsedToday && freezeCount > 0 && onUseFreeze && (
-              <button
-                type="button"
-                onClick={async () => {
-                  setShowStreakModal(false);
-                  await onUseFreeze();
-                }}
-                style={{
-                  width: "100%",
-                  background: "#3B82F6",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 12,
-                  padding: "12px 16px",
-                  fontSize: 15,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  marginBottom: 10,
-                }}
-              >
-                Use Freeze Now
-              </button>
-            )}
-
-            {/* Buy freeze button */}
-            {onBuyFreeze && (
-              <button
-                type="button"
-                onClick={() => {
-                  setShowStreakModal(false);
-                  onBuyFreeze();
-                }}
-                style={{
-                  width: "100%",
-                  background: "var(--color-primary)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 12,
-                  padding: "12px 16px",
-                  fontSize: 15,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  marginBottom: 10,
-                }}
-              >
-                Buy Freeze - 200 XP
-              </button>
-            )}
-
+            <StreakFreezeBody
+              freezeCount={freezeCount}
+              xp={xp}
+              lessonsToday={lessonsToday}
+              streak={streak}
+              signedIn={signedIn}
+              onBuy={onBuyFreeze}
+            />
             <button
               className="btn btn-secondary"
               onClick={() => setShowStreakModal(false)}
-              style={{ width: "100%" }}
+              style={{ width: "100%", marginTop: 12 }}
             >
               Close
             </button>
