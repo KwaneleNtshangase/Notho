@@ -4,15 +4,44 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ensurePushSubscription, pushSupported } from "@/lib/push/subscribe";
 import { useNotho } from "@/context/NothoContext";
+import { supabase } from "@/lib/supabaseClient";
 
 const DECIDED_KEY = "notho-notif-decided";
 const OLD_SNOOZE = "notho-notif-prompt-snoozed-until";
+const NID_KEY = "notho-push-nid";
+
+async function reportPush(id: string, lesson: boolean) {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) return;
+  await fetch("/api/push/open", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ id, lesson }),
+  });
+}
 
 export function NotificationOptIn() {
   const pathname = usePathname() || "/";
   const { userData } = useNotho();
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const n = new URLSearchParams(window.location.search).get("n");
+    if (!n) return;
+    try { sessionStorage.setItem(NID_KEY, n); } catch { /* ignore */ }
+    void reportPush(n, false);
+  }, []);
+
+  useEffect(() => {
+    if (!pathname.startsWith("/lesson/")) return;
+    let id = "";
+    try { id = sessionStorage.getItem(NID_KEY) ?? ""; } catch { /* ignore */ }
+    if (!id) return;
+    const t = setTimeout(() => { void reportPush(id, true); }, 20000);
+    return () => clearTimeout(t);
+  }, [pathname]);
 
   const doneALesson = (userData?.totalCompleted ?? 0) > 0 || (userData?.lessonsToday ?? 0) > 0;
   const onQuietPath =
@@ -91,41 +120,8 @@ export function NotificationOptIn() {
       <div style={{ flex: 1, fontSize: 15, fontWeight: 700, color: "var(--color-text-primary)", lineHeight: 1.3 }}>
         Remind you for the next lesson?
       </div>
-      <button
-        type="button"
-        onClick={() => close(true)}
-        style={{
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          fontSize: 14,
-          fontWeight: 700,
-          color: "var(--color-text-secondary)",
-          padding: "8px 10px",
-          flexShrink: 0,
-        }}
-      >
-        No
-      </button>
-      <button
-        type="button"
-        onClick={() => void enable()}
-        disabled={busy}
-        style={{
-          background: "var(--color-primary)",
-          color: "#fff",
-          border: "none",
-          borderRadius: 10,
-          padding: "8px 14px",
-          fontSize: 14,
-          fontWeight: 700,
-          cursor: "pointer",
-          opacity: busy ? 0.6 : 1,
-          flexShrink: 0,
-        }}
-      >
-        {busy ? "…" : "Remind me"}
-      </button>
+      <button type="button" onClick={() => close(true)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "var(--color-text-secondary)", padding: "8px 10px", flexShrink: 0 }}>No</button>
+      <button type="button" onClick={() => void enable()} disabled={busy} style={{ background: "var(--color-primary)", color: "#fff", border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 14, fontWeight: 700, cursor: "pointer", opacity: busy ? 0.6 : 1, flexShrink: 0 }}>{busy ? "…" : "Remind me"}</button>
     </div>
   );
 }
