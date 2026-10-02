@@ -339,6 +339,21 @@ html.dark .nav-link.active {
   }
 }
 
+/* Learn-tab freeze shop. Hidden where the right-hand stats panel shows the same control. */
+.streak-freeze-mobile-card {
+  display: block;
+  margin: 0 16px 12px;
+  padding: 14px 14px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+}
+@media (min-width: 1200px) {
+  .streak-freeze-mobile-card {
+    display: none;
+  }
+}
+
 .stats-section {
   margin-bottom: 32px;
 }

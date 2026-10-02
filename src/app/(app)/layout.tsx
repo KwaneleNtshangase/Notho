@@ -28,6 +28,7 @@ import { AuthGate } from "@/components/AuthGate";
 import { OnboardingGate } from "@/components/OnboardingGate";
 import { NotificationOptIn } from "@/components/NotificationOptIn";
 import { StreakRepairBanner } from "@/components/StreakRepairBanner";
+import { StreakFreezeBody } from "@/components/StreakFreezeControl";
 import { UsageTracker } from "@/components/UsageTracker";
 import { AppGestures } from "@/components/AppGestures";
 import { ShakeToReport } from "@/components/ShakeToReport";
@@ -158,8 +159,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 function MobileTopBarWrapper() {
-  const { userData, hearts, maxHearts, heartsRegenInfo, freezeCount, buyStreakFreeze, useFreeze } = useNotho();
+  const { userData, hearts, maxHearts, heartsRegenInfo, freezeCount, buyStreakFreeze, userId } = useNotho();
+  const pathname = usePathname() || "/";
   if (!userData) return null;
+  const showFreezeCard = pathname === "/learn" || pathname === "/";
   return (
     <div className="mobile-top-bar">
       <NothoTopBar
@@ -170,22 +173,30 @@ function MobileTopBarWrapper() {
         heartsRegenInfo={heartsRegenInfo}
         freezeCount={freezeCount}
         onBuyFreeze={() => buyStreakFreeze()}
-        onUseFreeze={async () => { await useFreeze(); }}
-        freezeUsedToday={userData.lessonsToday > 0 && freezeCount > 0}
         lessonsToday={userData.lessonsToday}
+        signedIn={Boolean(userId)}
       />
+      {showFreezeCard && (
+        <div className="streak-freeze-mobile-card">
+          <StreakFreezeBody
+            compact
+            freezeCount={freezeCount}
+            xp={userData.xp}
+            lessonsToday={userData.lessonsToday}
+            streak={userData.streak}
+            signedIn={Boolean(userId)}
+            onBuy={() => buyStreakFreeze()}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
 function StatsPanelWrapper() {
-  const { userData, hearts, maxHearts, freezeCount, buyStreakFreeze, useFreeze } = useNotho();
+  const { userData, hearts, maxHearts, freezeCount, buyStreakFreeze, userId } = useNotho();
 
   if (!userData) return null;
-
-  const handleBuyFreeze = () => buyStreakFreeze();
-  const handleUseFreeze = () => useFreeze();
-  const freezeUsedToday = userData.lessonsToday > 0 && freezeCount > 0;
 
   return (
     <StatsPanel
@@ -193,9 +204,8 @@ function StatsPanelWrapper() {
       hearts={hearts}
       maxHearts={maxHearts}
       freezeCount={freezeCount}
-      onBuyFreeze={handleBuyFreeze}
-      onUseFreeze={handleUseFreeze}
-      freezeUsedToday={freezeUsedToday}
+      onBuyFreeze={() => buyStreakFreeze()}
+      signedIn={Boolean(userId)}
     />
   );
 }
