@@ -1,17 +1,11 @@
 "use client";
 
-/**
- * /admin — operator hub.
- *
- * One place to land, sign in, and jump to the desk or the bug console
- * without walking through the learner app.
- */
-
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { ThemeProvider } from "./analytics/theme";
 import { DeskSignIn } from "./DeskSignIn";
+import { PushBringBack } from "@/components/PushBringBack";
 
 export default function AdminHomePage() {
   return (
@@ -38,9 +32,7 @@ function Hub() {
 
   useEffect(() => {
     refresh();
-    const { data: sub } = supabase.auth.onAuthStateChange(() => {
-      refresh();
-    });
+    const { data: sub } = supabase.auth.onAuthStateChange(() => { refresh(); });
     return () => sub.subscription.unsubscribe();
   }, [refresh]);
 
@@ -48,9 +40,7 @@ function Hub() {
     <div className="nv-shell" style={{ maxWidth: 820 }}>
       <header className="nv-head">
         <div className="nv-title">
-          <div className="nv-mark">
-            <img src="/notho-icon-192.png" alt="Notho" />
-          </div>
+          <div className="nv-mark"><img src="/notho-icon-192.png" alt="Notho" /></div>
           <div>
             <h1 className="nv-h1">Notho backend</h1>
             <p className="nv-lockup">Learn · Grow · Build wealth</p>
@@ -60,7 +50,6 @@ function Hub() {
       </header>
 
       {state === "checking" && <div className="nv-skel" style={{ height: 180 }} />}
-
       {state === "out" && <DeskSignIn onSignedIn={refresh} returnPath="/admin" />}
 
       {state === "in" && (
@@ -68,34 +57,22 @@ function Hub() {
           <p style={{ margin: 0, fontSize: 13.5, color: "var(--body)" }}>
             Signed in as <strong style={{ color: "var(--ink)" }}>{email}</strong>
           </p>
+          <div className="nv-card">
+            <h2 className="nv-card-title">Which reminder brought them back</h2>
+            <p className="nv-card-sub">Last 28 days. Tap rate by kind, and which line actually got a lesson.</p>
+            <PushBringBack />
+          </div>
           <div className="nv-grid two">
             <Link href="/admin/analytics" className="nv-card" style={{ textDecoration: "none", color: "inherit" }}>
               <h2 className="nv-card-title">Desk</h2>
-              <p className="nv-card-sub" style={{ marginBottom: 0 }}>
-                Live analytics. Pulse, growth, engagement, retention, content, churn, people.
-              </p>
+              <p className="nv-card-sub" style={{ marginBottom: 0 }}>Live analytics. Pulse, growth, engagement, retention, content, churn, people.</p>
             </Link>
             <Link href="/admin/bugs" className="nv-card" style={{ textDecoration: "none", color: "inherit" }}>
               <h2 className="nv-card-title">Bug console</h2>
-              <p className="nv-card-sub" style={{ marginBottom: 0 }}>
-                Crash inbox, lifecycle email tests, and broadcasts.
-              </p>
+              <p className="nv-card-sub" style={{ marginBottom: 0 }}>Crash inbox, lifecycle email tests, and broadcasts.</p>
             </Link>
           </div>
-          <p className="nv-card-sub" style={{ margin: 0 }}>
-            Google, a password, or a magic link all stay on /admin. They do not open Learn.
-          </p>
-          <button
-            type="button"
-            className="nv-btn"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              setState("out");
-            }}
-            style={{ width: "fit-content" }}
-          >
-            Sign out
-          </button>
+          <button type="button" className="nv-btn" onClick={async () => { await supabase.auth.signOut(); setState("out"); }} style={{ width: "fit-content" }}>Sign out</button>
         </div>
       )}
     </div>
