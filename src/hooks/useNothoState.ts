@@ -653,6 +653,8 @@ export function useNothoState() {
       badges: userBadges,
       // Server-backed (daily_lessons_today): consistent across devices.
       lessonsToday: progress.dailyLessons,
+      // Written by sync-streak when today's lesson/review extends the streak.
+      lastActivityDate: progress.lastActivityDate,
       freezeCount: progress.freezeCount,
     } satisfies UserData,
     dailyXP,
