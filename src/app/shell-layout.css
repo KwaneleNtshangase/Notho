@@ -107,17 +107,22 @@ html.dark {
   background: var(--color-bg);
 }
 
-/* Phone and tablet: the streak / XP / hearts bar stays on screen.
-   overflow-x: clip on .main-content makes sticky fail, so the bar is fixed
-   and the content column is padded by the same height. */
+/* Phone and tablet: the streak / XP / hearts bar is the top of the screen.
+   Its background covers the status-bar strip, so a heading cannot scroll
+   into the gap above the icons. overflow-x: clip on .main-content would
+   trap position: fixed, so that clip is lifted here. */
 @media (max-width: 1199px) {
+  .main-content {
+    overflow-x: visible;
+  }
   .mobile-top-bar {
     position: fixed;
-    top: env(safe-area-inset-top, 0px);
+    top: 0;
     left: 0;
     right: 0;
-    z-index: 40;
+    z-index: 100;
     background: var(--color-bg);
+    padding-top: env(safe-area-inset-top, 0px);
   }
   .main-content {
     padding-top: 52px;
