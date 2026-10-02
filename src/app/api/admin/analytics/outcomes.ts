@@ -38,8 +38,32 @@ async function fetchAll<T>(
   return rows;
 }
 
+/** profiles is keyed by user_id, not id. Join dates live on auth.users. */
+async function loadAccounts(admin: SupabaseClient): Promise<{ id: string; username: string | null; createdAt: string | null }[]> {
+  const profiles = await fetchAll<{ user_id: string; username: string | null }>(
+    admin,
+    "profiles",
+    "user_id, username"
+  );
+  const names = new Map(profiles.map((p) => [p.user_id, p.username]));
+  const accounts: { id: string; username: string | null; createdAt: string | null }[] = [];
+  for (let page = 1; page <= 50; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+    if (error) throw new Error(`auth.users: ${error.message}`);
+    for (const user of data.users) {
+      accounts.push({
+        id: user.id,
+        username: names.get(user.id) ?? null,
+        createdAt: user.created_at ?? null,
+      });
+    }
+    if (data.users.length < 200) break;
+  }
+  return accounts;
+}
+
 export async function loadOutcomes(admin: SupabaseClient): Promise<OutcomesPayload> {
-  const [lessons, entries, profiles] = await Promise.all([
+  const [lessons, entries, accounts] = await Promise.all([
     fetchAll<{ user_id: string; course_id: string; lesson_id: string; completed_at: string }>(
       admin,
       "lesson_results",
@@ -53,11 +77,7 @@ export async function loadOutcomes(admin: SupabaseClient): Promise<OutcomesPaylo
       entry_date: string;
       is_transfer: boolean | null;
     }>(admin, "budget_entries", "user_id, type, category, amount, entry_date, is_transfer"),
-    fetchAll<{ id: string; username: string | null; created_at: string | null }>(
-      admin,
-      "profiles",
-      "id, username, created_at"
-    ),
+    loadAccounts(admin),
   ]);
 
   const done: LessonDone[] = lessons
@@ -86,13 +106,13 @@ export async function loadOutcomes(admin: SupabaseClient): Promise<OutcomesPaylo
     byUser.set(row.user_id, list);
   }
 
-  const names = new Map(profiles.map((p) => [p.id, p.username]));
+  const names = new Map(accounts.map((p) => [p.id, p.username]));
   const today = new Date().toISOString();
   const checks = OUTCOME_CHECKS.map((check) => summariseCheck(check, done, byUser, names, today));
 
-  const joins: JoinCall[] = profiles
-    .filter((p) => p.created_at && byUser.has(p.id))
-    .map((p) => sinceJoining(p.id, p.created_at as string, byUser.get(p.id) ?? [], today, p.username));
+  const joins: JoinCall[] = accounts
+    .filter((p) => p.createdAt && byUser.has(p.id))
+    .map((p) => sinceJoining(p.id, p.createdAt as string, byUser.get(p.id) ?? [], today, p.username));
 
   return {
     generatedAt: today,
@@ -102,7 +122,7 @@ export async function loadOutcomes(admin: SupabaseClient): Promise<OutcomesPaylo
       budgetUsers: byUser.size,
       lessonUsers: new Set(done.map((d) => d.userId)).size,
       classifiedNote:
-        "Wants are entertainment, shopping and travel. Needs are food, transport, housing, airtime, healthcare and education. Transfers, debt, savings and custom categories are not wants.",
+        "Wants are entertainment, shopping and travel. Needs are food, transport, housing, airtime, healthcare and education. Transfers, debt, savings and custom categories are not wants. Click a name for the person view.",
     },
   };
 }
