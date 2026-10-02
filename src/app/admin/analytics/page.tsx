@@ -1,25 +1,5 @@
 "use client";
 
-/**
- * /admin/analytics - Notho Desk.
- *
- * Live by design: every panel re-queries Postgres on load, on the refresh
- * cadence below, and whenever the tab regains focus. Nothing here is a stale
- * nightly export.
- *
- * Access: the API route is the real gate (it checks profiles.is_admin against a
- * service-role client, and the RPCs themselves are revoked from authenticated).
- * The check on this page is a courtesy so a non-admin sees one clear message
- * instead of seven broken panels.
- *
- * Sign-in happens here. Do not send operators through the learner AuthGate.
- *
- * The tab order is deliberate. Pulse first because it answers "what should I do
- * today"; the rest are the evidence, arranged in the order a product question
- * usually travels - are people arriving, do they engage, do they come back, is
- * the content right, why do they leave, and finally who exactly are they.
- */
-
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
@@ -46,7 +26,7 @@ const TABS: { value: Tab; label: string; blurb: string }[] = [
   { value: "content", label: "Content", blurb: "Which lessons and questions to rewrite, and which to leave alone." },
   { value: "outcomes", label: "Outcomes", blurb: "Did spending move after a lesson, or since they joined? Only when both windows have real budget rows." },
   { value: "churn", label: "Churn", blurb: "Why the ones who left, left - in their own words." },
-  { value: "people", label: "People", blurb: "Every account, searchable, with a full drill-down." },
+  { value: "people", label: "People", blurb: "Every account. Open a row for join date, lessons, last stop, and the one retention move. Do not export emails into a deck." },
 ];
 
 const WINDOWS = [
@@ -113,7 +93,6 @@ function Dashboard() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [auto, setAuto] = useState(true);
   const [openUser, setOpenUser] = useState<string | null>(null);
-
   const [gate, setGate] = useState<"checking" | "ok" | "denied" | "signed-out">("checking");
   const [gateError, setGateError] = useState<string | null>(null);
   const [who, setWho] = useState<string | null>(null);
@@ -150,9 +129,7 @@ function Dashboard() {
       if (cancelled) return;
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
-        checkGate();
-      }
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") checkGate();
       if (event === "SIGNED_OUT") {
         setWho(null);
         setGate("signed-out");
@@ -213,117 +190,55 @@ function Dashboard() {
             <p className="nv-sub">Live from the database. Updates on its own.</p>
           </div>
         </div>
-
         <div className="nv-actions">
-          <Link href="/admin" className="nv-btn" style={{ textDecoration: "none" }}>
-            Backend
-          </Link>
+          <Link href="/admin" className="nv-btn" style={{ textDecoration: "none" }}>Backend</Link>
           {gate === "ok" && (
             <>
-              <Link href="/admin/bugs" className="nv-btn" style={{ textDecoration: "none" }}>
-                Bugs
-              </Link>
+              <Link href="/admin/bugs" className="nv-btn" style={{ textDecoration: "none" }}>Bugs</Link>
               <label className="nv-live">
-                <input
-                  type="checkbox"
-                  checked={auto}
-                  onChange={(e) => setAuto(e.target.checked)}
-                  style={{ accentColor: "var(--teal)" }}
-                />
+                <input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} style={{ accentColor: "var(--teal)" }} />
                 <span className={`nv-pulse ${auto ? "" : "off"}`} />
                 {auto ? "Live" : "Paused"}
-                {lastRefresh && (
-                  <span>
-                    {" · "}
-                    {lastRefresh.toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}
-                  </span>
-                )}
+                {lastRefresh && <span>{" · "}{lastRefresh.toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}</span>}
               </label>
               <Btn onClick={refresh}>Refresh</Btn>
             </>
           )}
-          <Btn
-            onClick={toggle}
-            title="Dark is the working console. Light is the export theme for screenshots and decks."
-          >
-            {mode === "dark" ? "Export theme" : "Console theme"}
-          </Btn>
-          {gate === "ok" && (
-            <Btn onClick={signOut} title={who ?? "Sign out"}>
-              Sign out
-            </Btn>
-          )}
+          <Btn onClick={toggle} title="Dark is the working console. Light is the export theme for screenshots and decks.">{mode === "dark" ? "Export theme" : "Console theme"}</Btn>
+          {gate === "ok" && <Btn onClick={signOut} title={who ?? "Sign out"}>Sign out</Btn>}
         </div>
       </header>
-
       {gate === "checking" && <Skeleton height={260} />}
-
-      {gate === "signed-out" && (
-        <DeskSignIn onSignedIn={checkGate} returnPath="/admin/analytics" />
-      )}
-
+      {gate === "signed-out" && <DeskSignIn onSignedIn={checkGate} returnPath="/admin/analytics" />}
       {gate === "denied" && (
         <Card>
-          <ErrorNote
-            message={
-              gateError ??
-              "This dashboard is admin-only and your account is not an admin. Ask an existing admin to set is_admin on your profile."
-            }
-          />
-          <div style={{ marginTop: 14, display: "flex", gap: 8 }}>
-            <Btn onClick={signOut}>Use a different account</Btn>
-          </div>
+          <ErrorNote message={gateError ?? "This dashboard is admin-only and your account is not an admin."} />
+          <div style={{ marginTop: 14 }}><Btn onClick={signOut}>Use a different account</Btn></div>
         </Card>
       )}
-
       {gate === "ok" && (
         <>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 12,
-              flexWrap: "wrap",
-              marginBottom: 14,
-            }}
-          >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
             <nav className="nv-nav" role="tablist" aria-label="Dashboard sections">
               {TABS.map((t) => (
-                <button
-                  key={t.value}
-                  role="tab"
-                  aria-selected={tab === t.value}
-                  className="nv-tab"
-                  onClick={() => setTab(t.value)}
-                >
-                  {t.label}
-                </button>
+                <button key={t.value} role="tab" aria-selected={tab === t.value} className="nv-tab" onClick={() => setTab(t.value)}>{t.label}</button>
               ))}
             </nav>
-
             {tab !== "people" && tab !== "outcomes" && (
               <Segmented options={WINDOWS} value={days} onChange={setDays} label="Time window" />
             )}
           </div>
-
           <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 18px" }}>{active.blurb}</p>
-
           <div role="tabpanel" aria-label={active.label}>
             {tab === "pulse" && <PulsePanel days={numDays} nonce={nonce} onJump={jump} />}
             {tab === "growth" && <GrowthPanel days={numDays} nonce={nonce} />}
             {tab === "engagement" && <EngagementPanel days={numDays} nonce={nonce} />}
-            {tab === "retention" && (
-              <RetentionPanel days={numDays} nonce={nonce} onOpenUser={openUserFromAnywhere} />
-            )}
+            {tab === "retention" && <RetentionPanel days={numDays} nonce={nonce} onOpenUser={openUserFromAnywhere} />}
             {tab === "content" && <ContentPanel days={numDays} nonce={nonce} />}
-            {tab === "outcomes" && <OutcomesPanel nonce={nonce} />}
+            {tab === "outcomes" && <OutcomesPanel nonce={nonce} onOpenUser={openUserFromAnywhere} />}
             {tab === "churn" && <ChurnPanel days={numDays} nonce={nonce} />}
-            {tab === "people" && (
-              <PeoplePanel nonce={nonce} openUser={openUser} onOpenUser={setOpenUser} />
-            )}
+            {tab === "people" && <PeoplePanel nonce={nonce} openUser={openUser} onOpenUser={setOpenUser} />}
           </div>
-
           <p className="nv-foot">
             This page shows personal data and is restricted to admins. Under POPIA, only view what
             you need for a legitimate product purpose, and prefer the aggregate tabs over the
