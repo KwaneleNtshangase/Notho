@@ -33,9 +33,10 @@ import { RetentionPanel } from "./panelsRetention";
 import { ContentPanel } from "./panelsContent";
 import { ChurnPanel } from "./panelsChurn";
 import { PeoplePanel } from "./panelsPeople";
+import { OutcomesPanel } from "./panelsOutcomes";
 import { DeskSignIn } from "../DeskSignIn";
 
-type Tab = "pulse" | "growth" | "engagement" | "retention" | "content" | "churn" | "people";
+type Tab = "pulse" | "growth" | "engagement" | "retention" | "content" | "outcomes" | "churn" | "people";
 
 const TABS: { value: Tab; label: string; blurb: string }[] = [
   { value: "pulse", label: "Pulse", blurb: "What to do today. Counts first. Percentages only when the sample can carry them." },
@@ -43,6 +44,7 @@ const TABS: { value: Tab; label: string; blurb: string }[] = [
   { value: "engagement", label: "Engagement", blurb: "Which parts of Notho earn their place, and when people show up." },
   { value: "retention", label: "Retention", blurb: "Do they come back, and who is about to stop?" },
   { value: "content", label: "Content", blurb: "Which lessons and questions to rewrite, and which to leave alone." },
+  { value: "outcomes", label: "Outcomes", blurb: "Did spending move after a lesson, or since they joined? Only when both windows have real budget rows." },
   { value: "churn", label: "Churn", blurb: "Why the ones who left, left - in their own words." },
   { value: "people", label: "People", blurb: "Every account, searchable, with a full drill-down." },
 ];
@@ -195,7 +197,7 @@ function Dashboard() {
     setGate("signed-out");
   }, []);
 
-  const active = useMemo(() => TABS.find((t) => t.value === tab)!,[tab]);
+  const active = useMemo(() => TABS.find((t) => t.value === tab)!, [tab]);
   const numDays = Number(days);
 
   return (
@@ -300,7 +302,7 @@ function Dashboard() {
               ))}
             </nav>
 
-            {tab !== "people" && (
+            {tab !== "people" && tab !== "outcomes" && (
               <Segmented options={WINDOWS} value={days} onChange={setDays} label="Time window" />
             )}
           </div>
@@ -315,6 +317,7 @@ function Dashboard() {
               <RetentionPanel days={numDays} nonce={nonce} onOpenUser={openUserFromAnywhere} />
             )}
             {tab === "content" && <ContentPanel days={numDays} nonce={nonce} />}
+            {tab === "outcomes" && <OutcomesPanel nonce={nonce} />}
             {tab === "churn" && <ChurnPanel days={numDays} nonce={nonce} />}
             {tab === "people" && (
               <PeoplePanel nonce={nonce} openUser={openUser} onOpenUser={setOpenUser} />
