@@ -114,3 +114,45 @@ export function resolveCategoryMeta(
     isSavingsVehicle: vehicle,
   };
 }
+
+export type NeedsWantsSplit = {
+  needs: number;
+  wants: number;
+  /** Needs + wants. Transfers, business, savings vehicles and debt are excluded. */
+  dayToDay: number;
+  needsPct: number;
+  wantsPct: number;
+};
+
+/**
+ * Needs vs wants is a split of day-to-day living, not of every outflow.
+ * Stokvel, savings, debt, business costs and transfers are not needs or wants,
+ * so they must not sit in the denominator — otherwise a savings-heavy month
+ * reads as "Needs 1%".
+ */
+export function needsVsWantsSplit(
+  expenses: { category: string; amount: number; name?: string }[],
+): NeedsWantsSplit {
+  let needs = 0;
+  let wants = 0;
+  for (const expense of expenses) {
+    if (!Number.isFinite(expense.amount) || expense.amount <= 0) continue;
+    const name = expense.name?.trim() || expense.category;
+    const vehicle = isSavingsVehicleCategory(expense.category, name);
+    const group = groupForCategory(expense.category, name, vehicle);
+    if (group === "needs") needs += expense.amount;
+    else if (group === "wants") wants += expense.amount;
+  }
+  const dayToDay = needs + wants;
+  if (dayToDay <= 0) {
+    return { needs: 0, wants: 0, dayToDay: 0, needsPct: 0, wantsPct: 0 };
+  }
+  const needsPct = Math.round((needs / dayToDay) * 100);
+  return {
+    needs,
+    wants,
+    dayToDay,
+    needsPct,
+    wantsPct: 100 - needsPct,
+  };
+}
