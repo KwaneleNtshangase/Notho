@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
-import { NothoStreak, NothoHeart, NothoLevel, NothoXP } from "@/components/icons/NothoIcons";
+import { NothoStreak, NothoHeart, NothoLevel, NothoXP, NothoFreeze } from "@/components/icons/NothoIcons";
 import { formatWithSpaces } from "@/lib/formatters";
 import { generateShareText, type UserData } from "@/app/pageViews.types";
 import { StreakFreezeBody } from "@/components/StreakFreezeControl";
@@ -23,6 +24,7 @@ export function StatsPanel({
   signedIn?: boolean;
 }) {
   // If the user already did a lesson today their streak is already safe
+  const [showFreeze, setShowFreeze] = useState(false);
   const goalProgress = Math.min(
     (userData.dailyXP / userData.dailyGoal) * 100,
     100
@@ -109,21 +111,23 @@ export function StatsPanel({
           </div>
         </div>
 
-        {/* Streak Freeze — same control as the phone chip */}
-        <div className="stat-item" style={{ alignItems: "flex-start" }}>
-          <div className="stat-content" style={{ flex: 1 }}>
-            <div className="stat-label">Streak Freezes</div>
-            <StreakFreezeBody
-              compact
-              freezeCount={freezeCount}
-              xp={userData.xp}
-              lessonsToday={userData.lessonsToday}
-              streak={userData.streak}
-              signedIn={signedIn}
-              onBuy={onBuyFreeze}
-            />
+        <button
+          type="button"
+          className="stat-item"
+          onClick={() => setShowFreeze(true)}
+          aria-label={`${freezeCount} of 2 streak freezes equipped`}
+          style={{ width: "100%", border: "none", cursor: "pointer", textAlign: "left", color: "inherit" }}
+        >
+          <div className="stat-icon" style={{ color: freezeCount > 0 ? "#3B82F6" : "var(--color-text-secondary)" }}>
+            <NothoFreeze size={28} />
           </div>
-        </div>
+          <div className="stat-content">
+            <div className="stat-label">Streak Freezes</div>
+            <div className="stat-value" style={{ color: freezeCount > 0 ? "#3B82F6" : "var(--color-text-secondary)" }}>
+              {freezeCount}/2
+            </div>
+          </div>
+        </button>
 
         <div className="stat-item">
           <div className="stat-icon">
@@ -187,6 +191,51 @@ export function StatsPanel({
       }}>
         Educational content only - not financial advice. Consult a licensed financial advisor before making any financial decisions.
       </div>
+      {showFreeze && (
+        <div
+          onClick={() => setShowFreeze(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.45)",
+            zIndex: 420,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "var(--color-surface)",
+              borderRadius: 20,
+              padding: "28px 24px",
+              width: "100%",
+              maxWidth: 320,
+              textAlign: "center",
+            }}
+          >
+            <StreakFreezeBody
+              freezeCount={freezeCount}
+              xp={userData.xp}
+              lessonsToday={userData.lessonsToday}
+              streak={userData.streak}
+              signedIn={signedIn}
+              onBuy={onBuyFreeze}
+            />
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowFreeze(false)}
+              style={{ width: "100%", marginTop: 12 }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }
+
