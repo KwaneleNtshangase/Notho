@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabaseClient";
 
 async function compressAvatarFile(file: File): Promise<Blob> {
@@ -163,15 +162,12 @@ function paintCircle(node: HTMLElement | null, url: string | null) {
 export function ProfilePhotoGate() {
   const inputRef = useRef<HTMLInputElement>(null);
   const circleRef = useRef<HTMLElement | null>(null);
-  const [box, setBox] = useState<{ top: number; left: number; size: number } | null>(null);
+  const badgeRef = useRef<HTMLButtonElement | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [googleUrl, setGoogleUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [sheet, setSheet] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -190,42 +186,66 @@ export function ProfilePhotoGate() {
   }, []);
 
   useEffect(() => {
-    let raf = 0;
     let lives = true;
-    const tick = () => {
+    const badge = document.createElement("button");
+    badge.type = "button";
+    badge.setAttribute("data-notho-avatar-badge", "1");
+    badge.setAttribute("aria-label", "Add a profile photo");
+    badge.style.cssText = [
+      "position:absolute",
+      "right:-2px",
+      "bottom:-2px",
+      "width:26px",
+      "height:26px",
+      "border-radius:50%",
+      "z-index:2",
+      "background:var(--color-surface)",
+      "border:1px solid var(--color-border)",
+      "display:flex",
+      "align-items:center",
+      "justify-content:center",
+      "color:var(--color-text-primary)",
+      "box-shadow:0 1px 4px rgba(0,0,0,0.2)",
+      "padding:0",
+      "cursor:pointer",
+    ].join(";");
+    badge.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`;
+    badge.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setSheet(true);
+    });
+    badgeRef.current = badge;
+
+    const attach = () => {
       if (!lives) return;
       const node = findInitialsCircle();
       circleRef.current = node;
       paintCircle(node, avatarUrl);
-      if (node) {
-        const r = node.getBoundingClientRect();
-        if (r.width >= 40 && r.height >= 40) {
-          const next = { top: r.top, left: r.left, size: r.width };
-          setBox((prev) => {
-            if (
-              prev &&
-              Math.abs(prev.top - next.top) < 0.4 &&
-              Math.abs(prev.left - next.left) < 0.4 &&
-              Math.abs(prev.size - next.size) < 0.4
-            ) {
-              return prev;
-            }
-            return next;
-          });
-        } else {
-          setBox(null);
-        }
-      } else {
-        setBox(null);
-      }
-      raf = window.requestAnimationFrame(tick);
+      if (!node) return;
+      if (getComputedStyle(node).position === "static") node.style.position = "relative";
+      node.style.overflow = "visible";
+      if (badge.parentElement !== node) node.appendChild(badge);
     };
-    raf = window.requestAnimationFrame(tick);
+
+    attach();
+    const obs = new MutationObserver(() => attach());
+    obs.observe(document.body, { childList: true, subtree: true });
     return () => {
       lives = false;
-      window.cancelAnimationFrame(raf);
+      obs.disconnect();
+      badge.remove();
+      badgeRef.current = null;
     };
   }, [avatarUrl]);
+
+  useEffect(() => {
+    const badge = badgeRef.current;
+    if (!badge) return;
+    badge.disabled = busy;
+    badge.style.cursor = busy ? "wait" : "pointer";
+    badge.setAttribute("aria-label", avatarUrl ? "Change profile photo" : "Add a profile photo");
+  }, [busy, avatarUrl]);
 
   const flash = (msg: string) => {
     setHint(msg);
@@ -282,43 +302,6 @@ export function ProfilePhotoGate() {
     }
   };
 
-  const badge = 26;
-  const overlay =
-    mounted && box && typeof document !== "undefined"
-      ? createPortal(
-          <button
-            type="button"
-            onClick={() => setSheet(true)}
-            disabled={busy}
-            aria-label={avatarUrl ? "Change profile photo" : "Add a profile photo"}
-            style={{
-              position: "fixed",
-              top: box.top + box.size - badge + 4,
-              left: box.left + box.size - badge + 4,
-              width: badge,
-              height: badge,
-              borderRadius: "50%",
-              zIndex: 40,
-              background: "var(--color-surface)",
-              border: "1px solid var(--color-border)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--color-text-primary)",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-              padding: 0,
-              cursor: busy ? "wait" : "pointer",
-            }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-              <circle cx="12" cy="13" r="4" />
-            </svg>
-          </button>,
-          document.body,
-        )
-      : null;
-
   return (
     <>
       <input
@@ -333,7 +316,6 @@ export function ProfilePhotoGate() {
           if (file) void onFile(file);
         }}
       />
-      {overlay}
       {sheet && (
         <div
           onClick={() => setSheet(false)}
