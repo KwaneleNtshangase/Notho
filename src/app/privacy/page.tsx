@@ -184,7 +184,7 @@ export default function PrivacyPage() {
           <p>Your information is used to:</p>
           <ul style={{ paddingLeft: "20px", lineHeight: 1.8 }}>
             <li>Provide, personalise, and sync your learning experience across devices.</li>
-            <li>Calculate and display your XP, streaks, and leaderboard ranking.</li>
+            <li>Calculate and display your XP and streaks.</li>
             <li>Send optional in-app notifications about your progress or new content.</li>
             <li>Improve app features through anonymised, aggregated analytics.</li>
             <li>Comply with legal obligations under South African law.</li>

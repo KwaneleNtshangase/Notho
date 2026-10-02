@@ -88,9 +88,8 @@ const NOTHO_FAQ = [
     section: "Using Notho",
     items: [
       { q: "What is a streak?", a: "A streak counts how many days in a row you've completed at least one lesson. The number goes up by one on the first lesson of a SAST day. A streak freeze covers one missed day and does not add a day. You can equip up to 2, bought with 200 XP. They apply on their own. Miss more days than you have equipped and the streak breaks; the freezes stay in your pocket." },
-      { q: "How does the XP system work?", a: "You earn XP (experience points) by completing lessons, getting correct answers, and claiming daily challenges. XP increases your level and your position on the leaderboard." },
+      { q: "How does the XP system work?", a: "You earn XP (experience points) by completing lessons, getting correct answers, and claiming daily challenges. XP increases your level." },
       { q: "What are Daily Challenges?", a: "Every day, three challenges appear on your home screen. Complete the required action first (e.g. finish a lesson, log an expense), then tap Claim to receive bonus XP. Challenges reset at midnight." },
-      { q: "What are Leaderboards?", a: "Leaderboards rank all Notho users by XP. Your position updates in real time as you and others complete lessons. Use it to track your progress relative to other learners." },
     ],
   },
   {
@@ -318,7 +317,7 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
           {[
             { title: "1. General", body: "Notho (\"we\", \"us\") cares about your personal information. This Privacy Policy explains how we collect, use, and protect it when you use the Notho app and related services. By using the service, you agree to the practices described here." },
             { title: "2. Information We Collect", body: "We collect: (a) your email address and display name when you register; (b) your learning progress including lessons completed, XP earned, and streaks; (c) budget entries you create - these are stored securely and only accessible to you; (d) anonymised, aggregated budget data for the community benchmarking feature; (e) app usage data such as which lessons you viewed and how long you spent." },
-            { title: "3. How We Use Your Information", body: "We use your information to provide and improve the service, personalise your learning experience, display your progress on the leaderboard (which you can disable by not setting a public display name), detect and fix bugs, and send you progress-related reminders (which you can opt out of in your device notification settings)." },
+            { title: "3. How We Use Your Information", body: "We use your information to provide and improve the service, personalise your learning experience, display your progress, detect and fix bugs, and send you progress-related reminders (which you can opt out of in your device notification settings)." },
             { title: "4. Sharing Your Information", body: "We do not sell your personal information. We may share it with trusted service providers (Supabase for database hosting, PostHog for anonymised analytics) who are contractually bound to protect it. Budget data is only used in aggregate form with a minimum of 3 users before any comparison is shown." },
             { title: "5. Your Rights", body: "You have the right to: access the personal data we hold about you; correct inaccurate information; request deletion of your account and associated data; object to certain processing; export your data. To exercise any of these rights, email privacy@notho.co.za." },
             { title: "6. Data Retention", body: "We retain your data for as long as your account is active. When you delete your account, we delete your personal data within 30 days, except where retention is required by law." },
@@ -342,7 +341,7 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
             { title: "1. Acceptance of Terms", body: "By accessing or using Notho (\"Service\"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Service. We may update these terms and will notify you of material changes via the app." },
             { title: "2. Description of Service", body: "Notho is a financial literacy app that provides educational content, budgeting tools, and gamified learning experiences. It is designed for general financial education purposes only and does not constitute financial advice." },
             { title: "3. Not Financial Advice", body: "Nothing in the Notho app, including lessons, calculator results, or investment projections, constitutes personalised financial, investment, tax, or legal advice. Always consult a qualified financial advisor before making financial decisions." },
-            { title: "4. Acceptable Use", body: "You may use the Service only for lawful purposes. You agree not to: share your account credentials; attempt to reverse-engineer or scrape the app; upload harmful or offensive content; impersonate other users or misrepresent your identity on the leaderboard." },
+            { title: "4. Acceptable Use", body: "You may use the Service only for lawful purposes. You agree not to: share your account credentials; attempt to reverse-engineer or scrape the app; upload harmful or offensive content; impersonate other users or misrepresent your identity." },
             { title: "5. Intellectual Property", body: "All content in the app - including lessons, graphics, and the Notho name and logo - is owned by or licensed to Notho. You may not reproduce, distribute, or create derivative works from any app content without our written permission." },
             { title: "6. User-Generated Content", body: "Any display names, profile information, or content you submit to the Service grants us a licence to display it within the app. You retain ownership of your content but are responsible for ensuring it does not violate these terms." },
             { title: "7. Account Termination", body: "We reserve the right to suspend or terminate your account for violations of these terms, fraudulent activity, or any other reason at our discretion. You may delete your account at any time by contacting privacy@notho.co.za." },
@@ -634,7 +633,8 @@ export function ProfileView({
 
       {/* Avatar + name */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "16px 0 16px" }}>
-        <div style={{
+        <div data-notho-avatar-host="1" style={{
+          position: "relative", overflow: "visible",
           width: 72, height: 72, borderRadius: "50%", marginBottom: 12,
           background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -771,7 +771,7 @@ export function ProfileView({
       {needsProfileUpdate && !editingProfile && (
         <div style={{ background: "var(--color-primary-light, #E8F5EE)", border: "1.5px solid var(--color-primary)", borderRadius: 14, padding: "16px", marginBottom: 16 }}>
           <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4, color: "var(--color-primary)" }}>Complete your profile</div>
-          <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 12 }}>Add your name so we can personalise your experience and show you on the leaderboard.</div>
+          <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 12 }}>Add your name so we can personalise your experience.</div>
           <button type="button" className="btn btn-primary" style={{ width: "100%" }} onClick={() => { setEditingProfile(true); if (!editFirstName && profileName) { const parts = profileName.split(" "); setEditFirstName(parts[0] ?? ""); setEditLastName(parts.slice(1).join(" ") ?? ""); } }}>Add details</button>
         </div>
       )}
@@ -837,7 +837,7 @@ export function ProfileView({
             <input type="text" placeholder="Last name" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 13, boxSizing: "border-box" }} />
           </div>
           <div style={{ marginBottom: 8 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)" }}>Username (leaderboard name)</label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)" }}>Username</label>
             <input
               type="text"
               autoCorrect="off"

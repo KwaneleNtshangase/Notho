@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { formatWithSpaces } from "@/lib/formatters";
 import { syncLastWeekXp } from "@/lib/lastWeekXp";
 
@@ -12,7 +11,6 @@ export function ThisWeekCard({
   weeklyXp: number;
   userId: string | null;
 }) {
-  const router = useRouter();
   const [lastWeekXp, setLastWeekXp] = useState(0);
 
   useEffect(() => {
@@ -55,14 +53,6 @@ export function ThisWeekCard({
             {hasLastWeek ? ` · last week ${formatWithSpaces(lastWeekXp)} XP` : ""}
           </div>
         </div>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={() => router.push("/leaderboard")}
-          style={{ fontSize: 13, fontWeight: 700 }}
-        >
-          This week&apos;s learners
-        </button>
       </div>
     </section>
   );

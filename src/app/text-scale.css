@@ -3,6 +3,30 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+/* iOS Safari zooms the page when a focused field is under 16px, and it
+   ignores user-scalable=no. Keep every text control at 16px so a tap on
+   an input, select, or pill never zooms the layout. Double-tap zoom is
+   off via touch-action on the controls themselves. */
+input,
+textarea,
+select,
+[contenteditable="true"],
+button,
+a,
+label,
+.option-button,
+.nav-pill,
+.nav-pill-btn {
+  touch-action: manipulation;
+}
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  font-size: 16px !important;
 }
 
 .bottom-nav,
