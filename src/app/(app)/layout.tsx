@@ -28,7 +28,6 @@ import { AuthGate } from "@/components/AuthGate";
 import { OnboardingGate } from "@/components/OnboardingGate";
 import { NotificationOptIn } from "@/components/NotificationOptIn";
 import { StreakRepairBanner } from "@/components/StreakRepairBanner";
-import { StreakFreezeBody } from "@/components/StreakFreezeControl";
 import { UsageTracker } from "@/components/UsageTracker";
 import { AppGestures } from "@/components/AppGestures";
 import { ShakeToReport } from "@/components/ShakeToReport";
@@ -160,9 +159,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
 function MobileTopBarWrapper() {
   const { userData, hearts, maxHearts, heartsRegenInfo, freezeCount, buyStreakFreeze, userId } = useNotho();
-  const pathname = usePathname() || "/";
   if (!userData) return null;
-  const showFreezeCard = pathname === "/learn" || pathname === "/";
   return (
     <div className="mobile-top-bar">
       <NothoTopBar
@@ -176,19 +173,6 @@ function MobileTopBarWrapper() {
         lessonsToday={userData.lessonsToday}
         signedIn={Boolean(userId)}
       />
-      {showFreezeCard && (
-        <div className="streak-freeze-mobile-card">
-          <StreakFreezeBody
-            compact
-            freezeCount={freezeCount}
-            xp={userData.xp}
-            lessonsToday={userData.lessonsToday}
-            streak={userData.streak}
-            signedIn={Boolean(userId)}
-            onBuy={() => buyStreakFreeze()}
-          />
-        </div>
-      )}
     </div>
   );
 }
