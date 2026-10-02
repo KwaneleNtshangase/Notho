@@ -8,6 +8,7 @@ import { shareFileBlob } from "@/lib/nativeShare";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
+import { needsVsWantsSplit } from "@/lib/budget/report/categories";
 import { trackBehaviorEvent } from "@/lib/behaviorTracking";
 import { resolveDefaultBudget, resolveMonthlyBudget, type BudgetTargetRow } from "@/lib/budget/budgetResolve";
 import { CosmoCoachCard } from "@/components/CosmoCoachCard";
@@ -1139,8 +1140,15 @@ export function BudgetView() {
     total: realEntries.filter((e) => e.type === "expense" && e.category === c.id).reduce((s, e) => s + e.amount, 0),
   })).filter((c) => c.total > 0).sort((a, b) => b.total - a.total);
 
-  const needsTotal = realEntries.filter((e) => e.type === "expense" && ["food","transport","housing","airtime","healthcare","education"].includes(e.category)).reduce((s, e) => s + e.amount, 0);
-  const wantsTotal = realEntries.filter((e) => e.type === "expense" && e.category === "entertainment").reduce((s, e) => s + e.amount, 0);
+  const expenseCatName = (id: string) =>
+    BUDGET_EXPENSE_CATS.find((c) => c.id === id)?.label
+    ?? customCats.find((c) => c.id === id)?.name
+    ?? id;
+  const needsWants = needsVsWantsSplit(
+    realEntries
+      .filter((e) => e.type === "expense")
+      .map((e) => ({ category: e.category, amount: e.amount, name: expenseCatName(e.category) })),
+  );
   const debtTotal = realEntries.filter((e) => e.type === "expense" && e.category === "debt").reduce((s, e) => s + e.amount, 0);
   const explicitSavingsTotal = realEntries.filter((e) => e.type === "expense" && e.category === "savings").reduce((s, e) => s + e.amount, 0);
   const mathSavingsRate = income > 0 ? Math.round(((income - expenses) / income) * 100) : 0;
@@ -1432,11 +1440,12 @@ export function BudgetView() {
                       </div>
                     )}
 
-                    {needsTotal + wantsTotal > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13 }}>
+                    {needsWants.dayToDay > 0 && (
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, gap: 12 }}>
                         <span style={{ color: "var(--color-text-secondary)" }}>Needs vs Wants</span>
-                        <span style={{ fontWeight: 600 }}>
-                          {expenses > 0 ? Math.round((needsTotal / expenses) * 100) : 0}% / {expenses > 0 ? Math.round((wantsTotal / expenses) * 100) : 0}%
+                        <span style={{ fontWeight: 600, textAlign: "right" }}>
+                          Needs {needsWants.needsPct}% · Wants {needsWants.wantsPct}%
+                          <span style={{ display: "block", color: "var(--color-text-secondary)", fontSize: 11, fontWeight: 500 }}>of day-to-day spend</span>
                         </span>
                       </div>
                     )}
