@@ -1,12 +1,11 @@
 /**
  * Web Push sender used by the cron and the hello ping.
- *
- * The old Edge Function posted a raw JSON body to the push endpoint.
- * Browsers require RFC 8291 encryption — those sends were silently dropped.
+ * Native tokens (apns:/fcm:) go through FCM.
  */
 
 import webpush from "web-push";
 import { VAPID_PUBLIC_KEY } from "@/lib/push/subscribe";
+import { sendNativePush } from "@/lib/push/nativeSend";
 
 export type WebPushSub = {
   endpoint: string;
@@ -25,8 +24,11 @@ export async function sendWebPush(
   sub: WebPushSub,
   payload: { title: string; body: string; url: string }
 ): Promise<{ ok: boolean; status?: number }> {
+  if (sub.endpoint.startsWith("apns:") || sub.endpoint.startsWith("fcm:")) {
+    return sendNativePush(sub.endpoint, payload);
+  }
   if (!vapidReady()) return { ok: false, status: 0 };
-  if (!sub.endpoint || sub.endpoint.startsWith("fcm:")) return { ok: false, status: 0 };
+  if (!sub.endpoint) return { ok: false, status: 0 };
   try {
     const res = await webpush.sendNotification(
       {
