@@ -5,11 +5,13 @@
 import { classifyClientError } from "./errorNoise";
 import { isAutomatedUserAgent } from "./errorReportGuards";
 
-type SentryLikeEvent = {
+type Primitive = string | number | boolean | null | undefined;
+
+export type SentryLikeEvent = {
   message?: string;
   exception?: { values?: Array<{ value?: string; type?: string }> };
-  tags?: Record<string, string>;
-  request?: { headers?: Record<string, string> };
+  tags?: Record<string, Primitive>;
+  request?: { headers?: Record<string, string | undefined> };
   fingerprint?: string[];
 };
 
@@ -38,10 +40,10 @@ function inferArea(message: string): string {
   return "window.error";
 }
 
-export function sentryBeforeSend<T extends SentryLikeEvent>(
-  event: T,
+export function sentryBeforeSend(
+  event: SentryLikeEvent,
   hint: SentryLikeHint
-): T | null {
+): SentryLikeEvent | null {
   const headers = event.request?.headers ?? {};
   const ua = headers["User-Agent"] || headers["user-agent"] || "";
   if (isAutomatedUserAgent(ua)) return null;
@@ -50,7 +52,7 @@ export function sentryBeforeSend<T extends SentryLikeEvent>(
   if (!message) return event;
 
   const taggedArea = event.tags?.["notho.area"];
-  const area = taggedArea || inferArea(message);
+  const area = typeof taggedArea === "string" ? taggedArea : inferArea(message);
   const classified = classifyClientError(area, message);
 
   if (classified.classification === "noise") return null;
