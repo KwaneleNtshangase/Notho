@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   ensurePushSubscription,
@@ -9,6 +9,7 @@ import {
   webNotificationPermission,
 } from "@/lib/push/subscribe";
 import { useNotho } from "@/context/NothoContext";
+import { analytics } from "@/lib/analytics";
 
 const DECIDED_KEY = "notho-notif-decided";
 const OLD_SNOOZE = "notho-notif-prompt-snoozed-until";
@@ -18,6 +19,7 @@ export function NotificationOptIn() {
   const { userData } = useNotho();
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
+  const shown = useRef(false);
 
   const doneALesson = (userData?.totalCompleted ?? 0) > 0 || (userData?.lessonsToday ?? 0) > 0;
   const onQuietPath =
@@ -41,7 +43,6 @@ export function NotificationOptIn() {
           return;
         }
         if (permission === "denied") return;
-        // iOS/Android shell: Notification is missing. Capacitor permission is separate.
         if (permission === null) {
           if (!isNativeShell()) return;
           const existing = await ensurePushSubscription(false).catch(() => "unsupported" as const);
@@ -53,7 +54,13 @@ export function NotificationOptIn() {
         } catch {
           /* storage unavailable */
         }
-        if (!cancelled) setShow(true);
+        if (!cancelled) {
+          setShow(true);
+          if (!shown.current) {
+            shown.current = true;
+            analytics.pushPromptShown();
+          }
+        }
       })();
     }, 800);
     return () => {
@@ -62,7 +69,7 @@ export function NotificationOptIn() {
     };
   }, [doneALesson, onQuietPath]);
 
-  const close = (remember: boolean) => {
+  const close = (remember: boolean, optedOut = false) => {
     if (remember) {
       try {
         localStorage.setItem(DECIDED_KEY, "1");
@@ -71,6 +78,7 @@ export function NotificationOptIn() {
         /* storage unavailable */
       }
     }
+    if (optedOut) analytics.pushOptOut();
     setShow(false);
   };
 
@@ -78,6 +86,7 @@ export function NotificationOptIn() {
     setBusy(true);
     try {
       await ensurePushSubscription(true);
+      analytics.pushOptIn();
     } finally {
       setBusy(false);
       close(true);
@@ -113,7 +122,7 @@ export function NotificationOptIn() {
       </div>
       <button
         type="button"
-        onClick={() => close(true)}
+        onClick={() => close(true, true)}
         style={{
           background: "none",
           border: "none",
