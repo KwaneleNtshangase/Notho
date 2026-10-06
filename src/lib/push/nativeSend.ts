@@ -1,7 +1,6 @@
 /**
- * FCM HTTP v1 for iOS (via Firebase APNs) and Android.
- * Needs FIREBASE_PROJECT_ID and FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY on Vercel.
- * Without those, native tokens are stored and skipped.
+ * Android tokens go through FCM. iPhone tokens are Apple device tokens, so they
+ * go straight to APNs when APNS_AUTH_KEY, APNS_KEY_ID and APNS_TEAM_ID are set.
  */
 
 import crypto from "crypto";
@@ -36,13 +35,42 @@ async function accessToken(): Promise<string | null> {
   return json.access_token ?? null;
 }
 
+async function sendApns(token: string, payload: { title: string; body: string; url: string }) {
+  const key = process.env.APNS_AUTH_KEY?.replace(/\\n/g, "\n");
+  const keyId = process.env.APNS_KEY_ID;
+  const teamId = process.env.APNS_TEAM_ID;
+  if (!key || !keyId || !teamId) return { ok: false, status: 0 };
+  const now = Math.floor(Date.now() / 1000);
+  const header = b64url(JSON.stringify({ alg: "ES256", kid: keyId }));
+  const claim = b64url(JSON.stringify({ iss: teamId, iat: now }));
+  const sign = crypto.createSign("SHA256");
+  sign.update(`${header}.${claim}`);
+  const jwt = `${header}.${claim}.${sign.sign({ key, dsaEncoding: "ieee-p1363" }).toString("base64url")}`;
+  const res = await fetch(`https://api.push.apple.com/3/device/${token}`, {
+    method: "POST",
+    headers: {
+      authorization: `bearer ${jwt}`,
+      "apns-topic": "za.co.notho.app",
+      "apns-push-type": "alert",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      aps: { alert: { title: payload.title, body: payload.body }, sound: "default" },
+      url: payload.url,
+    }),
+  });
+  return { ok: res.ok, status: res.status };
+}
+
 export async function sendNativePush(
   endpoint: string,
   payload: { title: string; body: string; url: string }
 ): Promise<{ ok: boolean; status?: number }> {
+  const token = endpoint.replace(/^(apns:|fcm:)/, "");
+  if (endpoint.startsWith("apns:")) return sendApns(token, payload);
+
   const project = process.env.FIREBASE_PROJECT_ID;
   if (!project) return { ok: false, status: 0 };
-  const token = endpoint.replace(/^(apns:|fcm:)/, "");
   const access = await accessToken();
   if (!access) return { ok: false, status: 0 };
   const res = await fetch(`https://fcm.googleapis.com/v1/projects/${project}/messages:send`, {
@@ -53,7 +81,7 @@ export async function sendNativePush(
         token,
         notification: { title: payload.title, body: payload.body },
         data: { url: payload.url },
-        apns: { payload: { aps: { sound: "default" } } },
+        android: { priority: "HIGH" },
       },
     }),
   });
