@@ -31,9 +31,11 @@ import { StreakRepairBanner } from "@/components/StreakRepairBanner";
 import { UsageTracker } from "@/components/UsageTracker";
 import { AppGestures } from "@/components/AppGestures";
 import { ShakeToReport } from "@/components/ShakeToReport";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 function AppNavigation() {
   const { setRoute } = useNotho();
+  const { t } = useLocale();
   const pathname = usePathname() || "/";
   const pathKey = tabKeyFromPath(pathname);
   const [pendingKey, setPendingKey] = useState<AppTabKey | null>(null);
@@ -62,7 +64,7 @@ function AppNavigation() {
       items={[
         {
           key: "learn",
-          label: "Learn",
+          label: t("nav.learn"),
           icon: <NothoLearn size={24} className="text-current" />,
           isActive: activeKey === "learn",
           onClick: () => handleNav("learn"),
@@ -70,7 +72,7 @@ function AppNavigation() {
         },
         {
           key: "calculator",
-          label: "Calculate",
+          label: t("nav.calculate"),
           icon: <NothoCalculate size={24} className="text-current" />,
           isActive: activeKey === "calculator",
           onClick: () => handleNav("calculator"),
@@ -78,7 +80,7 @@ function AppNavigation() {
         },
         {
           key: "budget",
-          label: "Budget",
+          label: t("nav.budget"),
           icon: <NothoBudget size={24} className="text-current" />,
           isActive: activeKey === "budget",
           onClick: () => handleNav("budget"),
@@ -86,7 +88,7 @@ function AppNavigation() {
         },
         {
           key: "quests",
-          label: "Goals",
+          label: t("nav.goals"),
           icon: <NothoGoals size={24} className="text-current" />,
           isActive: activeKey === "quests",
           onClick: () => handleNav("quests"),
@@ -94,7 +96,7 @@ function AppNavigation() {
         },
         {
           key: "profile",
-          label: "Profile",
+          label: t("nav.profile"),
           icon: <NothoProfile size={24} className="text-current" />,
           isActive: activeKey === "profile",
           onClick: () => handleNav("profile"),
@@ -156,7 +158,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 function MobileTopBarWrapper() {
-  const { userData, hearts, maxHearts, heartsRegenInfo, freezeCount, buyStreakFreeze, useFreeze } = useNotho();
+  const { userData, hearts, maxHearts, heartsRegenInfo, freezeCount, buyStreakFreeze, userId } = useNotho();
   if (!userData) return null;
   return (
     <div className="mobile-top-bar">
@@ -168,22 +170,18 @@ function MobileTopBarWrapper() {
         heartsRegenInfo={heartsRegenInfo}
         freezeCount={freezeCount}
         onBuyFreeze={() => buyStreakFreeze()}
-        onUseFreeze={async () => { await useFreeze(); }}
-        freezeUsedToday={userData.lessonsToday > 0 && freezeCount > 0}
         lessonsToday={userData.lessonsToday}
+        lastActivityDate={userData.lastActivityDate}
+        signedIn={Boolean(userId)}
       />
     </div>
   );
 }
 
 function StatsPanelWrapper() {
-  const { userData, hearts, maxHearts, freezeCount, buyStreakFreeze, useFreeze } = useNotho();
+  const { userData, hearts, maxHearts, freezeCount, buyStreakFreeze, userId } = useNotho();
 
   if (!userData) return null;
-
-  const handleBuyFreeze = () => buyStreakFreeze();
-  const handleUseFreeze = () => useFreeze();
-  const freezeUsedToday = userData.lessonsToday > 0 && freezeCount > 0;
 
   return (
     <StatsPanel
@@ -191,9 +189,8 @@ function StatsPanelWrapper() {
       hearts={hearts}
       maxHearts={maxHearts}
       freezeCount={freezeCount}
-      onBuyFreeze={handleBuyFreeze}
-      onUseFreeze={handleUseFreeze}
-      freezeUsedToday={freezeUsedToday}
+      onBuyFreeze={() => buyStreakFreeze()}
+      signedIn={Boolean(userId)}
     />
   );
 }

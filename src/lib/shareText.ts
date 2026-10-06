@@ -1,3 +1,6 @@
+import { translate } from "@/i18n/messages";
+import { parseLocale, type Locale } from "@/i18n/locales";
+
 export type ShareTextType = "lesson" | "badge" | "streak" | "level";
 
 export type ShareTextData = {
@@ -7,13 +10,16 @@ export type ShareTextData = {
   xp?: number;
   level?: number;
   investorProfile?: string;
+  locale?: Locale | string;
 };
 
 export function generateShareText(type: ShareTextType, data: ShareTextData): string {
+  const locale = parseLocale(data.locale);
   if (type === "lesson") {
     const title = data.lessonTitle ?? "a lesson";
     const xpPart = data.xp ? ` (+${data.xp} XP)` : "";
-    return `I just completed "${title}"${xpPart} on Notho 🇿🇦\n\nFree South African money lessons, no jargon, 2 minutes a day. How would you score on this topic?\n👉 notho.co.za`;
+    const lead = translate(locale, "share.lessonDone");
+    return `${lead} "${title}"${xpPart}\n\nFree South African money lessons, no jargon, 2 minutes a day. How would you score on this topic?\n👉 notho.co.za`;
   }
   if (type === "badge") {
     const name = data.badgeName ?? "a";

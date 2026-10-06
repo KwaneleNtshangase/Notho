@@ -1,8 +1,9 @@
 /**
- * Shared web-push subscription helpers.
+ * Shared push subscription helpers. Native shell first, web push otherwise.
  */
 
 import { supabase } from "@/lib/supabaseClient";
+import { ensureNativePush } from "@/lib/push/native";
 
 export const VAPID_PUBLIC_KEY =
   "BFfb98U0f0zXJaGdF9Tx7Sm7WkgGztyMxM701qNeJyMbOKJiKfGiPYov0CLCiihusSIOtbSTs-h_Z5JdOrBXiF0";
@@ -16,19 +17,39 @@ export function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray;
 }
 
+export function isNativeShell(): boolean {
+  if (typeof window === "undefined") return false;
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  return !!cap?.isNativePlatform?.();
+}
+
+/**
+ * iOS WKWebView has no Notification binding. A bare `Notification` identifier
+ * throws ReferenceError ("Can't find variable: Notification") and takes down Learn.
+ * `typeof` is safe; direct property access is not.
+ */
+export function webNotificationPermission(): NotificationPermission | null {
+  if (typeof window === "undefined" || typeof Notification === "undefined") return null;
+  try {
+    return Notification.permission;
+  } catch {
+    return null;
+  }
+}
+
 export function pushSupported(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    "serviceWorker" in navigator &&
-    "PushManager" in window &&
-    "Notification" in window
-  );
+  if (typeof window === "undefined") return false;
+  if (isNativeShell()) return true;
+  return "serviceWorker" in navigator && "PushManager" in window && typeof Notification !== "undefined";
 }
 
 export type EnsureResult = "subscribed" | "unsupported" | "denied" | "dismissed";
 
 export async function ensurePushSubscription(interactive: boolean): Promise<EnsureResult> {
+  const native = await ensureNativePush(interactive);
+  if (native) return native;
   if (!pushSupported()) return "unsupported";
+  if (typeof Notification === "undefined") return "unsupported";
 
   if (Notification.permission === "denied") return "denied";
   if (Notification.permission !== "granted") {
@@ -80,18 +101,15 @@ export async function ensurePushSubscription(interactive: boolean): Promise<Ensu
 }
 
 export async function disablePush(): Promise<void> {
-  if (!pushSupported()) return;
+  if (isNativeShell()) return;
+  if (!pushSupported() || typeof Notification === "undefined") return;
   const reg = await navigator.serviceWorker.getRegistration("/sw.js");
   if (!reg) return;
   const sub = await reg.pushManager.getSubscription();
   if (!sub) return;
   const { data: { user } } = await supabase.auth.getUser();
   if (user) {
-    await supabase
-      .from("push_subscriptions")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("endpoint", sub.endpoint);
+    await supabase.from("push_subscriptions").delete().eq("user_id", user.id).eq("endpoint", sub.endpoint);
   }
   await sub.unsubscribe();
 }

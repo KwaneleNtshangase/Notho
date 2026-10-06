@@ -40,6 +40,32 @@ html::before {
   pointer-events: none;
 }
 
+/* Status-bar and home-indicator strips. On an edge-to-edge WebView these
+   are inside the page; a white UIKit default otherwise shows through. */
+html::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--notho-canvas);
+  z-index: 400;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-bottom, 0px);
+  background: var(--notho-canvas);
+  z-index: 400;
+  pointer-events: none;
+}
+
 #__next,
 .app-container {
   background-color: var(--notho-canvas);
@@ -104,5 +130,36 @@ html.dark {
 }
 
 .mobile-top-bar {
-  background: var(--color-bg);
+  background: var(--notho-canvas);
+}
+
+/* Phone and tablet: the streak / XP / hearts bar is the top of the screen.
+   Its background covers the status-bar strip, so a heading cannot scroll
+   into the gap above the icons. overflow-x: clip on .main-content would
+   trap position: fixed, so that clip is lifted here. */
+@media (max-width: 1199px) {
+  .main-content {
+    overflow-x: visible;
+  }
+  .mobile-top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--notho-canvas);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .main-content {
+    padding-top: 52px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .mobile-top-bar {
+    left: var(--sidebar-width);
+  }
+  .main-content {
+    padding-top: 72px !important;
+  }
 }

@@ -1,5 +1,7 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
+import { useLocale } from "@/i18n/LocaleProvider";
+import { localizeContent } from "@/i18n/contentZu";
+/* eslint-disable @next/next/no-html-link-for-pages */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -186,6 +188,7 @@ export function CourseView({
   nextCourse?: Course | null;
   onGoToNextCourse?: () => void;
 }) {
+  const { locale } = useLocale();
   const colour = COURSE_COLOURS[courseIndex % COURSE_COLOURS.length];
   const [lockedModal, setLockedModal] = useState<{
     lessonTitle: string;
@@ -287,7 +290,7 @@ export function CourseView({
           <div style={{ marginBottom: 12, color: colour.accent }}>
             <CourseIcon name={course.icon} size={56} />
           </div>
-          <h2 className="course-map-title" style={{ color: colour.accent }}>{course.title}</h2>
+          <h2 className="course-map-title" style={{ color: colour.accent }}>{localizeContent(locale, `course.${course.id}`, course.title)}</h2>
           <p className="course-map-description">{course.description}</p>
         </div>
 
@@ -341,7 +344,7 @@ export function CourseView({
         {course.units.map((unit) => (
           <div className="unit" key={unit.id}>
             <div className="unit-header">
-              <div className="unit-title">{unit.title}</div>
+              <div className="unit-title">{localizeContent(locale, `unit.${course.id}.${unit.id}`, unit.title)}</div>
               <div className="unit-description">{unit.description}</div>
             </div>
 
@@ -406,7 +409,7 @@ export function CourseView({
                       {icon}
                     </div>
                     <div className="lesson-label">
-                      {lesson.title}
+                      {localizeContent(locale, `lesson.${course.id}.${lesson.id}`, lesson.title)}
                       {lessonGrade(lesson.id)}
                       {state === "coming_soon" && (
                         <span
@@ -435,7 +438,7 @@ export function CourseView({
             style={{ width: "100%", marginTop: 24 }}
             onClick={onGoToNextCourse}
           >
-            Next Course: {nextCourse.title}
+            Next Course: {localizeContent(locale, `course.${nextCourse.id}`, nextCourse.title)}
           </button>
         ) : (
           <p style={{ textAlign: "center", marginTop: 24, color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 600 }}>

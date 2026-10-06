@@ -78,6 +78,26 @@ export function sastSundayDate(): string {
   return `${y}-${m}-${d}`;
 }
 
+
+const MONTHS_EN = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+/**
+ * Quiet Profile line: "Learning since September 2026".
+ * Uses the auth account created_at instant, rendered in SAST month + year.
+ */
+export function formatLearningSince(iso: string | null | undefined): string | null {
+  if (iso == null || String(iso).trim() === "") return null;
+  const t = Date.parse(String(iso));
+  if (!Number.isFinite(t)) return null;
+  const sast = new Date(t + SAST_OFFSET_MS);
+  const month = MONTHS_EN[sast.getUTCMonth()];
+  const year = sast.getUTCFullYear();
+  if (!month || !Number.isFinite(year)) return null;
+  return `Learning since ${month} ${year}`;
+}
 /**
  * Calculates the number of days between two SAST date strings (YYYY-MM-DD).
  * e.g., if dateA is tomorrow and dateB is today, returns 1.
@@ -162,6 +182,15 @@ export function evaluateStreak(
  *   4. A gap bigger than the freeze stock breaks the streak; this lesson
  *      starts a new streak at 1.
  */
+/** True when today's SAST streak has already been extended (flame should be lit). */
+export function streakExtendedToday(
+  lastActivityDate: string | null | undefined,
+  currentDate: string = sastToday()
+): boolean {
+  const today = normaliseSastDay(currentDate) ?? sastToday();
+  return normaliseSastDay(lastActivityDate) === today;
+}
+
 export function applyLessonToStreak(
   streak: number,
   freezeCount: number,

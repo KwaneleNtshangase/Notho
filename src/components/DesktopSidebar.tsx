@@ -16,9 +16,11 @@ import {
   tabKeyFromPath,
   type AppTabKey,
 } from "@/lib/appTabs";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export function DesktopSidebar() {
   const { setRoute } = useNotho();
+  const { t } = useLocale();
   const pathname = usePathname() || "/";
   const pathKey = tabKeyFromPath(pathname);
   const [pendingKey, setPendingKey] = useState<AppTabKey | null>(null);
@@ -43,11 +45,11 @@ export function DesktopSidebar() {
   };
 
   const items = [
-    { key: "learn" as const, label: "Learn", Icon: NothoLearn },
-    { key: "calculator" as const, label: "Calculate", Icon: NothoCalculate },
-    { key: "budget" as const, label: "Budget", Icon: NothoBudget },
-    { key: "quests" as const, label: "Goals", Icon: NothoGoals },
-    { key: "profile" as const, label: "Profile", Icon: NothoProfile },
+    { key: "learn" as const, label: t("nav.learn"), Icon: NothoLearn },
+    { key: "calculator" as const, label: t("nav.calculate"), Icon: NothoCalculate },
+    { key: "budget" as const, label: t("nav.budget"), Icon: NothoBudget },
+    { key: "quests" as const, label: t("nav.goals"), Icon: NothoGoals },
+    { key: "profile" as const, label: t("nav.profile"), Icon: NothoProfile },
   ];
 
   return (

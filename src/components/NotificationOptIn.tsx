@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ensurePushSubscription, pushSupported } from "@/lib/push/subscribe";
+import {
+  ensurePushSubscription,
+  isNativeShell,
+  pushSupported,
+  webNotificationPermission,
+} from "@/lib/push/subscribe";
 import { useNotho } from "@/context/NothoContext";
 
 const DECIDED_KEY = "notho-notif-decided";
@@ -27,19 +32,34 @@ export function NotificationOptIn() {
       return;
     }
     if (!pushSupported()) return;
-    if (Notification.permission === "granted") {
-      void ensurePushSubscription(false).catch(() => {});
-      return;
-    }
-    if (Notification.permission === "denied") return;
-    if (!doneALesson) return;
-    try {
-      if (localStorage.getItem(DECIDED_KEY) === "1") return;
-    } catch {
-      /* storage unavailable */
-    }
-    const t = setTimeout(() => setShow(true), 800);
-    return () => clearTimeout(t);
+    let cancelled = false;
+    const t = setTimeout(() => {
+      void (async () => {
+        const permission = webNotificationPermission();
+        if (permission === "granted") {
+          await ensurePushSubscription(false).catch(() => {});
+          return;
+        }
+        if (permission === "denied") return;
+        // iOS/Android shell: Notification is missing. Capacitor permission is separate.
+        if (permission === null) {
+          if (!isNativeShell()) return;
+          const existing = await ensurePushSubscription(false).catch(() => "unsupported" as const);
+          if (existing === "subscribed" || existing === "denied" || existing === "unsupported") return;
+        }
+        if (!doneALesson || cancelled) return;
+        try {
+          if (localStorage.getItem(DECIDED_KEY) === "1") return;
+        } catch {
+          /* storage unavailable */
+        }
+        if (!cancelled) setShow(true);
+      })();
+    }, 800);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [doneALesson, onQuietPath]);
 
   const close = (remember: boolean) => {

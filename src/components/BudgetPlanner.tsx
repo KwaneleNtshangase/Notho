@@ -8,6 +8,7 @@ import { shareFileBlob } from "@/lib/nativeShare";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
+import { defaultSpendRole, needsVsWantsSplit, type SpendRole } from "@/lib/budget/report/categories";
 import { trackBehaviorEvent } from "@/lib/behaviorTracking";
 import { resolveDefaultBudget, resolveMonthlyBudget, type BudgetTargetRow } from "@/lib/budget/budgetResolve";
 import { CosmoCoachCard } from "@/components/CosmoCoachCard";
@@ -122,6 +123,12 @@ type CustomBudgetCat = {
   icon_name: string;
   type: "expense" | "income";
 };
+
+const SPEND_ROLES: { id: SpendRole; label: string }[] = [
+  { id: "need", label: "Need" },
+  { id: "want", label: "Want" },
+  { id: "out", label: "Leave out" },
+];
 
 type BudgetCatOption = {
   id: string;
@@ -353,6 +360,10 @@ export function BudgetView() {
   const [budgetDraft, setBudgetDraft] = useState<Record<string, string>>({});
   const [budgetSaving, setBudgetSaving] = useState(false);
   const [customCats, setCustomCats] = useState<CustomBudgetCat[]>([]);
+  const [spendRoles, setSpendRoles] = useState<Record<string, SpendRole>>({});
+  const [showSpendRoles, setShowSpendRoles] = useState(false);
+  const [newCatRole, setNewCatRole] = useState<SpendRole>("out");
+  const [roleTouched, setRoleTouched] = useState(false);
   const [showAddCustomCat, setShowAddCustomCat] = useState(false);
   const [newCatType, setNewCatType] = useState<"expense" | "income">("expense");
   const [newCatName, setNewCatName] = useState("");
@@ -570,6 +581,33 @@ export function BudgetView() {
 
   useEffect(() => { loadCustomCats(); }, [loadCustomCats]);
 
+  const loadSpendRoles = React.useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("budget_category_roles")
+      .select("category_id, role")
+      .eq("user_id", user.id);
+    if (error || !data) return;
+    const next: Record<string, SpendRole> = {};
+    for (const row of data as { category_id: string; role: string }[]) {
+      if (row.role === "need" || row.role === "want" || row.role === "out") next[row.category_id] = row.role;
+    }
+    setSpendRoles(next);
+  }, []);
+
+  useEffect(() => { loadSpendRoles(); }, [loadSpendRoles]);
+
+  const saveSpendRole = async (categoryId: string, role: SpendRole) => {
+    setSpendRoles((prev) => ({ ...prev, [categoryId]: role }));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.from("budget_category_roles").upsert(
+      { user_id: user.id, category_id: categoryId, role, updated_at: new Date().toISOString() },
+      { onConflict: "user_id,category_id" },
+    );
+  };
+
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("budget_benchmarks").select("category, avg_pct, user_count");
@@ -584,6 +622,8 @@ export function BudgetView() {
   const resetCustomCatForm = () => {
     setEditingCatId(null);
     setNewCatName(""); setNewCatColor("#007A85"); setNewCatIcon("MoreHorizontal");
+    setNewCatRole("out");
+    setRoleTouched(false);
   };
 
   // Load an existing custom category into the form for editing.
@@ -593,6 +633,8 @@ export function BudgetView() {
     setNewCatName(c.name);
     setNewCatColor(c.color);
     setNewCatIcon(c.icon_name);
+    setNewCatRole(spendRoles[c.id] ?? defaultSpendRole(c.id, c.name));
+    setRoleTouched(true);
   };
 
   const handleSaveCustomCat = async () => {
@@ -600,15 +642,17 @@ export function BudgetView() {
     setSavingCustomCat(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSavingCustomCat(false); return; }
+    const role = newCatType === "expense" ? newCatRole : "out";
     if (editingCatId) {
-      // Update name / colour / icon of an existing category (id and type kept).
       await supabase.from("custom_budget_categories")
         .update({ name: newCatName.trim(), color: newCatColor, icon_name: newCatIcon })
         .eq("id", editingCatId);
+      if (newCatType === "expense") await saveSpendRole(editingCatId, role);
     } else {
-      await supabase.from("custom_budget_categories").insert({
+      const { data: created } = await supabase.from("custom_budget_categories").insert({
         user_id: user.id, name: newCatName.trim(), color: newCatColor, icon_name: newCatIcon, type: newCatType,
-      });
+      }).select("id").single();
+      if (created?.id && newCatType === "expense") await saveSpendRole(created.id, role);
     }
     setSavingCustomCat(false);
     setShowAddCustomCat(false);
@@ -1139,8 +1183,16 @@ export function BudgetView() {
     total: realEntries.filter((e) => e.type === "expense" && e.category === c.id).reduce((s, e) => s + e.amount, 0),
   })).filter((c) => c.total > 0).sort((a, b) => b.total - a.total);
 
-  const needsTotal = realEntries.filter((e) => e.type === "expense" && ["food","transport","housing","airtime","healthcare","education"].includes(e.category)).reduce((s, e) => s + e.amount, 0);
-  const wantsTotal = realEntries.filter((e) => e.type === "expense" && e.category === "entertainment").reduce((s, e) => s + e.amount, 0);
+  const expenseCatName = (id: string) =>
+    BUDGET_EXPENSE_CATS.find((c) => c.id === id)?.label
+    ?? customCats.find((c) => c.id === id)?.name
+    ?? id;
+  const needsWants = needsVsWantsSplit(
+    realEntries
+      .filter((e) => e.type === "expense")
+      .map((e) => ({ category: e.category, amount: e.amount, name: expenseCatName(e.category) })),
+    spendRoles,
+  );
   const debtTotal = realEntries.filter((e) => e.type === "expense" && e.category === "debt").reduce((s, e) => s + e.amount, 0);
   const explicitSavingsTotal = realEntries.filter((e) => e.type === "expense" && e.category === "savings").reduce((s, e) => s + e.amount, 0);
   const mathSavingsRate = income > 0 ? Math.round(((income - expenses) / income) * 100) : 0;
@@ -1432,13 +1484,17 @@ export function BudgetView() {
                       </div>
                     )}
 
-                    {needsTotal + wantsTotal > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13 }}>
+                    {needsWants.dayToDay > 0 && (
+                      <button type="button" onClick={() => setShowSpendRoles(true)}
+                        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, gap: 12, background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left", width: "100%" }}>
                         <span style={{ color: "var(--color-text-secondary)" }}>Needs vs Wants</span>
-                        <span style={{ fontWeight: 600 }}>
-                          {expenses > 0 ? Math.round((needsTotal / expenses) * 100) : 0}% / {expenses > 0 ? Math.round((wantsTotal / expenses) * 100) : 0}%
+                        <span style={{ fontWeight: 600, textAlign: "right", color: "var(--color-text-primary)" }}>
+                          Needs {needsWants.needsPct}% · Wants {needsWants.wantsPct}%
+                          <span style={{ display: "block", color: "var(--color-text-secondary)", fontSize: 11, fontWeight: 500 }}>
+                            of day-to-day spend{needsWants.excluded > 0 ? ` · ${formatRand(needsWants.excluded)} left out` : ""}
+                          </span>
                         </span>
-                      </div>
+                      </button>
                     )}
 
                     <Link href="/learn?course=saving-investing" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "rgba(0,122,133,0.06)", borderRadius: 10, textDecoration: "none" }}>
@@ -2297,7 +2353,35 @@ export function BudgetView() {
       )}
 
       {/* Add Custom Category Modal */}
-      {showAddCustomCat && (
+      
+      {showSpendRoles && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 80, display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={() => setShowSpendRoles(false)}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(560px, 100%)", maxHeight: "80vh", overflow: "auto", background: "var(--color-surface)", borderRadius: "16px 16px 0 0", padding: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+              <h3 style={{ fontWeight: 900, fontSize: 18, margin: 0 }}>What counts</h3>
+              <button type="button" onClick={() => setShowSpendRoles(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)" }}><X size={18} /></button>
+            </div>
+            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: "0 0 14px" }}>Need and Want make the percentage. Leave out keeps savings, business, transfers and anything else off that line. This does not move the money.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {allExpCats.map((c) => {
+                const role = spendRoles[c.id] ?? defaultSpendRole(c.id, c.label);
+                return (
+                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ flex: 1, minWidth: 0, fontWeight: 650, fontSize: 13 }}>{c.label}</span>
+                    {SPEND_ROLES.map((option) => (
+                      <button key={option.id} type="button" onClick={() => saveSpendRole(c.id, option.id)}
+                        style={{ borderRadius: 8, padding: "6px 8px", fontSize: 12, fontWeight: 700, cursor: "pointer", border: `1px solid ${role === option.id ? "var(--color-primary)" : "var(--color-border)"}`, background: role === option.id ? "rgba(0,122,133,0.12)" : "transparent", color: "var(--color-text-primary)" }}>
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+{showAddCustomCat && (
         <div className="fixed inset-0 z-[500] flex items-end justify-center bg-black/70" role="dialog" aria-modal="true" onClick={() => { setShowAddCustomCat(false); resetCustomCatForm(); }}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", padding: "24px 20px 40px", width: "100%", maxWidth: 500, maxHeight: "92vh", overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, position: "sticky", top: -24, background: "var(--color-surface)", paddingTop: 8, marginTop: -8, zIndex: 2 }}>
@@ -2314,7 +2398,11 @@ export function BudgetView() {
             </div>
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Category Name</div>
-              <input type="text" placeholder="e.g. Gym, Pets, Clothing" value={newCatName} onChange={(e) => setNewCatName(e.target.value)}
+              <input type="text" placeholder="e.g. Gym, Pets, Clothing" value={newCatName} onChange={(e) => {
+                const value = e.target.value;
+                setNewCatName(value);
+                if (!roleTouched && newCatType === "expense") setNewCatRole(defaultSpendRole("custom", value));
+              }}
                 style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 15, fontWeight: 700, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
             </div>
             <div style={{ marginBottom: 18 }}>
@@ -2360,6 +2448,21 @@ export function BudgetView() {
                 ))}
               </div>
             </div>
+
+            {newCatType === "expense" && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 8 }}>Counts as</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                  {SPEND_ROLES.map((role) => (
+                    <button key={role.id} type="button" onClick={() => { setRoleTouched(true); setNewCatRole(role.id); }}
+                      style={{ padding: 10, borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", border: `2px solid ${newCatRole === role.id ? "var(--color-primary)" : "var(--color-border)"}`, background: newCatRole === role.id ? "rgba(0,122,133,0.1)" : "var(--color-bg)", color: "var(--color-text-primary)" }}>
+                      {role.label}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 6 }}>Suggested from the name. Change it if that is not how you use this money.</div>
+              </div>
+            )}
             <div style={{ marginBottom: 20, padding: "12px 14px", borderRadius: 12, border: "1px solid var(--color-border)", background: "var(--color-bg)", display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${newCatColor}20`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {(() => { const Ic = getIconByName(newCatIcon); return <Ic size={18} style={{ color: newCatColor }} />; })()}

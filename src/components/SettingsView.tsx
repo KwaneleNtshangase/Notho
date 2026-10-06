@@ -21,6 +21,8 @@ import {
 import { LegalPage, FeedbackModal } from "@/components/ProfileView";
 import { ExitSurveyModal } from "@/components/churn/ExitSurvey";
 import { isAdminEmail } from "@/lib/admin";
+import { useLocale } from "@/i18n/LocaleProvider";
+import type { Locale } from "@/i18n/locales";
 
 function SettingsAccountSection() {
   const [name, setName] = useState("");
@@ -110,6 +112,7 @@ export function SettingsView({
   onDeleteAccount?: (exitId?: string | null) => Promise<void>;
   onDownloadData?: () => void;
 }) {
+  const { locale, setLocale, t } = useLocale();
   const [showLegalPage, setShowLegalPage] = useState<"faq" | "privacy" | "terms" | null>(null);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -196,7 +199,32 @@ export function SettingsView({
 
   return (
     <main style={{ paddingBottom: 28 }}>
-      <h2 className="text-gray-900 dark:text-gray-100" style={{ fontSize: 32, fontWeight: 800, marginBottom: 24 }}>Settings</h2>
+      <h2 className="text-gray-900 dark:text-gray-100" style={{ fontSize: 32, fontWeight: 800, marginBottom: 24 }}>{t("settings.title")}</h2>
+
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 8 }}>{t("settings.language")}</div>
+      <div style={{
+        background: "var(--color-surface)", border: "1px solid var(--color-border)",
+        borderRadius: 12, padding: "14px 16px", marginBottom: 16,
+      }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+          {(["en", "zu"] as Locale[]).map((code) => (
+            <button
+              key={code}
+              type="button"
+              onClick={() => setLocale(code)}
+              style={{
+                padding: "6px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                border: "1.5px solid",
+                borderColor: locale === code ? "var(--color-primary)" : "var(--color-border)",
+                background: locale === code ? "var(--color-primary)" : "transparent",
+                color: locale === code ? "white" : "var(--color-text-secondary)",
+                transition: "all 0.15s",
+              }}
+            >{code === "en" ? t("settings.languageEn") : t("settings.languageZu")}</button>
+          ))}
+        </div>
+        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.4 }}>{t("settings.languageHint")}</div>
+      </div>
 
       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 8 }}>Learning</div>
 
@@ -249,7 +277,7 @@ export function SettingsView({
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
           <span style={{ color: "var(--color-primary)" }}><Target size={18} /></span>
           <div>
-            <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>Daily XP Goal</div>
+            <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>{t("settings.dailyGoal")}</div>
             <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>How much XP you aim to earn per day</div>
           </div>
         </div>

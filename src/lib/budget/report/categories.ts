@@ -114,3 +114,53 @@ export function resolveCategoryMeta(
     isSavingsVehicle: vehicle,
   };
 }
+
+export type SpendRole = "need" | "want" | "out";
+
+export type NeedsWantsSplit = {
+  needs: number;
+  wants: number;
+  /** Needs + wants. Everything else is excluded from the ratio. */
+  dayToDay: number;
+  needsPct: number;
+  wantsPct: number;
+  excluded: number;
+};
+
+/** Default role before a user override. Savings, debt, business and transfers are out. */
+export function defaultSpendRole(categoryId: string, name?: string): SpendRole {
+  const label = name?.trim() || categoryId;
+  if (isSavingsVehicleCategory(categoryId, label)) return "out";
+  const group = groupForCategory(categoryId, label, false);
+  if (group === "needs") return "need";
+  if (group === "wants") return "want";
+  return "out";
+}
+
+/**
+ * Needs vs wants is a split of what the user counts as day-to-day living.
+ * A saved role wins over the default. Stokvel, savings, debt, business and
+ * transfers stay out unless the user moves them in.
+ */
+export function needsVsWantsSplit(
+  expenses: { category: string; amount: number; name?: string }[],
+  roles: Record<string, SpendRole> = {},
+): NeedsWantsSplit {
+  let needs = 0;
+  let wants = 0;
+  let excluded = 0;
+  for (const expense of expenses) {
+    if (!Number.isFinite(expense.amount) || expense.amount <= 0) continue;
+    const name = expense.name?.trim() || expense.category;
+    const role = roles[expense.category] ?? defaultSpendRole(expense.category, name);
+    if (role === "need") needs += expense.amount;
+    else if (role === "want") wants += expense.amount;
+    else excluded += expense.amount;
+  }
+  const dayToDay = needs + wants;
+  if (dayToDay <= 0) {
+    return { needs: 0, wants: 0, dayToDay: 0, needsPct: 0, wantsPct: 0, excluded };
+  }
+  const needsPct = Math.round((needs / dayToDay) * 100);
+  return { needs, wants, dayToDay, needsPct, wantsPct: 100 - needsPct, excluded };
+}
