@@ -1,5 +1,7 @@
 import { CONTENT_DATA, type LessonStep } from "@/data/content";
 import { CONCEPTS, type Concept, type ReviewCard } from "@/data/concepts";
+import { sastToday } from "@/lib/dates";
+import { hashSeed } from "@/lib/lessonShuffle";
 import { isReviewExcludedCourse } from "@/lib/reviewPool";
 import type { MasteryRecord } from "@/lib/spaced-repetition";
 
@@ -20,7 +22,7 @@ function asReviewCard(step: LessonStep): ReviewCard | null {
   };
 }
 
-function questionKey(card: ReviewCard): string {
+function questionKey(card: Pick<ReviewCard, "question">): string {
   return card.question.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
@@ -79,13 +81,44 @@ export function reviewPromptsFor(concept: Concept): ReviewCard[] {
   return out;
 }
 
+const LAST_STEM_KEY = "notho-review-last-stem";
+
+function readLastStem(conceptId: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const map = JSON.parse(localStorage.getItem(LAST_STEM_KEY) ?? "{}") as Record<string, string>;
+    return map[conceptId] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Remember the stem just shown so the next review of this concept skips it. */
+export function rememberReviewStem(conceptId: string, question: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    const map = JSON.parse(localStorage.getItem(LAST_STEM_KEY) ?? "{}") as Record<string, string>;
+    map[conceptId] = questionKey({ question });
+    localStorage.setItem(LAST_STEM_KEY, JSON.stringify(map));
+  } catch {
+    /* best-effort */
+  }
+}
+
 /**
- * Pick one stem for this review. Same concept keeps one SM-2 schedule;
- * the stem rotates with successful repetitions so retrieval is of the idea,
- * not the screenshot of yesterday's four options.
+ * Pick one stem for this review. The SM-2 schedule stays on the concept.
+ * The wording does not: a miss resets repetitions to 0, so indexing by
+ * repetitions always replayed the same sentence. Day + last stem pick a
+ * different lesson variant whenever one exists.
  */
 export function promptForReview(concept: Concept, record: MasteryRecord): ReviewCard {
   const pool = reviewPromptsFor(concept);
-  const idx = Math.abs(record.repetitions) % pool.length;
+  if (pool.length <= 1) return pool[0]!;
+  const day = sastToday();
+  let idx = Math.abs(hashSeed(`${concept.id}:${day}:${record.concept_id}`)) % pool.length;
+  const last = readLastStem(concept.id);
+  if (last && questionKey(pool[idx]!) === last) {
+    idx = (idx + 1) % pool.length;
+  }
   return pool[idx]!;
 }
