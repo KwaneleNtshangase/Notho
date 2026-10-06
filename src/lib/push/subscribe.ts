@@ -17,11 +17,30 @@ export function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray;
 }
 
-export function pushSupported(): boolean {
+export function isNativeShell(): boolean {
   if (typeof window === "undefined") return false;
   const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
-  if (cap?.isNativePlatform?.()) return true;
-  return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  return !!cap?.isNativePlatform?.();
+}
+
+/**
+ * iOS WKWebView has no Notification binding. A bare `Notification` identifier
+ * throws ReferenceError ("Can't find variable: Notification") and takes down Learn.
+ * `typeof` is safe; direct property access is not.
+ */
+export function webNotificationPermission(): NotificationPermission | null {
+  if (typeof window === "undefined" || typeof Notification === "undefined") return null;
+  try {
+    return Notification.permission;
+  } catch {
+    return null;
+  }
+}
+
+export function pushSupported(): boolean {
+  if (typeof window === "undefined") return false;
+  if (isNativeShell()) return true;
+  return "serviceWorker" in navigator && "PushManager" in window && typeof Notification !== "undefined";
 }
 
 export type EnsureResult = "subscribed" | "unsupported" | "denied" | "dismissed";
@@ -30,6 +49,7 @@ export async function ensurePushSubscription(interactive: boolean): Promise<Ensu
   const native = await ensureNativePush(interactive);
   if (native) return native;
   if (!pushSupported()) return "unsupported";
+  if (typeof Notification === "undefined") return "unsupported";
 
   if (Notification.permission === "denied") return "denied";
   if (Notification.permission !== "granted") {
@@ -81,9 +101,8 @@ export async function ensurePushSubscription(interactive: boolean): Promise<Ensu
 }
 
 export async function disablePush(): Promise<void> {
-  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
-  if (cap?.isNativePlatform?.()) return;
-  if (!pushSupported()) return;
+  if (isNativeShell()) return;
+  if (!pushSupported() || typeof Notification === "undefined") return;
   const reg = await navigator.serviceWorker.getRegistration("/sw.js");
   if (!reg) return;
   const sub = await reg.pushManager.getSubscription();
