@@ -7,7 +7,7 @@
  * Session Replay stays off. Budget statements, Cosmo threads and profile
  * fields are on screen, and POPIA does not want those in a third-party video.
  */
-import type { BrowserOptions } from "@sentry/nextjs";
+import type { BrowserOptions, ErrorEvent, EventHint } from "@sentry/nextjs";
 import { sentryBeforeSend } from "./sentryFilter";
 
 const dsn =
@@ -22,6 +22,10 @@ const release =
 const tracesSampleRate =
   environment === "production" ? 0.05 : environment === "preview" ? 0.2 : 0;
 
+function beforeSend(event: ErrorEvent, hint: EventHint): ErrorEvent | null {
+  return sentryBeforeSend(event, hint) as ErrorEvent | null;
+}
+
 export const sentryBaseOptions: BrowserOptions = {
   dsn,
   environment,
@@ -29,7 +33,7 @@ export const sentryBaseOptions: BrowserOptions = {
   enabled: Boolean(dsn),
   sendDefaultPii: false,
   tracesSampleRate,
-  beforeSend: sentryBeforeSend,
+  beforeSend,
   ignoreErrors: [
     "ResizeObserver loop",
     /^Script error\. ?$/,
