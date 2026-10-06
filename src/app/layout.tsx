@@ -43,8 +43,19 @@ const CANVAS_BOOT_SCRIPT = `(() => {
     var c = dark ? '#000000' : '#ffffff';
     var root = document.documentElement;
     root.style.backgroundColor = c;
+    root.style.colorScheme = dark ? 'dark' : 'light';
     root.style.setProperty('--notho-canvas', c);
+    if (dark) root.classList.add('dark');
     if (document.body) document.body.style.backgroundColor = c;
+    var metas = document.querySelectorAll('meta[name="theme-color"]');
+    if (!metas.length) {
+      var meta = document.createElement('meta');
+      meta.setAttribute('name', 'theme-color');
+      meta.setAttribute('content', c);
+      document.head.appendChild(meta);
+    } else {
+      for (var i = 0; i < metas.length; i++) metas[i].setAttribute('content', c);
+    }
     var loc = '';
     try { loc = localStorage.getItem('notho-locale') || ''; } catch (e) {}
     if (loc === 'zu') root.lang = 'zu-ZA';
@@ -59,8 +70,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
   colorScheme: "light dark",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
   ],
 };
 
