@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { needsVsWantsSplit } from "../categories";
+import { defaultSpendRole, needsVsWantsSplit } from "../categories";
 
 describe("needsVsWantsSplit", () => {
   it("excludes stokvel, business and transfers from the split", () => {
@@ -11,6 +11,7 @@ describe("needsVsWantsSplit", () => {
       { category: "entertainment", name: "Entertainment", amount: 100 },
     ]);
     expect(split.dayToDay).toBe(500);
+    expect(split.excluded).toBe(44505);
     expect(split.needsPct).toBe(80);
     expect(split.wantsPct).toBe(20);
   });
@@ -27,24 +28,24 @@ describe("needsVsWantsSplit", () => {
     expect(split.wantsPct).toBe(37);
   });
 
-  it("treats a custom stokvel name as savings, not a need", () => {
-    const split = needsVsWantsSplit([
-      { category: "custom-1", name: "Stokvel", amount: 22000 },
-      { category: "airtime", amount: 150 },
-    ]);
-    expect(split.needs).toBe(150);
-    expect(split.wants).toBe(0);
-    expect(split.needsPct).toBe(100);
-    expect(split.wantsPct).toBe(0);
+  it("lets a user move a built-in category", () => {
+    const split = needsVsWantsSplit(
+      [
+        { category: "shopping", name: "Shopping", amount: 2000 },
+        { category: "business", name: "Business", amount: 8000 },
+      ],
+      { shopping: "need", business: "want" },
+    );
+    expect(split.needs).toBe(2000);
+    expect(split.wants).toBe(8000);
+    expect(split.excluded).toBe(0);
+    expect(split.needsPct).toBe(20);
+    expect(split.wantsPct).toBe(80);
   });
 
-  it("returns zeros when nothing is day-to-day", () => {
-    expect(needsVsWantsSplit([{ category: "transfers", amount: 2505 }])).toEqual({
-      needs: 0,
-      wants: 0,
-      dayToDay: 0,
-      needsPct: 0,
-      wantsPct: 0,
-    });
+  it("suggests out for a stokvel name and need for rent", () => {
+    expect(defaultSpendRole("custom-1", "Stokvel")).toBe("out");
+    expect(defaultSpendRole("custom-2", "Rent")).toBe("need");
+    expect(defaultSpendRole("custom-3", "Netflix")).toBe("want");
   });
 });
