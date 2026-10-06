@@ -1,12 +1,18 @@
 import { supabase } from "@/lib/supabaseClient";
 
 async function saveToken(endpoint: string) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  await supabase.from("push_subscriptions").upsert(
-    { user_id: user.id, endpoint, p256dh: "native", auth: "native" },
-    { onConflict: "user_id,endpoint" }
-  );
+  const { data: session } = await supabase.auth.getSession();
+  const token = session.session?.access_token;
+  if (!token) return;
+  await fetch("/api/push/register", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ endpoint }),
+  });
+  await fetch("/api/push/hello", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 /** iOS/Android device token. No-op in the browser. */
@@ -22,6 +28,7 @@ export async function ensureNativePush(interactive: boolean): Promise<"subscribe
       if (perm.receive !== "granted") return "denied";
     }
     const platform = cap.getPlatform?.() === "ios" ? "apns" : "fcm";
+    await PushNotifications.removeAllListeners();
     await PushNotifications.addListener("registration", (token) => {
       void saveToken(`${platform}:${token.value}`);
     });
