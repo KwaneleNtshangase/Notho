@@ -33,6 +33,7 @@
     "@capacitor/share": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.2",
     "@capgo/capacitor-native-biometric": "^8.6.2",
+    "@capgo/capacitor-shake": "^8.0.46",
     "@react-pdf/renderer": "^4.5.1",
     "@supabase/supabase-js": "^2.99.2",
     "canvas-confetti": "^1.9.4",
