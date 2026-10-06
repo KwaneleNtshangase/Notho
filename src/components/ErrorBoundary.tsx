@@ -13,7 +13,6 @@ type State = { hasError: boolean; error: Error | null; recovering: boolean };
 
 /** Longest we hold the reload back so the error report can leave the device. */
 const REPORT_GRACE_MS = 1200;
-const SUPPORT_EMAIL = "hello@notho.co.za";
 
 /**
  * Catches any unhandled rendering error in the React tree and shows a
@@ -120,7 +119,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
     } catch {
       /* ignore */
     }
-    // Report to our own pipeline so the team is alerted and can notify the user.
     void this.report("app-crash", error, {
       componentStack: info.componentStack?.slice(0, 1000),
     });
@@ -139,8 +137,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
   render(): React.ReactNode {
     if (!this.state.hasError) return this.props.children;
 
-    // Reloading ourselves — a crash screen that vanishes on its own reads as a
-    // second fault. Say what is happening and keep it quiet.
     if (this.state.recovering) {
       return (
         <main
@@ -217,13 +213,13 @@ export class ErrorBoundary extends React.Component<Props, State> {
             {isChunk ? (
               <>
                 Your progress is safe. Part of the app didn't finish
-                downloading. Reloading fetches the latest version.
+                downloading. Reload fetches the latest version.
               </>
             ) : (
               <>
-                Your progress is safe. We have already been told about this.
-                Reload fetches a fresh copy. Try this screen again only redraws
-                it, so the same fault can come straight back.
+                Your progress is safe. We have already been told. Reload fetches
+                a fresh copy. Try this screen again only redraws it, so the same
+                fault can come straight back.
               </>
             )}
           </p>
@@ -265,19 +261,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
               </button>
             )}
           </div>
-          <p
-            style={{
-              fontSize: 13,
-              color: "var(--color-text-secondary, #6b7280)",
-              lineHeight: 1.5,
-              margin: "16px 0 0",
-            }}
-          >
-            Still stuck? Email{" "}
-            <a href={`mailto:${SUPPORT_EMAIL}`} style={{ color: "var(--color-primary, #007A85)", fontWeight: 700 }}>
-              {SUPPORT_EMAIL}
-            </a>
-          </p>
           {process.env.NODE_ENV !== "production" && this.state.error && (
             <pre
               style={{
