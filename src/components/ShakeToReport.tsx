@@ -36,10 +36,10 @@ async function requestMotionIfNeeded(): Promise<void> {
 }
 
 /**
- * Instagram-style shake → report.
- * Uses the web DeviceMotion API so Android WebView and PWA pick it up
- * without a new store binary. iOS Safari/WKWebView only after the OS
- * grants motion (requested on the first tap, no extra UI).
+ * Shake opens Send Feedback.
+ * Native shells use @capgo/capacitor-shake (Core Motion / SensorManager),
+ * because WKWebView often never delivers DeviceMotionEvent.
+ * The website and PWA keep the web detector.
  */
 export function ShakeToReport() {
   const [open, setOpen] = useState(false);
@@ -66,6 +66,9 @@ export function ShakeToReport() {
   }, [open]);
 
   useEffect(() => {
+    let removeNative: (() => void) | undefined;
+    let cancelled = false;
+
     const fire = () => {
       if (openRef.current || overlayOpen()) return;
       openRef.current = true;
@@ -89,10 +92,30 @@ export function ShakeToReport() {
       void requestMotionIfNeeded();
     };
 
+    (async () => {
+      try {
+        const { Capacitor } = await import("@capacitor/core");
+        if (!Capacitor.isNativePlatform()) return;
+        const { CapacitorShake } = await import("@capgo/capacitor-shake");
+        const handle = await CapacitorShake.addListener("shake", fire);
+        if (cancelled) {
+          await handle.remove();
+          return;
+        }
+        removeNative = () => {
+          void handle.remove();
+        };
+      } catch {
+        /* plugin missing until the next store binary — web path still runs */
+      }
+    })();
+
     window.addEventListener("devicemotion", onMotion);
     window.addEventListener("notho:shake", onCustom);
     window.addEventListener("pointerdown", onFirstGesture, { passive: true });
     return () => {
+      cancelled = true;
+      removeNative?.();
       window.removeEventListener("devicemotion", onMotion);
       window.removeEventListener("notho:shake", onCustom);
       window.removeEventListener("pointerdown", onFirstGesture);
