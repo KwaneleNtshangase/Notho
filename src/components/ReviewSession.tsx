@@ -3,7 +3,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Brain, CheckCircle2, X } from "@/components/icons/NothoIcons";
 import { CONCEPTS } from "@/data/concepts";
-import { promptForReview } from "@/lib/reviewCards";
+import { promptForReview, rememberReviewStem } from "@/lib/reviewCards";
+import { sastToday } from "@/lib/dates";
 import { applyReview, getReviewSessionQueue, saveMastery } from "@/lib/spaced-repetition";
 import type { MasteryRecord } from "@/lib/spaced-repetition";
 import { hashSeed, seededPermutation } from "@/lib/lessonShuffle";
@@ -35,11 +36,15 @@ export function ReviewSession({
   const concept = current ? CONCEPTS.find((c) => c.id === current.concept_id) : null;
   const card = concept && current ? promptForReview(concept, current) : null;
 
+  useEffect(() => {
+    if (concept && card) rememberReviewStem(concept.id, card.question);
+  }, [concept, card]);
+
   const shuffled = React.useMemo(() => {
     if (!concept || !card) return null;
     const perm = seededPermutation(
       card.options.length,
-      hashSeed(`review:${concept.id}:${card.question}`)
+      hashSeed(`review:${concept.id}:${card.question}:${sastToday()}`)
     );
     return {
       options: perm.map((oldIdx) => card.options[oldIdx]),
@@ -100,7 +105,7 @@ export function ReviewSession({
           )}
           {outcome.counted && outcome.alreadyCountedToday && (
             <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-4">
-              Streak kept · today&apos;s review was already counted
+              Streak kept · today's review was already counted
             </p>
           )}
           {!outcome.counted && (
@@ -209,7 +214,7 @@ export function ReviewSession({
         {showExplanation && (
           <div className={`mt-5 rounded-xl p-4 ${selected === correctIdx ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" : "bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"}`}>
             <p className={`text-xs font-bold mb-1 ${selected === correctIdx ? "text-green-700 dark:text-green-400" : "text-orange-700 dark:text-orange-400"}`}>
-              {selected === correctIdx ? "✓ Correct!" : "Not quite"}
+              {selected === correctIdx ? "\u2713 Correct!" : "Not quite"}
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
               {card.explanation}
@@ -228,7 +233,7 @@ export function ReviewSession({
             onClick={handleNext}
             className="w-full rounded-xl bg-purple-600 py-3.5 text-sm font-bold text-white"
           >
-            {currentIdx + 1 >= queue.length ? "See Results" : "Next →"}
+            {currentIdx + 1 >= queue.length ? "See Results" : "Next \u2192"}
           </button>
         </div>
       )}
