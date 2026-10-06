@@ -13,6 +13,7 @@ type State = { hasError: boolean; error: Error | null; recovering: boolean };
 
 /** Longest we hold the reload back so the error report can leave the device. */
 const REPORT_GRACE_MS = 1200;
+const SUPPORT_EMAIL = "hello@notho.co.za";
 
 /**
  * Catches any unhandled rendering error in the React tree and shows a
@@ -215,29 +216,21 @@ export class ErrorBoundary extends React.Component<Props, State> {
           >
             {isChunk ? (
               <>
-                Your progress is safe. Part of the app didn&apos;t finish
-                downloading - usually a brief network drop, or a new version
-                going live while you had Notho open. Reloading fixes it.
+                Your progress is safe. Part of the app didn't finish
+                downloading. Reloading fetches the latest version.
               </>
             ) : (
               <>
-                Your progress is safe. We hit an unexpected hiccup on this screen
-                - our team has been notified automatically and we&apos;re on it.
-                Try again, and if it keeps happening you can also let us know via
-                Send Feedback in your Profile.
+                Your progress is safe. We have already been told about this.
+                Reload fetches a fresh copy. Try this screen again only redraws
+                it, so the same fault can come straight back.
               </>
             )}
           </p>
-          {/*
-            Order matters. "Try again" only re-renders the tree, which is a real
-            fix for a transient render fault and no fix at all for a missing
-            chunk - the same fetch just fails again. So on a chunk error, Reload
-            is the primary action and Try again is not offered.
-          */}
           <div style={{ display: "flex", gap: 10, flexDirection: "column" }}>
             <button
               type="button"
-              onClick={isChunk ? this.handleReload : this.handleRetry}
+              onClick={this.handleReload}
               style={{
                 width: "100%",
                 padding: "14px 20px",
@@ -250,28 +243,41 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 cursor: "pointer",
               }}
             >
-              {isChunk ? "Reload Notho" : "Try again"}
+              Reload Notho
             </button>
             {!isChunk && (
               <button
                 type="button"
-                onClick={this.handleReload}
+                onClick={this.handleRetry}
                 style={{
                   width: "100%",
                   padding: "12px 20px",
                   borderRadius: 12,
-                  border: "1px solid var(--color-border, #e5e7eb)",
+                  border: "none",
                   background: "transparent",
-                  color: "var(--color-text-primary, #111827)",
+                  color: "var(--color-text-secondary, #6b7280)",
                   fontWeight: 600,
                   fontSize: 14,
                   cursor: "pointer",
                 }}
               >
-                Reload the app
+                Try this screen again
               </button>
             )}
           </div>
+          <p
+            style={{
+              fontSize: 13,
+              color: "var(--color-text-secondary, #6b7280)",
+              lineHeight: 1.5,
+              margin: "16px 0 0",
+            }}
+          >
+            Still stuck? Email{" "}
+            <a href={`mailto:${SUPPORT_EMAIL}`} style={{ color: "var(--color-primary, #007A85)", fontWeight: 700 }}>
+              {SUPPORT_EMAIL}
+            </a>
+          </p>
           {process.env.NODE_ENV !== "production" && this.state.error && (
             <pre
               style={{
