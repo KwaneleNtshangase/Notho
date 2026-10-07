@@ -19,6 +19,7 @@ import {
   Zap,
 } from "@/components/icons/NothoIcons";
 import { LegalPage, FeedbackModal } from "@/components/ProfileView";
+import { ShakeReportSetting } from "@/components/ReportProblemSheet";
 import { ExitSurveyModal } from "@/components/churn/ExitSurvey";
 import { isAdminEmail } from "@/lib/admin";
 import { useLocale } from "@/i18n/LocaleProvider";
@@ -326,6 +327,8 @@ export function SettingsView({
           </a>
         </>
       )}
+
+      <ShakeReportSetting />
 
       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Help & Legal</div>
       <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, marginBottom: 8, overflow: "hidden" }}>

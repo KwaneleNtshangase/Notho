@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FeedbackModal } from "@/components/ProfileView";
 import { createShakeState, feedShake } from "@/lib/shakeDetect";
+import { ReportProblemSheet, shakeReportEnabled, takeReportScreenshot } from "@/components/ReportProblemSheet";
 
 type DeviceMotionPermission = {
   requestPermission?: () => Promise<PermissionState>;
@@ -43,6 +43,7 @@ async function requestMotionIfNeeded(): Promise<void> {
  */
 export function ShakeToReport() {
   const [open, setOpen] = useState(false);
+  const [shot, setShot] = useState<string | null>(null);
   const openRef = useRef(false);
   const stateRef = useRef(createShakeState());
   const askedRef = useRef(false);
@@ -70,10 +71,15 @@ export function ShakeToReport() {
     let cancelled = false;
 
     const fire = () => {
+      if (!shakeReportEnabled()) return;
       if (openRef.current || overlayOpen()) return;
       openRef.current = true;
-      setOpen(true);
-      void hapticLight();
+      void (async () => {
+        const image = await takeReportScreenshot();
+        setShot(image);
+        setOpen(true);
+        void hapticLight();
+      })();
     };
 
     const onMotion = (event: DeviceMotionEvent) => {
@@ -122,5 +128,5 @@ export function ShakeToReport() {
     };
   }, []);
 
-  return <FeedbackModal open={open} onClose={() => setOpen(false)} />;
+  return <ReportProblemSheet open={open} onClose={() => setOpen(false)} screenshot={shot} />;
 }
