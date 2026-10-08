@@ -580,22 +580,16 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               data-testid="apple-oauth"
-              aria-label={t("auth.continueApple")}
+              aria-label="Continue with Apple"
               onClick={() => handleOAuthSignIn("apple")}
               style={{
-                width: "100%", minHeight: 44, padding: 0, borderRadius: 10,
-                border: "none", background: "#000", cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+                width: "100%", minHeight: 44, padding: "11px 16px", borderRadius: 10,
+                border: "none", background: "#000", color: "#fff", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontWeight: 600, fontSize: 14,
               }}
             >
-              <img
-                src="https://appleid.cdn-apple.com/appleid/button?height=44&width=375&color=black&border=false&type=continue&border_radius=10&scale=3&locale=en_GB"
-                alt=""
-                width={375}
-                height={44}
-                aria-hidden="true"
-                style={{ width: "100%", height: "auto", maxHeight: 44, objectFit: "contain", display: "block" }}
-              />
+              Continue with Apple
             </button>
             <button
               type="button"

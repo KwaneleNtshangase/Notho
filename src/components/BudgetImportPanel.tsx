@@ -797,7 +797,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
         <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 16, fontSize: 13, color: "var(--color-text-secondary)" }}>
           <Shield size={16} style={{ flexShrink: 0, marginTop: 2 }} />
           <span>
-            Files are processed <strong>in memory only</strong> - raw PDFs, CSVs, and passwords are never stored.
+            We read it in memory and do not keep the file.
             Only categorised transactions and account labels are saved.
           </span>
         </div>

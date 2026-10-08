@@ -1,9 +1,21 @@
-import { normalizeUsername, validateUsername } from "@/app/pageViews.types";
-
 export type OnboardingIdentity = {
   username?: string | null;
   goal?: string | null;
 };
+
+/** Pure copy of the username rules. Kept off pageViews.types so tests do not load Supabase. */
+function normalizeUsername(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+}
+
+function validateUsername(value: string): string | null {
+  if (!value) return "Username is required.";
+  if (value.length < 3) return "Username must be at least 3 characters.";
+  if (value.length > 20) return "Username must be 20 characters or less.";
+  if (!/^[a-z0-9_]+$/.test(value))
+    return "Use only lowercase letters, numbers, and underscores.";
+  return null;
+}
 
 export function hasValidUsername(identity: OnboardingIdentity): boolean {
   const username = normalizeUsername(identity.username ?? "");

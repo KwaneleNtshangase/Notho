@@ -65,14 +65,15 @@ describe("seo copy", () => {
   });
 });
 
-describe("AuthGate bank-statement copy", () => {
+describe("bank-statement copy", () => {
   it("does NOT contain the misleading 'never stored' phrasing", async () => {
     const fs = await import("fs");
     const path = await import("path");
-    const filePath = path.resolve(__dirname, "../../components/AuthGate.tsx");
+    const filePath = path.resolve(__dirname, "../../components/BudgetImportPanel.tsx");
     const content = fs.readFileSync(filePath, "utf-8");
 
     expect(content).not.toContain("processed in memory, never stored");
+    expect(content).not.toContain("never stored");
     expect(content).toContain("We read it in memory and do not keep the file.");
   });
 });
