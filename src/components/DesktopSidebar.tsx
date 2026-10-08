@@ -52,25 +52,30 @@ export function DesktopSidebar() {
     { key: "profile" as const, label: t("nav.profile"), Icon: NothoProfile },
   ];
 
+  const lockupStyle = {
+    width: "100%",
+    height: "auto",
+    objectFit: "contain" as const,
+  };
+
   return (
     <nav className="sidebar" style={{ background: "var(--color-bg)", border: "none" }}>
       <div style={{
-        padding: "16px 14px 12px",
-        borderBottom: "1px solid var(--color-border)",
-        marginBottom: 8,
+        padding: "20px 16px 8px",
+        marginBottom: 4,
       }}>
         {/* Theme CSS swaps these. Do not set display inline — it beats html.dark .logo-light. */}
         <img
           className="logo-light"
           src="/notho-logo.png"
           alt="Notho"
-          style={{ width: "100%", maxWidth: 132, height: "auto", objectFit: "contain" }}
+          style={lockupStyle}
         />
         <img
           className="logo-dark"
           src="/notho-logo-on-dark.png"
           alt=""
-          style={{ width: "100%", maxWidth: 132, height: "auto", objectFit: "contain" }}
+          style={lockupStyle}
         />
       </div>
       <ul className="nav-menu">
