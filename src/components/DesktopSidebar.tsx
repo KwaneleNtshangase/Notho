@@ -59,16 +59,17 @@ export function DesktopSidebar() {
         borderBottom: "1px solid var(--color-border)",
         marginBottom: 8,
       }}>
+        {/* Theme CSS swaps these. Do not set display inline — it beats html.dark .logo-light. */}
         <img
           className="logo-light"
           src="/notho-logo.png"
           alt="Notho"
-          style={{ width: "100%", maxWidth: 132, height: "auto", objectFit: "contain", display: "block" }}
+          style={{ width: "100%", maxWidth: 132, height: "auto", objectFit: "contain" }}
         />
         <img
           className="logo-dark"
           src="/notho-logo-on-dark.png"
-          alt="Notho"
+          alt=""
           style={{ width: "100%", maxWidth: 132, height: "auto", objectFit: "contain" }}
         />
       </div>
