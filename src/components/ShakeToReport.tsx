@@ -8,14 +8,6 @@ type DeviceMotionPermission = {
   requestPermission?: () => Promise<PermissionState>;
 };
 
-function overlayOpen(): boolean {
-  if (typeof document === "undefined") return false;
-  return (
-    document.documentElement.classList.contains("notho-overlay-open") ||
-    document.body.classList.contains("modal-open")
-  );
-}
-
 async function hapticLight(): Promise<void> {
   try {
     const { Haptics, ImpactStyle } = await import("@capacitor/haptics");
@@ -31,15 +23,30 @@ async function requestMotionIfNeeded(): Promise<void> {
   try {
     await MotionEvent.requestPermission();
   } catch {
-    /* denied or unsupported — shake stays off on this session */
+    /* denied or unsupported */
   }
 }
 
+function withTimeout<T>(work: Promise<T>, ms: number): Promise<T | null> {
+  return new Promise((resolve) => {
+    const timer = window.setTimeout(() => resolve(null), ms);
+    work.then(
+      (value) => {
+        window.clearTimeout(timer);
+        resolve(value);
+      },
+      () => {
+        window.clearTimeout(timer);
+        resolve(null);
+      }
+    );
+  });
+}
+
 /**
- * Shake opens Send Feedback.
- * Native shells use @capgo/capacitor-shake (Core Motion / SensorManager),
- * because WKWebView often never delivers DeviceMotionEvent.
- * The website and PWA keep the web detector.
+ * Shake opens Report a Problem.
+ * Native shells use @capgo/capacitor-shake. The sheet opens immediately —
+ * screenshot capture must not block it (html-to-image can hang in WKWebView).
  */
 export function ShakeToReport() {
   const [open, setOpen] = useState(false);
@@ -72,30 +79,20 @@ export function ShakeToReport() {
 
     const fire = () => {
       if (!shakeReportEnabled()) return;
-      if (openRef.current || overlayOpen()) return;
+      if (openRef.current) return;
       openRef.current = true;
-      void (async () => {
-        const image = await takeReportScreenshot();
-        setShot(image);
-        setOpen(true);
-        void hapticLight();
-      })();
+      setShot(null);
+      setOpen(true);
+      void hapticLight();
+      void withTimeout(takeReportScreenshot(), 1800).then((image) => {
+        if (!cancelled) setShot(image);
+      });
     };
 
     const onMotion = (event: DeviceMotionEvent) => {
       const a = event.accelerationIncludingGravity ?? event.acceleration;
       if (!a || a.x == null || a.y == null || a.z == null) return;
-      if (feedShake(stateRef.current, { x: a.x, y: a.y, z: a.z, t: Date.now() })) {
-        fire();
-      }
-    };
-
-    const onCustom = () => fire();
-
-    const onFirstGesture = () => {
-      if (askedRef.current) return;
-      askedRef.current = true;
-      void requestMotionIfNeeded();
+      if (feedShake(stateRef.current, { x: a.x, y: a.y, z: a.z, t: Date.now() })) fire();
     };
 
     (async () => {
@@ -112,21 +109,24 @@ export function ShakeToReport() {
           void handle.remove();
         };
       } catch {
-        /* plugin missing until the next store binary — web path still runs */
+        /* old binary has no plugin */
       }
     })();
 
     window.addEventListener("devicemotion", onMotion);
-    window.addEventListener("notho:shake", onCustom);
-    window.addEventListener("pointerdown", onFirstGesture, { passive: true });
+    window.addEventListener("notho:shake", fire);
+    window.addEventListener("pointerdown", () => {
+      if (askedRef.current) return;
+      askedRef.current = true;
+      void requestMotionIfNeeded();
+    }, { passive: true });
     return () => {
       cancelled = true;
       removeNative?.();
       window.removeEventListener("devicemotion", onMotion);
-      window.removeEventListener("notho:shake", onCustom);
-      window.removeEventListener("pointerdown", onFirstGesture);
+      window.removeEventListener("notho:shake", fire);
     };
   }, []);
 
-  return <ReportProblemSheet open={open} onClose={() => setOpen(false)} screenshot={shot} />;
+  return <ReportProblemSheet open={open} onClose={() => { openRef.current = false; setOpen(false); }} screenshot={shot} />;
 }
