@@ -1,6 +1,7 @@
 import React from "react";
 import { Trophy, Sparkles, Target, Flame, Wallet } from "lucide-react";
-import { BUDGET_LESSON_BRIDGE } from "@/app/pageViews.types";
+import { BUDGET_LESSON_BRIDGE, getLessonTitle } from "@/app/pageViews.types";
+import { ShareResultButton } from "@/components/ShareCard";
 
 export function LessonSummaryView({
   lessonSummary,
@@ -23,6 +24,7 @@ export function LessonSummaryView({
 }) {
   const bridgeKey = `${lessonSummary.courseId}:${lessonSummary.lessonId}`;
   const bridge = BUDGET_LESSON_BRIDGE[bridgeKey];
+  const lessonTitle = getLessonTitle(lessonSummary.courseId, lessonSummary.lessonId) ?? "Lesson";
 
   return (
     <div style={{
@@ -32,7 +34,6 @@ export function LessonSummaryView({
       alignItems: "center", justifyContent: "center",
       padding: "24px 20px",
     }}>
-      {/* Celebration header */}
       <div style={{ textAlign: "center", marginBottom: 32 }}>
         <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }}>
           {lessonSummary.isPerfect
@@ -47,12 +48,10 @@ export function LessonSummaryView({
         </div>
       </div>
 
-      {/* Stats cards */}
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 1fr",
         gap: 12, width: "100%", maxWidth: 360, marginBottom: 32,
       }}>
-        {/* XP Earned */}
         <div style={{
           background: "#FFF8E7", border: "2px solid #EFB343",
           borderRadius: 16, padding: "18px 12px", textAlign: "center",
@@ -61,7 +60,6 @@ export function LessonSummaryView({
           <div style={{ fontSize: 26, fontWeight: 900, color: "#B8870F" }}>+{lessonSummary.xpEarned}</div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#B8870F", textTransform: "uppercase", letterSpacing: 1 }}>XP Earned</div>
         </div>
-        {/* Time */}
         <div style={{
           background: "#E8F5FF", border: "2px solid #3B7DD8",
           borderRadius: 16, padding: "18px 12px", textAlign: "center",
@@ -72,7 +70,6 @@ export function LessonSummaryView({
           </div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#2563EB", textTransform: "uppercase", letterSpacing: 1 }}>Time</div>
         </div>
-        {/* Accuracy */}
         <div style={{
           background: "#F0FDF4", border: "2px solid #0E7C85",
           borderRadius: 16, padding: "18px 12px", textAlign: "center",
@@ -81,7 +78,6 @@ export function LessonSummaryView({
           <div style={{ fontSize: 26, fontWeight: 900, color: "#0E7C85" }}>{lessonSummary.accuracy}%</div>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#0E7C85", textTransform: "uppercase", letterSpacing: 1 }}>Accuracy</div>
         </div>
-        {/* Streak */}
         <div style={{
           background: "#FFF3EE", border: "2px solid #F97316",
           borderRadius: 16, padding: "18px 12px", textAlign: "center",
@@ -119,6 +115,19 @@ export function LessonSummaryView({
           </div>
         </button>
       ) : null}
+
+      <div style={{ width: "100%", maxWidth: 360, marginBottom: 12 }}>
+        <ShareResultButton
+          label="Share"
+          data={{
+            type: "lesson",
+            lessonTitle,
+            xpEarned: lessonSummary.xpEarned,
+            isPerfect: lessonSummary.isPerfect,
+            courseName: lessonSummary.courseId,
+          }}
+        />
+      </div>
 
       <button
         type="button"
