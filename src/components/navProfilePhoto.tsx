@@ -46,17 +46,14 @@ function isGoogleHosted(url: string): boolean {
 
 function paintHost(url: string | null) {
   const node = document.querySelector<HTMLElement>("[data-notho-avatar-host]");
-  if (!node) return;
-  if (url) {
-    node.style.backgroundImage = `url("${url.replace(/"/g, "")}")`;
-    node.style.backgroundSize = "cover";
-    node.style.backgroundPosition = "center";
-    node.style.color = "transparent";
-    node.style.backgroundColor = "transparent";
-  }
+  if (!node || !url) return;
+  node.style.backgroundImage = `url("${url.replace(/"/g, "")}")`;
+  node.style.backgroundSize = "cover";
+  node.style.backgroundPosition = "center";
+  node.style.color = "transparent";
+  node.style.backgroundColor = "transparent";
 }
 
-/** Decode the saved photo before Profile opens, and paint the circle on the first frame. */
 export function warmProfileAvatar() {
   const cached = readCachedAvatarUrl();
   if (cached) preloadAvatar(cached);
@@ -73,8 +70,8 @@ export function warmProfileAvatar() {
         .maybeSingle();
       const fromRow = (row as { avatar_url?: string | null } | null)?.avatar_url?.trim() || "";
       if (fromRow && !fromRow.startsWith("data:")) url = fromRow;
-      else if (!cached) return;
-      else url = cached;
+      else if (cached) url = cached;
+      else return;
     }
     if (!url || url.startsWith("data:")) return;
     if (url !== cached) publishAvatarUrl(url);
@@ -91,15 +88,9 @@ export function ProfilePhotoBoot() {
     window.addEventListener(AVATAR_CHANGED, onChange);
     const obs = new MutationObserver(paint);
     obs.observe(document.body, { childList: true, subtree: true });
-    const orig = localStorage.setItem.bind(localStorage);
-    localStorage.setItem = (key: string, value: string) => {
-      orig(key, value);
-      if (key === "notho-avatar-url") publishAvatarUrl(value);
-    };
     return () => {
       window.removeEventListener(AVATAR_CHANGED, onChange);
       obs.disconnect();
-      localStorage.setItem = orig;
     };
   }, []);
   return null;
