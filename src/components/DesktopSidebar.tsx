@@ -9,7 +9,7 @@ import {
   NothoBudget,
   NothoGoals,
 } from "@/components/icons/NothoIcons";
-import { NavProfileMark } from "@/components/ProfileAvatar";
+import { NavProfileMark } from "@/components/navProfilePhoto";
 import {
   APP_TAB_EVENT,
   tabKeyFromHref,

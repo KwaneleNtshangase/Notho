@@ -30,7 +30,7 @@ import { StreakRepairBanner } from "@/components/StreakRepairBanner";
 import { UsageTracker } from "@/components/UsageTracker";
 import { AppGestures } from "@/components/AppGestures";
 import { ShakeToReport } from "@/components/ShakeToReport";
-import { NavProfileMark, warmProfileAvatar } from "@/components/ProfileAvatar";
+import { NavProfileMark, ProfilePhotoBoot, warmProfileAvatar } from "@/components/navProfilePhoto";
 import { useLocale } from "@/i18n/LocaleProvider";
 
 function AppNavigation() {
@@ -133,6 +133,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <NothoProvider>
       <AuthGate>
         <OnboardingGate>
+          <ProfilePhotoBoot />
           <div className="app-container">
             {!isMockExam && <DesktopSidebar />}
             <div
