@@ -37,6 +37,12 @@ describe("classifyClientError", () => {
     ).toBe("noise");
   });
 
+  it("drops the iOS in-app browser already-closed rejection", () => {
+    expect(
+      classifyClientError("unhandledrejection", "No active window to close!").classification
+    ).toBe("noise");
+  });
+
   it("keeps a real app crash actionable", () => {
     const c = classifyClientError(
       "app-crash",
