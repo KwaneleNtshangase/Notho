@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
 import { NothoStreak, NothoXP, NothoHeart } from "@/components/icons/NothoIcons";
-import { generateShareText } from "@/app/pageViews.types";
+import { shareDuoCard } from "@/components/ShareCard";
 import { streakExtendedToday } from "@/lib/dates";
 import { formatWithSpaces } from "@/lib/formatters";
 import { StreakFreezeBody, StreakFreezeChip } from "@/components/StreakFreezeControl";
@@ -51,7 +51,6 @@ export function NothoTopBar({
           borderBottom: "none",
         }}
       >
-        {/* Streak - tap to open freeze modal */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <button
             type="button"
@@ -73,21 +72,8 @@ export function NothoTopBar({
           <StreakFreezeChip count={freezeCount} onClick={() => setShowStreakModal(true)} />
           <button
             type="button"
-            onClick={async () => {
-              const text = generateShareText("streak", { streakDays: streak });
-              if (typeof navigator !== "undefined" && navigator.share) {
-                try {
-                  await navigator.share({ text });
-                  return;
-                } catch {
-                  /* ignore */
-                }
-              }
-              window.open(
-                `https://wa.me/?text=${encodeURIComponent(text)}`,
-                "_blank",
-                "noopener,noreferrer"
-              );
+            onClick={() => {
+              void shareDuoCard({ type: "streak", streakDays: streak });
             }}
             className="text-orange-400 hover:text-orange-600 p-1"
             title="Share your streak"
@@ -126,7 +112,6 @@ export function NothoTopBar({
         </button>
       </div>
 
-      {/* Hearts modal */}
       {showHeartsModal && (
         <div
           onClick={() => setShowHeartsModal(false)}
@@ -181,7 +166,6 @@ export function NothoTopBar({
         </div>
       )}
 
-      {/* Streak & Freeze modal */}
       {showStreakModal && (
         <div
           onClick={() => setShowStreakModal(false)}
@@ -207,7 +191,6 @@ export function NothoTopBar({
               textAlign: "center",
             }}
           >
-            {/* Streak count */}
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
               <NothoStreak size={52} style={{ color: "#FF9500" }} />
             </div>
