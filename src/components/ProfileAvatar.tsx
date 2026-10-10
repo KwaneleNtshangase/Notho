@@ -33,6 +33,9 @@ function cacheChosen(url: string | null) {
   } catch {
     /* ignore */
   }
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("notho-avatar-changed", { detail: url }));
+  }
 }
 
 function isGoogleHosted(url: string): boolean {
@@ -74,6 +77,11 @@ async function resolveSavedAvatar(userId: string): Promise<string | null> {
     /* ignore */
   }
 
+  const { data: sessionData } = await supabase.auth.getSession();
+  const sessionMeta = sessionData.session?.user.user_metadata as { notho_avatar_url?: string; avatar_url?: string } | undefined;
+  const fromSession = (sessionMeta?.notho_avatar_url || sessionMeta?.avatar_url || "").trim();
+  if (fromSession && !fromSession.startsWith("data:") && !isGoogleHosted(fromSession)) return fromSession;
+
   const { data: row } = await supabase
     .from("profiles")
     .select("avatar_url")
@@ -82,15 +90,7 @@ async function resolveSavedAvatar(userId: string): Promise<string | null> {
   const fromRow = (row as { avatar_url?: string | null } | null)?.avatar_url?.trim() || "";
   if (fromRow && !fromRow.startsWith("data:") && !isGoogleHosted(fromRow)) return fromRow;
 
-  const { data: listed } = await supabase.storage.from("avatars").list(userId, { limit: 10 });
-  const hasFile = (listed ?? []).some((obj) => obj.name === "avatar.jpg" || obj.name.startsWith("avatar."));
-  if (hasFile) return `${publicAvatarUrl(userId)}?v=${Date.now()}`;
-
-  const { data: userData } = await supabase.auth.getUser();
-  const meta = userData.user?.user_metadata as { notho_avatar_url?: string; avatar_url?: string } | undefined;
-  const fromMeta = (meta?.notho_avatar_url || "").trim();
-  if (fromMeta && !fromMeta.startsWith("data:") && !isGoogleHosted(fromMeta)) return fromMeta;
-
+  if (fromSession && !fromSession.startsWith("data:")) return fromSession;
   if (fromRow && !fromRow.startsWith("data:")) return fromRow;
   return null;
 }
@@ -163,11 +163,19 @@ export function ProfilePhotoGate() {
   const inputRef = useRef<HTMLInputElement>(null);
   const circleRef = useRef<HTMLElement | null>(null);
   const badgeRef = useRef<HTMLButtonElement | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() => {
+    try { return localStorage.getItem("notho-avatar-url"); } catch { return null; }
+  });
   const [googleUrl, setGoogleUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [sheet, setSheet] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    const node = findInitialsCircle();
+    circleRef.current = node;
+    paintCircle(node, avatarUrl);
+  }, [avatarUrl]);
 
   useEffect(() => {
     let cancelled = false;
@@ -178,7 +186,10 @@ export function ProfilePhotoGate() {
       const google = typeof meta?.picture === "string" ? meta.picture : "";
       if (google && isGoogleHosted(google)) setGoogleUrl(google);
       const saved = await resolveSavedAvatar(user.id);
-      if (!cancelled && saved) setAvatarUrl(saved);
+      if (!cancelled && saved) {
+        cacheChosen(saved);
+        setAvatarUrl(saved);
+      }
     });
     return () => {
       cancelled = true;
@@ -380,7 +391,7 @@ export function ProfilePhotoGate() {
             whiteSpace: "nowrap",
           }}
         >
-          {busy ? "Saving photo…" : hint}
+          {busy ? "Saving photo\u2026" : hint}
         </div>
       )}
     </>

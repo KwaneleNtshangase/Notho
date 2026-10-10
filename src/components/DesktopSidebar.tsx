@@ -8,8 +8,8 @@ import {
   NothoCalculate,
   NothoBudget,
   NothoGoals,
-  NothoProfile,
 } from "@/components/icons/NothoIcons";
+import { NavProfileMark } from "@/components/navProfilePhoto";
 import {
   APP_TAB_EVENT,
   tabKeyFromHref,
@@ -49,7 +49,7 @@ export function DesktopSidebar() {
     { key: "calculator" as const, label: t("nav.calculate"), Icon: NothoCalculate },
     { key: "budget" as const, label: t("nav.budget"), Icon: NothoBudget },
     { key: "quests" as const, label: t("nav.goals"), Icon: NothoGoals },
-    { key: "profile" as const, label: t("nav.profile"), Icon: NothoProfile },
+    { key: "profile" as const, label: t("nav.profile"), Icon: null },
   ];
 
   const lockupStyle = {
@@ -87,7 +87,7 @@ export function DesktopSidebar() {
               onClick={() => handleNav(key)}
             >
               <span className="nav-icon">
-                <Icon size={20} className="text-current" />
+                {key === "profile" ? <NavProfileMark size={20} /> : Icon ? <Icon size={20} className="text-current" /> : null}
               </span>
               {label}
             </button>

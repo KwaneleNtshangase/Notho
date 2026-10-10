@@ -9,7 +9,6 @@ import {
   NothoCalculate,
   NothoBudget,
   NothoGoals,
-  NothoProfile,
 } from "@/components/icons/NothoIcons";
 import { usePathname } from "next/navigation";
 import { StatsPanel } from "@/components/StatsPanel";
@@ -31,6 +30,7 @@ import { StreakRepairBanner } from "@/components/StreakRepairBanner";
 import { UsageTracker } from "@/components/UsageTracker";
 import { AppGestures } from "@/components/AppGestures";
 import { ShakeToReport } from "@/components/ShakeToReport";
+import { NavProfileMark, ProfilePhotoBoot, warmProfileAvatar } from "@/components/navProfilePhoto";
 import { useLocale } from "@/i18n/LocaleProvider";
 
 function AppNavigation() {
@@ -97,7 +97,7 @@ function AppNavigation() {
         {
           key: "profile",
           label: t("nav.profile"),
-          icon: <NothoProfile size={24} className="text-current" />,
+          icon: <NavProfileMark size={24} />,
           isActive: activeKey === "profile",
           onClick: () => handleNav("profile"),
           order: "order-5",
@@ -125,10 +125,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener(APP_TAB_EVENT, onTab);
   }, []);
 
+  useEffect(() => {
+    warmProfileAvatar();
+  }, []);
+
   return (
     <NothoProvider>
       <AuthGate>
         <OnboardingGate>
+          <ProfilePhotoBoot />
           <div className="app-container">
             {!isMockExam && <DesktopSidebar />}
             <div
