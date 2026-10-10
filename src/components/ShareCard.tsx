@@ -5,6 +5,7 @@ import { Share2 } from "@/components/icons/NothoIcons";
 import { analytics } from "@/lib/analytics";
 import { markSharedToday } from "@/lib/dailyChallengeFlags";
 import { duoCardCopy } from "@/lib/duoShareCard";
+import { isIosNative } from "@/lib/capacitorPlatform";
 import { isShareCancel, shareNativeFile } from "@/lib/nativeShare";
 import { generateShareText } from "@/app/pageViews.types";
 
@@ -178,56 +179,50 @@ async function blobFromCard(data: ShareCardData): Promise<Blob> {
   return (await fetch(dataUrl)).blob();
 }
 
-export async function shareDuoCard(data: ShareCardData): Promise<"shared" | "cancelled" | "downloaded" | "failed"> {
-  try {
-    const blob = await blobFromCard(data);
-    const fileName = data.type === "streak" ? "notho-streak.png" : "notho-lesson.png";
-    const text = shareCaption(data);
-    const native = await shareNativeFile({
-      blob,
-      fileName,
-      title: "Notho",
-      text,
-      dialogTitle: "Share",
-    });
-    if (native === "shared") {
-      analytics.shareTriggered(data.type === "calculator" ? "badge" : data.type, "native");
+async function shareTextFallback(data: ShareCardData, text: string): Promise<"shared" | "cancelled" | "failed"> {
+  const shareType = data.type === "calculator" ? "badge" : data.type;
+  if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+    try {
+      await navigator.share({ title: "Notho", text, url: "https://www.notho.co.za" });
+      analytics.shareTriggered(shareType, "native");
       markSharedToday();
       return "shared";
+    } catch (err) {
+      if (isShareCancel(err)) return "cancelled";
     }
-    if (native === "cancelled") return "cancelled";
-
-    const file = new File([blob], fileName, { type: "image/png" });
-    if (typeof navigator !== "undefined" && navigator.canShare?.({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: "Notho", text });
-        analytics.shareTriggered(data.type === "calculator" ? "badge" : data.type, "native");
-        markSharedToday();
-        return "shared";
-      } catch (err) {
-        if (isShareCancel(err)) return "cancelled";
-      }
-    }
-    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-      try {
-        await navigator.share({ title: "Notho", text, url: "https://www.notho.co.za" });
-        analytics.shareTriggered(data.type === "calculator" ? "badge" : data.type, "native");
-        markSharedToday();
-        return "shared";
-      } catch (err) {
-        if (isShareCancel(err)) return "cancelled";
-      }
-    }
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+  }
+  if (typeof window !== "undefined") {
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+    analytics.shareTriggered(shareType, "whatsapp");
     markSharedToday();
-    return "downloaded";
+    return "shared";
+  }
+  return "failed";
+}
+
+export async function shareDuoCard(data: ShareCardData): Promise<"shared" | "cancelled" | "downloaded" | "failed"> {
+  const text = shareCaption(data);
+  const shareType = data.type === "calculator" ? "badge" : data.type;
+  try {
+    // Image sheet is iPhone-only. Android, Huawei, web, and desktop keep text share.
+    if (await isIosNative()) {
+      const blob = await blobFromCard(data);
+      const fileName = data.type === "streak" ? "notho-streak.png" : "notho-lesson.png";
+      const native = await shareNativeFile({
+        blob,
+        fileName,
+        title: "Notho",
+        text,
+        dialogTitle: "Share",
+      });
+      if (native === "shared") {
+        analytics.shareTriggered(shareType, "native");
+        markSharedToday();
+        return "shared";
+      }
+      if (native === "cancelled") return "cancelled";
+    }
+    return shareTextFallback(data, text);
   } catch {
     return "failed";
   }
@@ -282,7 +277,7 @@ export function ShareResultButton({ data, label = "Share" }: { data: ShareCardDa
         }}
       >
         <Share2 size={16} />
-        {sharing ? "Preparing\u2026" : status === "done" ? "Shared" : status === "error" ? "Try again" : label}
+        {sharing ? "Preparing…" : status === "done" ? "Shared" : status === "error" ? "Try again" : label}
       </button>
     </div>
   );
