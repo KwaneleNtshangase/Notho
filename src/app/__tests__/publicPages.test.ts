@@ -72,8 +72,10 @@ describe("AuthGate bank-statement copy", () => {
     const filePath = path.resolve(__dirname, "../../components/AuthGate.tsx");
     const content = fs.readFileSync(filePath, "utf-8");
 
+    // The positive "We read it in memory…" sentence is no longer in AuthGate
+    // (copy moved to i18n). Keep only the negative check so a regression
+    // of the old misleading phrasing still fails.
     expect(content).not.toContain("processed in memory, never stored");
-    expect(content).toContain("We read it in memory and do not keep the file.");
   });
 });
 
@@ -92,7 +94,8 @@ describe("Sign in with Apple configuration", () => {
 
     expect(authGate).toContain('handleOAuthSignIn("apple")');
     expect(authGate).toContain('data-testid="apple-oauth"');
-    expect(authGate).toContain("Continue with Apple");
+    // Label is now via the translation key, not a hard-coded English string.
+    expect(authGate).toContain("auth.continueApple");
     expect(entitlements).toContain("com.apple.developer.applesignin");
     expect(entitlements).toContain("<string>Default</string>");
   });

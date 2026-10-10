@@ -49,6 +49,12 @@ jobs:
       # reports green.
       - name: Unit tests
         run: npm run test:unit
+        env:
+          # Same public defaults the build step uses. pageViews.types.ts
+          # imports the Supabase client at module load; without these the
+          # client throws "supabaseUrl is required" during the test run.
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
 
       # Surfaces high-severity advisories (like the Next.js CVEs in audit H1)
       # without letting them fail the build. A new advisory can land against a
