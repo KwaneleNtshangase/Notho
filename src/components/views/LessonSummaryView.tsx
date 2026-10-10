@@ -1,7 +1,10 @@
-import React from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import { Trophy, Sparkles, Target, Flame, Wallet } from "lucide-react";
 import { BUDGET_LESSON_BRIDGE, getLessonTitle } from "@/app/pageViews.types";
 import { ShareResultButton } from "@/components/ShareCard";
+import { isIosNative } from "@/lib/capacitorPlatform";
 
 export function LessonSummaryView({
   lessonSummary,
@@ -22,9 +25,18 @@ export function LessonSummaryView({
   onClose: () => void;
   onBudgetBridge: () => void;
 }) {
+  const [iosShare, setIosShare] = useState(false);
   const bridgeKey = `${lessonSummary.courseId}:${lessonSummary.lessonId}`;
   const bridge = BUDGET_LESSON_BRIDGE[bridgeKey];
   const lessonTitle = getLessonTitle(lessonSummary.courseId, lessonSummary.lessonId) ?? "Lesson";
+
+  useEffect(() => {
+    let cancelled = false;
+    isIosNative().then((ios) => {
+      if (!cancelled) setIosShare(ios);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <div style={{
@@ -116,18 +128,20 @@ export function LessonSummaryView({
         </button>
       ) : null}
 
-      <div style={{ width: "100%", maxWidth: 360, marginBottom: 12 }}>
-        <ShareResultButton
-          label="Share"
-          data={{
-            type: "lesson",
-            lessonTitle,
-            xpEarned: lessonSummary.xpEarned,
-            isPerfect: lessonSummary.isPerfect,
-            courseName: lessonSummary.courseId,
-          }}
-        />
-      </div>
+      {iosShare ? (
+        <div style={{ width: "100%", maxWidth: 360, marginBottom: 12 }}>
+          <ShareResultButton
+            label="Share"
+            data={{
+              type: "lesson",
+              lessonTitle,
+              xpEarned: lessonSummary.xpEarned,
+              isPerfect: lessonSummary.isPerfect,
+              courseName: lessonSummary.courseId,
+            }}
+          />
+        </div>
+      ) : null}
 
       <button
         type="button"
