@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Sentry auth from `npx @sentry/wizard` — never commit
+.sentryclirc
+
 # Local Codex worktrees (separate checkouts, never part of the app)
 /.worktrees/
 
