@@ -1,1 +1,1 @@
-$(cat /tmp/to_upload.tsx)
+FILE_CONTENT_WILL_BE_REPLACED
