@@ -1,19 +1,34 @@
 {
   "crons": [
-    { "path": "/api/cron/lifecycle", "schedule": "30 7 * * *" },
-    { "path": "/api/cron/push-triggers", "schedule": "0 11 * * *" },
-    { "path": "/api/cron/push-triggers", "schedule": "0 16 * * *" }
+    {
+      "path": "/api/cron/lifecycle",
+      "schedule": "30 7 * * *"
+    },
+    {
+      "path": "/api/cron/push-triggers",
+      "schedule": "15 * * * *"
+    }
   ],
   "redirects": [
     {
       "source": "/:path(.*)",
-      "has": [{ "type": "host", "value": "fundiapp.co.za" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "fundiapp.co.za"
+        }
+      ],
       "destination": "https://www.notho.co.za/:path",
       "permanent": true
     },
     {
       "source": "/:path(.*)",
-      "has": [{ "type": "host", "value": "www.fundiapp.co.za" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.fundiapp.co.za"
+        }
+      ],
       "destination": "https://www.notho.co.za/:path",
       "permanent": true
     }

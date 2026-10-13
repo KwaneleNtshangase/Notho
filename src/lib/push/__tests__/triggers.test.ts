@@ -56,6 +56,14 @@ describe("routinePush", () => {
   it("stops after a quiet week", () => {
     expect(routinePush("2026-07-01", "2026-07-12", next)).toBeNull();
   });
+
+  it("only fires the next-day routine inside the 22–24h window when a timestamp is known", () => {
+    expect(routinePush("2026-07-11", "2026-07-12", next, 23)).not.toBeNull();
+    expect(routinePush("2026-07-11", "2026-07-12", next, 20)).toBeNull();
+    expect(routinePush("2026-07-11", "2026-07-12", next, 25)).toBeNull();
+    // Without a timestamp the window is not enforced (legacy / no results yet).
+    expect(routinePush("2026-07-11", "2026-07-12", next, null)).not.toBeNull();
+  });
 });
 
 describe("coachAlertPush", () => {

@@ -3,6 +3,10 @@
  *
  * Cron feeds each subscribed user through these and sends at most ONE push
  * per user per day, in priority: save (streak at risk) > routine > coach alert.
+ *
+ * Routine reminders fire only in the 22–24 hour window after the last lesson
+ * when the user has not learned today, so they land near the same time of day
+ * rather than at fixed clock times.
  */
 
 export type PushMessage = {
@@ -72,7 +76,8 @@ export function streakAtRiskPush(
 export function routinePush(
   lastActivityDate: string | null,
   sastToday: string,
-  next?: { lessonTitle: string; courseTitle: string; url: string } | null
+  next?: { lessonTitle: string; courseTitle: string; url: string } | null,
+  hoursSinceLastLesson?: number | null
 ): PushMessage | null {
   if (lastActivityDate === sastToday) return null;
   const yesterday = yesterdayOf(sastToday);
@@ -81,6 +86,12 @@ export function routinePush(
       ? Math.max(1, Math.floor((Date.parse(`${sastToday}T12:00:00Z`) - Date.parse(`${lastActivityDate}T12:00:00Z`)) / 86400000))
       : 0;
   if (daysOff > 7) return null;
+
+  // For the next-day routine (daysOff 0 or 1), only fire inside the 22–24h window
+  // when we know the last lesson timestamp. Win-back (daysOff >= 2) stays time-agnostic.
+  if (daysOff < 2 && hoursSinceLastLesson != null) {
+    if (hoursSinceLastLesson < 22 || hoursSinceLastLesson > 24) return null;
+  }
 
   const lesson = next?.lessonTitle ?? "the next lesson";
   const course = next?.courseTitle ?? "Learn";

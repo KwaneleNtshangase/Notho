@@ -85,6 +85,20 @@ export async function GET(req: NextRequest) {
     (progressRows ?? []).map((r: Record<string, unknown>) => [r.user_id as string, r])
   );
 
+  // Latest lesson completion so routine pushes can land ~23h later.
+  const lastCompleted = new Map<string, string>();
+  const { data: resultRows } = await admin
+    .from("lesson_results")
+    .select("user_id, completed_at")
+    .in("user_id", userIds)
+    .order("completed_at", { ascending: false });
+  for (const r of resultRows ?? []) {
+    const uid = (r as { user_id: string }).user_id;
+    if (!lastCompleted.has(uid)) {
+      lastCompleted.set(uid, (r as { completed_at: string }).completed_at);
+    }
+  }
+
   const summary = { evaluated: userIds.length, sent: 0, skippedDuplicate: 0, failed: 0 };
 
   for (const userId of userIds) {
@@ -104,10 +118,17 @@ export async function GET(req: NextRequest) {
         today,
         next
       );
+      const lastAt = lastCompleted.get(userId);
+      let hoursSince: number | null = null;
+      if (lastAt) {
+        const ms = Date.now() - new Date(lastAt).getTime();
+        hoursSince = ms / 3_600_000;
+      }
       const habitMsg = routinePush(
         (p?.last_activity_date as string | null) ?? null,
         today,
-        next
+        next,
+        hoursSince
       );
 
       let coachMsg: PushMessage | null = null;
