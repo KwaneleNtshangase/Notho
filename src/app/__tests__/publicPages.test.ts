@@ -66,14 +66,23 @@ describe("seo copy", () => {
 });
 
 describe("AuthGate bank-statement copy", () => {
-  it("does NOT contain the misleading 'never stored' phrasing", async () => {
+  it("does NOT use the misleading 'never stored' phrasing on the landing", async () => {
     const fs = await import("fs");
     const path = await import("path");
-    const filePath = path.resolve(__dirname, "../../components/AuthGate.tsx");
-    const content = fs.readFileSync(filePath, "utf-8");
+    const authGate = fs.readFileSync(
+      path.resolve(__dirname, "../../components/AuthGate.tsx"),
+      "utf-8"
+    );
+    const messages = fs.readFileSync(
+      path.resolve(__dirname, "../../i18n/messages.ts"),
+      "utf-8"
+    );
 
-    expect(content).not.toContain("processed in memory, never stored");
-    expect(content).toContain("We read it in memory and do not keep the file.");
+    // Copy lives in locale packs after i18n; AuthGate renders t("auth.landingBudget").
+    expect(authGate).toContain('t("auth.landingBudget")');
+    expect(authGate).not.toContain("processed in memory, never stored");
+    expect(messages).not.toContain("processed in memory, never stored");
+    expect(messages).toContain("We read it in memory and do not keep the file.");
   });
 });
 
@@ -85,6 +94,10 @@ describe("Sign in with Apple configuration", () => {
       path.resolve(__dirname, "../../components/AuthGate.tsx"),
       "utf-8"
     );
+    const messages = fs.readFileSync(
+      path.resolve(__dirname, "../../i18n/messages.ts"),
+      "utf-8"
+    );
     const entitlements = fs.readFileSync(
       path.resolve(__dirname, "../../../ios/App/App/App.entitlements"),
       "utf-8"
@@ -92,7 +105,8 @@ describe("Sign in with Apple configuration", () => {
 
     expect(authGate).toContain('handleOAuthSignIn("apple")');
     expect(authGate).toContain('data-testid="apple-oauth"');
-    expect(authGate).toContain("Continue with Apple");
+    expect(authGate).toContain('t("auth.continueApple")');
+    expect(messages).toContain('"auth.continueApple": "Continue with Apple"');
     expect(entitlements).toContain("com.apple.developer.applesignin");
     expect(entitlements).toContain("<string>Default</string>");
   });
