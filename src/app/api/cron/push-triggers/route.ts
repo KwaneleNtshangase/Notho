@@ -8,6 +8,7 @@ import {
   coachAlertPush,
   routinePush,
   pickPush,
+  isQuietHours,
   type PushMessage,
 } from "@/lib/push/triggers";
 import { resolveNextLesson } from "@/lib/push/nextLesson";
@@ -43,11 +44,23 @@ function resumeFrom(raw: unknown): { courseId?: string; lessonId?: string; clear
   return r;
 }
 
+/** SAST wall clock from a UTC ms instant. */
+function sastClock(nowMs: number): { hour: number; minute: number } {
+  const sast = new Date(nowMs + 2 * 60 * 60 * 1000);
+  return { hour: sast.getUTCHours(), minute: sast.getUTCMinutes() };
+}
+
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (!secret) return NextResponse.json({ error: "CRON_SECRET not configured" }, { status: 500 });
   if (req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const nowMs = Date.now();
+  const clock = sastClock(nowMs);
+  if (isQuietHours(clock.hour, clock.minute)) {
+    return NextResponse.json({ sent: 0, evaluated: 0, skippedQuietHours: true });
   }
 
   const admin = createServiceSupabase();
@@ -79,7 +92,7 @@ export async function GET(req: NextRequest) {
 
   const { data: progressRows } = await admin
     .from("user_progress")
-    .select("user_id, streak, last_activity_date, completed_lessons, pinned_courses, lesson_resume")
+    .select("user_id, streak, last_activity_date, completed_lessons, pinned_courses, lesson_resume, updated_at")
     .in("user_id", userIds);
   const progress = new Map(
     (progressRows ?? []).map((r: Record<string, unknown>) => [r.user_id as string, r])
@@ -98,6 +111,8 @@ export async function GET(req: NextRequest) {
         resume: resumeFrom(p?.lesson_resume),
       });
 
+      const lastAt = (p?.updated_at as string | null) ?? null;
+
       const streakMsg = streakAtRiskPush(
         Number(p?.streak ?? 0),
         (p?.last_activity_date as string | null) ?? null,
@@ -107,7 +122,9 @@ export async function GET(req: NextRequest) {
       const habitMsg = routinePush(
         (p?.last_activity_date as string | null) ?? null,
         today,
-        next
+        next,
+        lastAt,
+        nowMs
       );
 
       let coachMsg: PushMessage | null = null;

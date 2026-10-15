@@ -6,6 +6,8 @@ import {
   leaderboardDefencePush,
   routinePush,
   pickPush,
+  isQuietHours,
+  hoursSince,
 } from "../triggers";
 
 const next = { lessonTitle: "Needs vs Wants", courseTitle: "Money Basics", url: "/lesson/money-basics/lesson-2" };
@@ -15,6 +17,30 @@ describe("yesterdayOf", () => {
     expect(yesterdayOf("2026-07-12")).toBe("2026-07-11");
     expect(yesterdayOf("2026-07-01")).toBe("2026-06-30");
     expect(yesterdayOf("2026-01-01")).toBe("2025-12-31");
+  });
+});
+
+describe("isQuietHours", () => {
+  it("covers 21:30–07:30 SAST", () => {
+    expect(isQuietHours(21, 30)).toBe(true);
+    expect(isQuietHours(22, 0)).toBe(true);
+    expect(isQuietHours(0, 15)).toBe(true);
+    expect(isQuietHours(7, 15)).toBe(true);
+    expect(isQuietHours(7, 30)).toBe(false);
+    expect(isQuietHours(21, 29)).toBe(false);
+    expect(isQuietHours(12, 0)).toBe(false);
+  });
+});
+
+describe("hoursSince", () => {
+  it("returns null for missing timestamps", () => {
+    expect(hoursSince(null, Date.now())).toBeNull();
+  });
+
+  it("computes elapsed hours", () => {
+    const now = Date.parse("2026-07-12T09:00:00Z");
+    const then = Date.parse("2026-07-11T10:00:00Z");
+    expect(hoursSince(new Date(then).toISOString(), now)).toBeCloseTo(23);
   });
 });
 
@@ -42,11 +68,19 @@ describe("streakAtRiskPush", () => {
 });
 
 describe("routinePush", () => {
-  it("fires when they have not learned today", () => {
-    const p = routinePush("2026-07-11", "2026-07-12", next);
+  it("fires when they have not learned today and 23h have passed", () => {
+    const now = Date.parse("2026-07-12T09:00:00Z");
+    const last = new Date(Date.parse("2026-07-11T10:00:00Z")).toISOString();
+    const p = routinePush("2026-07-11", "2026-07-12", next, last, now);
     expect(p).not.toBeNull();
     expect(p!.key).toBe("routine:2026-07-12");
     expect(p!.url).toBe(next.url);
+  });
+
+  it("stays quiet before 23 hours", () => {
+    const now = Date.parse("2026-07-12T09:00:00Z");
+    const last = new Date(Date.parse("2026-07-11T12:00:00Z")).toISOString();
+    expect(routinePush("2026-07-11", "2026-07-12", next, last, now)).toBeNull();
   });
 
   it("stays quiet after today's lesson", () => {

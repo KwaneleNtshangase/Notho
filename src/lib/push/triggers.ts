@@ -3,6 +3,10 @@
  *
  * Cron feeds each subscribed user through these and sends at most ONE push
  * per user per day, in priority: save (streak at risk) > routine > coach alert.
+ *
+ * Routine waits ~23h after the last activity timestamp so it lands near the
+ * time the learner last opened a lesson, not at a fixed clock time.
+ * Quiet hours (21:30–07:30 SAST) are checked by the caller.
  */
 
 export type PushMessage = {
@@ -51,6 +55,21 @@ function pick<T>(list: T[], seed: string): T {
   return list[h % list.length]!;
 }
 
+/** True during 21:30–07:30 SAST. Caller passes SAST wall-clock hour and minute. */
+export function isQuietHours(sastHour: number, sastMinute: number): boolean {
+  if (sastHour > 21 || (sastHour === 21 && sastMinute >= 30)) return true;
+  if (sastHour < 7 || (sastHour === 7 && sastMinute < 30)) return true;
+  return false;
+}
+
+/** Hours since an ISO timestamp. Null if missing or unparseable. */
+export function hoursSince(iso: string | null | undefined, nowMs: number): number | null {
+  if (!iso) return null;
+  const t = Date.parse(iso);
+  if (!Number.isFinite(t)) return null;
+  return (nowMs - t) / 3_600_000;
+}
+
 export function streakAtRiskPush(
   streak: number,
   lastActivityDate: string | null,
@@ -69,10 +88,17 @@ export function streakAtRiskPush(
   };
 }
 
+/**
+ * Routine / win-back. Skips if they already learned today, or if more than
+ * 7 days quiet. When lastActivityAt is supplied, also waits until ~23 hours
+ * have passed so the nudge lands near the learner's usual time.
+ */
 export function routinePush(
   lastActivityDate: string | null,
   sastToday: string,
-  next?: { lessonTitle: string; courseTitle: string; url: string } | null
+  next?: { lessonTitle: string; courseTitle: string; url: string } | null,
+  lastActivityAt?: string | null,
+  nowMs?: number
 ): PushMessage | null {
   if (lastActivityDate === sastToday) return null;
   const yesterday = yesterdayOf(sastToday);
@@ -81,6 +107,13 @@ export function routinePush(
       ? Math.max(1, Math.floor((Date.parse(`${sastToday}T12:00:00Z`) - Date.parse(`${lastActivityDate}T12:00:00Z`)) / 86400000))
       : 0;
   if (daysOff > 7) return null;
+
+  // Prefer the real timestamp. Fall back to date-only only when no timestamp
+  // exists (old rows). 23h window matches the playbook (23.5h after last lesson).
+  if (lastActivityAt && nowMs != null) {
+    const hours = hoursSince(lastActivityAt, nowMs);
+    if (hours == null || hours < 23) return null;
+  }
 
   const lesson = next?.lessonTitle ?? "the next lesson";
   const course = next?.courseTitle ?? "Learn";
