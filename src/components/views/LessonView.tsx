@@ -120,6 +120,7 @@ import { StatsPanel } from "@/components/StatsPanel";
 import { AuthGate } from "@/components/AuthGate";
 import { ShareButton, ShareResultButton } from "@/components/ShareCard";
 import { CosmoCharacter } from "@/components/CosmoCharacter";
+import { SpeakButton } from "@/components/SpeakButton";
 import { NothoTopBar } from "@/components/NothoTopBar";
 import {
   OnboardingTooltips,
@@ -484,9 +485,13 @@ export function LessonView({
     }
 
     if (step.type === "info") {
+      const infoText = localizeString(locale, step.title) + ". " + (typeof step.content === "string" ? step.content : "");
       return (
         <>
-          <h2 className="step-title">{localizeString(locale, step.title)}</h2>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <h2 className="step-title" style={{ margin: 0, flex: 1 }}>{localizeString(locale, step.title)}</h2>
+            <SpeakButton text={infoText} />
+          </div>
           <div
             className="step-content"
             dangerouslySetInnerHTML={{ __html: typeof window !== 'undefined' ? DOMPurify.sanitize(localizeString(locale, step.content)) : localizeString(locale, step.content) }}
