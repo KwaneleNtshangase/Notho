@@ -190,7 +190,10 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
 
   return (
     <>
-      <h2 className="step-title">{localizeString(locale, step.title || "Fill in the blank")}</h2>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+        <h2 className="step-title" style={{ margin: 0, flex: 1 }}>{localizeString(locale, step.title || "Fill in the blank")}</h2>
+        <SpeakButton text={localizeString(locale, step.title || "") + ". " + (step.prompt || "")} />
+      </div>
       <div className="step-content" style={{ fontSize: 16, lineHeight: 1.7, marginBottom: 20 }}>
         {parts[0]}
         {!isAnswered ? (

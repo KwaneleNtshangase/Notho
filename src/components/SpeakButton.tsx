@@ -18,7 +18,6 @@ function stripHtml(html: string): string {
   return tmp.textContent || tmp.innerText || "";
 }
 
-/** Stable key for a voice so the chosen one still matches after reload. */
 export function voiceKey(v: SpeechSynthesisVoice): string {
   return `${v.name}||${v.lang}`;
 }
@@ -38,6 +37,8 @@ export function SpeakButton({ text, className, style }: SpeakButtonProps) {
   useEffect(() => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     setSupported(true);
+    // Prime voices (some browsers only populate after this)
+    window.speechSynthesis.getVoices();
   }, []);
 
   const stop = useCallback(() => {
@@ -48,7 +49,8 @@ export function SpeakButton({ text, className, style }: SpeakButtonProps) {
 
   const speak = useCallback(() => {
     if (!supported || !text.trim()) return;
-    stop();
+    // Always cancel anything already speaking so only one utterance plays
+    window.speechSynthesis.cancel();
 
     const clean = stripHtml(text).replace(/\s+/g, " ").trim();
     if (!clean) return;
@@ -66,7 +68,7 @@ export function SpeakButton({ text, className, style }: SpeakButtonProps) {
 
     setSpeaking(true);
     window.speechSynthesis.speak(utterance);
-  }, [supported, text, stop]);
+  }, [supported, text]);
 
   const toggle = () => {
     if (speaking) stop();
