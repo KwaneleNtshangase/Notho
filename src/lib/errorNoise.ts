@@ -28,6 +28,8 @@ const LOCK_STEAL = /lock broken by another request with the ['‘]steal['’] op
 const CHUNK_MESSAGE =
   /(failed to load chunk|loading chunk \S+ failed|chunkloaderror|failed to fetch dynamically imported module|importing a module script failed)/i;
 
+const IN_APP_BROWSER_ALREADY_CLOSED = /no active window to close/i;
+
 export function errorFingerprint(area: string, message: string): string {
   const normalised = message
     .toLowerCase()
@@ -93,6 +95,16 @@ export function classifyClientError(area: string, message: string): ClassifiedEr
       severity: "P4",
       fingerprint,
       reason: "Generic network blip with no stack that points at Notho code.",
+    };
+  }
+
+  if (IN_APP_BROWSER_ALREADY_CLOSED.test(text)) {
+    return {
+      classification: "noise",
+      severity: "P4",
+      fingerprint,
+      reason:
+        "Capacitor Browser.close() after iOS already dismissed the OAuth sheet. Sign-in still completed.",
     };
   }
 
