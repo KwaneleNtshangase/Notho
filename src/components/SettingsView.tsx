@@ -20,6 +20,7 @@ import {
 } from "@/components/icons/NothoIcons";
 import { LegalPage, FeedbackModal } from "@/components/ProfileView";
 import { ShakeReportSetting } from "@/components/ReportProblemSheet";
+import { VoiceSettings } from "@/components/VoiceSettings";
 import { ExitSurveyModal } from "@/components/churn/ExitSurvey";
 import { isAdminEmail } from "@/lib/admin";
 import { useLocale } from "@/i18n/LocaleProvider";
@@ -228,6 +229,8 @@ export function SettingsView({
       </div>
 
       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 8 }}>Learning</div>
+
+      <VoiceSettings />
 
       <Row icon={<Zap size={18} />} label="Sound effects" sub="Plays on correct / incorrect answers">
         <button
