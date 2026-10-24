@@ -163,3 +163,16 @@ html.dark {
     padding-top: 72px !important;
   }
 }
+
+/* Lockup fills the sidebar. Width only — display stays on .logo-light / .logo-dark. */
+.sidebar-lockup {
+  width: 100%;
+  padding: 14px 0 6px;
+  margin: 0;
+}
+
+.sidebar-lockup img {
+  width: 100% !important;
+  max-width: none !important;
+  height: auto;
+}
