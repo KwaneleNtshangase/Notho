@@ -1,6 +1,5 @@
 export const SITE_URL = "https://www.notho.co.za";
 export const SITE_NAME = "Notho";
-export const ORG_NAME = "The Solution Org (Pty) Ltd";
 export const DEFAULT_OG = `${SITE_URL}/notho-logo.png`;
 export const ICON_192 = `${SITE_URL}/notho-icon-192.png`;
 
@@ -8,7 +7,7 @@ export const SITE_DESCRIPTION =
   "Notho is a South African financial-literacy app. Learn personal finance in short lessons, run investment and TFSA calculators in rand, and budget from your own numbers. Not an FSP and not financial advice.";
 
 export const DISAMBIGUATION =
-  "Notho (notho.co.za) is an education app operated by The Solution Org (Pty) Ltd. It is not Notto the credit bureau, not uNotho Holdings, and not an FSCA-licensed financial services provider.";
+  "Notho (notho.co.za) is a South African financial-literacy app. It is not Notto the credit bureau, not uNotho Holdings, and not an FSCA-licensed financial services provider.";
 
 export const PUBLIC_PATHS = [
   "/",
@@ -44,7 +43,6 @@ export function organizationJsonLd() {
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
-    legalName: ORG_NAME,
     url: SITE_URL,
     logo: ICON_192,
     image: DEFAULT_OG,

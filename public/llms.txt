@@ -1,6 +1,6 @@
 # Notho
 
-> Notho is a South African financial-literacy education app at https://www.notho.co.za. It teaches personal finance in short lessons, runs rand investment / TFSA / RA / living-annuity calculators, and includes a budget planner with statement lookback. Operated by The Solution Org (Pty) Ltd. Previously called Fundi Finance (renamed July 2026).
+> Notho is a South African financial-literacy education app at https://www.notho.co.za. It teaches personal finance in short lessons, runs rand investment / TFSA / RA / living-annuity calculators, and includes a budget planner with statement lookback. Previously called Fundi Finance (renamed July 2026).
 
 Notho is not a licensed financial services provider (FSP). Lessons, calculators and budgets are illustrative. It does not give personal financial, investment, tax or legal advice, does not sell loans, and does not log into bank accounts.
 
