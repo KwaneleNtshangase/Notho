@@ -34,6 +34,18 @@
                 <data android:scheme="za.co.notho.app" />
             </intent-filter>
 
+            <!-- App Links: https://www.notho.co.za and https://notho.co.za open the app when installed.
+                 Verified by /.well-known/assetlinks.json. Falls back to the browser if the app is missing. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="www.notho.co.za" android:pathPrefix="/lesson" />
+                <data android:scheme="https" android:host="notho.co.za" android:pathPrefix="/lesson" />
+                <data android:scheme="https" android:host="www.notho.co.za" android:pathPrefix="/learn" />
+                <data android:scheme="https" android:host="notho.co.za" android:pathPrefix="/learn" />
+            </intent-filter>
+
         </activity>
 
         <provider

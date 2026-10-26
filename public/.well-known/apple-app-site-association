@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "YM3SZ5DTGQ.za.co.notho.app",
+        "paths": ["/lesson/*", "/learn/*", "/budget", "/calculator", "/quests", "/profile"]
+      }
+    ]
+  }
+}
