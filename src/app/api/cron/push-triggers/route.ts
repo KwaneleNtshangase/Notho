@@ -12,6 +12,7 @@ import {
 } from "@/lib/push/triggers";
 import { resolveNextLesson } from "@/lib/push/nextLesson";
 import { sendWebPush } from "@/lib/push/send";
+import { sendNativePush } from "@/lib/push/nativeSend";
 import { CONTENT_DATA } from "@/data/content";
 
 export const runtime = "nodejs";
@@ -163,7 +164,10 @@ export async function GET(req: NextRequest) {
 
       let delivered = 0;
       for (const sub of byUser.get(userId) ?? []) {
-        const result = await sendWebPush(sub, { title: msg.title, body: msg.body, url: msg.url });
+        const payload = { title: msg.title, body: msg.body, url: msg.url };
+        const result = sub.endpoint.startsWith("apns:") || sub.endpoint.startsWith("fcm:")
+          ? await sendNativePush(sub.endpoint, payload)
+          : await sendWebPush(sub, payload);
         if (result.ok) delivered++;
       }
       if (delivered > 0) summary.sent++;

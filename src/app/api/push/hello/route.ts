@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { createServiceSupabase } from "@/lib/supabaseServer";
 import { sendWebPush } from "@/lib/push/send";
+import { sendNativePush } from "@/lib/push/nativeSend";
 import { resolveNextLesson } from "@/lib/push/nextLesson";
 import { CONTENT_DATA } from "@/data/content";
 
@@ -54,7 +55,10 @@ export async function POST(req: NextRequest) {
 
   let sent = 0;
   for (const sub of subs) {
-    const result = await sendWebPush(sub, payload);
+    const endpoint = sub.endpoint as string;
+    const result = endpoint.startsWith("apns:") || endpoint.startsWith("fcm:")
+      ? await sendNativePush(endpoint, payload)
+      : await sendWebPush(sub, payload);
     if (result.ok) sent++;
   }
   return NextResponse.json({ sent, url: next.url });

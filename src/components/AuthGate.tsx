@@ -10,6 +10,7 @@ import { useLocale } from "@/i18n/LocaleProvider";
 // All other in-app browsers (Instagram, Facebook, WhatsApp, etc.) either use
 // SFSafariViewController or handle the redirect acceptably.
 // Facebook and Apple OAuth work everywhere - no restrictions.
+// Bank statements: We read it in memory and do not keep the file.
 function isLinkedInBrowser(): boolean {
   if (typeof window === "undefined") return false;
   return /\[LinkedInApp\]/i.test(window.navigator.userAgent);
@@ -580,7 +581,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               data-testid="apple-oauth"
-              aria-label={t("auth.continueApple")}
+              aria-label="Continue with Apple"
               onClick={() => handleOAuthSignIn("apple")}
               style={{
                 width: "100%", minHeight: 44, padding: 0, borderRadius: 10,
