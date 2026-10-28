@@ -5,7 +5,8 @@ import { Share2 } from "@/components/icons/NothoIcons";
 import { NothoStreak, NothoHeart, NothoLevel, NothoXP, NothoFreeze } from "@/components/icons/NothoIcons";
 import { streakExtendedToday } from "@/lib/dates";
 import { formatWithSpaces } from "@/lib/formatters";
-import { generateShareText, type UserData } from "@/app/pageViews.types";
+import { type UserData } from "@/app/pageViews.types";
+import { shareDuoCard } from "@/components/ShareCard";
 import { StreakFreezeBody } from "@/components/StreakFreezeControl";
 import type { FreezePurchase } from "@/lib/streakFreeze";
 
@@ -24,8 +25,6 @@ export function StatsPanel({
   onBuyFreeze?: () => Promise<FreezePurchase> | FreezePurchase;
   signedIn?: boolean;
 }) {
-  // Lit when the streak just moved, or last activity is already today.
-  // lessonsToday alone stays 0 on a replay that still stamps the day.
   const streakSafeToday =
     userData.lessonsToday > 0 || streakExtendedToday(userData.lastActivityDate);
   const [showFreeze, setShowFreeze] = useState(false);
@@ -66,21 +65,8 @@ export function StatsPanel({
           </div>
           <button
             type="button"
-            onClick={async () => {
-              const text = generateShareText("streak", { streakDays: userData.streak });
-              if (typeof navigator !== "undefined" && navigator.share) {
-                try {
-                  await navigator.share({ text });
-                  return;
-                } catch {
-                  /* ignore */
-                }
-              }
-              window.open(
-                `https://wa.me/?text=${encodeURIComponent(text)}`,
-                "_blank",
-                "noopener,noreferrer"
-              );
+            onClick={() => {
+              void shareDuoCard({ type: "streak", streakDays: userData.streak });
             }}
             className="text-orange-400 hover:text-orange-600"
             title="Share your streak"
@@ -182,7 +168,6 @@ export function StatsPanel({
         </div>
       </div>
 
-      {/* Legal disclaimer */}
       <div style={{
         marginTop: "auto",
         paddingTop: 20,
@@ -242,4 +227,3 @@ export function StatsPanel({
     </aside>
   );
 }
-
