@@ -16,6 +16,31 @@
  *   came to do happens first and is confirmed; the survey comes after, clearly
  *   optional. A survey standing between a person and an unsubscribe button is
  *   how you earn a spam complaint.
+ *
+ * WHY EVERY COLOUR HERE IS var(--u-*), NEVER A LITERAL HEX STRING
+ *   This page is a public, unauthenticated door reached from an email client.
+ *   It has nothing to do with whatever theme a signed-in visitor's app session
+ *   left on <html> (html.dark), and it must not inherit it: globals.css carries
+ *   blanket dark-mode rules (~line 1259) that force colour on bare div/span/p/
+ *   label under html.dark, plus attribute-selector overrides that rewrite any
+ *   inline style containing specific hardcoded hex strings (#111827, #4B5563,
+ *   #6B7280, "#fff", etc). A hardcoded white card with hardcoded dark text is
+ *   exactly the shape those rules target - the result, for a visitor whose app
+ *   theme happens to be dark, is white text painted onto a card that stayed
+ *   white: unreadable.
+ *   Rather than editing globals.css (owned by another surface, and a public
+ *   email-footer page has no business inheriting the signed-in app's theme
+ *   rules anyway), this page defines its own small set of --u-* custom
+ *   properties on its root element, pinned to fixed light-theme values, and
+ *   references colour only via var(...). An inline style is never beaten by a
+ *   non-!important external rule regardless of specificity, so this is safe
+ *   independent of any hex-matching detail in globals.css - and there is no
+ *   literal hex substring left in any `style` attribute for an attribute
+ *   selector to find in the first place.
+ *   The same block also re-pins --color-primary / --color-text-primary / etc,
+ *   the tokens ExitSurvey's <ReasonPicker> reads, so the reason survey renders
+ *   in the same fixed light theme as the rest of the page instead of following
+ *   whatever the signed-in app's theme happened to be.
  */
 
 import React, { useCallback, useEffect, useState } from "react";
@@ -25,13 +50,48 @@ import { offerFor, type ReasonCode } from "@/lib/churn/reasons";
 
 type Choice = "weekly" | "pause30" | "product_only" | "all";
 
+/**
+ * The page's entire palette, pinned regardless of html.dark. Applied once, on
+ * the outermost element, and referenced everywhere below via var(--u-*).
+ *
+ * The --color-* entries are not this page's own tokens - they are the ones
+ * globals.css redefines under html.dark and that ExitSurvey's ReasonPicker
+ * reads via var(). Re-declaring them here, on this subtree, overrides the
+ * inherited (possibly dark) value for every descendant without touching
+ * globals.css or ExitSurvey.tsx.
+ */
+const ISOLATED_THEME = {
+  colorScheme: "light",
+  "--u-bg": "#f4f5f7",
+  "--u-card": "#ffffff",
+  "--u-brand": "#007A85",
+  "--u-brand-ink": "#B5E4E8",
+  "--u-on-brand": "#ffffff",
+  "--u-ink": "#111827",
+  "--u-ink-2": "#4b5563",
+  "--u-ink-3": "#6b7280",
+  "--u-ink-4": "#9AA0A6",
+  "--u-border": "#e5e7eb",
+  "--u-border-2": "#d8dbe0",
+  "--u-danger": "#E03C31",
+  "--u-selected-bg": "#E6F4F5",
+  "--u-offer-title": "#00636B",
+
+  "--color-primary": "#007A85",
+  "--color-primary-light": "#E6F4F5",
+  "--color-text-primary": "#111827",
+  "--color-text-secondary": "#6B7280",
+  "--color-border": "transparent",
+  "--color-bg": "#ffffff",
+} as React.CSSProperties;
+
 const primaryBtn: React.CSSProperties = {
   width: "100%", padding: "13px", borderRadius: 12, border: "none",
-  background: "#007A85", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer",
+  background: "var(--u-brand)", color: "var(--u-on-brand)", fontWeight: 700, fontSize: 15, cursor: "pointer",
 };
 const ghostBtn: React.CSSProperties = {
-  width: "100%", padding: "11px", borderRadius: 12, border: "1px solid #d8dbe0",
-  background: "transparent", color: "#111827", fontWeight: 600, fontSize: 14, cursor: "pointer",
+  width: "100%", padding: "11px", borderRadius: 12, border: "1px solid var(--u-border-2)",
+  background: "transparent", color: "var(--u-ink)", fontWeight: 600, fontSize: 14, cursor: "pointer",
 };
 
 /**
@@ -42,20 +102,20 @@ const ghostBtn: React.CSSProperties = {
  */
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main style={{ minHeight: "100dvh", background: "#f4f5f7", padding: "40px 16px", fontFamily: "'Inter','Helvetica Neue',Arial,sans-serif" }}>
+    <main style={{ ...ISOLATED_THEME, minHeight: "100dvh", background: "var(--u-bg)", padding: "40px 16px", fontFamily: "'Inter','Helvetica Neue',Arial,sans-serif" }}>
       <div style={{ maxWidth: 520, margin: "0 auto" }}>
-        <div style={{ background: "#007A85", borderRadius: "16px 16px 0 0", padding: "22px 26px", display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ background: "var(--u-brand)", borderRadius: "16px 16px 0 0", padding: "22px 26px", display: "flex", alignItems: "center", gap: 12 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/notho-icon-white.png" width={36} height={36} alt="" style={{ display: "block" }} />
           <div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>Notho</div>
-            <div style={{ fontSize: 11, color: "#B5E4E8", letterSpacing: "0.04em", paddingTop: 2 }}>Master Your Money</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "var(--u-on-brand)", lineHeight: 1.2 }}>Notho</div>
+            <div style={{ fontSize: 11, color: "var(--u-brand-ink)", letterSpacing: "0.04em", paddingTop: 2 }}>Master Your Money</div>
           </div>
         </div>
-        <div style={{ background: "#fff", borderRadius: "0 0 16px 16px", padding: "28px 26px 30px", color: "#111827", lineHeight: 1.6 }}>
+        <div style={{ background: "var(--u-card)", borderRadius: "0 0 16px 16px", padding: "28px 26px 30px", color: "var(--u-ink)", lineHeight: 1.6 }}>
           {children}
         </div>
-        <p style={{ textAlign: "center", fontSize: 11, color: "#9AA0A6", marginTop: 16 }}>
+        <p style={{ textAlign: "center", fontSize: 11, color: "var(--u-ink-4)", marginTop: 16 }}>
           Notho · Educational content only, not financial advice.
         </p>
       </div>
@@ -168,6 +228,19 @@ export default function UnsubscribeClient() {
       const b = await res.json().catch(() => ({}));
       setExitId(b.id ?? null);
     } catch { /* never block on analytics */ }
+    // Tell the founder why, same door as everything else here: best-effort,
+    // fire-and-forget, and never something that can slow this down or fail
+    // the person's exit. This is a separate request from the one above on
+    // purpose - the founder alert for the unsubscribe itself already went out
+    // when the choice was applied, and most people skip this survey, so most
+    // unsubscribes only ever get that first email.
+    if (!skipped && reason && token) {
+      fetch("/api/unsubscribe", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, reason, detail }),
+      }).catch(() => { /* best effort */ });
+    }
     setReasonSent(true);
     setBusy(false);
   }, [token, inactive, reason, detail]);
@@ -195,13 +268,13 @@ export default function UnsubscribeClient() {
     setBusy(false);
   };
 
-  if (loading) return <Shell><p style={{ color: "#6b7280", margin: 0 }}>Loading…</p></Shell>;
+  if (loading) return <Shell><p style={{ color: "var(--u-ink-3)", margin: 0 }}>Loading…</p></Shell>;
 
   if (invalid) {
     return (
       <Shell>
         <h1 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 10px" }}>This link isn&apos;t valid</h1>
-        <p style={{ color: "#4b5563", margin: "0 0 18px" }}>
+        <p style={{ color: "var(--u-ink-2)", margin: "0 0 18px" }}>
           It may have been cut short by your email app. You can change email settings inside Notho under
           Settings, or email us and we&apos;ll do it for you.
         </p>
@@ -221,7 +294,7 @@ export default function UnsubscribeClient() {
         <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>
           {firstName ? `${firstName}, what happened?` : "What happened?"}
         </h1>
-        <p style={{ color: "#4b5563", margin: "0 0 20px" }}>
+        <p style={{ color: "var(--u-ink-2)", margin: "0 0 20px" }}>
           You stopped using Notho a few weeks ago. No pressure to come back — we just want to know what
           got in the way, so it doesn&apos;t get in the next person&apos;s way too.
         </p>
@@ -250,15 +323,15 @@ export default function UnsubscribeClient() {
     return (
       <Shell>
         <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>Done{firstName ? `, ${firstName}` : ""}.</h1>
-        <p style={{ color: "#4b5563", margin: "0 0 22px" }}>{line[applied]}</p>
+        <p style={{ color: "var(--u-ink-2)", margin: "0 0 22px" }}>{line[applied]}</p>
 
         {!reasonSent ? (
           <>
-            <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 20 }}>
+            <div style={{ borderTop: "1px solid var(--u-border)", paddingTop: 20 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 6px" }}>
-                Would you tell us why? <span style={{ fontWeight: 500, color: "#6b7280" }}>Optional</span>
+                Would you tell us why? <span style={{ fontWeight: 500, color: "var(--u-ink-3)" }}>Optional</span>
               </h2>
-              <p style={{ color: "#6b7280", fontSize: 13.5, margin: "0 0 16px" }}>
+              <p style={{ color: "var(--u-ink-3)", fontSize: 13.5, margin: "0 0 16px" }}>
                 Your setting is already saved. This is just so we know what to fix.
               </p>
               <ReasonPicker exitType="email_unsubscribe" value={reason} onChange={setReason} detail={detail} onDetailChange={setDetail} />
@@ -274,14 +347,14 @@ export default function UnsubscribeClient() {
             </div>
           </>
         ) : (
-          <p style={{ color: "#4b5563", margin: 0 }}>Thanks — that&apos;s genuinely useful.</p>
+          <p style={{ color: "var(--u-ink-2)", margin: 0 }}>Thanks — that&apos;s genuinely useful.</p>
         )}
 
         {applied === "all" && (
-          <p style={{ fontSize: 12.5, color: "#6b7280", marginTop: 22, borderTop: "1px solid #e5e7eb", paddingTop: 16 }}>
+          <p style={{ fontSize: 12.5, color: "var(--u-ink-3)", marginTop: 22, borderTop: "1px solid var(--u-border)", paddingTop: 16 }}>
             Changed your mind?{" "}
             <button type="button" onClick={() => apply("resubscribe" as Choice)}
-              style={{ background: "none", border: "none", padding: 0, color: "#007A85", fontWeight: 700, cursor: "pointer", fontSize: 12.5, textDecoration: "underline" }}>
+              style={{ background: "none", border: "none", padding: 0, color: "var(--u-brand)", fontWeight: 700, cursor: "pointer", fontSize: 12.5, textDecoration: "underline" }}>
               Turn emails back on
             </button>
           </p>
@@ -297,7 +370,7 @@ export default function UnsubscribeClient() {
         {offerTaken ? (
           <>
             <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>Sorted.</h1>
-            <p style={{ color: "#4b5563", margin: "0 0 22px" }}>
+            <p style={{ color: "var(--u-ink-2)", margin: "0 0 22px" }}>
               That&apos;s changed. Your account and progress are exactly where you left them.
             </p>
             <a href="https://www.notho.co.za" style={{ ...primaryBtn, display: "block", textAlign: "center", textDecoration: "none", boxSizing: "border-box" }}>
@@ -307,14 +380,14 @@ export default function UnsubscribeClient() {
         ) : (
           <>
             <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>Thank you.</h1>
-            <p style={{ color: "#4b5563", margin: "0 0 20px" }}>
+            <p style={{ color: "var(--u-ink-2)", margin: "0 0 20px" }}>
               That goes straight to the person who decides what we build next.
             </p>
-            {error && <p style={{ color: "#E03C31", fontSize: 13.5, margin: "0 0 14px" }}>{error}</p>}
+            {error && <p style={{ color: "var(--u-danger)", fontSize: 13.5, margin: "0 0 14px" }}>{error}</p>}
             {offer && (
-              <div style={{ background: "#E6F4F5", border: "1px solid #007A85", borderRadius: 14, padding: "16px 18px", marginBottom: 16 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#00636B", marginBottom: 6 }}>{offer.title}</div>
-                <div style={{ fontSize: 13.5, color: "#111827", lineHeight: 1.55 }}>{offer.body}</div>
+              <div style={{ background: "var(--u-selected-bg)", border: "1px solid var(--u-brand)", borderRadius: 14, padding: "16px 18px", marginBottom: 16 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--u-offer-title)", marginBottom: 6 }}>{offer.title}</div>
+                <div style={{ fontSize: 13.5, color: "var(--u-ink)", lineHeight: 1.55 }}>{offer.body}</div>
               </div>
             )}
             {offer && (
@@ -337,11 +410,11 @@ export default function UnsubscribeClient() {
       <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>
         {greeting}how often should we email you?
       </h1>
-      <p style={{ color: "#4b5563", margin: "0 0 20px" }}>
+      <p style={{ color: "var(--u-ink-2)", margin: "0 0 20px" }}>
         Pick whatever suits. You can change it again any time from this same link.
       </p>
 
-      {error && <p style={{ color: "#E03C31", fontSize: 13.5, margin: "0 0 14px" }}>{error}</p>}
+      {error && <p style={{ color: "var(--u-danger)", fontSize: 13.5, margin: "0 0 14px" }}>{error}</p>}
 
       <div role="radiogroup" aria-label="Email frequency" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
         {CHOICES.map((c) => {
@@ -351,19 +424,19 @@ export default function UnsubscribeClient() {
               style={{
                 display: "flex", alignItems: "flex-start", gap: 11, width: "100%", textAlign: "left",
                 padding: "13px 15px", borderRadius: 12, border: "1.5px solid",
-                borderColor: on ? "#007A85" : "#e5e7eb", background: on ? "#E6F4F5" : "transparent",
-                cursor: "pointer", color: "#111827",
+                borderColor: on ? "var(--u-brand)" : "var(--u-border)", background: on ? "var(--u-selected-bg)" : "transparent",
+                cursor: "pointer", color: "var(--u-ink)",
               }}>
               <span aria-hidden style={{
                 width: 18, height: 18, flexShrink: 0, marginTop: 2, borderRadius: "50%",
-                border: "2px solid", borderColor: on ? "#007A85" : "#d8dbe0",
+                border: "2px solid", borderColor: on ? "var(--u-brand)" : "var(--u-border-2)",
                 display: "inline-flex", alignItems: "center", justifyContent: "center",
               }}>
-                {on && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#007A85" }} />}
+                {on && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--u-brand)" }} />}
               </span>
               <span>
                 <span style={{ display: "block", fontSize: 14.5, fontWeight: 700 }}>{c.title}</span>
-                <span style={{ display: "block", fontSize: 13, color: "#6b7280", marginTop: 2 }}>{c.body}</span>
+                <span style={{ display: "block", fontSize: 13, color: "var(--u-ink-3)", marginTop: 2 }}>{c.body}</span>
               </span>
             </button>
           );
