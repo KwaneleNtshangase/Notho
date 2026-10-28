@@ -34,10 +34,6 @@ import {
   NothoBrain,
 } from "@/components/icons/NothoIcons";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Types shared across multiple components
-// ─────────────────────────────────────────────────────────────────────────────
-
 export type WeeklyProgressJSON = {
   lessonsCompleted: number;
   xpEarned: number;
@@ -90,10 +86,6 @@ export function progressNumberFromWeeklyState(
   return 0;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Audio
-// ─────────────────────────────────────────────────────────────────────────────
-
 export function playSound(type: "correct" | "incorrect" | "complete") {
   if (typeof window === "undefined") return;
   if (localStorage.getItem("notho-sound-enabled") === "false") return;
@@ -132,10 +124,6 @@ export function playSound(type: "correct" | "incorrect" | "complete") {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Onboarding options (shared between OnboardingView and LearnView)
-// ─────────────────────────────────────────────────────────────────────────────
-
 export const ONBOARDING_GOAL_OPTIONS = [
   { id: "debt-free", label: "Get debt-free", Icon: CreditCard },
   { id: "emergency", label: "Build emergency fund", Icon: Shield },
@@ -154,7 +142,6 @@ export const ONBOARDING_AGE_RANGES = [
   { id: "56+", label: "56+", Icon: Flag },
 ] as const;
 
-/** Onboarding goal ids + labels - reuse for Learn screen banner. */
 export const GOAL_OPTIONS = ONBOARDING_GOAL_OPTIONS;
 
 export const GOAL_COURSE_MAP: Record<string, string[]> = {
@@ -165,10 +152,6 @@ export const GOAL_COURSE_MAP: Record<string, string[]> = {
   retire: ["retirement", "sa-investing", "investing-basics"],
   business: ["business-finance", "taxes", "money-basics"],
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Share helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 export function generateShareText(
   type: "lesson" | "badge" | "streak",
@@ -234,10 +217,6 @@ export function ShareButton({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Persist goal
-// ─────────────────────────────────────────────────────────────────────────────
-
 export async function persistUserGoalToStorageAndSupabase(goalId: string, goalDescription?: string) {
   if (typeof window === "undefined") return;
   localStorage.setItem("notho-user-goal", goalId);
@@ -255,10 +234,6 @@ export async function persistUserGoalToStorageAndSupabase(goalId: string, goalDe
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Lesson title lookup
-// ─────────────────────────────────────────────────────────────────────────────
-
 export function getLessonTitle(
   courseId: string | null | undefined,
   lessonId: string | null | undefined
@@ -273,10 +248,6 @@ export function getLessonTitle(
   return undefined;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared types
-// ─────────────────────────────────────────────────────────────────────────────
-
 export type UserData = {
   xp: number;
   level: number;
@@ -286,6 +257,7 @@ export type UserData = {
   dailyXP: number;
   dailyGoal: number;
   badges: string[];
+  freezeCount?: number;
 };
 
 export type Route =
@@ -299,68 +271,15 @@ export type Route =
   | { name: "budget" }
   | { name: "onboarding" };
 
-export type CalcInputs = {
-  principal: number;
-  monthly: number;
-  rate: number;
-  years: number;
-  escalation: number;
-  frequency: "monthly" | "annually" | "once-off";
-};
+export type { CalcInputs } from "@/lib/calculators";
+export { calcGrowth } from "@/lib/calculators";
+export { ShareResultButton, generateShareCard } from "@/components/ShareCard";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Calculator math
-// ─────────────────────────────────────────────────────────────────────────────
-
-export function calcGrowth(inputs: CalcInputs) {
-  const { principal, monthly, rate, years, escalation, frequency } = inputs;
-  const data: {
-    year: number;
-    value: number;
-    contributions: number;
-    interest: number;
-  }[] = [];
-  let balance = principal;
-  let currentMonthly = monthly;
-  let totalContributions = principal;
-
-  for (let year = 0; year <= years; year++) {
-    data.push({
-      year,
-      value: Math.round(balance),
-      contributions: Math.round(totalContributions),
-      interest: Math.round(balance - totalContributions),
-    });
-    if (year < years) {
-      if (frequency === "monthly") {
-        for (let m = 0; m < 12; m++) {
-          balance = balance * (1 + rate / 100 / 12) + currentMonthly;
-          totalContributions += currentMonthly;
-        }
-        currentMonthly = currentMonthly * (1 + escalation / 100);
-      } else if (frequency === "annually") {
-        balance = balance * Math.pow(1 + rate / 100, 1) + currentMonthly * 12;
-        totalContributions += currentMonthly * 12;
-        currentMonthly = currentMonthly * (1 + escalation / 100);
-      } else {
-        balance = balance * Math.pow(1 + rate / 100, 1);
-      }
-    }
-  }
-  return data;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Number formatters
-// ─────────────────────────────────────────────────────────────────────────────
-
-/** Thousands use spaces (e.g. 1 000), not commas. */
 export function formatWithSpaces(value: number) {
   if (!isFinite(value) || isNaN(value)) return "0";
   return Math.round(Math.abs(value)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
 }
 
-/** Rand amounts with space grouping (en-ZA). */
 export function formatRand(v: number): string {
   if (!isFinite(v) || isNaN(v)) return "R0";
   const abs = Math.abs(v);
@@ -372,10 +291,6 @@ export function formatRand(v: number): string {
 export function formatZAR(value: number) {
   return formatRand(value);
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CosmoCharacter mascot
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type CosmoExpression = "default" | "thinking" | "sad" | "celebrating";
 
@@ -396,10 +311,6 @@ export function CosmoCharacter({
     style: { objectFit: "contain", display: "block", ...extraStyle },
   });
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CourseIcon + COURSE_COLOURS
-// ─────────────────────────────────────────────────────────────────────────────
 
 export function CourseIcon({ name, size = 48 }: { name: string; size?: number }) {
   const props = { size, className: "text-current" };
@@ -435,21 +346,16 @@ export function CourseIcon({ name, size = 48 }: { name: string; size?: number })
   }
 }
 
-// Course accent colours, cycles through SA-themed palette
 export const COURSE_COLOURS = [
-  { bg: "#E8F5EE", accent: "#007A85", light: "#CBE9EB" }, // green
-  { bg: "#FFF8E7", accent: "#EFB343", light: "#FFE9A0" }, // gold
-  { bg: "#FFF0EF", accent: "#E03C31", light: "#FCCFCC" }, // red
-  { bg: "#EEF4FF", accent: "#3B7DD8", light: "#C5D9F7" }, // blue
-  { bg: "#F3EEFF", accent: "#7C4DFF", light: "#D9C8FF" }, // purple
-  { bg: "#E8FAF0", accent: "#00BFA5", light: "#B2EDEF" }, // teal
-  { bg: "#FFF3E0", accent: "#F57C00", light: "#FFD9A8" }, // orange
-  { bg: "#FCE4EC", accent: "#C2185B", light: "#F5B8CE" }, // pink
+  { bg: "#E8F5EE", accent: "#007A85", light: "#CBE9EB" },
+  { bg: "#FFF8E7", accent: "#EFB343", light: "#FFE9A0" },
+  { bg: "#FFF0EF", accent: "#E03C31", light: "#FCCFCC" },
+  { bg: "#EEF4FF", accent: "#3B7DD8", light: "#C5D9F7" },
+  { bg: "#F3EEFF", accent: "#7C4DFF", light: "#D9C8FF" },
+  { bg: "#E8FAF0", accent: "#00BFA5", light: "#B2EDEF" },
+  { bg: "#FFF3E0", accent: "#F57C00", light: "#FFD9A8" },
+  { bg: "#FCE4EC", accent: "#C2185B", light: "#F5B8CE" },
 ];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Saved lesson progress type
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type SavedLessonProgress = {
   courseId: string;
@@ -459,240 +365,6 @@ export type SavedLessonProgress = {
   savedAt: number;
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ShareResultButton (canvas-based shareable card)
-// ─────────────────────────────────────────────────────────────────────────────
-
 export type ShareCardData =
   | { type: "lesson"; lessonTitle: string; xpEarned: number; isPerfect: boolean; courseName: string }
   | { type: "calculator"; headline: string; sub: string };
-
-/** Cross-browser rounded rect - falls back to plain rect if roundRect unavailable */
-function canvasRoundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number, y: number, w: number, h: number, r: number
-) {
-  if (typeof ctx.roundRect === "function") {
-    ctx.beginPath();
-    ctx.roundRect(x, y, w, h, r);
-  } else {
-    const safeR = Math.min(r, w / 2, h / 2);
-    ctx.beginPath();
-    ctx.moveTo(x + safeR, y);
-    ctx.lineTo(x + w - safeR, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + safeR);
-    ctx.lineTo(x + w, y + h - safeR);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - safeR, y + h);
-    ctx.lineTo(x + safeR, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - safeR);
-    ctx.lineTo(x, y + safeR);
-    ctx.quadraticCurveTo(x, y, x + safeR, y);
-    ctx.closePath();
-  }
-}
-
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const words = text.split(" ");
-  let line = "";
-  const lines: string[] = [];
-  for (const w of words) {
-    const test = line + (line ? " " : "") + w;
-    if (ctx.measureText(test).width > maxWidth) { lines.push(line); line = w; }
-    else line = test;
-  }
-  if (line) lines.push(line);
-  return lines;
-}
-
-export function generateShareCard(data: ShareCardData): Promise<string> {
-  return new Promise((resolve, reject) => {
-    try {
-      const W = 1080, H = 1920;
-      const canvas = document.createElement("canvas");
-      canvas.width = W; canvas.height = H;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) { reject(new Error("Canvas not supported")); return; }
-
-      // Background gradient
-      const bg = ctx.createLinearGradient(0, 0, W, H);
-      bg.addColorStop(0, "#06201F");
-      bg.addColorStop(0.6, "#082A29");
-      bg.addColorStop(1, "#061009");
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, W, H);
-
-      // Radial glow centre
-      const glow = ctx.createRadialGradient(W / 2, H * 0.42, 0, W / 2, H * 0.42, 480);
-      glow.addColorStop(0, "rgba(34,197,94,0.22)");
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, W, H);
-
-      // Subtle grid lines
-      ctx.strokeStyle = "rgba(34,197,94,0.06)";
-      ctx.lineWidth = 1;
-      for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-      for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
-
-      // Top brand strip
-      ctx.fillStyle = "rgba(0,122,60,0.18)";
-      canvasRoundRect(ctx, 60, 100, W - 120, 90, 18); ctx.fill();
-      ctx.fillStyle = "#22c55e";
-      ctx.font = "bold 36px -apple-system, BlinkMacSystemFont, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("NOTHO", W / 2, 156);
-
-      if (data.type === "lesson") {
-        // Big trophy icon area
-        ctx.fillStyle = "rgba(239,179,67,0.12)";
-        ctx.beginPath(); ctx.arc(W / 2, H * 0.35, 140, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "#EFB343";
-        ctx.font = "140px serif";
-        ctx.textAlign = "center";
-        ctx.fillText("🏆", W / 2, H * 0.35 + 52);
-
-        ctx.fillStyle = "rgba(255,255,255,0.08)";
-        canvasRoundRect(ctx, 60, H * 0.52, W - 120, 260, 24); ctx.fill();
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = `bold 58px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.textAlign = "center";
-        const lines = wrapText(ctx, data.lessonTitle, W - 160);
-        lines.forEach((l, i) => ctx.fillText(l, W / 2, H * 0.54 + i * 70));
-
-        ctx.fillStyle = "#22c55e";
-        ctx.font = `bold 48px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.fillText(`+${data.xpEarned} XP earned`, W / 2, H * 0.54 + lines.length * 70 + 60);
-
-        if (data.isPerfect) {
-          ctx.fillStyle = "#EFB343";
-          ctx.font = `bold 38px -apple-system, BlinkMacSystemFont, sans-serif`;
-          ctx.fillText("⭐ Perfect Score!", W / 2, H * 0.54 + lines.length * 70 + 120);
-        }
-
-        ctx.fillStyle = "rgba(255,255,255,0.45)";
-        ctx.font = `500 34px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.fillText(`${data.courseName} course`, W / 2, H * 0.82);
-      } else {
-        // Calculator card
-        ctx.fillStyle = "rgba(34,197,94,0.1)";
-        canvasRoundRect(ctx, 60, H * 0.28, W - 120, 500, 28); ctx.fill();
-        ctx.strokeStyle = "rgba(34,197,94,0.3)";
-        ctx.lineWidth = 2;
-        canvasRoundRect(ctx, 60, H * 0.28, W - 120, 500, 28); ctx.stroke();
-
-        ctx.fillStyle = "#22c55e";
-        ctx.font = `bold 42px -apple-system, BlinkMacSystemFont, sans-serif`;
-        ctx.textAlign = "center";
-        ctx.fillText("I just discovered…", W / 2, H * 0.31);
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = `bold 68px -apple-system, BlinkMacSystemFont, sans-serif`;
-        const lines2 = wrapText(ctx, data.headline, W - 180);
-        lines2.forEach((l, i) => ctx.fillText(l, W / 2, H * 0.37 + i * 80));
-
-        ctx.fillStyle = "rgba(255,255,255,0.55)";
-        ctx.font = `500 38px -apple-system, BlinkMacSystemFont, sans-serif`;
-        const subLines = wrapText(ctx, data.sub, W - 200);
-        subLines.forEach((l, i) => ctx.fillText(l, W / 2, H * 0.37 + lines2.length * 80 + 60 + i * 52));
-      }
-
-      // Bottom CTA
-      ctx.fillStyle = "#22c55e";
-      canvasRoundRect(ctx, 120, H - 220, W - 240, 80, 40); ctx.fill();
-      ctx.fillStyle = "#000000";
-      ctx.font = `bold 34px -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx.fillText("Try it FREE → notho.co.za", W / 2, H - 170);
-
-      ctx.fillStyle = "rgba(255,255,255,0.25)";
-      ctx.font = `500 28px -apple-system, BlinkMacSystemFont, sans-serif`;
-      ctx.fillText("Real money skills. Start free at notho.co.za", W / 2, H - 110);
-
-      resolve(canvas.toDataURL("image/png"));
-    } catch (err) {
-      reject(err);
-    }
-  });
-}
-
-export function ShareResultButton({ data, label = "Share" }: { data: ShareCardData; label?: string }) {
-  const [sharing, setSharing] = React.useState(false);
-  const [status, setStatus] = React.useState<"idle" | "done" | "error">("idle");
-
-  const handleShare = async () => {
-    setSharing(true);
-    setStatus("idle");
-    try {
-      const dataUrl = await generateShareCard(data);
-
-      const text = data.type === "calculator"
-        ? `${data.headline} - calculated on Notho 📊 Try it free at notho.co.za`
-        : `I just completed "${(data as any).lessonTitle}" (+${(data as any).xpEarned} XP) on Notho 🎓 notho.co.za`;
-
-      // Try native share with image file
-      try {
-        const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob], "notho-result.png", { type: "image/png" });
-        if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: "Notho", text });
-          analytics.shareTriggered(data.type === "lesson" ? "lesson" : "badge", "native");
-          setStatus("done");
-          setSharing(false);
-          return;
-        }
-      } catch {
-        // canShare or share failed - fall through to download
-      }
-
-      // Fallback: try navigator.share with just text (no image)
-      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-        try {
-          await navigator.share({ title: "Notho", text });
-          analytics.shareTriggered(data.type === "lesson" ? "lesson" : "badge", "native");
-          setStatus("done");
-          setSharing(false);
-          return;
-        } catch {
-          // dismissed - fall through to download
-        }
-      }
-
-      // Final fallback: download the image card
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = "notho-result.png";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setStatus("done");
-    } catch {
-      setStatus("error");
-    }
-    setSharing(false);
-  };
-
-  const btnLabel = sharing
-    ? "Generating…"
-    : status === "done"
-      ? "Saved / Shared ✓"
-      : status === "error"
-        ? "Try again"
-        : label;
-
-  return React.createElement("button", {
-    type: "button",
-    onClick: handleShare,
-    disabled: sharing,
-    style: {
-      display: "flex", alignItems: "center", gap: 8, justifyContent: "center",
-      padding: "12px 20px", borderRadius: 12, cursor: sharing ? "default" : "pointer",
-      border: `1.5px solid ${status === "error" ? "rgba(220,38,38,0.4)" : "rgba(34,197,94,0.4)"}`,
-      background: status === "error" ? "rgba(220,38,38,0.08)" : "rgba(34,197,94,0.08)",
-      color: status === "error" ? "#dc2626" : "#22c55e",
-      fontWeight: 700, fontSize: 14, width: "100%",
-    },
-  },
-    React.createElement(Share2, { size: 16 }),
-    btnLabel
-  );
-}

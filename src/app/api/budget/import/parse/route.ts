@@ -124,28 +124,29 @@ export async function POST(req: NextRequest) {
       .select("merchant_pattern, category, type")
       .eq("user_id", user.id);
 
-    const { data: existingRows } = await admin
-      .from("budget_entries")
-      .select("dedupe_hash")
-      .eq("user_id", user.id)
-      .not("dedupe_hash", "is", null);
-
-    // For fuzzy duplicate detection we need each existing entry's date/amount/
-    // type/description - not just its hash. Exclude transfers (they legitimately
-    // mirror another leg).
-    const { data: existingEntryRows } = await admin
-      .from("budget_entries")
-      .select("entry_date, amount, type, description, is_transfer")
-      .eq("user_id", user.id);
-
-    const existingKeys: ExistingTxnKey[] = (existingEntryRows ?? [])
-      .filter((r) => !r.is_transfer)
-      .map((r) => ({
-        entry_date: r.entry_date as string,
-        amountCents: Math.round(Number(r.amount) * 100),
-        type: r.type as "income" | "expense",
-        description: (r.description as string | null) ?? null,
-      }));
+    const existingHashes = new Set<string>();
+    const existingKeys: ExistingTxnKey[] = [];
+    const PAGE = 500;
+    for (let from = 0; ; from += PAGE) {
+      const { data: page } = await admin
+        .from("budget_entries")
+        .select("dedupe_hash, entry_date, amount, type, description, is_transfer")
+        .eq("user_id", user.id)
+        .range(from, from + PAGE - 1);
+      const rows = page ?? [];
+      for (const r of rows) {
+        if (r.dedupe_hash) existingHashes.add(r.dedupe_hash as string);
+        if (!r.is_transfer) {
+          existingKeys.push({
+            entry_date: r.entry_date as string,
+            amountCents: Math.abs(Math.round(Number(r.amount) * 100)),
+            type: r.type as "income" | "expense",
+            description: (r.description as string | null) ?? null,
+          });
+        }
+      }
+      if (rows.length < PAGE) break;
+    }
 
     const { data: customCatRows } = await admin
       .from("custom_budget_categories")
@@ -154,10 +155,6 @@ export async function POST(req: NextRequest) {
       .order("created_at", { ascending: true });
 
     const customCategories = (customCatRows ?? []) as CustomBudgetCategory[];
-
-    const existingHashes = new Set(
-      (existingRows ?? []).map((r) => r.dedupe_hash as string).filter(Boolean)
-    );
 
     if (fileType === "pdf") {
       const buffer = new Uint8Array(await file.arrayBuffer());

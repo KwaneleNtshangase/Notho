@@ -1,0 +1,58 @@
+/* Cap, do not zoom. Tailwind preflight uses 100%; we keep that as the
+   floor and let applyTextScale raise it only as far as 115%. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+/* iOS Safari zooms the page when a focused field is under 16px, and it
+   ignores user-scalable=no. Keep every text control at 16px so a tap on
+   an input, select, or pill never zooms the layout. Double-tap zoom is
+   off via touch-action on the controls themselves. */
+input,
+textarea,
+select,
+[contenteditable="true"],
+button,
+a,
+label,
+.option-button,
+.nav-pill,
+.nav-pill-btn {
+  touch-action: manipulation;
+}
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  font-size: 16px !important;
+}
+
+.bottom-nav,
+.nav-pill,
+.nav-pill-btn,
+.nav-lbl {
+  white-space: nowrap;
+}
+.nav-pill-btn {
+  min-width: 0;
+  flex: 1 1 0;
+  overflow: hidden;
+}
+.nav-lbl {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Chrome buttons only. Content cards (recommended courses, settings
+   rows) must be allowed to wrap so titles stay inside the box. */
+.btn,
+button.btn,
+.option-button {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

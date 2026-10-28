@@ -12,20 +12,39 @@ export type TransferPair = {
   creditAccount: string;
 };
 
-const TRANSFER_HINTS =
-  /\b(transfer|payment to|payment from|inter.?account|own account|trf|internet trf|immediate trf)\b/i;
+/** The row itself is an inter-account move. */
+const STRONG_TRANSFER =
+  /\b(ib transfer|int acnt|inter.?acc(?:ount| trans)|fund transfers|own account|payshap|rtc(?:\s+pmt|\s+credit)?|live better|interest sweep|std transfer|transfers?)\b/i;
 
-const AMOUNT_TOLERANCE_CENTS = 100; // R1.00
-const MAX_DATE_DAYS = 3;
+const WEAK_TRANSFER =
+  /\b(transfer|trf|payment to|payment from|payment received|immediate payment|ib payment)\b/i;
 
-function transferHintScore(description: string): number {
-  return TRANSFER_HINTS.test(description) ? 30 : 0;
+const FEE_OR_INTEREST =
+  /\b(fee|fees|charge|charges|interest|vat|service fee|admin fee|txn fee|transaction fee|cash finance|#international|#electronic|#inter acc|#fee)\b/i;
+
+const THIRD_PARTY_PAYOUT =
+  /\b(staff wages?|vb staff|village black|wages village|payroll)\b/i;
+
+const AMOUNT_TOLERANCE_CENTS = 1;
+const LOOSE_TOLERANCE_CENTS = 100;
+const MAX_DATE_DAYS = 2;
+
+function isFeeOrInterest(description: string): boolean {
+  return FEE_OR_INTEREST.test(description);
 }
 
-/**
- * Detect likely inter-account transfer pairs across 2+ parsed statements.
- * Only pairs from different account labels are considered.
- */
+function isStrong(description: string): boolean {
+  return STRONG_TRANSFER.test(description);
+}
+
+function isWeak(description: string): boolean {
+  return WEAK_TRANSFER.test(description);
+}
+
+function isThirdPartyPayout(description: string): boolean {
+  return THIRD_PARTY_PAYOUT.test(description);
+}
+
 export function detectTransferPairs(rows: PreviewTxn[]): TransferPair[] {
   const active = rows.filter((r) => !r.skipReason && !r.isTransfer);
   if (active.length < 2) return [];
@@ -51,26 +70,31 @@ export function detectTransferPairs(rows: PreviewTxn[]): TransferPair[] {
 
       const creditCents = amountToCents(credit.amountZAR);
       const diff = Math.abs(debitCents + creditCents);
-      if (diff > AMOUNT_TOLERANCE_CENTS) continue;
+      const debitStrong = isStrong(debit.description);
+      const creditStrong = isStrong(credit.description);
+      const eitherStrong = debitStrong || creditStrong;
+      const maxDiff = eitherStrong ? LOOSE_TOLERANCE_CENTS : AMOUNT_TOLERANCE_CENTS;
+      if (diff > maxDiff) continue;
+      if (isFeeOrInterest(debit.description) || isFeeOrInterest(credit.description)) continue;
+      if (isThirdPartyPayout(debit.description) || isThirdPartyPayout(credit.description)) continue;
 
       const dayGap = daysBetween(debit.date, credit.date);
       if (dayGap > MAX_DATE_DAYS) continue;
 
-      let score = 50;
-      score += transferHintScore(debit.description);
-      score += transferHintScore(credit.description);
-      score += Math.max(0, 20 - dayGap * 5);
-      score += diff === 0 ? 20 : 10;
+      if (!eitherStrong) continue;
 
-      if (!best || score > best.score) {
-        best = { credit, score };
-      }
+      let score = 40;
+      score += debitStrong ? 30 : isWeak(debit.description) ? 10 : 0;
+      score += creditStrong ? 30 : isWeak(credit.description) ? 10 : 0;
+      score += Math.max(0, 20 - dayGap * 8);
+      score += diff === 0 ? 20 : 5;
+
+      if (!best || score > best.score) best = { credit, score };
     }
 
-    if (best && best.score >= 60) {
-      const pairId = `xfer-${debit.id}-${best.credit.id}`;
+    if (best && best.score >= 70) {
       pairs.push({
-        pairId,
+        pairId: `xfer-${debit.id}-${best.credit.id}`,
         debitId: debit.id,
         creditId: best.credit.id,
         amountCents: Math.abs(debitCents),

@@ -32,8 +32,11 @@ const config: CapacitorConfig = {
   },
 
   ios: {
-    contentInset: "always",
-    backgroundColor: "#0a0a0a",
+    // "always" reserved a white native strip above the WebView for the clock
+    // / battery. Dark mode then looked like Instagram-but-with-a-white-hat.
+    // Never: the page paints edge-to-edge and uses safe-area padding instead.
+    contentInset: "never",
+    backgroundColor: "#000000",
     // Identifies the shell in your server logs and lets you branch on native.
     appendUserAgent: "NothoApp/iOS",
     limitsNavigationsToAppBoundDomains: false,
@@ -47,8 +50,10 @@ const config: CapacitorConfig = {
 
   plugins: {
     SplashScreen: {
-      launchShowDuration: 1200,
-      backgroundColor: "#0a0a0a",
+      // iOS already shows LaunchScreen.storyboard while the process starts.
+      // Do not add a second timed native splash before AuthGate's Notho splash.
+      launchShowDuration: 0,
+      backgroundColor: "#ffffff",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
     },

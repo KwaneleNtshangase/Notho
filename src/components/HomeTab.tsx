@@ -179,7 +179,7 @@ export function LearnView({
               {dueCount} concept{dueCount > 1 ? "s" : ""} to review
             </p>
             <p className="text-purple-600 dark:text-purple-400 text-xs">
-              Quick quiz to keep your memory sharp
+              Cards that are due today
             </p>
           </div>
           <span className="shrink-0 text-xs font-bold text-white bg-purple-600 rounded-full px-2.5 py-1">
@@ -243,27 +243,26 @@ export function LearnView({
 
       {/* Fact of the Day */}
       <div style={{
-        background: "linear-gradient(135deg, rgba(0,122,133,0.08) 0%, rgba(239,179,67,0.06) 100%)",
-        border: "1px solid rgba(0,122,133,0.2)", borderRadius: 14,
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-border)", borderRadius: 12,
         padding: "14px 16px", marginBottom: 20,
-        borderLeft: "4px solid var(--color-primary)",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-primary)", marginBottom: 4 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}>
           <Lightbulb size={14} aria-hidden />
-          Fact of the Day
+          Today
         </div>
         <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.5 }}>{todayFact}</div>
       </div>
 
       <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 16 }}>
-        Your Learning Path
+        Courses
       </h2>
 
       {!search.trim() && recommendedCourseIds.length > 0 && (
         <div className="mb-6">
           <div className="mb-3 flex items-center justify-between px-1">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white">Recommended for You</h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400">Based on your goal</span>
+            <h3 className="text-base font-bold text-gray-900 dark:text-white">First up</h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400">From the goal you picked</span>
           </div>
           <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
             {recommendedCourseIds.map((courseId) => {
@@ -280,7 +279,7 @@ export function LearnView({
                     <CourseIcon name={course.icon} size={40} />
                   </div>
                   <p className="text-sm font-bold leading-tight text-gray-900 dark:text-white">{course.title}</p>
-                  <p className="mt-1 text-xs font-medium text-green-600 dark:text-green-400">Start here →</p>
+                  <p className="mt-1 text-xs font-medium text-green-600 dark:text-green-400">Open course</p>
                 </button>
               );
             })}
@@ -292,7 +291,7 @@ export function LearnView({
       <div style={{ position: "relative", marginBottom: 24 }}>
         <input
           type="text"
-          placeholder="Search courses..."
+          placeholder="Search courses"
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{

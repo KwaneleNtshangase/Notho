@@ -1,0 +1,113 @@
+/* Quiet liquid glass — Expo GlassView regular, not a milky sticker.
+   Real UIGlassEffect only exists in native Expo. This is the web/Capacitor
+   stand-in: blur does the work, fill stays thin, no tint, no rainbow rim. */
+
+.bottom-nav {
+  background: transparent !important;
+  border-top: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  touch-action: pan-y;
+}
+
+.bottom-nav::before,
+.bottom-nav::after {
+  content: none !important;
+  display: none !important;
+}
+
+.nav-pill {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.28) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(140%) !important;
+  backdrop-filter: blur(40px) saturate(140%) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.38) !important;
+  border-radius: 999px !important;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -0.5px 0 rgba(255, 255, 255, 0.08),
+    0 10px 28px rgba(0, 0, 0, 0.06) !important;
+  filter: none !important;
+  padding: 3px 4px !important;
+}
+
+.nav-lens {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.34);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.7);
+  transition:
+    transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 160ms ease;
+}
+
+.nav-pill-btn {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+  color: rgba(28, 28, 32, 0.72) !important;
+}
+
+.nav-pill-btn .nav-lbl {
+  color: inherit;
+  font-weight: 650;
+  opacity: 1;
+}
+
+.nav-pill-btn[data-active="true"] {
+  background: transparent !important;
+  color: #111118 !important;
+}
+
+.nav-pill-btn[data-active="true"] .nav-ico {
+  transform: scale(1.04);
+}
+
+html.dark .nav-pill {
+  background: rgba(18, 18, 20, 0.38) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.28),
+    0 10px 28px rgba(0, 0, 0, 0.28) !important;
+}
+
+html.dark .nav-lens {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.28);
+}
+
+html.dark .nav-pill-btn {
+  color: rgba(235, 235, 240, 0.72) !important;
+}
+
+html.dark .nav-pill-btn[data-active="true"] {
+  color: #ffffff !important;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav-pill {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+  }
+  html.dark .nav-pill {
+    background: rgba(28, 28, 30, 0.96) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-lens {
+    transition: none !important;
+  }
+}

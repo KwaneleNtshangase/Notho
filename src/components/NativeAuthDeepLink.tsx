@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
+import { parseNativeAuthCallback } from "@/lib/nativeAuthCallback";
 
-// Google and Facebook refuse to complete OAuth inside an embedded webview
+// OAuth providers must not complete authentication inside an embedded webview
 // (Google returns 403: disallowed_useragent), so on native platforms
 // AuthGate hands the OAuth URL to the system browser via @capacitor/browser
 // instead of letting it open inside the app's own webview. See
@@ -39,13 +40,26 @@ export function NativeAuthDeepLink() {
         async ({ url }: { url: string }) => {
           if (!url.includes("auth/callback")) return;
 
-          const code = new URL(url).searchParams.get("code");
-          if (code) {
-            const { error } = await supabase.auth.exchangeCodeForSession(code);
-            if (error) {
-              // eslint-disable-next-line no-console
-              console.error("Native OAuth callback failed:", error.message);
-            }
+          const callback = parseNativeAuthCallback(url);
+          let authError: Error | null = null;
+
+          if (callback.errorDescription) {
+            authError = new Error(callback.errorDescription);
+          } else if (callback.accessToken && callback.refreshToken) {
+            const { error } = await supabase.auth.setSession({
+              access_token: callback.accessToken,
+              refresh_token: callback.refreshToken,
+            });
+            authError = error;
+          } else if (callback.code) {
+            const { error } = await supabase.auth.exchangeCodeForSession(callback.code);
+            authError = error;
+          } else {
+            authError = new Error("The sign-in callback did not contain a session.");
+          }
+
+          if (authError) {
+            console.error("Native OAuth callback failed:", authError.message);
           }
 
           // Closes the system browser tab/sheet that OAuth ran in, returning

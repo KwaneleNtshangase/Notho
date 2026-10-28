@@ -22,7 +22,7 @@ export type BankTemplate = {
 
 export const BANK_TEMPLATES: BankTemplate[] = [
   { id: "capitec", detect: /capitec/i, dateFormat: "dmy" },
-  { id: "standard-bank", detect: /standard\s+bank|std\s+bank/i, dateFormat: "dmy" },
+  { id: "standard-bank", detect: /standard\s+bank|std\s+bank/i, dateFormat: "dMon" },
   { id: "fnb", detect: /\bfnb\b|first\s+national\s+bank|fnb\.co\.za|gold\s+business\s+account/i, dateFormat: "dMon" },
   { id: "discovery", detect: /discovery\s+bank|discovery\s+gold\s+transaction|fsp\s+number\s+48657/i, dateFormat: "dMon" },
 ];
@@ -40,9 +40,11 @@ const FNB_FOOTER =
 const SB_HEADER_RE = /\bdate\b.*\bdescription\b.*\bpayments\b.*\bdeposits\b.*\bbalance\b/i;
 const SB_OPENING_RE = /statement\s+opening\s+balance/i;
 const SB_SECTION_END =
-  /statement\s+closing\s+balance|today'?s\s+debits\s+have\s+not|the\s+standard\s+bank\s+of\s+south/i;
+  /statement\s+summary|today'?s\s+debits\s+have\s+not|please\s+verify\s+all\s+transactions/i;
 const SB_FOOTER =
-  /customer\s+care|standardbank\.co\.za|pg\s*\d+\s*of\s*\d+|page\s*\d+\s*of\s*\d+/i;
+  /customer\s+care|standardbank\.co\.za|pg\s*\d+\s*of\s*\d+|page\s*\d+\s+of\s+\d+|the\s+standard\s+bank\s+of\s+south|authorised\s+financial\s+services|we\s+subscribe\s+to\s+the\s+code\s+of\s+banking/i;
+const SB_PAGE_CHROME =
+  /available\s+balance|account\s+number|account\s+holder|product\s+name|transaction\s+details|3\s+month\s+statement|6\s+month\s+statement|website\s*:|single\s+ibt\s+sbsa/i;
 
 /**
  * Trim noise from a transaction description: card masks, long reference/account
@@ -55,6 +57,16 @@ export function cleanDescription(raw: string): string {
   s = s.replace(/\b\d{6,}\b/g, " ");                           // long reference / account numbers
   s = s.replace(/\b0\d{2}[-\s]?\d{3}[-\s]?\d{4}\b/g, " ");     // phone numbers
   s = s.replace(/universal\s+branch\s+code\s*\d*/gi, " ");     // branch-code boilerplate
+  s = s.replace(/www\.[a-z0-9.-]+\.[a-z]{2,}/gi, " ");
+  s = s.replace(/https?:\/\/\S+/gi, " ");
+  s = s.replace(/customer\s+care(?:\s*:)?\s*[\d\s]+/gi, " ");
+  s = s.replace(/\bwebsite\s*:/gi, " ");
+  s = s.replace(/\bsingle\s+ibt\s+sbsa\b/gi, " ");
+  s = s.replace(/\bstandard\s+bank(?:\s+limited)?\b/gi, " ");
+  s = s.replace(/\bthe\s+standard\s+bank\s+of\s+south\s+africa\b/gi, " ");
+  s = s.replace(/\bavailable\s+balance\b/gi, " ");
+  s = s.replace(/\bstatement\s+summary\b/gi, " ");
+  s = s.replace(/\btoday'?s\s+debits\s+have\s+not\s+yet\s+been\s+paid\b/gi, " ");
   s = s.replace(/\s+/g, " ").trim();
   if (s.length > 90) s = `${s.slice(0, 89).trim()}…`;
   return s;
@@ -463,6 +475,42 @@ export function detectStandardBankColumns(line: TextLine): ColumnLayout | null {
   };
 }
 
+function orderStandardBankLines(lines: TextLine[]): TextLine[] {
+  const byPage = new Map<number, TextLine[]>();
+  for (const line of lines) {
+    const arr = byPage.get(line.page) ?? [];
+    arr.push(line);
+    byPage.set(line.page, arr);
+  }
+  const out: TextLine[] = [];
+  for (const page of [...byPage.keys()].sort((a, b) => a - b)) {
+    const pageLines = byPage.get(page)!;
+    const header = pageLines.find((l) => SB_HEADER_RE.test(l.text.replace(/\s+/g, " ")));
+    if (!header) {
+      out.push(...[...pageLines].sort((a, b) => b.y - a.y));
+      continue;
+    }
+    const rest = pageLines.filter((l) => l !== header);
+    const belowHeader = rest.filter((l) => l.y < header.y - 0.5);
+    const aboveHeader = rest.filter((l) => l.y > header.y + 0.5);
+    if (belowHeader.length >= aboveHeader.length) {
+      out.push(header, ...belowHeader.sort((a, b) => b.y - a.y));
+    } else {
+      out.push(header, ...aboveHeader.sort((a, b) => a.y - b.y));
+    }
+  }
+  return out;
+}
+
+function isStandardBankNoiseLine(line: TextLine): boolean {
+  const t = line.text;
+  if (SB_FOOTER.test(t)) return true;
+  if (SB_PAGE_CHROME.test(t) && !SB_HEADER_RE.test(t.replace(/\s+/g, " ")) && !SB_OPENING_RE.test(t)) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * Standard Bank parser. Two-line rows (a date line + a transaction-type line),
  * separate Payments (out) / Deposits (in) columns, comma thousands, DD Mon YY
@@ -480,8 +528,10 @@ export function parseStandardBankLayout(
   let balanceChainOk = true;
   let lastRowIndex = -1;
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  const ordered = orderStandardBankLines(lines);
+
+  for (let i = 0; i < ordered.length; i++) {
+    const line = ordered[i];
 
     const headerCols = detectStandardBankColumns(line);
     if (headerCols) {
@@ -501,6 +551,9 @@ export function parseStandardBankLayout(
       inTable = false;
       continue;
     }
+    if (isStandardBankNoiseLine(line)) {
+      continue;
+    }
 
     const buckets = bucketItemsToColumns(line, columns);
     const dateStr = textFromBucket(buckets, "date").replace(/\s+/g, " ").trim();
@@ -516,10 +569,11 @@ export function parseStandardBankLayout(
         lastRowIndex >= 0 &&
         balanceAfter === null &&
         moneyIn === null &&
-        moneyOut === null
+        moneyOut === null &&
+        !isStandardBankNoiseLine(line)
       ) {
         const extra = textFromBucket(buckets, "description").replace(/\s+/g, " ").trim();
-        if (extra) {
+        if (extra && !SB_FOOTER.test(extra) && !SB_PAGE_CHROME.test(extra)) {
           const last = rows[lastRowIndex];
           last.description = cleanDescription(`${last.description} ${extra}`) || last.description;
         }

@@ -1,30 +1,12 @@
 /**
- * Shared types, fetching and formatting for the admin analytics dashboard.
- * Kept out of page.tsx so the page file stays about layout, not plumbing.
+ * Types, fetching and formatting for the admin dashboard.
+ *
+ * Kept separate from the panels so the panel files stay about what a number
+ * means, not how it arrived. Every row shape here mirrors a SECURITY DEFINER
+ * function in supabase/migrations - if you change one, change both.
  */
 
 import { supabase } from "@/lib/supabaseClient";
-
-// ── Brand palette (from brand/BRAND.md) ──────────────────────────────────────
-export const C = {
-  navy: "#083088",
-  teal: "#049DA7",
-  tealDeep: "#007A85",
-  gold: "#EAAC3E",
-  blue: "#0A3A71",
-  red: "#E03C31",
-  green: "#0E9F6E",
-  purple: "#7C4DFF",
-  ink: "#111827",
-  body: "#374151",
-  muted: "#6B7280",
-  line: "#E5E7EB",
-  bg: "#F7FAFC",
-  card: "#FFFFFF",
-} as const;
-
-/** Ordered so charts stay visually distinct without hand-picking per series. */
-export const SERIES = [C.teal, C.gold, C.navy, C.purple, C.green, C.red, C.blue];
 
 // ── Row shapes returned by the RPCs ──────────────────────────────────────────
 
@@ -38,13 +20,29 @@ export type Overview = {
   wau: number;
   mau: number;
   lessonsCompleted: number;
+  lessonsInWindow: number;
+  lessonsInWindowPrev: number;
   totalXp: number;
   totalMinutes: number;
+  totalMinutesPrev: number;
   sessions: number;
+  sessionsPrev: number;
   avgSessionMinutes: number;
+  medianSessionMinutes: number;
   usersWithStreak: number;
+  streak7Plus: number;
   answerAccuracy: number;
+  answerAccuracyPrev: number;
+  firstTryAccuracy: number | null;
+  answers: number;
   pwaShare: number;
+  activatedUsers: number;
+  activationRate: number;
+  neverActivated: number;
+  atRiskUsers: number;
+  dormantUsers: number;
+  returningShare: number;
+  avgActiveDays: number;
   windowDays: number;
   generatedAt: string;
 };
@@ -55,6 +53,7 @@ export type DailyRow = {
   sessions: number;
   minutes: number;
   lessons: number;
+  answers: number;
   new_users: number;
 };
 
@@ -75,12 +74,83 @@ export type FeatureTimeRow = {
   share_pct: number;
 };
 
+export type FeatureLiftRow = {
+  feature: string;
+  users_used: number;
+  users_not: number;
+  return_used_pct: number | null;
+  return_not_pct: number | null;
+  lift_pts: number | null;
+  avg_days_used: number | null;
+  avg_days_not: number | null;
+};
+
 export type RetentionRow = {
   cohort_week: string;
   cohort_size: number;
   d1_pct: number | null;
   d7_pct: number | null;
   d30_pct: number | null;
+};
+
+export type MatrixRow = {
+  cohort_week: string;
+  cohort_size: number;
+  week_index: number;
+  retained: number;
+  pct: number | null;
+};
+
+export type FunnelRow = {
+  step: number;
+  step_key: string;
+  label: string;
+  hint: string;
+  users: number;
+  pct: number | null;
+  drop_pct: number | null;
+};
+
+export type SegmentRow = {
+  sort_order: number;
+  segment: string;
+  label: string;
+  action: string;
+  users: number;
+  pct: number | null;
+  avg_minutes: number | null;
+  avg_lessons: number | null;
+  avg_days_since: number | null;
+};
+
+export type ClockRow = { dow: number; hour: number; events: number; users: number };
+
+export type GrowthRow = {
+  week: string;
+  active: number;
+  new_users: number;
+  retained: number;
+  resurrected: number;
+  churned: number;
+  net: number;
+};
+
+export type StreakRow = { sort_order: number; bucket: string; users: number; pct: number | null };
+
+export type AtRiskRow = {
+  user_id: string;
+  email: string;
+  username: string | null;
+  full_name: string | null;
+  lessons_done: number;
+  xp: number;
+  streak: number;
+  longest_streak: number;
+  total_minutes: number;
+  last_seen: string;
+  days_since: number;
+  risk: string;
+  risk_score: number;
 };
 
 export type UserRow = {
@@ -110,6 +180,20 @@ export type ContentRow = {
   learners: number;
   first_try_pct: number | null;
   overall_pct: number;
+  avg_attempts: number;
+  verdict: string;
+};
+
+export type QuestionRow = {
+  course_id: string;
+  lesson_id: string;
+  slot_id: string;
+  variant_id: string;
+  concept_id: string | null;
+  attempts: number;
+  learners: number;
+  first_try_pct: number | null;
+  overall_pct: number | null;
   avg_attempts: number;
   verdict: string;
 };
@@ -179,7 +263,7 @@ export type UserDetail = {
     longestStreak: number;
     lessonsDone: number;
     perfectTotal: number;
-    hearts: number;
+    hearts: number | null;
     lastActivity: string | null;
     completedLessons: string[];
   } | null;
@@ -193,22 +277,39 @@ export type UserDetail = {
     usesPwa: boolean;
   } | null;
   features: { feature: string; events: number; lastUsed: string }[];
-  accuracy: { answered: number; correct: number; pct: number | null } | null;
-  dailyMinutes: { day: string; minutes: number }[];
+  accuracy: {
+    answered: number;
+    correct: number;
+    pct: number | null;
+    firstTryPct: number | null;
+    firstAnswer: string | null;
+    lastAnswer: string | null;
+  } | null;
+  dailyMinutes: { day: string; minutes: number; answers: number }[];
+  courses: {
+    courseId: string;
+    lessons: number;
+    attempts: number;
+    firstTryPct: number | null;
+    lastSeen: string;
+  }[];
   recentEvents: {
     event: string;
     feature: string;
     props: Record<string, unknown>;
     at: string;
   }[];
+  lastActive: string | null;
+  daysSinceSeen: number | null;
 };
 
 // ── Fetching ─────────────────────────────────────────────────────────────────
 
 /**
  * Calls the admin analytics endpoint with the caller's access token. Throws a
- * message the UI can show verbatim - the panel components surface these
- * directly rather than showing a generic failure.
+ * message the UI can show verbatim, including the raw Postgres detail the route
+ * now returns to admins - a generic "could not load" cost a whole debugging
+ * session the last time a query broke.
  */
 export async function fetchView<T>(
   view: string,
@@ -233,7 +334,10 @@ export async function fetchView<T>(
     throw new Error("This dashboard is admin-only and your account is not an admin.");
   }
   if (!res.ok) {
-    throw new Error(body?.error ?? `Request failed (${res.status}).`);
+    const parts = [body?.error ?? `Request failed (${res.status}).`];
+    if (body?.hint) parts.push(body.hint);
+    if (body?.detail) parts.push(`Postgres said: ${body.detail}`);
+    throw new Error(parts.join("\n"));
   }
   return body.data as T;
 }
@@ -285,10 +389,10 @@ export function shortDate(iso: string): string {
 }
 
 /** Percentage change vs the previous equal-length window. */
-export function delta(current: number, previous: number): {
-  pct: number | null;
-  dir: "up" | "down" | "flat";
-} {
+export function delta(
+  current: number,
+  previous: number
+): { pct: number | null; dir: "up" | "down" | "flat" } {
   if (!previous) return { pct: null, dir: current > 0 ? "up" : "flat" };
   const pct = Math.round(((current - previous) / previous) * 100);
   return { pct, dir: pct > 0 ? "up" : pct < 0 ? "down" : "flat" };
@@ -319,6 +423,16 @@ export const FEATURE_LABELS: Record<string, string> = {
 
 export function featureLabel(key: string): string {
   return FEATURE_LABELS[key] ?? key.charAt(0).toUpperCase() + key.slice(1);
+}
+
+export const DOW_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+export function displayName(u: {
+  username?: string | null;
+  full_name?: string | null;
+  email?: string | null;
+}): string {
+  return u.username || u.full_name || u.email?.split("@")[0] || "Unknown";
 }
 
 // ── CSV export ───────────────────────────────────────────────────────────────

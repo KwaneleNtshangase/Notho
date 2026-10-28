@@ -4,8 +4,11 @@ import {
   streakAtRiskPush,
   coachAlertPush,
   leaderboardDefencePush,
+  routinePush,
   pickPush,
 } from "../triggers";
+
+const next = { lessonTitle: "Needs vs Wants", courseTitle: "Money Basics", url: "/lesson/money-basics/lesson-2" };
 
 describe("yesterdayOf", () => {
   it("handles normal days and month boundaries", () => {
@@ -16,24 +19,42 @@ describe("yesterdayOf", () => {
 });
 
 describe("streakAtRiskPush", () => {
-  it("fires for a 3+ streak last active yesterday", () => {
-    const p = streakAtRiskPush(7, "2026-07-11", "2026-07-12");
+  it("fires for a 2+ streak last active yesterday", () => {
+    const p = streakAtRiskPush(7, "2026-07-11", "2026-07-12", next);
     expect(p).not.toBeNull();
     expect(p!.key).toBe("streak:2026-07-12");
-    expect(p!.title).toContain("7-day streak");
+    expect(p!.url).toBe(next.url);
+    expect(p!.body).toContain("Needs vs Wants");
   });
 
-  it("skips short streaks", () => {
-    expect(streakAtRiskPush(2, "2026-07-11", "2026-07-12")).toBeNull();
+  it("skips a one-day streak", () => {
+    expect(streakAtRiskPush(1, "2026-07-11", "2026-07-12", next)).toBeNull();
   });
 
   it("skips users already active today", () => {
-    expect(streakAtRiskPush(7, "2026-07-12", "2026-07-12")).toBeNull();
+    expect(streakAtRiskPush(7, "2026-07-12", "2026-07-12", next)).toBeNull();
   });
 
   it("skips already-broken streaks", () => {
-    expect(streakAtRiskPush(7, "2026-07-09", "2026-07-12")).toBeNull();
-    expect(streakAtRiskPush(7, null, "2026-07-12")).toBeNull();
+    expect(streakAtRiskPush(7, "2026-07-09", "2026-07-12", next)).toBeNull();
+    expect(streakAtRiskPush(7, null, "2026-07-12", next)).toBeNull();
+  });
+});
+
+describe("routinePush", () => {
+  it("fires when they have not learned today", () => {
+    const p = routinePush("2026-07-11", "2026-07-12", next);
+    expect(p).not.toBeNull();
+    expect(p!.key).toBe("routine:2026-07-12");
+    expect(p!.url).toBe(next.url);
+  });
+
+  it("stays quiet after today's lesson", () => {
+    expect(routinePush("2026-07-12", "2026-07-12", next)).toBeNull();
+  });
+
+  it("stops after a quiet week", () => {
+    expect(routinePush("2026-07-01", "2026-07-12", next)).toBeNull();
   });
 });
 
@@ -48,16 +69,10 @@ describe("coachAlertPush", () => {
 });
 
 describe("leaderboardDefencePush", () => {
-  it("fires Saturdays for competing users", () => {
+  it("still returns a parked payload so old tests have a shape", () => {
     const p = leaderboardDefencePush(2, 90, "2026-W28", true);
     expect(p).not.toBeNull();
-    expect(p!.key).toBe("rank:2026-W28");
-    expect(p!.title).toContain("#2");
-  });
-
-  it("has a special #1 message", () => {
-    const p = leaderboardDefencePush(1, 150, "2026-W28", true);
-    expect(p!.body).toContain("crown");
+    expect(p!.url).toBe("/learn");
   });
 
   it("skips non-Saturdays, low ranks and zero-XP users", () => {
@@ -69,10 +84,10 @@ describe("leaderboardDefencePush", () => {
 
 describe("pickPush", () => {
   it("returns the first non-null candidate (priority order)", () => {
-    const streak = streakAtRiskPush(5, "2026-07-11", "2026-07-12");
-    const rank = leaderboardDefencePush(1, 150, "2026-W28", true);
-    expect(pickPush([streak, null, rank])!.key).toBe("streak:2026-07-12");
-    expect(pickPush([null, null, rank])!.key).toBe("rank:2026-W28");
+    const streak = streakAtRiskPush(5, "2026-07-11", "2026-07-12", next);
+    const routine = routinePush("2026-07-11", "2026-07-12", next);
+    expect(pickPush([streak, routine])!.key).toBe("streak:2026-07-12");
+    expect(pickPush([null, routine])!.key).toBe("routine:2026-07-12");
     expect(pickPush([null, null, null])).toBeNull();
   });
 });

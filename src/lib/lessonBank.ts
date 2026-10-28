@@ -6,6 +6,24 @@ import type {
 } from "@/data/content";
 import { hashSeed, mulberry32 } from "@/lib/lessonShuffle";
 import type { WorkingStep } from "@/lib/lessonMastery";
+import { prettyExponents } from "@/lib/prettyExponents";
+
+function prettyStep<T extends LessonStep>(step: T): T {
+  const s = { ...(step as unknown as Record<string, unknown>) };
+  for (const k of ["question", "prompt", "content", "title", "statement", "explanation"]) {
+    if (typeof s[k] === "string") s[k] = prettyExponents(s[k] as string);
+  }
+  if (Array.isArray(s.options)) s.options = (s.options as string[]).map(prettyExponents);
+  const f = s.feedback as Record<string, string> | undefined;
+  if (f && typeof f === "object") {
+    s.feedback = {
+      ...f,
+      ...(typeof f.correct === "string" ? { correct: prettyExponents(f.correct) } : {}),
+      ...(typeof f.incorrect === "string" ? { incorrect: prettyExponents(f.incorrect) } : {}),
+    };
+  }
+  return s as T;
+}
 
 /**
  * Lesson bank resolution.
@@ -117,9 +135,6 @@ function pickVariant(
   }
   const key = slotKey(userId, slot.slotId);
 
-  // Spaced-repetition weighting: if the learner has previously missed a variant
-  // of this slot, re-serve that exact item part of the time — the hard question
-  // keeps coming back until they get it right (then it's cleared).
   const missedIds = (missed[key] ?? []).filter((id) =>
     slot.variants.some((v) => v.variantId === id)
   );
@@ -128,20 +143,17 @@ function pickVariant(
     return slot.variants.find((v) => v.variantId === id)!;
   }
 
-  // Otherwise prefer a variant not seen in recent attempts (freshness).
   const recent = seen[key] ?? [];
   let pool = slot.variants.filter((v) => !recent.includes(v.variantId));
-  if (pool.length === 0) pool = slot.variants; // exhausted → allow reuse
+  if (pool.length === 0) pool = slot.variants;
 
   const chosen = pool[Math.floor(rng() * pool.length)];
 
-  // Remember it, capped so at least one variant is always "fresh" next time.
   const cap = Math.max(1, slot.variants.length - 1);
   seen[key] = [...recent.filter((id) => id !== chosen.variantId), chosen.variantId].slice(-cap);
   return chosen;
 }
 
-/** Attach the slot's concept + slot/variant ids to the chosen step. */
 function variantToStep(variant: QuestionVariant, slot: QuestionSlot): WorkingStep {
   return {
     ...variant.step,
@@ -155,7 +167,6 @@ function legacySeenKey(userId: string | null, lessonId: string): string {
   return `${userId ?? "anon"}:legacy:${lessonId}`;
 }
 
-/** Pick `count` question-step indices, preferring those not recently seen. */
 function pickLegacyQuestionIndices(
   questionIndices: number[],
   userId: string | null,
@@ -184,20 +195,16 @@ function pickLegacyQuestionIndices(
   return chosen;
 }
 
-/**
- * Legacy lessons: show a seeded subset of question steps so replays differ.
- * Non-question steps (info, action, …) are always kept in order.
- */
 function resolveLegacyLessonSteps(lesson: Lesson, ctx: ResolveCtx): LessonStep[] {
   const steps = lesson.steps ?? [];
-  if (typeof window === "undefined") return steps;
+  if (typeof window === "undefined") return steps.map((st) => prettyStep(st));
 
   const questionIndices: number[] = [];
   for (let i = 0; i < steps.length; i++) {
     if (LEGACY_QT.has(steps[i]!.type)) questionIndices.push(i);
   }
   const Q = questionIndices.length;
-  if (Q <= LEGACY_SHOW || Q > LEGACY_MAX) return steps;
+  if (Q <= LEGACY_SHOW || Q > LEGACY_MAX) return steps.map((st) => prettyStep(st));
 
   const seen = readMap(SEEN_KEY);
   const chosen = new Set(
@@ -215,9 +222,9 @@ function resolveLegacyLessonSteps(lesson: Lesson, ctx: ResolveCtx): LessonStep[]
   for (let i = 0; i < steps.length; i++) {
     const step = steps[i]!;
     if (LEGACY_QT.has(step.type)) {
-      if (chosen.has(i)) out.push(step);
+      if (chosen.has(i)) out.push(prettyStep(step));
     } else {
-      out.push(step);
+      out.push(prettyStep(step));
     }
   }
 
@@ -225,10 +232,6 @@ function resolveLegacyLessonSteps(lesson: Lesson, ctx: ResolveCtx): LessonStep[]
   return out;
 }
 
-/**
- * Resolve a lesson into concrete steps. Bank-backed lessons pick one variant
- * per slot; legacy lessons rotate a subset of their question steps per attempt.
- */
 export function resolveLessonSteps(lesson: Lesson, ctx: ResolveCtx): LessonStep[] {
   if (!lesson.layout || !lesson.slots || lesson.slots.length === 0) {
     return resolveLegacyLessonSteps(lesson, ctx);
@@ -246,9 +249,9 @@ export function resolveLessonSteps(lesson: Lesson, ctx: ResolveCtx): LessonStep[
     if ("slot" in item) {
       const slot = slotsById.get(item.slot);
       if (!slot || slot.variants.length === 0) continue;
-      out.push(variantToStep(pickVariant(slot, ctx.userId, rng, seen, missed), slot));
+      out.push(prettyStep(variantToStep(pickVariant(slot, ctx.userId, rng, seen, missed), slot)));
     } else {
-      out.push(item);
+      out.push(prettyStep(item));
     }
   }
 
@@ -258,11 +261,6 @@ export function resolveLessonSteps(lesson: Lesson, ctx: ResolveCtx): LessonStep[
 
 const ATTEMPTS_KEY = "notho-lesson-attempts";
 
-/**
- * Read-then-increment the replay counter for a lesson. Bumping it is what makes
- * a repeat resolve to a different set of variants.
- */
-/** Read the current attempt counter without incrementing (for logging). */
 export function peekAttemptNo(userId: string | null, lessonId: string): number {
   if (typeof window === "undefined") return 1;
   try {

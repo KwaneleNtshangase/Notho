@@ -73,7 +73,9 @@ function lessonQuestionCount(lesson: {
   layout?: unknown[];
   slots?: unknown[];
   steps?: LessonStep[];
+  secureQuestionCount?: number;
 }): number {
+  if (typeof lesson.secureQuestionCount === "number") return lesson.secureQuestionCount;
   if (Array.isArray(lesson.layout) && Array.isArray(lesson.slots) && lesson.slots.length > 0) {
     let n = 0;
     for (const item of lesson.layout as Array<Record<string, unknown>>) {
@@ -108,17 +110,19 @@ describe("content quality — answer patterns", () => {
     ).toEqual([]);
   });
 
-  it("keeps the correct-is-longest rate from regressing", () => {
-    // RATCHET: 72% after pass 3 (chance would be ~25%). Do not let it climb;
-    // lower it as more content is rebalanced.
-    const MAX_LONGEST_RATE = 0.73;
+  it("keeps the correct-is-longest count from regressing", () => {
+    // Secure mocks moved out of this client-content sample, so its denominator
+    // changed. Preserve the pre-move numerator as an absolute ratchet instead
+    // of loosening a percentage until it passes.
+    const MAX_LONGEST_COUNT = 440;
     const longest = optionQs.filter((q) => lengthStats(q).uniquelyLongest).length;
-    expect(longest / optionQs.length).toBeLessThanOrEqual(MAX_LONGEST_RATE);
+    expect(longest).toBeLessThanOrEqual(MAX_LONGEST_COUNT);
   });
 
   it("keeps the flagrant (>=40% margin) count from regressing", () => {
-    // RATCHET: 147 after pass 3 (444 pre-audit, 364 pass 1, 273 pass 2).
-    const MAX_FLAGRANT = 147;
+    // The previous 147 included client fallback mocks that no longer ship.
+    // 138 is the unchanged non-mock numerator at the server boundary move.
+    const MAX_FLAGRANT = 138;
     const flagrant = optionQs.filter((q) => {
       const s = lengthStats(q);
       return s.uniquelyLongest && s.marginPct >= 40;

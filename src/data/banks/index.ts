@@ -36,8 +36,6 @@ import { RETIREMENT_EXTRA_BANKS } from "./retirement-extra";
 import { RAND_ECONOMY_EXTRA_BANKS } from "./rand-economy-extra";
 import { CRYPTO_BASICS_EXTRA_BANKS } from "./crypto-basics-extra";
 import { BUSINESS_FINANCE_EXTRA_BANKS } from "./business-finance-extra";
-import { RE5_MOCK_A_BANK } from "./re5-mock-a";
-import { RE5_MOCK_B_BANK } from "./re5-mock-b";
 
 export type { LessonBank };
 
@@ -84,6 +82,4 @@ export const LESSON_BANKS: Record<string, LessonBank> = {
   ...RAND_ECONOMY_EXTRA_BANKS,
   ...CRYPTO_BASICS_EXTRA_BANKS,
   ...BUSINESS_FINANCE_EXTRA_BANKS,
-  ...RE5_MOCK_A_BANK,
-  ...RE5_MOCK_B_BANK,
 };

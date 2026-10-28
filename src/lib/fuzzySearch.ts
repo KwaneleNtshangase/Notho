@@ -11,6 +11,7 @@
 
 import type { Course } from "@/data/content";
 import type { Concept } from "@/data/concepts";
+import { courseSearchText } from "@/lib/courseSearchText";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -21,6 +22,8 @@ export type IndexEntry = {
   titleTokens: string[];
   tagTokens: string[];
   descTokens: string[];
+  /** Tokens from every locale pack: titles, lesson copy, and translations. */
+  localeTokens: string[];
 };
 
 export type FuzzySearchResult = {
@@ -143,6 +146,7 @@ export function buildSearchIndex(
     titleTokens: tokenise(course.title),
     tagTokens: [...new Set(courseConceptMap.get(course.id) ?? [])],
     descTokens: tokenise(course.description ?? ""),
+    localeTokens: [...new Set(tokenise(courseSearchText(course)))],
   }));
 }
 
@@ -198,9 +202,10 @@ export function fuzzySearch(
     for (const qt of queryTokens) {
       const titleScore = scoreToken(qt, entry.titleTokens) * FIELD_WEIGHTS.title;
       const tagScore = scoreToken(qt, entry.tagTokens) * FIELD_WEIGHTS.tag;
+      const localeScore = scoreToken(qt, entry.localeTokens) * FIELD_WEIGHTS.tag;
       const descScore = scoreToken(qt, entry.descTokens) * FIELD_WEIGHTS.description;
 
-      const maxFieldScore = Math.max(titleScore, tagScore, descScore);
+      const maxFieldScore = Math.max(titleScore, tagScore, localeScore, descScore);
       totalScore += maxFieldScore;
 
       if (titleScore === maxFieldScore && titleScore > bestFieldScore) {
@@ -209,6 +214,9 @@ export function fuzzySearch(
       } else if (tagScore === maxFieldScore && tagScore > bestFieldScore) {
         bestField = "tag";
         bestFieldScore = tagScore;
+      } else if (localeScore === maxFieldScore && localeScore > bestFieldScore) {
+        bestField = "tag";
+        bestFieldScore = localeScore;
       } else if (descScore > bestFieldScore) {
         bestField = "description";
         bestFieldScore = descScore;
@@ -247,6 +255,7 @@ export function getSuggestion(
     for (const t of entry.titleTokens) vocab.add(t);
     for (const t of entry.tagTokens) vocab.add(t);
     for (const t of entry.descTokens) vocab.add(t);
+    for (const t of entry.localeTokens) vocab.add(t);
   }
   const vocabArray = [...vocab];
 

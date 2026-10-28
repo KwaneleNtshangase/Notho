@@ -102,6 +102,8 @@ export type Lesson = {
   id: string;
   title: string;
   comingSoon?: boolean;
+  /** Server-delivered mock metadata. No questions or correctness live here. */
+  secureQuestionCount?: number;
   /** Legacy / static lessons: a fixed list of steps. Still fully supported. */
   steps?: LessonStep[];
   /** Bank-backed lessons: ordered teaching steps + slot references. */

@@ -1,4 +1,5 @@
 import { reportClientError } from "@/lib/errorReporting";
+import { isBenignClientNoise } from "@/lib/errorNoise";
 
 export type ServiceWorkerUpdateHandler = (
   registration: ServiceWorkerRegistration
@@ -7,6 +8,7 @@ export type ServiceWorkerUpdateHandler = (
 const SW_URL = "/sw.js";
 
 let refreshing = false;
+let registerAttempted = false;
 
 function listenForControllerChange() {
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
@@ -40,6 +42,23 @@ function checkForWaitingWorker(
   }
 }
 
+function whenPageSettled(): Promise<void> {
+  if (typeof document === "undefined") return Promise.resolve();
+  if (document.readyState === "complete") return Promise.resolve();
+  return new Promise((resolve) => {
+    window.addEventListener("load", () => resolve(), { once: true });
+  });
+}
+
+function isAbortish(err: unknown): boolean {
+  const name = (err as { name?: string } | undefined)?.name ?? "";
+  const message = (err as { message?: string } | undefined)?.message ?? String(err);
+  return (
+    name === "AbortError" ||
+    isBenignClientNoise("sw-registration", message)
+  );
+}
+
 /** Activate a waiting worker and reload once it takes control. */
 export function applyServiceWorkerUpdate(
   registration: ServiceWorkerRegistration
@@ -55,10 +74,35 @@ export async function registerServiceWorker(options: {
     return null;
   }
 
+  // React Strict Mode mounts this twice in development. One in-flight register
+  // is enough; a second call is how Chrome 117 produces "Operation has been aborted".
+  if (registerAttempted) {
+    return navigator.serviceWorker.getRegistration(SW_URL).then((r) => r ?? null);
+  }
+  registerAttempted = true;
+
   listenForControllerChange();
 
   try {
-    const registration = await navigator.serviceWorker.register(SW_URL);
+    // Do not contend with first-paint for bandwidth. AbortError is what you get
+    // when register() is still running as the user leaves /learn.
+    await whenPageSettled();
+    if (document.visibilityState === "hidden") {
+      await new Promise<void>((resolve) => {
+        const onVis = () => {
+          if (document.visibilityState === "visible") {
+            document.removeEventListener("visibilitychange", onVis);
+            resolve();
+          }
+        };
+        document.addEventListener("visibilitychange", onVis);
+      });
+    }
+
+    const registration = await navigator.serviceWorker.register(SW_URL, {
+      scope: "/",
+      updateViaCache: "none",
+    });
 
     checkForWaitingWorker(registration, options.onUpdateAvailable);
 
@@ -66,21 +110,21 @@ export async function registerServiceWorker(options: {
       watchInstallingWorker(registration, options.onUpdateAvailable);
     });
 
-    // Re-check when the tab becomes visible (browser SW update check is throttled).
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         registration.update().catch(() => {/* transient — next visibility change retries */});
       }
     });
 
-    // Periodic check while the app is open.
     window.setInterval(() => {
       registration.update().catch(() => {/* transient — next interval retries */});
     }, 60 * 60 * 1000);
 
     return registration;
   } catch (err) {
-    void reportClientError("sw-registration", err);
+    if (!isAbortish(err)) {
+      void reportClientError("sw-registration", err);
+    }
     return null;
   }
 }

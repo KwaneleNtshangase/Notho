@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useNotho } from "@/context/NothoContext";
 import {
@@ -8,126 +8,91 @@ import {
   NothoCalculate,
   NothoBudget,
   NothoGoals,
-  NothoProgress as NothoLeaderboard,
-  NothoProfile,
 } from "@/components/icons/NothoIcons";
-
-/** Which nav item should be highlighted, derived from the real URL. */
-function activeKeyFromPath(pathname: string): string {
-  if (pathname.startsWith("/budget")) return "budget";
-  if (pathname.startsWith("/calculator")) return "calculator";
-  if (pathname.startsWith("/quests")) return "quests";
-  if (pathname.startsWith("/leaderboard")) return "leaderboard";
-  if (pathname.startsWith("/profile")) return "profile";
-  // learn, course, lesson and the root all live under "Learn"
-  return "learn";
-}
+import { NavProfileMark } from "@/components/navProfilePhoto";
+import {
+  APP_TAB_EVENT,
+  tabKeyFromHref,
+  tabKeyFromPath,
+  type AppTabKey,
+} from "@/lib/appTabs";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export function DesktopSidebar() {
   const { setRoute } = useNotho();
+  const { t } = useLocale();
   const pathname = usePathname() || "/";
-  const active = activeKeyFromPath(pathname);
+  const pathKey = tabKeyFromPath(pathname);
+  const [pendingKey, setPendingKey] = useState<AppTabKey | null>(null);
+  const active = pendingKey ?? pathKey;
 
-  const handleNav = (name: string) => {
+  useEffect(() => {
+    if (pendingKey && pendingKey === pathKey) setPendingKey(null);
+  }, [pathKey, pendingKey]);
+
+  useEffect(() => {
+    const onTab = (event: Event) => {
+      const key = tabKeyFromHref((event as CustomEvent<string>).detail);
+      if (key) setPendingKey(key);
+    };
+    window.addEventListener(APP_TAB_EVENT, onTab);
+    return () => window.removeEventListener(APP_TAB_EVENT, onTab);
+  }, []);
+
+  const handleNav = (name: AppTabKey) => {
+    setPendingKey(name);
     setRoute({ name: name as never });
+  };
+
+  const items = [
+    { key: "learn" as const, label: t("nav.learn"), Icon: NothoLearn },
+    { key: "calculator" as const, label: t("nav.calculate"), Icon: NothoCalculate },
+    { key: "budget" as const, label: t("nav.budget"), Icon: NothoBudget },
+    { key: "quests" as const, label: t("nav.goals"), Icon: NothoGoals },
+    { key: "profile" as const, label: t("nav.profile"), Icon: null },
+  ];
+
+  const lockupStyle = {
+    width: "100%",
+    height: "auto",
+    objectFit: "contain" as const,
   };
 
   return (
     <nav className="sidebar" style={{ background: "var(--color-bg)", border: "none" }}>
-      {/* Branded sidebar header */}
       <div style={{
-        padding: "20px 20px 16px",
-        borderBottom: "1px solid var(--color-border)",
-        marginBottom: 8,
+        padding: "20px 16px 8px",
+        marginBottom: 4,
       }}>
-        {/* Full lockup fills the header. Mode-aware: navy wordmark on the light
-            sidebar, white wordmark on the dark one. */}
+        {/* Theme CSS swaps these. Do not set display inline — it beats html.dark .logo-light. */}
         <img
           className="logo-light"
           src="/notho-logo.png"
           alt="Notho"
-          style={{ width: "100%", maxWidth: 190, height: "auto", objectFit: "contain", display: "block" }}
+          style={lockupStyle}
         />
         <img
           className="logo-dark"
           src="/notho-logo-on-dark.png"
-          alt="Notho"
-          style={{ width: "100%", maxWidth: 190, height: "auto", objectFit: "contain" }}
+          alt=""
+          style={lockupStyle}
         />
       </div>
       <ul className="nav-menu">
-        <li className="nav-item">
-          <button
-            className={`nav-link ${active ==="learn" ? "active" : ""}`}
-            style={active !=="learn" ? { color: "var(--nav-link-color)" } : {}}
-            onClick={() => handleNav("learn")}
-          >
-            <span className="nav-icon">
-              <NothoLearn size={20} className="text-current" />
-            </span>
-            Learn
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${active ==="calculator" ? "active" : ""}`}
-            style={active !=="calculator" ? { color: "var(--nav-link-color)" } : {}}
-            onClick={() => handleNav("calculator")}
-          >
-            <span className="nav-icon">
-              <NothoCalculate size={20} className="text-current" />
-            </span>
-            Calculate
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${active ==="budget" ? "active" : ""}`}
-            style={active !=="budget" ? { color: "var(--nav-link-color)" } : {}}
-            onClick={() => handleNav("budget")}
-          >
-            <span className="nav-icon">
-              <NothoBudget size={20} className="text-current" />
-            </span>
-            Budget
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${active ==="quests" ? "active" : ""}`}
-            style={active !=="quests" ? { color: "var(--nav-link-color)" } : {}}
-            onClick={() => handleNav("quests")}
-          >
-            <span className="nav-icon">
-              <NothoGoals size={20} className="text-current" />
-            </span>
-            Goals
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${active ==="leaderboard" ? "active" : ""}`}
-            style={active !=="leaderboard" ? { color: "var(--nav-link-color)" } : {}}
-            onClick={() => handleNav("leaderboard")}
-          >
-            <span className="nav-icon">
-              <NothoLeaderboard size={20} className="text-current" />
-            </span>
-            Leaderboard
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${active ==="profile" ? "active" : ""}`}
-            style={active !=="profile" ? { color: "var(--nav-link-color)" } : {}}
-            onClick={() => handleNav("profile")}
-          >
-            <span className="nav-icon">
-              <NothoProfile size={20} className="text-current" />
-            </span>
-            Profile
-          </button>
-        </li>
+        {items.map(({ key, label, Icon }) => (
+          <li className="nav-item" key={key}>
+            <button
+              className={`nav-link ${active === key ? "active" : ""}`}
+              style={active !== key ? { color: "var(--nav-link-color)" } : {}}
+              onClick={() => handleNav(key)}
+            >
+              <span className="nav-icon">
+                {key === "profile" ? <NavProfileMark size={20} /> : Icon ? <Icon size={20} className="text-current" /> : null}
+              </span>
+              {label}
+            </button>
+          </li>
+        ))}
       </ul>
     </nav>
   );

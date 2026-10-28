@@ -140,7 +140,7 @@ export function computeCoachInsights(input: CoachInput): CoachInsight[] {
         id: `over-budget:${cat}:${monthKey}`,
         severity: "alert",
         title: `${label(cat)} is over budget`,
-        body: `You've spent ${formatRand(spent)} of your ${formatRand(limit)} ${label(cat).toLowerCase()} budget (${Math.round(pct)}%). A quick lesson can help you plan the rest of the month.`,
+        body: `Spent ${formatRand(spent)} of ${formatRand(limit)} on ${label(cat).toLowerCase()} (${Math.round(pct)}%).`,
         lesson: lessonForCategory(cat, label(cat)),
         priority: 10 + (100 - Math.min(pct, 300)) / 100,
       });
@@ -177,7 +177,7 @@ export function computeCoachInsights(input: CoachInput): CoachInsight[] {
         id: `spike:${cat}:${monthKey}`,
         severity: "warn",
         title: `${label(cat)} is up sharply vs last month`,
-        body: `${formatRand(spent)} so far this month vs ${formatRand(prev)} in all of last month. Worth a look to see what changed.`,
+        body: `${formatRand(spent)} so far this month, against ${formatRand(prev)} for all of last month.`,
         lesson: lessonForCategory(cat, label(cat)),
         priority: 25,
       });
@@ -193,7 +193,7 @@ export function computeCoachInsights(input: CoachInput): CoachInsight[] {
         id: `savings-low:${monthKey}`,
         severity: "info",
         title: "Little set aside for savings so far",
-        body: `Of ${formatRand(income)} income this month, ${formatRand(saved)} has gone to savings. Even small, regular amounts build an emergency cushion over time.`,
+        body: `${formatRand(saved)} of ${formatRand(income)} income is in savings so far this month.`,
         lesson: LESSONS.emergencyFund,
         priority: 40,
       });
@@ -202,7 +202,7 @@ export function computeCoachInsights(input: CoachInput): CoachInsight[] {
         id: `savings-praise:${monthKey}`,
         severity: "praise",
         title: `You're saving ${Math.round(rate * 100)}% of your income`,
-        body: `${formatRand(saved)} set aside this month, ahead of the common 20% guideline. Keep the streak going.`,
+        body: `${formatRand(saved)} set aside this month. That is at or above the 20% rule of thumb.`,
         priority: 50,
       });
     }
@@ -214,7 +214,7 @@ export function computeCoachInsights(input: CoachInput): CoachInsight[] {
       id: `no-budget:${monthKey}`,
       severity: "info",
       title: "You're tracking spending. Next step: set budgets",
-      body: `You've logged ${formatRand(total(spend))} of spending this month. Setting a limit per category turns tracking into a plan.`,
+      body: `${formatRand(total(spend))} logged this month. Set a limit per category if you want a plan, not only a list.`,
       lesson: LESSONS.buildingBudget,
       priority: 15,
     });
@@ -228,7 +228,7 @@ export function computeCoachInsights(input: CoachInput): CoachInsight[] {
         id: `debt-load:${monthKey}`,
         severity: "warn",
         title: `Debt repayments are ${Math.round((debt / income) * 100)}% of income`,
-        body: `${formatRand(debt)} of ${formatRand(income)} income went to debt this month. A structured payoff method can shrink this over time.`,
+        body: `${formatRand(debt)} of ${formatRand(income)} income went to debt this month.`,
         lesson: LESSONS.debtSnowball,
         priority: 22,
       });
@@ -245,7 +245,7 @@ export function computeCoachInsights(input: CoachInput): CoachInsight[] {
         id: `on-track:${monthKey}`,
         severity: "praise",
         title: "Every budget is on track this month",
-        body: "All your category budgets are under 85% with the month nearly done. That's how plans become habits.",
+        body: "Every category budget is still under 85% this late in the month.",
         priority: 45,
       });
     }

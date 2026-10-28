@@ -4,22 +4,15 @@ import React from "react";
 
 export type CosmoExpression = "default" | "thinking" | "sad" | "celebrating";
 
+/** Kept so existing call sites compile. Renders nothing — Cosmo is a name
+ *  inside Budget, not a mascot on lesson complete. */
 export function CosmoCharacter({
   expression = "default",
-  size = 100,
-  style: extraStyle = {},
 }: {
   expression?: CosmoExpression;
   size?: number;
   style?: React.CSSProperties;
 }) {
-  return (
-    <img
-      src={`/characters/cosmo-${expression}.png`}
-      alt={`Cosmo ${expression}`}
-      width={size}
-      height={size}
-      style={{ objectFit: "contain", display: "block", ...extraStyle }}
-    />
-  );
+  void expression;
+  return null;
 }

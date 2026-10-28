@@ -5,6 +5,7 @@
 
 import { supabase } from "@/lib/supabaseClient";
 import { CONTENT_DATA, type Lesson } from "@/data/content";
+export { generateShareText } from "@/lib/shareText";
 
 // ── Core app types ────────────────────────────────────────────────────────────
 
@@ -18,6 +19,10 @@ export type UserData = {
   dailyGoal: number;
   badges: string[];
   lessonsToday: number;
+  /** SAST civil date the streak was last extended. Drives the lit flame. */
+  lastActivityDate?: string | null;
+  /** Equipped streak freezes, 0–2. Optional so older callers still typecheck. */
+  freezeCount?: number;
 };
 
 export type Route =
@@ -151,41 +156,6 @@ export function getLessonTitle(
     if (le) return le.title;
   }
   return undefined;
-}
-
-// ── Sharing ───────────────────────────────────────────────────────────────────
-
-export function generateShareText(
-  type: "lesson" | "badge" | "streak" | "level",
-  data: {
-    lessonTitle?: string;
-    badgeName?: string;
-    streakDays?: number;
-    xp?: number;
-    level?: number;
-    investorProfile?: string;
-  }
-): string {
-  if (type === "lesson") {
-    const t = data.lessonTitle ?? "a lesson";
-    const xpPart = data.xp ? ` (+${data.xp} XP)` : "";
-    // Curiosity hook: "what would YOU score?"
-    return `I just completed "${t}"${xpPart} on Notho 🇿🇦\n\nFree South African money lessons, no jargon, 5 min a day. How would you score on this topic?\n👇 notho.co.za`;
-  }
-  if (type === "badge") {
-    const n = data.badgeName ?? "a";
-    return `I just unlocked the "${n}" badge on Notho 🏅\n\nBuilding real SA financial knowledge. Quiz: do you know the difference between CGT and income tax?\n👇 notho.co.za`;
-  }
-  if (type === "streak") {
-    const d = data.streakDays ?? 0;
-    return `${d} days straight learning about money 🔥\n\nNotho, free SA financial lessons. Most people can't answer 3 basic money questions. Can you?\n👇 notho.co.za`;
-  }
-  if (type === "level") {
-    const l = data.level ?? 1;
-    const profile = data.investorProfile ? ` My investor profile: ${data.investorProfile}.` : "";
-    return `I just hit Level ${l} on Notho 🚀${profile}\n\nDo you know YOUR investor profile? Takes 2 min, most South Africans get it wrong.\n👇 notho.co.za`;
-  }
-  return "";
 }
 
 // ── Course level requirements ─────────────────────────────────────────────────
@@ -351,7 +321,10 @@ export const getNextLesson = (courseId: string, lessonId: string): Lesson | null
   if (currentIndex === -1) return null;
   for (let i = currentIndex + 1; i < allLessons.length; i++) {
     const candidate = allLessons[i];
-    if (candidate.steps && candidate.steps.length > 0) return candidate;
+    if (
+      (candidate.steps && candidate.steps.length > 0) ||
+      (candidate.secureQuestionCount ?? 0) > 0
+    ) return candidate;
   }
   return null;
 };

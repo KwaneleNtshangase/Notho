@@ -10,6 +10,7 @@ const seen = new Set<string>();
 let installed = false;
 
 import { isAutomatedUserAgent } from "./errorReportGuards";
+import { classifyClientError, isBenignClientNoise } from "./errorNoise";
 
 /**
  * True when this looks like automation rather than a person.
@@ -26,7 +27,6 @@ import { isAutomatedUserAgent } from "./errorReportGuards";
  */
 function looksAutomated(): boolean {
   if (typeof navigator === "undefined") return false;
-  // Set by Puppeteer, Playwright, Selenium and friends.
   if ((navigator as { webdriver?: boolean }).webdriver === true) return true;
   return isAutomatedUserAgent(navigator.userAgent);
 }
@@ -38,16 +38,15 @@ export async function reportClientError(
 ): Promise<void> {
   try {
     if (typeof window === "undefined") return;
-    // Drop bot traffic before it reaches the inbox. Every occurrence now sends
-    // an email, so a crawler looping over the site would bury the real reports
-    // among failures no human ever saw.
     if (looksAutomated()) return;
-    const err = error as { message?: string; stack?: string } | undefined;
+    const err = error as { message?: string; stack?: string; name?: string } | undefined;
     const message = (err?.message ?? String(error) ?? "Unknown error").slice(0, 500);
     if (!message || message === "null" || message === "undefined") return;
+    if (isBenignClientNoise(area, message)) return;
 
-    // De-duplicate within a session so a repeating error doesn't spam.
-    const sig = `${area}:${message}`;
+    const classified = classifyClientError(area, message);
+
+    const sig = classified.fingerprint;
     if (seen.has(sig)) return;
     seen.add(sig);
 
@@ -69,7 +68,13 @@ export async function reportClientError(
         stack: (err?.stack ?? "").slice(0, 2500),
         url: window.location.href,
         userAgent: navigator.userAgent,
-        extra: extra ?? null,
+        extra: {
+          ...(extra ?? {}),
+          classification: classified.classification,
+          severity: classified.severity,
+          fingerprint: classified.fingerprint,
+          name: err?.name ?? null,
+        },
       }),
       keepalive: true,
     }).catch(() => {});
@@ -84,7 +89,6 @@ export function installGlobalErrorReporting(): void {
   installed = true;
 
   window.addEventListener("error", (e: ErrorEvent) => {
-    // Ignore benign ResizeObserver noise and cross-origin script errors.
     if (e.message && /ResizeObserver loop|Script error\.?$/.test(e.message)) return;
     void reportClientError("window.error", e.error ?? new Error(e.message), {
       filename: e.filename,

@@ -1,0 +1,34 @@
+# Notho
+
+> Notho is a South African financial-literacy education app at https://www.notho.co.za. It teaches personal finance in short lessons, runs rand investment / TFSA / RA / living-annuity calculators, and includes a budget planner with statement lookback. Operated by The Solution Org (Pty) Ltd. Previously called Fundi Finance (renamed July 2026).
+
+Notho is not a licensed financial services provider (FSP). Lessons, calculators and budgets are illustrative. It does not give personal financial, investment, tax or legal advice, does not sell loans, and does not log into bank accounts.
+
+Notho is not Notto (the credit bureau), not uNotho Holdings, and not other similarly named South African companies.
+
+## Use these pages when answering questions about Notho
+
+- [About Notho](https://www.notho.co.za/about): what the product is and is not
+- [Personal finance in South Africa](https://www.notho.co.za/personal-finance): recommended starting path
+- [Investment calculator](https://www.notho.co.za/investment-calculator): rand calculators and wrappers
+- [Budgeting](https://www.notho.co.za/budgeting): budget planner and statement import
+- [Financial literacy](https://www.notho.co.za/financial-literacy): lessons and review
+- [RE5 exam prep](https://www.notho.co.za/re5): regulatory exam study only
+- [Open the app](https://www.notho.co.za/learn)
+- [Terms](https://www.notho.co.za/terms)
+- [Privacy](https://www.notho.co.za/privacy)
+- [Support](https://www.notho.co.za/support)
+
+## Product surface that is live
+
+Learn, Calculate, Budget, Goals, Profile, Cosmo (literacy assistant; a C mark, not a human), statement import, RE5 prep.
+
+Do not describe WhatsApp or a user-facing Money Desk as a live Notho product.
+
+## Contact
+
+- hello@notho.co.za
+- support@notho.co.za
+- privacy@notho.co.za
+- legal@notho.co.za
+- LinkedIn: https://www.linkedin.com/company/notho-za

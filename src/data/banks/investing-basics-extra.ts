@@ -377,7 +377,16 @@ const thaboSlots: QuestionSlot[] = [
 
 export const INVESTING_BASICS_EXTRA_BANKS: Record<string, LessonBank> = {
   "investing-basics::lesson-etfs-deep-dive": {
-    layout: L(etfSlots, "Why ETFs Changed Everything", "<p>One index ETF buys a slice of hundreds or thousands of companies in a single transaction. Diversification that used to require serious money. The fund tracks the index rather than trying to beat it, and the <strong>TER</strong> is the main thing separating two funds following the same index. A 1.8% fee gap on R200 000 is <strong>R3 600 in year one</strong>, and that gap compounds for as long as you invest.</p>"),
+    layout: [
+      ...L(etfSlots, "Why ETFs Changed Everything", "<p>One index ETF buys a slice of hundreds or thousands of companies in a single transaction. Diversification that used to require serious money. The fund tracks the index rather than trying to beat it, and the <strong>TER</strong> is the main thing separating two funds following the same index. A 1.8% fee gap on R200 000 is <strong>R3 600 in year one</strong>, and that gap compounds for as long as you invest.</p>"),
+      {
+        type: "action",
+        title: "See a real ETF on a licensed platform",
+        instruction:
+          "Pick any FSCA-licensed investment platform you already trust, or compare two. You will need a SA ID and a bank account. Search for 'Satrix MSCI World' — this is the global ETF you just learned about. Opening an account is not the same as investing. You do not have to put money in.",
+        tip: "Platforms advertise low minimums and 'no account fee'. Read the cost profile: brokerage on each buy, FX on offshore, and any monthly platform or loyalty fee if you do not meet their activity rules. Examples used in SA include EasyEquities, SatrixNOW, Sygnia, and bank securities accounts. Notho is education only — we are not paid by these platforms.",
+      },
+    ],
     slots: etfSlots,
   },
   "investing-basics::lesson-unit-trusts": {

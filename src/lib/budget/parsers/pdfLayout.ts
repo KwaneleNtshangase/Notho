@@ -195,9 +195,10 @@ export function amountFromBucket(
   key: keyof ColumnLayout
 ): number | null {
   const items = buckets.get(key) ?? [];
+  const allowZero = key === "balance";
   for (const item of items) {
     const val = parseAmountToken(item.text);
-    if (val !== null && Math.abs(val) >= 0.01) return val;
+    if (val !== null && (allowZero || Math.abs(val) >= 0.01)) return val;
   }
   return null;
 }

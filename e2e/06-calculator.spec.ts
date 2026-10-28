@@ -13,9 +13,9 @@ test.describe("Calculator", () => {
   test("6.1 — Calculator tab loads", async ({ page }) => {
     const error = page.locator("text=Something went wrong");
     await expect(error).not.toBeVisible();
-    // Some input or selector should be visible
-    const content = page.locator("input, select, button").first();
-    await expect(content).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByRole("heading", { name: "Investment Calculator", exact: true })
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test("6.2 — Compound interest calculates and shows result", async ({ page }) => {

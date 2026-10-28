@@ -7,8 +7,13 @@ import { NothoTrophy } from "@/components/icons/NothoIcons";
 import { supabase } from "@/lib/supabaseClient";
 import { formatWithSpaces } from "@/lib/formatters";
 import { sastWeekKey } from "@/lib/dates";
+import {
+  buildWeeklyRoster,
+  scorerCount,
+  type LeaderRow,
+} from "@/lib/leaderboardRoster";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────
 
 export function getLeaderboardWeekKey(): string {
   return sastWeekKey();
@@ -26,7 +31,7 @@ function getWeekResetDate(): Date {
   return new Date(resetSAST.getTime() - SAST_OFFSET_MS);
 }
 
-// ─── LeaderboardView ──────────────────────────────────────────────────────────
+// ─── LeaderboardView ─────────────────────────────────────────────────
 
 export function LeaderboardView({
   xp,
@@ -37,9 +42,7 @@ export function LeaderboardView({
   weeklyXp?: number;
   currentUserId?: string;
 }) {
-  const [leaders, setLeaders] = useState<
-    { id: string; name: string; xp: number; totalXp: number; isYou: boolean; rank: number }[]
-  >([]);
+  const [leaders, setLeaders] = useState<LeaderRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -95,48 +98,13 @@ export function LeaderboardView({
           return;
         }
 
-        // Build rows - weekly XP only counts if week_key matches current week
-        const rows: { id: string; name: string; xp: number; totalXp: number; isYou: boolean; rank: number }[] = [];
-
-        // Internal QA accounts must never appear on the public leaderboard -
-        // being told to "overtake e2e_test_bot" destroys trust in the ranking.
-        const isTestAccount = (username: string | null): boolean => {
-          const n = (username ?? "").trim().toLowerCase();
-          return /(^|[^a-z])(e2e|test|tester|qa)([^a-z]|$)|_bot$|^bot_|^tester$/.test(n);
-        };
-
-        (rpcRows ?? []).forEach((r: { user_id: string; username: string | null; xp: number | null; weekly_xp: number | null; week_key: string | null }) => {
-          const uid = String(r.user_id);
-          // Never hide the signed-in user from themselves
-          if (uid !== myId && isTestAccount(r.username)) return;
-          const isCurrentWeek = (r.week_key ?? "") === currentWeekKey;
-          const thisWeekXp = isCurrentWeek ? (r.weekly_xp ?? 0) : 0;
-          const totalXp = r.xp ?? 0;
-          const isYou = uid === myId;
-
-          // Merge: current user's local weekly XP takes priority (most up-to-date)
-          const displayWeeklyXp = isYou
-            ? Math.max(thisWeekXp, weeklyXp ?? 0)
-            : thisWeekXp;
-
-          const rawName = (r.username ?? "").trim();
-          const name = isYou ? "You" : (rawName || "Learner " + uid.slice(0, 4).toUpperCase());
-
-          rows.push({
-            id: uid,
-            name,
-            xp: displayWeeklyXp,
-            totalXp,
-            isYou,
-            rank: 0,
-          });
-        });
-
-        // Sort by this week's XP descending
-        rows.sort((a, b) => b.xp - a.xp || b.totalXp - a.totalXp);
-        rows.forEach((r, i) => { r.rank = i + 1; });
-
-        setLeaders(rows);
+        setLeaders(
+          buildWeeklyRoster(rpcRows ?? [], {
+            myId,
+            currentWeekKey,
+            localWeeklyXp: weeklyXp,
+          })
+        );
       } finally {
         setLoading(false);
       }
@@ -149,14 +117,16 @@ export function LeaderboardView({
   const aheadOfMe = myIndex > 0 ? leaders[myIndex - 1] : null;
   const xpToNext = aheadOfMe && myRank ? aheadOfMe.xp - myRank.xp : null;
 
-  const top3 = leaders.slice(0, 3);
-  const restLeaders = leaders.slice(3);
+  const scorers = scorerCount(leaders);
+  const showPodium = scorers >= 3 && leaders.length >= 3;
+  const listRows = showPodium ? leaders.slice(3) : leaders;
+  const quietTitle = scorers < 10;
 
   return (
     <main >
       <div style={{ maxWidth: 760, margin: "0 auto", width: "100%" }}>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 4, flexWrap: "wrap", gap: 8 }}>
-          <h2 style={{ fontSize: 32, fontWeight: 800, margin: 0 }}>Leaderboard</h2>
+          <h2 style={{ fontSize: 32, fontWeight: 800, margin: 0 }}>{quietTitle ? "This week's learners" : "Leaderboard"}</h2>
           {timeLeft && (
             <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", background: "var(--color-border)", borderRadius: 20, padding: "4px 12px", marginBottom: 4 }}>
               <RefreshCcw size={11} style={{ display: "inline", marginRight: 4, verticalAlign: "middle" }} />Resets in {timeLeft}
@@ -164,7 +134,7 @@ export function LeaderboardView({
           )}
         </div>
         <p style={{ color: "var(--color-text-secondary)", marginBottom: 12, fontSize: 14 }}>
-          This week&apos;s XP - everyone starts fresh every Sunday
+          Weekly XP among people who learned this week. Resets every Sunday.
         </p>
 
         {/* Username prompt - shown until the user picks a handle */}
@@ -214,13 +184,13 @@ export function LeaderboardView({
                   {formatWithSpaces(myRank.totalXp)} total XP
                 </div>
               </div>
-              {xpToNext !== null && xpToNext > 0 && aheadOfMe && (
+              {xpToNext !== null && xpToNext > 0 && aheadOfMe && aheadOfMe.xp > 0 && (
                 <div style={{
                   background: "var(--color-surface)", borderRadius: 12, padding: "10px 14px",
                   border: "1px solid var(--color-border)", textAlign: "center",
                 }}>
                   <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--color-text-secondary)", letterSpacing: "0.06em", marginBottom: 2 }}>
-                    To overtake {aheadOfMe.name}
+                    To pass {aheadOfMe.name}
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 900, color: "#EFB343" }}>
                     {formatWithSpaces(xpToNext)} XP
@@ -257,7 +227,7 @@ export function LeaderboardView({
         ) : (
           <>
             {/* Top 3 podium */}
-            {top3.length >= 3 && (
+            {showPodium && (
               <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 10, marginBottom: 24 }}>
                 {/* 2nd place */}
                 <div style={{ textAlign: "center", flex: 1 }}>
@@ -265,10 +235,10 @@ export function LeaderboardView({
                     width: 52, height: 52, borderRadius: "50%", margin: "0 auto 6px",
                     background: "#C0C0C0", display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 20, fontWeight: 900, color: "white",
-                    border: top3[1].isYou ? "3px solid var(--color-primary)" : "3px solid #C0C0C0",
-                  }}>{top3[1].name[0].toUpperCase()}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-primary)" }}>{top3[1].name}</div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF" }}>{formatWithSpaces(top3[1].xp)} XP</div>
+                    border: leaders[1].isYou ? "3px solid var(--color-primary)" : "3px solid #C0C0C0",
+                  }}>{leaders[1].name[0].toUpperCase()}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-primary)" }}>{leaders[1].name}</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF" }}>{formatWithSpaces(leaders[1].xp)} XP</div>
                   <div style={{ background: "#C0C0C0", borderRadius: "8px 8px 0 0", height: 60, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <span style={{ fontSize: 22, fontWeight: 900, color: "white" }}>2</span>
                   </div>
@@ -282,11 +252,11 @@ export function LeaderboardView({
                     width: 60, height: 60, borderRadius: "50%", margin: "0 auto 6px",
                     background: "#EFB343", display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 22, fontWeight: 900, color: "white",
-                    border: top3[0].isYou ? "3px solid var(--color-primary)" : "3px solid #EFB343",
+                    border: leaders[0].isYou ? "3px solid var(--color-primary)" : "3px solid #EFB343",
                     boxShadow: "0 4px 16px rgba(239,179,67,0.35)",
-                  }}>{top3[0].name[0].toUpperCase()}</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: "var(--color-text-primary)" }}>{top3[0].name}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#EFB343" }}>{formatWithSpaces(top3[0].xp)} XP</div>
+                  }}>{leaders[0].name[0].toUpperCase()}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "var(--color-text-primary)" }}>{leaders[0].name}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#EFB343" }}>{formatWithSpaces(leaders[0].xp)} XP</div>
                   <div style={{ background: "#EFB343", borderRadius: "8px 8px 0 0", height: 80, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <span style={{ fontSize: 26, fontWeight: 900, color: "white" }}>1</span>
                   </div>
@@ -297,10 +267,10 @@ export function LeaderboardView({
                     width: 48, height: 48, borderRadius: "50%", margin: "0 auto 6px",
                     background: "#CD7F32", display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 18, fontWeight: 900, color: "white",
-                    border: top3[2].isYou ? "3px solid var(--color-primary)" : "3px solid #CD7F32",
-                  }}>{top3[2].name[0].toUpperCase()}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-primary)" }}>{top3[2].name}</div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "#CD7F32" }}>{formatWithSpaces(top3[2].xp)} XP</div>
+                    border: leaders[2].isYou ? "3px solid var(--color-primary)" : "3px solid #CD7F32",
+                  }}>{leaders[2].name[0].toUpperCase()}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-primary)" }}>{leaders[2].name}</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#CD7F32" }}>{formatWithSpaces(leaders[2].xp)} XP</div>
                   <div style={{ background: "#CD7F32", borderRadius: "8px 8px 0 0", height: 44, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <span style={{ fontSize: 20, fontWeight: 900, color: "white" }}>3</span>
                   </div>
@@ -313,12 +283,13 @@ export function LeaderboardView({
               background: "var(--color-surface)", color: "var(--color-text-primary)",
               border: "1px solid var(--color-border)", borderRadius: 16, overflow: "hidden",
             }}>
-              {restLeaders.map((leader) => {
+              {listRows.map((leader) => {
                 const prevLeader = leaders[leader.rank - 2];
                 return (
                   <div
                     key={leader.id}
                     className="leaderboard-row"
+                    data-rank={leader.rank}
                     style={{
                       ...(leader.isYou ? { background: "rgba(0,122,133,0.08)", borderLeft: "4px solid var(--color-primary)" } : {}),
                       display: "flex", alignItems: "center", padding: "12px 16px",
@@ -367,6 +338,18 @@ export function LeaderboardView({
               })}
             </div>
           </>
+        )}
+
+        {!loading && (
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 20 }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => router.push("/learn")}
+            >
+              Continue a lesson
+            </button>
+          </div>
         )}
       </div>
     </main>

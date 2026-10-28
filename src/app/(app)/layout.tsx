@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NothoProvider, useNotho } from "@/context/NothoContext";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { DesktopSidebar } from "@/components/DesktopSidebar";
@@ -9,20 +9,53 @@ import {
   NothoCalculate,
   NothoBudget,
   NothoGoals,
-  NothoProgress,
-  NothoProfile,
 } from "@/components/icons/NothoIcons";
 import { usePathname } from "next/navigation";
 import { StatsPanel } from "@/components/StatsPanel";
 import { NothoTopBar } from "@/components/NothoTopBar";
+import { PersistentAppTabs } from "@/components/PersistentAppTabs";
+import {
+  APP_TAB_EVENT,
+  isAppTabPath,
+  tabKeyFromHref,
+  tabKeyFromPath,
+  type AppTabKey,
+} from "@/lib/appTabs";
+import "../gestures.css";
+import "../nav-glass.css";
+import { AuthGate } from "@/components/AuthGate";
+import { OnboardingGate } from "@/components/OnboardingGate";
+import { NotificationOptIn } from "@/components/NotificationOptIn";
+import { StreakRepairBanner } from "@/components/StreakRepairBanner";
+import { UsageTracker } from "@/components/UsageTracker";
+import { AppGestures } from "@/components/AppGestures";
+import { ShakeToReport } from "@/components/ShakeToReport";
+import { NavProfileMark, ProfilePhotoBoot, warmProfileAvatar } from "@/components/navProfilePhoto";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 function AppNavigation() {
   const { setRoute } = useNotho();
+  const { t } = useLocale();
   const pathname = usePathname() || "/";
-  const is = (p: string) => pathname.startsWith(p);
+  const pathKey = tabKeyFromPath(pathname);
+  const [pendingKey, setPendingKey] = useState<AppTabKey | null>(null);
+  const activeKey = pendingKey ?? pathKey;
 
-  const handleNav = (name: string) => {
-    // We just dispatch setRoute; the NothoContext will do router.push()
+  useEffect(() => {
+    if (pendingKey && pendingKey === pathKey) setPendingKey(null);
+  }, [pathKey, pendingKey]);
+
+  useEffect(() => {
+    const onTab = (event: Event) => {
+      const key = tabKeyFromHref((event as CustomEvent<string>).detail);
+      if (key) setPendingKey(key);
+    };
+    window.addEventListener(APP_TAB_EVENT, onTab);
+    return () => window.removeEventListener(APP_TAB_EVENT, onTab);
+  }, []);
+
+  const handleNav = (name: AppTabKey) => {
+    setPendingKey(name);
     setRoute({ name: name as never });
   };
 
@@ -31,94 +64,106 @@ function AppNavigation() {
       items={[
         {
           key: "learn",
-          label: "Learn",
+          label: t("nav.learn"),
           icon: <NothoLearn size={24} className="text-current" />,
-          isActive: is("/learn") || is("/course") || is("/lesson") || pathname === "/",
+          isActive: activeKey === "learn",
           onClick: () => handleNav("learn"),
           order: "order-1",
         },
         {
           key: "calculator",
-          label: "Calculate",
+          label: t("nav.calculate"),
           icon: <NothoCalculate size={24} className="text-current" />,
-          isActive: is("/calculator"),
+          isActive: activeKey === "calculator",
           onClick: () => handleNav("calculator"),
           order: "order-2",
         },
         {
           key: "budget",
-          label: "Budget",
+          label: t("nav.budget"),
           icon: <NothoBudget size={24} className="text-current" />,
-          isActive: is("/budget"),
+          isActive: activeKey === "budget",
           onClick: () => handleNav("budget"),
           order: "order-3",
         },
         {
           key: "quests",
-          label: "Goals",
+          label: t("nav.goals"),
           icon: <NothoGoals size={24} className="text-current" />,
-          isActive: is("/quests"),
+          isActive: activeKey === "quests",
           onClick: () => handleNav("quests"),
           order: "order-4",
         },
         {
-          key: "progress",
-          label: "Leaderboard",
-          icon: <NothoProgress size={24} className="text-current" />,
-          isActive: is("/leaderboard"),
-          onClick: () => handleNav("leaderboard"),
-          order: "order-5",
-        },
-        {
           key: "profile",
-          label: "Profile",
-          icon: <NothoProfile size={24} className="text-current" />,
-          isActive: is("/profile"),
+          label: t("nav.profile"),
+          icon: <NavProfileMark size={24} />,
+          isActive: activeKey === "profile",
           onClick: () => handleNav("profile"),
-          order: "order-6",
+          order: "order-5",
         },
       ]}
     />
   );
 }
 
-import { AuthGate } from "@/components/AuthGate";
-import { NotificationOptIn } from "@/components/NotificationOptIn";
-import { StreakRepairBanner } from "@/components/StreakRepairBanner";
-import { UsageTracker } from "@/components/UsageTracker";
-
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "/";
+  const isMockExam = /^\/lesson\/re5-exam-prep\/re5-mock-[ab](?:\/|$)/.test(
+    pathname
+  );
+  const pathIsTab = isAppTabPath(pathname);
+  const [showTabs, setShowTabs] = useState(pathIsTab);
+
+  useEffect(() => {
+    setShowTabs(isAppTabPath(pathname));
+  }, [pathname]);
+
+  useEffect(() => {
+    const onTab = () => setShowTabs(true);
+    window.addEventListener(APP_TAB_EVENT, onTab);
+    return () => window.removeEventListener(APP_TAB_EVENT, onTab);
+  }, []);
+
+  useEffect(() => {
+    warmProfileAvatar();
+  }, []);
 
   return (
     <NothoProvider>
       <AuthGate>
-        <div className="app-container">
-          <DesktopSidebar />
-          <div
-            className={`main-content ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
-            style={{ display: 'flex', flexDirection: 'column' }}
-          >
-            {(pathname === "/learn" || pathname === "/") && <MobileTopBarWrapper />}
-            <div style={{ paddingBottom: "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</div>
+        <OnboardingGate>
+          <ProfilePhotoBoot />
+          <div className="app-container">
+            {!isMockExam && <DesktopSidebar />}
+            <div
+              className={`main-content ${isMockExam ? "mock-main-content" : ""} ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
+              style={{ display: 'flex', flexDirection: 'column' }}
+            >
+              {!isMockExam && <MobileTopBarWrapper />}
+              <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {!isMockExam && <PersistentAppTabs visible={showTabs} />}
+                {!showTabs && children}
+              </div>
+            </div>
+            {(pathname === "/learn" || pathname === "/") && (
+              <StatsPanelWrapper />
+            )}
           </div>
-          {(pathname === "/learn" || pathname === "/") && (
-            <StatsPanelWrapper />
-          )}
-        </div>
-        <AppNavigation />
-        <NotificationOptIn />
-        <StreakRepairBanner />
-        <UsageTracker />
+          {!isMockExam && <AppNavigation />}
+          {!isMockExam && <NotificationOptIn />}
+          {!isMockExam && <StreakRepairBanner />}
+          <UsageTracker />
+          <AppGestures />
+          <ShakeToReport />
+        </OnboardingGate>
       </AuthGate>
     </NothoProvider>
   );
 }
 
-// Compact streak/XP/hearts bar for phones and tablets - the desktop StatsPanel
-// only exists at >=1200px, so without this mobile users never see their hearts.
 function MobileTopBarWrapper() {
-  const { userData, hearts, maxHearts, heartsRegenInfo, freezeCount, buyStreakFreeze, useFreeze } = useNotho();
+  const { userData, hearts, maxHearts, heartsRegenInfo, freezeCount, buyStreakFreeze, userId } = useNotho();
   if (!userData) return null;
   return (
     <div className="mobile-top-bar">
@@ -130,22 +175,18 @@ function MobileTopBarWrapper() {
         heartsRegenInfo={heartsRegenInfo}
         freezeCount={freezeCount}
         onBuyFreeze={() => buyStreakFreeze()}
-        onUseFreeze={async () => { await useFreeze(); }}
-        freezeUsedToday={userData.lessonsToday > 0 && freezeCount > 0}
         lessonsToday={userData.lessonsToday}
+        lastActivityDate={userData.lastActivityDate}
+        signedIn={Boolean(userId)}
       />
     </div>
   );
 }
 
 function StatsPanelWrapper() {
-  const { userData, hearts, maxHearts, freezeCount, buyStreakFreeze, useFreeze } = useNotho();
-  
-  if (!userData) return null;
+  const { userData, hearts, maxHearts, freezeCount, buyStreakFreeze, userId } = useNotho();
 
-  const handleBuyFreeze = () => buyStreakFreeze();
-  const handleUseFreeze = () => useFreeze();
-  const freezeUsedToday = userData.lessonsToday > 0 && freezeCount > 0;
+  if (!userData) return null;
 
   return (
     <StatsPanel
@@ -153,9 +194,8 @@ function StatsPanelWrapper() {
       hearts={hearts}
       maxHearts={maxHearts}
       freezeCount={freezeCount}
-      onBuyFreeze={handleBuyFreeze}
-      onUseFreeze={handleUseFreeze}
-      freezeUsedToday={freezeUsedToday}
+      onBuyFreeze={() => buyStreakFreeze()}
+      signedIn={Boolean(userId)}
     />
   );
 }

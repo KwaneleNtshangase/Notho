@@ -14,7 +14,7 @@ import type { Metadata } from "next";
  * components and are unaffected.
  */
 export const metadata: Metadata = {
-  title: "Admin · Notho",
+  title: "Notho Desk",
   robots: {
     index: false,
     follow: false,

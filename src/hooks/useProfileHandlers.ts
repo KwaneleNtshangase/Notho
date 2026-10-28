@@ -1,5 +1,40 @@
 import { supabase } from "@/lib/supabaseClient";
 import { reportClientError } from "@/lib/errorReporting";
+import { isNativePlatform } from "@/lib/capacitorPlatform";
+import { shareFileBlob } from "@/lib/nativeShare";
+
+async function saveOrShareJson(blob: Blob, fileName: string): Promise<boolean> {
+  if (await isNativePlatform()) {
+    const shared = await shareFileBlob({
+      blob,
+      fileName,
+      title: "Notho data export",
+      dialogTitle: "Save or share your Notho data",
+    });
+    if (shared) return true;
+  }
+
+  const file = new File([blob], fileName, { type: "application/json" });
+  const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+  if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: "Notho data export" });
+      return true;
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return true;
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return !(await isNativePlatform());
+}
 
 export function useProfileHandlers() {
   const handleProfileSignOut = async () => {
@@ -16,39 +51,43 @@ export function useProfileHandlers() {
   };
 
   const handleDownloadData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const lsData: Record<string, string> = {};
-    if (typeof window !== "undefined") {
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith("notho-")) lsData[k] = localStorage.getItem(k) ?? "";
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const lsData: Record<string, string> = {};
+      if (typeof window !== "undefined") {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith("notho-")) lsData[k] = localStorage.getItem(k) ?? "";
+        }
       }
+      let profileData: Record<string, unknown> = {};
+      let progressData: Record<string, unknown> = {};
+      if (user) {
+        const [{ data: p }, { data: pr }] = await Promise.all([
+          supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle(),
+          supabase.from("user_progress").select("*").eq("user_id", user.id).maybeSingle(),
+        ]);
+        if (p) profileData = p as Record<string, unknown>;
+        if (pr) progressData = pr as Record<string, unknown>;
+      }
+      const exportPayload = {
+        exportDate: new Date().toISOString(),
+        exportNote: "Your Notho data export - requested under POPIA Section 23 (Right of Access)",
+        account: { email: user?.email ?? "guest" },
+        profile: profileData,
+        progress: progressData,
+        localStorageSnapshot: lsData,
+      };
+      const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json" });
+      const ok = await saveOrShareJson(blob, "notho-data-export.json");
+      if (!ok) {
+        alert("Couldn't save the file on this device. Email privacy@notho.co.za and we'll send your export.");
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Data export failed";
+      void reportClientError("account-export-failed", new Error(msg));
+      alert(`${msg}\n\nIf this keeps happening, email privacy@notho.co.za.`);
     }
-    let profileData: Record<string, unknown> = {};
-    let progressData: Record<string, unknown> = {};
-    if (user) {
-      const [{ data: p }, { data: pr }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle(),
-        supabase.from("user_progress").select("*").eq("user_id", user.id).maybeSingle(),
-      ]);
-      if (p) profileData = p as Record<string, unknown>;
-      if (pr) progressData = pr as Record<string, unknown>;
-    }
-    const exportPayload = {
-      exportDate: new Date().toISOString(),
-      exportNote: "Your Notho data export - requested under POPIA Section 23 (Right of Access)",
-      account: { email: user?.email ?? "guest" },
-      profile: profileData,
-      progress: progressData,
-      localStorageSnapshot: lsData,
-    };
-    const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "notho-data-export.json";
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   /**

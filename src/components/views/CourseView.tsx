@@ -1,5 +1,7 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
+import { useLocale } from "@/i18n/LocaleProvider";
+import { localizeContent } from "@/i18n/contentZu";
+/* eslint-disable @next/next/no-html-link-for-pages */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -155,6 +157,11 @@ import {
 import { CourseIcon } from "@/components/views/LearnView";
 import { useNothoState } from "@/hooks/useNothoState";
 import { SettingsView } from "@/components/SettingsView";
+import { useRouter } from "next/navigation";
+import { useLessonResults } from "@/hooks/useLessonResults";
+import { GradeBadge, PassPill } from "@/components/results/GradeBadge";
+import { RE5_COURSE_ID, examSpecFor } from "@/lib/results/re5";
+import { courseScore } from "@/lib/results/select";
 
 function getDailyFact(): string {
   const start = new Date(new Date().getFullYear(), 0, 0);
@@ -181,25 +188,37 @@ export function CourseView({
   nextCourse?: Course | null;
   onGoToNextCourse?: () => void;
 }) {
-  // Scroll to top when course is loaded
-  React.useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-    const mainContent = document.querySelector(".main-content");
-    if (mainContent) mainContent.scrollTo({ top: 0, behavior: "instant" });
-  }, [course.id]);
-
+  const { locale } = useLocale();
   const colour = COURSE_COLOURS[courseIndex % COURSE_COLOURS.length];
   const [lockedModal, setLockedModal] = useState<{
     lessonTitle: string;
     reason: string;
   } | null>(null);
 
-  // ── Progression logic ──────────────────────────────────────────────────────
-  // A lesson state is determined by LIVE PROGRESS, not the static comingSoon flag.
-  //   completed   → isLessonCompleted() is true
-  //   playable    → has steps AND (first in unit OR prev lesson completed)
-  //   locked      → has steps BUT prerequisite not yet done
-  //   coming_soon → no steps array at all (content not written yet)
+  const router = useRouter();
+  const { results: allResults, best: bestResults } = useLessonResults(course.id);
+  const isRe5 = course.id === RE5_COURSE_ID;
+
+  const overall = React.useMemo(
+    () => courseScore(allResults, course.id),
+    [allResults, course.id]
+  );
+
+  const playableLessonCount = React.useMemo(
+    () =>
+      course.units.reduce(
+        (n, unit) =>
+          n +
+          unit.lessons.filter(
+            (l) =>
+              (Array.isArray(l.steps) && l.steps.length > 0) ||
+              (l.secureQuestionCount ?? 0) > 0
+          ).length,
+        0
+      ),
+    [course]
+  );
+
   type LessonState = "completed" | "playable" | "locked" | "coming_soon";
 
   function getLessonState(
@@ -207,14 +226,54 @@ export function CourseView({
     lessonIndex: number
   ): LessonState {
     const lesson = unitLessons[lessonIndex];
-    const hasContent = Array.isArray(lesson.steps) && lesson.steps.length > 0;
+    const hasContent =
+      (Array.isArray(lesson.steps) && lesson.steps.length > 0) ||
+      (lesson.secureQuestionCount ?? 0) > 0;
 
     if (!hasContent) return "coming_soon";
     if (isLessonCompleted(course.id, lesson.id)) return "completed";
     if (lessonIndex === 0) return "playable";
     const prevDone = isLessonCompleted(course.id, unitLessons[lessonIndex - 1].id);
-    const state = prevDone ? "playable" : "locked";
-    return state;
+    return prevDone ? "playable" : "locked";
+  }
+
+  function lessonGrade(lessonId: string): ReactNode {
+    const result = bestResults.get(`${course.id}:${lessonId}`);
+    if (!result || result.totalQuestions === 0) return null;
+    const spec = examSpecFor(lessonId);
+
+    return (
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 5,
+          flexWrap: "wrap",
+          justifyContent: "center",
+          marginTop: 4,
+        }}
+      >
+        {spec && result.passed !== null && (
+          <PassPill
+            passed={result.passed}
+            passMarkCorrect={spec.passMarkCorrect}
+            totalQuestions={spec.totalQuestions}
+            size="sm"
+          />
+        )}
+        <GradeBadge
+          scorePct={result.scorePct}
+          size="sm"
+          title={
+            `Best attempt (#${result.attemptNo}): ` +
+            `${result.firstTryCorrect} of ${result.totalQuestions} right first time` +
+            (result.source === "backfill"
+              ? " (reconstructed from your earlier answers)"
+              : "")
+          }
+        />
+      </span>
+    );
   }
 
   return (
@@ -231,14 +290,61 @@ export function CourseView({
           <div style={{ marginBottom: 12, color: colour.accent }}>
             <CourseIcon name={course.icon} size={56} />
           </div>
-          <h2 className="course-map-title" style={{ color: colour.accent }}>{course.title}</h2>
+          <h2 className="course-map-title" style={{ color: colour.accent }}>{localizeContent(locale, `course.${course.id}`, course.title)}</h2>
           <p className="course-map-description">{course.description}</p>
         </div>
+
+        {overall && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              background: "var(--color-surface)",
+              border: "1.5px solid var(--color-border)",
+              borderRadius: 16,
+              padding: "12px 16px",
+              marginBottom: 12,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: 0.5,
+                textTransform: "uppercase",
+                color: "var(--color-text-secondary)",
+              }}
+            >
+              Course score
+              <span style={{ opacity: 0.7, fontWeight: 600 }}>
+                {" · "}
+                {overall.lessonsScored}/{playableLessonCount}
+              </span>
+            </span>
+            <GradeBadge scorePct={overall.scorePct} showLabel={false} />
+          </div>
+        )}
+
+        {isRe5 && (
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{ width: "100%", marginBottom: 16 }}
+            onClick={() => router.push("/re5-readiness")}
+          >
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+              <GraduationCap size={18} />
+              My RE5 readiness
+            </span>
+          </button>
+        )}
 
         {course.units.map((unit) => (
           <div className="unit" key={unit.id}>
             <div className="unit-header">
-              <div className="unit-title">{unit.title}</div>
+              <div className="unit-title">{localizeContent(locale, `unit.${course.id}.${unit.id}`, unit.title)}</div>
               <div className="unit-description">{unit.description}</div>
             </div>
 
@@ -277,7 +383,6 @@ export function CourseView({
                         '" first to unlock this lesson.',
                     });
                   } else {
-                    // "completed" or "playable", open the lesson
                     goToLesson(lesson.id);
                   }
                 };
@@ -286,6 +391,7 @@ export function CourseView({
                   <div key={lesson.id}>
                     <div
                       className={nodeClass}
+                      data-lesson-id={lesson.id}
                       onClick={handleClick}
                       style={{
                         cursor: state === "playable" || state === "completed" ? "pointer" : "default",
@@ -303,7 +409,8 @@ export function CourseView({
                       {icon}
                     </div>
                     <div className="lesson-label">
-                      {lesson.title}
+                      {localizeContent(locale, `lesson.${course.id}.${lesson.id}`, lesson.title)}
+                      {lessonGrade(lesson.id)}
                       {state === "coming_soon" && (
                         <span
                           style={{
@@ -331,15 +438,14 @@ export function CourseView({
             style={{ width: "100%", marginTop: 24 }}
             onClick={onGoToNextCourse}
           >
-            Next Course: {nextCourse.title}
+            Next Course: {localizeContent(locale, `course.${nextCourse.id}`, nextCourse.title)}
           </button>
         ) : (
           <p style={{ textAlign: "center", marginTop: 24, color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 600 }}>
-            You&apos;ve completed all courses!
+            You've completed all courses!
           </p>
         )}
 
-        {/* Lock / coming-soon modal */}
         {lockedModal && (
           <div
             onClick={() => setLockedModal(null)}

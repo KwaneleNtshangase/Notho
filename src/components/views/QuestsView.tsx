@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
+/* eslint-disable @next/next/no-html-link-for-pages */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -155,6 +155,7 @@ import {
 import { useNothoState } from "@/hooks/useNothoState";
 import { SettingsView } from "@/components/SettingsView";
 import { GoalCard } from "@/components/GoalCard";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 function getDailyFact(): string {
   const start = new Date(new Date().getFullYear(), 0, 0);
@@ -187,19 +188,20 @@ export function QuestsView({
   streak: number;
   addXP?: (amount: number) => void;
 }) {
+  const { t } = useLocale();
   const goalPct = Math.min(100, Math.round((dailyXP / Math.max(1, dailyGoal)) * 100));
 
   return (
     <main >
       <div style={{ maxWidth: 760, margin: "0 auto", width: "100%" }}>
-      <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 16 }}>Goals</h2>
+      <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 16 }}>{t("goals.pageTitle")}</h2>
       {/* Editable money-goal card - the "Goals" tab now owns the goal, with an
           inline picker instead of bouncing to the Learn page. */}
       <GoalCard />
       <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 14, marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
           <Target size={16} className="text-[var(--color-primary)]" aria-hidden />
-          <span style={{ fontSize: 13, fontWeight: 700 }}>Daily Goal</span>
+          <span style={{ fontSize: 13, fontWeight: 700 }}>{t("goals.daily")}</span>
         </div>
         <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 8 }}>
           {dailyXP} / {dailyGoal} XP today
@@ -220,7 +222,7 @@ export function QuestsView({
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-primary)", marginBottom: 2 }}>
-              Weekly Challenge
+              {t("goals.weekly")}
             </div>
             <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{weeklyChallenge.text}</div>
             <div style={{ background: "var(--color-border)", borderRadius: 4, height: 5, overflow: "hidden" }}>
@@ -240,12 +242,12 @@ export function QuestsView({
           </div>
           {challengeComplete && !challengeRewardClaimed && (
             <button className="btn btn-primary" style={{ fontSize: 12, padding: "6px 14px", flexShrink: 0 }} onClick={claimChallengeReward}>
-              Claim
+              {t("goals.claim")}
             </button>
           )}
           {challengeRewardClaimed && (
             <div style={{ fontSize: 11, color: "var(--color-primary)", fontWeight: 700, flexShrink: 0, display: "flex", alignItems: "center", gap: 4 }}>
-              <CheckCircle2 size={14} /> Claimed
+              <CheckCircle2 size={14} /> {t("goals.claimed")}
             </div>
           )}
         </div>

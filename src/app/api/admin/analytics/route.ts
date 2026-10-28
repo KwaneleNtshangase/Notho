@@ -21,6 +21,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { isAdminEmail, isAdminUser } from "@/lib/admin";
+import { loadOutcomes } from "./outcomes";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -58,12 +59,29 @@ const VIEWS: Record<string, string> = {
   dropoff: "admin_dropoff",
   churn: "admin_churn_reasons",
   churnVerbatims: "admin_churn_verbatims",
+  // Added by the analytics v2 migration. A view here that 500s with
+  // "function does not exist" means that migration has not been applied yet.
+  funnel: "admin_activation_funnel",
+  segments: "admin_engagement_segments",
+  matrix: "admin_retention_matrix",
+  clock: "admin_activity_clock",
+  atRisk: "admin_at_risk_users",
+  featureLift: "admin_feature_lift",
+  questions: "admin_question_offenders",
+  growth: "admin_growth_accounting",
+  streaks: "admin_streak_distribution",
 };
 
 function clampDays(raw: string | null, fallback: number): number {
   const n = Number(raw);
   if (!Number.isFinite(n)) return fallback;
   return Math.min(Math.max(Math.round(n), 1), 365);
+}
+
+function clampInt(raw: string | null, fallback: number, lo: number, hi: number): number {
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(Math.max(Math.round(n), lo), hi);
 }
 
 export async function GET(req: NextRequest) {
@@ -81,49 +99,76 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const view = url.searchParams.get("view") ?? "overview";
   const fn = VIEWS[view];
-  if (!fn) {
+  if (view !== "outcomes" && !fn) {
     return NextResponse.json(
       { error: `Unknown view "${view}".`, allowed: Object.keys(VIEWS) },
       { status: 400 }
     );
   }
 
+  if (view === "outcomes") {
+    try {
+      const data = await loadOutcomes(admin);
+      return NextResponse.json(
+        { view, days: 0, data, generatedAt: data.generatedAt },
+        { headers: { "Cache-Control": "no-store" } }
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Could not load outcomes.";
+      console.error("[admin/analytics] outcomes failed:", message);
+      return NextResponse.json(
+        { error: 'Could not load "outcomes".', detail: message, hint: "This view reads lesson_results, budget_entries and profiles with the service role. It is not an RPC." },
+        { status: 500 }
+      );
+    }
+  }
+
   const days = clampDays(url.searchParams.get("days"), 30);
   let args: Record<string, unknown> = { p_days: days };
 
-  if (view === "retention") {
+  if (view === "retention" || view === "segments" || view === "streaks") {
     args = {};
   } else if (view === "users") {
     args = {
       p_search: (url.searchParams.get("search") ?? "").slice(0, 80) || null,
-      p_limit: Math.min(Math.max(Number(url.searchParams.get("limit") ?? 100), 1), 500),
+      p_limit: clampInt(url.searchParams.get("limit"), 100, 1, 500),
       p_offset: Math.max(Number(url.searchParams.get("offset") ?? 0), 0),
       p_sort: url.searchParams.get("sort") ?? "last_seen",
     };
   } else if (view === "user") {
     const id = url.searchParams.get("userId");
-    // Validate shape before it reaches the RPC so a malformed id is a clean 400
-    // rather than a Postgres cast error surfacing as a 500.
     if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
       return NextResponse.json({ error: "A valid userId is required." }, { status: 400 });
     }
     args = { p_user_id: id };
   } else if (view === "content") {
-    args = { p_days: days, p_min_att: 5 };
+    args = { p_days: days, p_min_att: clampInt(url.searchParams.get("minAttempts"), 5, 1, 100) };
+  } else if (view === "questions") {
+    args = {
+      p_days: days,
+      p_min_att: clampInt(url.searchParams.get("minAttempts"), 4, 1, 100),
+    };
   } else if (view === "churnVerbatims") {
-    args = { p_days: days, p_limit: Math.min(Math.max(Number(url.searchParams.get("limit") ?? 100), 1), 500) };
+    args = { p_days: days, p_limit: clampInt(url.searchParams.get("limit"), 100, 1, 500) };
+  } else if (view === "matrix" || view === "growth") {
+    args = { p_weeks: clampInt(url.searchParams.get("weeks"), 12, 2, 26) };
+  } else if (view === "atRisk") {
+    args = { p_limit: clampInt(url.searchParams.get("limit"), 50, 1, 300) };
   }
 
   const { data, error } = await admin.rpc(fn, args);
 
   if (error) {
-    // The message can name internal objects, so it is logged rather than
-    // returned. The admin still gets enough to know which panel broke.
     console.error(`[admin/analytics] ${view} failed:`, error.message);
+    const missingFn = /(does not exist|schema cache)/i.test(error.message ?? "");
     return NextResponse.json(
       {
         error: `Could not load "${view}".`,
-        hint: "If this is the first load, the analytics migration may not have been applied yet.",
+        detail: error.message,
+        code: error.code ?? null,
+        hint: missingFn
+          ? `The database function ${fn}() is missing. Apply the pending migrations in supabase/migrations (the newest is the admin analytics v2 one).`
+          : "This is the raw Postgres error. It is shown because you are an admin.",
       },
       { status: 500 }
     );

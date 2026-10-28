@@ -15,11 +15,6 @@ describe("escapeHtml", () => {
     expect(escapeHtml("' onload='alert(1)")).toBe("&#39; onload=&#39;alert(1)");
   });
 
-  /**
-   * Order matters. If `&` were escaped after `<`, the ampersand in the
-   * just-produced `&lt;` would itself be rewritten to `&amp;lt;` and the reader
-   * would see the literal text "&lt;" instead of a "<".
-   */
   it("escapes the ampersand first so entities are not double-escaped", () => {
     expect(escapeHtml("<")).toBe("&lt;");
     expect(escapeHtml("&lt;")).toBe("&amp;lt;");
@@ -55,18 +50,13 @@ describe("isAutomatedUserAgent", () => {
     "Mozilla/5.0 HeadlessChrome/120.0.0.0",
     "UptimeRobot/2.0",
     "Mozilla/5.0 AhrefsBot/7.0",
+    "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.186 Mobile Safari/537.36 (compatible; AdsBot-Google-Mobile; +http://www.google.com/mobile/adsbot.html)",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.7922.173 Safari/537.36 PlayStore-Google",
+    "Google",
   ])("flags %s", (ua) => {
     expect(isAutomatedUserAgent(ua)).toBe(true);
   });
 
-  /**
-   * The regression this file was written for.
-   *
-   * The original list matched vendor names as whole words — `\bahrefs\b` — but
-   * these crawlers identify as `<Vendor>Bot`, where the `s` is followed by `B`
-   * with no word boundary between them. Neither the vendor name nor `\bbot\b`
-   * matched, so AhrefsBot and SemrushBot reported straight into the bug inbox.
-   */
   it.each([
     "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)",
     "Mozilla/5.0 (compatible; SemrushBot/7~bl)",
@@ -88,7 +78,6 @@ describe("isAutomatedUserAgent", () => {
   });
 
   it("does not flag a real browser", () => {
-    // A genuine build number, which automation stacks do not bother to fake.
     expect(
       isAutomatedUserAgent(
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.129 Safari/537.36"
@@ -101,11 +90,6 @@ describe("isAutomatedUserAgent", () => {
     ).toBe(false);
   });
 
-  /**
-   * Word-boundary anchored on purpose. "Robot" appears in ordinary product
-   * names and "spider" in ordinary words; matching them loosely would drop a
-   * real user's bug report silently, which is the expensive direction to fail.
-   */
   it("does not flag words that merely contain a bot name", () => {
     expect(isAutomatedUserAgent("Mozilla/5.0 RobotVacuumBrowser/1.0")).toBe(false);
     expect(isAutomatedUserAgent("Mozilla/5.0 SpiderMonkeyApp/2.1")).toBe(false);

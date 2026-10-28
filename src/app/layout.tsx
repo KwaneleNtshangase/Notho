@@ -5,9 +5,27 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ErrorReportingInit } from "@/components/ErrorReportingInit";
 import { NativeAuthDeepLink } from "@/components/NativeAuthDeepLink";
 import { NativeShellGuards } from "@/components/NativeShellGuards";
+import { TextScaleInit } from "@/components/TextScaleInit";
+import { AppleAuthGuard } from "@/components/AppleAuthGuard";
+import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { ServiceWorkerRegistration } from "@/lib/sw/ServiceWorkerRegistration";
 import { STORAGE_MIGRATION_SCRIPT } from "@/lib/storageMigration";
+import { TEXT_SCALE_BOOT_SCRIPT } from "@/lib/textScale";
+import { JsonLd } from "@/components/JsonLd";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+  organizationJsonLd,
+  softwareJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 import "./globals.css";
+import "./text-scale.css";
+import "./shell-layout.css";
+import "./splash-static.css";
+import "./apple-signin.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,31 +37,78 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Without this, mobile browsers render at ~980px virtual width and
-// CSS media queries like max-width: 1200px never match real phones.
-// Pinch-zoom stays enabled (WCAG 1.4.4) - never set maximumScale/userScalable.
+const CANVAS_BOOT_SCRIPT = `(() => {
+  try {
+    var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var c = dark ? '#000000' : '#ffffff';
+    var root = document.documentElement;
+    root.style.backgroundColor = c;
+    root.style.colorScheme = dark ? 'dark' : 'light';
+    root.style.setProperty('--notho-canvas', c);
+    if (dark) root.classList.add('dark');
+    if (document.body) document.body.style.backgroundColor = c;
+    var metas = document.querySelectorAll('meta[name="theme-color"]');
+    if (!metas.length) {
+      var meta = document.createElement('meta');
+      meta.setAttribute('name', 'theme-color');
+      meta.setAttribute('content', c);
+      document.head.appendChild(meta);
+    } else {
+      for (var i = 0; i < metas.length; i++) metas[i].setAttribute('content', c);
+    }
+    var loc = '';
+    try { loc = localStorage.getItem('notho-locale') || ''; } catch (e) {}
+    if (loc === 'zu') root.lang = 'zu-ZA';
+  } catch (e) {}
+})();`;
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  ],
 };
 
 export const metadata: Metadata = {
-  title: "Notho - Master Your Money",
-  description: "Interactive personal finance learning app built for South Africa.",
+  title: {
+    default: "Notho \u2014 Learn personal finance in South Africa",
+    template: "%s | Notho",
+  },
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "Notho",
+    "personal finance South Africa",
+    "financial literacy",
+    "investment calculator",
+    "TFSA calculator",
+    "budget app South Africa",
+    "RE5 prep",
+    "Fundi Finance",
+  ],
+  authors: [{ name: "The Solution Org (Pty) Ltd", url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: "The Solution Org (Pty) Ltd",
+  category: "education",
   manifest: "/manifest.json",
-  // www, not the apex. The apex 308-redirects to www, and social scrapers
-  // (WhatsApp, Twitter, LinkedIn) do not all follow redirects when fetching
-  // og:image — the share preview comes back blank. Point straight at the host
-  // that actually serves the file.
-  metadataBase: new URL("https://www.notho.co.za"),
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: SITE_URL },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
-    title: "Notho",
+    statusBarStyle: "black-translucent",
+    title: SITE_NAME,
   },
   icons: {
-    // Square mark for icon slots. The wide lockup used to sit here, which
-    // meant browsers and iOS centre-cropped it down to a sliver of the "N".
     icon: [
       { url: "/favicon.ico", sizes: "any" },
       { url: "/notho-icon-192.png", type: "image/png", sizes: "192x192" },
@@ -53,13 +118,19 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    // OG wants the wide lockup, not the square mark.
+    type: "website",
+    locale: "en_ZA",
+    siteName: SITE_NAME,
+    url: SITE_URL,
     images: ["/notho-logo.png"],
-    title: "Notho",
-    description: "Learn to manage money the South African way",
+    title: "Notho \u2014 Learn personal finance in South Africa",
+    description: SITE_DESCRIPTION,
   },
-  other: {
-    "mobile-web-app-capable": "yes",
+  twitter: {
+    card: "summary_large_image",
+    title: "Notho \u2014 Learn personal finance in South Africa",
+    description: SITE_DESCRIPTION,
+    images: ["/notho-logo.png"],
   },
 };
 
@@ -69,26 +140,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en-ZA">
       <head>
-        {/* Rebrand storage migration. Must run before hydration: hooks read
-            these keys on their first render, and without this every existing
-            user reads empty notho-* keys and looks brand new. */}
         <script dangerouslySetInnerHTML={{ __html: STORAGE_MIGRATION_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: TEXT_SCALE_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: CANVAS_BOOT_SCRIPT }} />
+        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
+        <JsonLd data={softwareJsonLd()} />
+        <GoogleAnalytics />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ErrorBoundary>
-          <PostHogProvider>{children}</PostHogProvider>
+          <LocaleProvider>
+            <PostHogProvider>{children}</PostHogProvider>
+          </LocaleProvider>
           <ServiceWorkerRegistration />
           <ErrorReportingInit />
-          {/* No-op on web; on native, exchanges the OAuth deep-link callback
-              for a session. See NativeAuthDeepLink.tsx and AuthGate.tsx. */}
+          <TextScaleInit />
           <NativeAuthDeepLink />
-          {/* No-op on web; on native, suppresses the browser's own PWA
-              install nudge. See NativeShellGuards.tsx. */}
           <NativeShellGuards />
+          <AppleAuthGuard />
         </ErrorBoundary>
       </body>
     </html>

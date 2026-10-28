@@ -2,8 +2,10 @@
 
 import { isScorableStep } from "@/lib/lessonScoring";
 import React, { use } from "react";
+import { useRouter } from "next/navigation";
 import { LessonView } from "@/components/views/LessonView";
 import { LessonSummaryView } from "@/components/views/LessonSummaryView";
+import { MockAttemptExperience } from "@/components/views/MockAttemptExperience";
 import { useNotho } from "@/context/NothoContext";
 import { getLessonTitle, getNextLesson } from "@/app/pageViews.types";
 import { analytics } from "@/lib/analytics";
@@ -13,11 +15,11 @@ import {
   assignQids,
   requeuedCopy,
   allQuestionsMastered,
-  firstTryAccuracy,
   baseQids,
   type WorkingStep,
 } from "@/lib/lessonMastery";
-import { recordConceptResult } from "@/lib/spaced-repetition";
+import { recordConceptResult, scheduleConceptsForCourse } from "@/lib/spaced-repetition";
+import { conceptIdsFromLessonSteps } from "@/lib/reviewIntro";
 import {
   resolveLessonSteps,
   nextAttemptNo,
@@ -26,8 +28,17 @@ import {
   clearMissedVariant,
 } from "@/lib/lessonBank";
 import { logQuestionAttempt } from "@/lib/questionAttempts";
+import { ExamResultView, type ExamAttemptSummary } from "@/components/views/ExamResultView";
+import { scoreAttempt } from "@/lib/results/score";
+import {
+  RE5_COURSE_ID,
+  examSpecFor,
+  isRe5MockExam,
+  re5AreaResolver,
+} from "@/lib/results/re5";
+import { fetchLessonResults, recordLessonResult } from "@/lib/results/store";
+import type { LessonResult } from "@/lib/results/types";
 
-/** Saved mid-lesson progress is honoured for this long after the last step. */
 const SAVED_PROGRESS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 type SavedMidLesson = {
@@ -62,28 +73,54 @@ function readSavedMidLesson(
   }
 }
 
+function warmRoute(router: { prefetch: (href: string) => void }, href: string) {
+  try {
+    router.prefetch(href);
+  } catch {
+    /* prefetch is best-effort */
+  }
+}
+
 export default function LessonPage({ params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const { courseId, lessonId } = use(params);
+
+  if (courseId === RE5_COURSE_ID && isRe5MockExam(lessonId)) {
+    return <MockAttemptExperience courseId={courseId} lessonId={lessonId} />;
+  }
+
+  return <StandardLessonPage courseId={courseId} lessonId={lessonId} />;
+}
+
+function StandardLessonPage({
+  courseId,
+  lessonId,
+}: {
+  courseId: string;
+  lessonId: string;
+}) {
   const {
     userId,
+    userData,
     currentLessonState,
     setCurrentLessonState,
     setRoute,
     hearts,
     loseHeart,
     completeLesson,
-    isLessonCompleted,
     lessonSummary,
     setLessonSummary,
   } = useNotho();
 
+  const router = useRouter();
   const lessonStartTimeRef = React.useRef(Date.now());
   const isFinalizingRef = React.useRef(false);
-  const lessonHeartLostRef = React.useRef(false); // To track if a heart was lost during this lesson
+  const lessonHeartLostRef = React.useRef(false);
 
-  // State is only usable when it belongs to THIS URL. A stale state from the
-  // previous lesson (e.g. after "Continue to next lesson") must be re-inited,
-  // or the old lesson's steps render under the new URL.
+  const [examResult, setExamResult] = React.useState<{
+    attempt: ExamAttemptSummary;
+    previousAttempts: LessonResult[];
+  } | null>(null);
+
   const hasLessonState = Boolean(
     currentLessonState &&
       currentLessonState.steps &&
@@ -92,12 +129,13 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       currentLessonState.lessonId === lessonId
   );
 
-  // Arrived without matching in-memory state (page refresh, PWA relaunch,
-  // deep link, or next-lesson navigation). Restore the saved mid-lesson
-  // position if one exists for this exact lesson, otherwise start it fresh
-  // from content; only bail to the course page when the lesson is unknown.
-  // Runs in an effect — the previous version called setRoute during render,
-  // which is unsafe and dumped users back to the course on every refresh.
+  React.useEffect(() => {
+    warmRoute(router, `/course/${courseId}`);
+    warmRoute(router, "/learn");
+    const next = getNextLesson(courseId, lessonId);
+    if (next?.id) warmRoute(router, `/lesson/${courseId}/${next.id}`);
+  }, [router, courseId, lessonId]);
+
   React.useEffect(() => {
     if (hasLessonState) return;
     const course = CONTENT_DATA.courses.find((c) => c.id === courseId);
@@ -111,14 +149,8 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       const saved = readSavedMidLesson(userId, courseId, lessonId);
       let workingSteps: WorkingStep[];
       if (saved?.steps && saved.steps.length > 0) {
-        // Prefer the persisted working steps — they include any re-queued
-        // copies from the mastery loop, which can't be re-derived from content.
         workingSteps = saved.steps;
       } else {
-        // Fresh (deep link / relaunch, no save): resolve the bank for this
-        // attempt, then shuffle with the same seed so answer indexes are stable.
-        // Fall back to static steps if bank resolution ever throws/empties, so
-        // the lesson still opens instead of hanging on "Loading lesson...".
         const attemptNo = nextAttemptNo(userId, lessonId);
         let resolved = lesson.steps ?? [];
         try {
@@ -160,111 +192,155 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
     return <div className="p-4">Loading lesson...</div>;
   }
 
-  const finalizeCurrentLesson = async (choice: "next" | "course") => {
-    // Prevent double-tap on Done from awarding XP multiple times
+  const finalizeCurrentLesson = (choice: "next" | "course") => {
     if (isFinalizingRef.current) return;
     isFinalizingRef.current = true;
 
-    const baseXP = 50;
-    const totalXP = baseXP + currentLessonState.correctCount * 10;
     if (!currentLessonState.courseId || !currentLessonState.lessonId) {
       isFinalizingRef.current = false;
       return;
     }
 
-    // Distinct questions in the lesson (re-queued copies share a qid, so this
-    // is not inflated by the mastery loop).
+    const doneCourseId = currentLessonState.courseId;
+    const doneLessonId = currentLessonState.lessonId;
+    const nextLesson = getNextLesson(doneCourseId, doneLessonId);
+
+    warmRoute(router, `/course/${doneCourseId}`);
+    if (choice === "next" && nextLesson?.id) {
+      warmRoute(router, `/lesson/${doneCourseId}/${nextLesson.id}`);
+    }
+
+    const baseXP = 50;
+    const totalXP = baseXP + currentLessonState.correctCount * 10;
     const totalQuestions = baseQids(currentLessonState.steps).length;
-    // With the mastery loop every question ends correct, so "perfect" can no
-    // longer mean "all correct" — it means the learner never missed on the
-    // first try.
     const isPerfect = totalQuestions > 0 && currentLessonState.mistakes === 0;
-
-    const lessonTitleDone =
-      getLessonTitle(currentLessonState.courseId, currentLessonState.lessonId) ?? "";
-    const alreadyCompleted = isLessonCompleted(
-      currentLessonState.courseId,
-      currentLessonState.lessonId
-    );
-
-    const { streak: streakAfterLesson, xpAwarded } = await completeLesson(
-      currentLessonState.courseId,
-      currentLessonState.lessonId,
-      totalXP,
-      isPerfect
-    );
-
-    analytics.lessonCompleted(
-      currentLessonState.courseId,
-      currentLessonState.lessonId,
-      lessonTitleDone,
-      {
-        xpEarned: xpAwarded,
-        isPerfect,
-        timeSeconds: Math.round((Date.now() - lessonStartTimeRef.current) / 1000),
-        heartLost: lessonHeartLostRef.current,
-      }
+    const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
+    const lessonTitleDone = getLessonTitle(doneCourseId, doneLessonId) ?? "";
+    const spec = examSpecFor(doneLessonId);
+    const scored = scoreAttempt(
+      currentLessonState.steps,
+      currentLessonState.mistakenQids,
+      spec ? re5AreaResolver(doneLessonId) : undefined
     );
 
     if (typeof window !== "undefined") {
       localStorage.removeItem("notho-lesson-progress");
     }
 
-    if (alreadyCompleted) {
-      const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
-      const accuracy =
-        totalQuestions > 0
-          ? Math.min(100, Math.round((currentLessonState.correctCount / totalQuestions) * 100))
-          : 0;
+    if (!spec) {
       setLessonSummary({
-        xpEarned: xpAwarded,
+        xpEarned: totalXP,
         timeSeconds: elapsedSeconds,
-        accuracy,
-        streak: streakAfterLesson,
+        accuracy: scored.scorePct,
+        streak: userData?.streak ?? 0,
         isPerfect,
         choice,
-        nextLessonId: getNextLesson(currentLessonState.courseId, currentLessonState.lessonId)?.id ?? null,
-        courseId: currentLessonState.courseId,
-        lessonId: currentLessonState.lessonId,
+        nextLessonId: nextLesson?.id ?? null,
+        courseId: doneCourseId,
+        lessonId: doneLessonId,
       });
-      isFinalizingRef.current = false;
-      return;
     }
 
-    // Perfect-lesson count is now server-backed (perfect_lessons_total via
-    // completeLesson → recordLessonStats) — no device-local counter to drift.
+    void (async () => {
+      try {
+        const { streak: streakAfterLesson, xpAwarded } = await completeLesson(
+          doneCourseId,
+          doneLessonId,
+          totalXP,
+          isPerfect
+        );
 
-    const elapsedSeconds = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
-    const accuracy = firstTryAccuracy(
-      currentLessonState.steps,
-      currentLessonState.mistakenQids
-    );
+        analytics.lessonCompleted(doneCourseId, doneLessonId, lessonTitleDone, {
+          xpEarned: xpAwarded,
+          isPerfect,
+          timeSeconds: elapsedSeconds,
+          heartLost: lessonHeartLostRef.current,
+        });
 
-    setLessonSummary({
-      xpEarned: xpAwarded,
-      timeSeconds: elapsedSeconds,
-      accuracy,
-      streak: streakAfterLesson,
-      isPerfect,
-      choice,
-      nextLessonId: getNextLesson(currentLessonState.courseId, currentLessonState.lessonId)?.id ?? null,
-      courseId: currentLessonState.courseId,
-      lessonId: currentLessonState.lessonId,
-    });
-    
-    isFinalizingRef.current = false;
+        void scheduleConceptsForCourse(
+          conceptIdsFromLessonSteps(currentLessonState.steps)
+        );
+
+        const priorResults = spec ? await fetchLessonResults(doneCourseId) : [];
+
+        const savedResult = await recordLessonResult({
+          courseId: doneCourseId,
+          lessonId: doneLessonId,
+          kind: spec ? "exam" : "lesson",
+          totalQuestions: scored.totalQuestions,
+          firstTryCorrect: scored.firstTryCorrect,
+          passMarkCorrect: spec?.passMarkCorrect ?? null,
+          durationSeconds: elapsedSeconds,
+          areaBreakdown: scored.areaBreakdown,
+        });
+
+        if (spec) {
+          setExamResult({
+            attempt: {
+              spec,
+              firstTryCorrect: scored.firstTryCorrect,
+              totalQuestions: scored.totalQuestions,
+              scorePct: scored.scorePct,
+              passed: scored.firstTryCorrect >= spec.passMarkCorrect,
+              durationSeconds: elapsedSeconds,
+              areaBreakdown: scored.areaBreakdown,
+              saved: savedResult !== null,
+            },
+            previousAttempts: priorResults,
+          });
+        } else {
+          setLessonSummary((prev) =>
+            prev && prev.courseId === doneCourseId && prev.lessonId === doneLessonId
+              ? { ...prev, xpEarned: xpAwarded, streak: streakAfterLesson }
+              : prev
+          );
+        }
+      } catch {
+        /* persistence failed; the local completion screen already showed */
+      } finally {
+        isFinalizingRef.current = false;
+      }
+    })();
   };
 
   const handleLessonSummaryClose = () => {
     if (!lessonSummary) return;
-    const { choice, nextLessonId, courseId } = lessonSummary;
+    const { choice, nextLessonId, courseId: summaryCourseId } = lessonSummary;
+    if (choice === "next" && nextLessonId) {
+      warmRoute(router, `/lesson/${summaryCourseId}/${nextLessonId}`);
+    } else {
+      warmRoute(router, `/course/${summaryCourseId}`);
+    }
     setLessonSummary(null);
     if (choice === "next" && nextLessonId) {
-      setRoute({ name: "lesson", courseId, lessonId: nextLessonId });
+      setRoute({ name: "lesson", courseId: summaryCourseId, lessonId: nextLessonId });
     } else {
-      setRoute({ name: "course", courseId });
+      setRoute({ name: "course", courseId: summaryCourseId });
     }
   };
+
+  if (examResult) {
+    return (
+      <ExamResultView
+        attempt={examResult.attempt}
+        previousAttempts={examResult.previousAttempts}
+        onBackToCourse={() => {
+          setExamResult(null);
+          warmRoute(router, `/course/${courseId}`);
+          setRoute({ name: "course", courseId });
+        }}
+        onViewReadiness={() => {
+          setExamResult(null);
+          router.push("/re5-readiness");
+        }}
+        onRetake={() => {
+          setExamResult(null);
+          setCurrentLessonState((prev) => ({ ...prev, courseId: null, lessonId: null, steps: [] }));
+          setRoute({ name: "lesson", courseId, lessonId });
+        }}
+      />
+    );
+  }
 
   if (lessonSummary) {
     return (
@@ -285,10 +361,6 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
     return next?.title ?? undefined;
   })();
 
-  // Single source of truth for answering any question type. On a wrong answer
-  // it (1) re-queues a fresh copy of the question to the end of the session so
-  // the learner must return to it, and (2) pulls the linked concept's next
-  // review sooner via SM-2 so it resurfaces in future sessions.
   const recordAnswer = (isCorrect: boolean, answerValue: unknown) => {
     const answeredStep = currentLessonState.steps[currentLessonState.stepIndex] as
       | (WorkingStep & { conceptId?: string })
@@ -298,11 +370,6 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       const qid = step?.__qid;
       const answers = { ...prev.answers, [prev.stepIndex]: answerValue };
 
-      // Ungraded steps record the interaction and stop there. An action step is
-      // self-reported completion, not a question with a right answer, so it must
-      // not touch correctCount, mistakes, hearts or the re-queue. Before this,
-      // "Done - I did it!" fell through to the wrong-answer branch below and the
-      // step re-queued itself forever — see src/lib/lessonScoring.ts.
       if (!isScorableStep(step?.type)) {
         return { ...prev, answers };
       }
@@ -340,18 +407,15 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
         isCorrect,
       });
     }
+    if (answeredStep?.conceptId) {
+      void recordConceptResult(answeredStep.conceptId, isCorrect);
+    }
     if (isCorrect) {
-      // Learner finally got this exact item right — stop resurfacing it.
       clearMissedVariant(userId, slotId, variantId);
     } else {
-      // Gamification: a wrong answer costs a heart (loseHeart shows the
-      // out-of-hearts state when it hits zero).
       loseHeart();
       lessonHeartLostRef.current = true;
-      // Resurface this exact variant in future plays, and shorten the concept's
-      // SM-2 interval so the idea returns in reviews too.
       recordMissedVariant(userId, slotId, variantId);
-      if (answeredStep?.conceptId) void recordConceptResult(answeredStep.conceptId, false);
     }
   };
 
@@ -378,9 +442,6 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       canFinalize={canFinalize}
       answerQuestion={(index: number) => {
         const step = currentLessonState.steps[currentLessonState.stepIndex];
-        // Scenario steps render through the same option UI but were never
-        // counted (type check was mcq-only) — perfect scores were impossible
-        // on lessons containing scenarios.
         const isCorrect =
           (step.type === "mcq" || step.type === "scenario") && index === step.correct;
         recordAnswer(isCorrect, index);
@@ -402,8 +463,6 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
       nextLessonTitle={nextTitle}
       lessonTitle={getLessonTitle(courseId, lessonId) || `${courseId} ${lessonId}`}
       lessonStartTimeRef={lessonStartTimeRef}
-      // Was counting non-existent types ("question", "action-check") — must
-      // match the scoreable set used in finalize, or accuracy is misstated.
       totalQuestions={currentLessonState.steps.filter((s: any) => s.type === "mcq" || s.type === "true-false" || s.type === "scenario" || s.type === "fill-blank").length}
     />
   );

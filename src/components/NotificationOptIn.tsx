@@ -1,50 +1,76 @@
 "use client";
 
-/**
- * Notifications "on by default", the browser-legal way:
- *  - Permission already granted → silently (re)subscribe on load. Covers new
- *    devices and expired subscriptions with zero UI.
- *  - Permission never asked → show a soft banner to every signed-in user.
- *    One tap fires the real browser prompt (user gesture, so iOS Safari
- *    accepts it). "Later" snoozes the banner for 14 days.
- *  - Permission denied → stay silent (the browser blocks re-asking anyway).
- * Users can switch off anytime in Settings (existing toggle).
- */
-
 import { useEffect, useState } from "react";
-import { ensurePushSubscription, pushSupported } from "@/lib/push/subscribe";
+import { usePathname } from "next/navigation";
+import {
+  ensurePushSubscription,
+  isNativeShell,
+  pushSupported,
+  webNotificationPermission,
+} from "@/lib/push/subscribe";
+import { useNotho } from "@/context/NothoContext";
 
-const SNOOZE_KEY = "notho-notif-prompt-snoozed-until";
-const SNOOZE_DAYS = 14;
+const DECIDED_KEY = "notho-notif-decided";
+const OLD_SNOOZE = "notho-notif-prompt-snoozed-until";
 
 export function NotificationOptIn() {
+  const pathname = usePathname() || "/";
+  const { userData } = useNotho();
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    if (!pushSupported()) return;
+  const doneALesson = (userData?.totalCompleted ?? 0) > 0 || (userData?.lessonsToday ?? 0) > 0;
+  const onQuietPath =
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/lesson") ||
+    pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/admin");
 
-    if (Notification.permission === "granted") {
-      // Auto: keep every granted device subscribed without asking anything.
-      void ensurePushSubscription(false).catch(() => {});
+  useEffect(() => {
+    if (onQuietPath) {
+      setShow(false);
       return;
     }
-    if (Notification.permission === "denied") return;
+    if (!pushSupported()) return;
+    let cancelled = false;
+    const t = setTimeout(() => {
+      void (async () => {
+        const permission = webNotificationPermission();
+        if (permission === "granted") {
+          await ensurePushSubscription(false).catch(() => {});
+          return;
+        }
+        if (permission === "denied") return;
+        // iOS/Android shell: Notification is missing. Capacitor permission is separate.
+        if (permission === null) {
+          if (!isNativeShell()) return;
+          const existing = await ensurePushSubscription(false).catch(() => "unsupported" as const);
+          if (existing === "subscribed" || existing === "denied" || existing === "unsupported") return;
+        }
+        if (!doneALesson || cancelled) return;
+        try {
+          if (localStorage.getItem(DECIDED_KEY) === "1") return;
+        } catch {
+          /* storage unavailable */
+        }
+        if (!cancelled) setShow(true);
+      })();
+    }, 800);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [doneALesson, onQuietPath]);
 
-    try {
-      const until = Number(localStorage.getItem(SNOOZE_KEY) ?? 0);
-      if (Date.now() < until) return;
-    } catch { /* storage unavailable */ }
-
-    // Let the app settle before asking (also keeps setState async in effects).
-    const t = setTimeout(() => setShow(true), 1500);
-    return () => clearTimeout(t);
-  }, []);
-
-  const snooze = () => {
-    try {
-      localStorage.setItem(SNOOZE_KEY, String(Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1000));
-    } catch { /* storage unavailable */ }
+  const close = (remember: boolean) => {
+    if (remember) {
+      try {
+        localStorage.setItem(DECIDED_KEY, "1");
+        localStorage.removeItem(OLD_SNOOZE);
+      } catch {
+        /* storage unavailable */
+      }
+    }
     setShow(false);
   };
 
@@ -54,7 +80,7 @@ export function NotificationOptIn() {
       await ensurePushSubscription(true);
     } finally {
       setBusy(false);
-      setShow(false);
+      close(true);
     }
   };
 
@@ -63,59 +89,63 @@ export function NotificationOptIn() {
   return (
     <div
       role="dialog"
-      aria-label="Enable notifications"
+      aria-label="Reminders"
       style={{
         position: "fixed",
         left: 12,
         right: 12,
         bottom: "calc(env(safe-area-inset-bottom, 0px) + 92px)",
         zIndex: 55,
-        maxWidth: 440,
+        maxWidth: 400,
         margin: "0 auto",
-        background: "var(--color-surface, #fff)",
+        background: "var(--color-surface, #111)",
         border: "1.5px solid var(--color-border)",
-        borderRadius: 14,
-        padding: "12px 16px",
-        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
+        borderRadius: 16,
+        padding: "14px 16px",
+        boxShadow: "0 12px 32px rgba(0, 0, 0, 0.28)",
         display: "flex",
         alignItems: "center",
         gap: 12,
-        flexWrap: "wrap",
       }}
     >
-      <div style={{ flex: 1, minWidth: 200 }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)" }}>
-          🔔 Don&apos;t lose your streak
-        </div>
-        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>
-          Get a reminder before your streak ends and alerts when a budget runs hot.
-        </div>
+      <div style={{ flex: 1, fontSize: 15, fontWeight: 700, color: "var(--color-text-primary)", lineHeight: 1.3 }}>
+        Remind you for the next lesson?
       </div>
-      <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
-        <button
-          type="button"
-          onClick={snooze}
-          style={{
-            background: "none", border: "none", cursor: "pointer",
-            fontSize: 13, fontWeight: 700, color: "var(--color-text-secondary)",
-            padding: "8px 10px",
-          }}
-        >
-          Later
-        </button>
-        <button
-          type="button"
-          onClick={enable}
-          disabled={busy}
-          style={{
-            background: "var(--color-primary)", color: "#fff", border: "none",
-            borderRadius: 10, padding: "8px 16px", fontSize: 13, fontWeight: 700,
-            cursor: "pointer", opacity: busy ? 0.6 : 1,
-          }}
-        >
-          {busy ? "Turning on…" : "Turn on"}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => close(true)}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          fontSize: 14,
+          fontWeight: 700,
+          color: "var(--color-text-secondary)",
+          padding: "8px 10px",
+          flexShrink: 0,
+        }}
+      >
+        No
+      </button>
+      <button
+        type="button"
+        onClick={() => void enable()}
+        disabled={busy}
+        style={{
+          background: "var(--color-primary)",
+          color: "#fff",
+          border: "none",
+          borderRadius: 10,
+          padding: "8px 14px",
+          fontSize: 14,
+          fontWeight: 700,
+          cursor: "pointer",
+          opacity: busy ? 0.6 : 1,
+          flexShrink: 0,
+        }}
+      >
+        {busy ? "…" : "Remind me"}
+      </button>
     </div>
   );
 }

@@ -6,17 +6,42 @@
  * courses to the top and pushes finished ones into a collapsed section at the
  * bottom.
  *
- * Storage is localStorage-only (`notho-pinned-courses`) — it's a display
- * preference, not progress, so it doesn't warrant a Supabase column or the
- * write path that comes with one. Trade-off: pins don't follow the user across
- * devices. If that becomes a complaint, add a `pinned_courses jsonb` column on
- * `user_progress` and sync it the way useUserSettings does.
+ * It DID become a complaint: a pin is an intentional choice about what you are
+ * working on, not a display preference, and pinning on a phone left the laptop
+ * unchanged. So the fix this file's own comment used to describe is now done —
+ * `user_progress.pinned_courses` (jsonb) holds `{ids, updatedAt}` and this
+ * store syncs to it the way useUserSettings syncs preferences.
+ *
+ * Storage model:
+ *   * localStorage stays the immediate, synchronous read/write surface — a pin
+ *     applies to the UI before anything touches the network, which is the
+ *     whole point on a phone with bad signal;
+ *   * every write also lands in the durable queue in `lib/sync/crossDeviceQueue`
+ *     and is flushed opportunistically;
+ *   * conflicts are resolved by `mergePinned` — last-write-wins on `updatedAt`,
+ *     whole-list replace. See `lib/sync/mergeRules.ts` for why it is not a
+ *     union, and the migration header for the same rule in SQL.
  *
  * The pure helpers below carry all the ordering rules so they can be unit
  * tested without a DOM.
  */
 
+import { sanitisePinnedIds, type PinnedCourses } from "@/lib/sync/mergeRules";
+
+export type { PinnedCourses };
+
 export const PINNED_COURSES_KEY = "notho-pinned-courses";
+
+/** When this device last changed the pin list (ISO-8601). Drives LWW. */
+export const PINNED_COURSES_UPDATED_AT_KEY = "notho-pinned-courses-updated-at";
+
+/**
+ * Set once this device's localStorage-only pins have been unioned into the
+ * account. Until then the first sync ADOPTS rather than races, so shipping
+ * cross-device pins cannot wipe pins that exist nowhere else.
+ * Same non-destructive stance as `lib/storageMigration.ts`.
+ */
+export const PINNED_COURSES_ADOPTED_KEY = "notho-pinned-courses-adopted";
 
 /**
  * Fired on `window` after a write so every mounted view updates immediately.
@@ -148,6 +173,15 @@ function readFromStorage(): string[] {
   }
 }
 
+function readUpdatedAt(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(PINNED_COURSES_UPDATED_AT_KEY);
+  } catch {
+    return null;
+  }
+}
+
 /** Current pinned list, hydrating from localStorage on first access. */
 export function readPinnedCourses(): string[] {
   if (typeof window === "undefined") return [];
@@ -155,11 +189,23 @@ export function readPinnedCourses(): string[] {
   return store;
 }
 
-export function writePinnedCourses(ids: readonly string[]): void {
-  if (typeof window === "undefined") return;
+/**
+ * The full record, timestamp included — what gets merged against the server.
+ * A device that has pins but has never stamped one (pre-sync build) reports
+ * the epoch, so any real edit from another device out-ranks it.
+ */
+export function readPinnedRecord(): PinnedCourses {
+  return {
+    ids: [...readPinnedCourses()],
+    updatedAt: readUpdatedAt() ?? new Date(0).toISOString(),
+  };
+}
+
+function persist(ids: readonly string[], updatedAt: string): void {
   store = [...ids];
   try {
     window.localStorage.setItem(PINNED_COURSES_KEY, JSON.stringify(store));
+    window.localStorage.setItem(PINNED_COURSES_UPDATED_AT_KEY, updatedAt);
   } catch {
     // Quota or private mode — the pin still applies for this session, it just
     // won't survive a reload. Not worth surfacing an error for.
@@ -167,11 +213,49 @@ export function writePinnedCourses(ids: readonly string[]): void {
   window.dispatchEvent(new Event(PINNED_COURSES_EVENT));
 }
 
-/** Toggles and persists in one step. Returns the new list. */
-export function toggleCoursePin(courseId: string): string[] {
+/**
+ * Local write. Stamps `updatedAt` so the server can arbitrate later; the
+ * caller is responsible for queueing the returned record.
+ */
+export function writePinnedCourses(
+  ids: readonly string[],
+  updatedAt: string = new Date().toISOString()
+): PinnedCourses {
+  if (typeof window === "undefined") return { ids: [...ids], updatedAt };
+  persist(ids, updatedAt);
+  return { ids: [...store!], updatedAt };
+}
+
+/**
+ * Adopt a value that came FROM the server. Deliberately separate from
+ * writePinnedCourses: it must not re-stamp the timestamp (that would make an
+ * adopted value look like a fresh local edit and win every future merge) and
+ * it must not queue a write back.
+ */
+export function hydratePinnedCourses(value: PinnedCourses | null): void {
+  if (typeof window === "undefined" || !value) return;
+  persist(sanitisePinnedIds(value.ids), value.updatedAt);
+}
+
+/** Toggles and persists in one step. Returns the new record. */
+export function toggleCoursePin(courseId: string): PinnedCourses {
   const next = togglePinned(readPinnedCourses(), courseId);
-  writePinnedCourses(next);
-  return next;
+  return writePinnedCourses(next);
+}
+
+/** True while this device's pins still need the one-time rollout union. */
+export function needsPinAdoption(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(PINNED_COURSES_ADOPTED_KEY) !== "1";
+  } catch {
+    return false;
+  }
+}
+
+export function markPinsAdopted(): void {
+  if (typeof window === "undefined") return;
+  try { window.localStorage.setItem(PINNED_COURSES_ADOPTED_KEY, "1"); } catch { /* ignore */ }
 }
 
 /** Stable reference between changes — required by useSyncExternalStore. */
@@ -188,7 +272,7 @@ export function getPinnedServerSnapshot(): readonly string[] {
 export function subscribePinnedCourses(onChange: () => void): () => void {
   if (typeof window === "undefined") return () => {};
 
-  // Same tab: writePinnedCourses already updated `store`, just notify.
+  // Same tab: the store was already updated, just notify.
   const onCustom = () => onChange();
 
   // Other tabs: adopt their value. `key === null` means localStorage.clear(),

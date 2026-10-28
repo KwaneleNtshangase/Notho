@@ -32,15 +32,6 @@ const SKIP_LINE =
 const FOOTER_LINE = /unique\s+document\s+no\.|page\s+\d+\s+of\s+\d+/i;
 const SUMMARY_BLOCK = /summary|scheduled\s+payments/i;
 
-/**
- * Section boilerplate that must never be glued onto a transaction description.
- *
- * A dateless line is normally a wrapped continuation of the row above it, but
- * only when the document is read in row order. PDF producers emit pages in
- * either vertical direction, so on a bottom-to-top document the "continuation"
- * sitting next to a row is actually the section heading ABOVE it - which is how
- * an account number ended up appended to a grocery purchase.
- */
 const SECTION_BOILERPLATE =
   /account\s+(type|number|name)\b|\bstatement\s+(period|date)\b|interest\s+rate|vat\s+(reg|no)|fsp\s+number/i;
 
@@ -48,7 +39,6 @@ function colRange(x: number, tolerance = 55): ColumnRange {
   return { x, tolerance };
 }
 
-/** Find a transaction-table header row and derive column x-positions. */
 export function detectGenericHeaderColumns(line: TextLine): ColumnLayout | null {
   const lower = line.text.toLowerCase();
   if (!/\bdate\b/.test(lower) || !/\bbalance\b/.test(lower)) return null;
@@ -98,11 +88,7 @@ function descriptionFromGenericColumns(
     }
     return true;
   });
-  return descItems
-    .map((i) => i.text)
-    .join(" ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return descItems.map((i) => i.text).join(" ").replace(/\s+/g, " ").trim();
 }
 
 function continuationGenericText(line: TextLine, cols: ColumnLayout): string {
@@ -120,19 +106,6 @@ function continuationGenericText(line: TextLine, cols: ColumnLayout): string {
     .trim();
 }
 
-/**
- * Assign each money item on the row to at most ONE column, nearest anchor wins.
- *
- * Money used to be read with independent "first item within 55pt of the anchor"
- * lookups, which is unsafe as soon as the money columns sit close together. On a
- * Discovery certified statement the Balance column is 46pt from the Credit
- * header anchor - inside tolerance - and the balance is the first such item in
- * x order, so a row whose only movement was a R1,234.56 debit was read as
- * R3,765.44 of INCOME: the running balance itself, imported as a credit.
- *
- * Exclusive nearest-wins assignment means an item can only ever be read as the
- * column it is genuinely closest to.
- */
 function moneyBuckets(line: TextLine, cols: ColumnLayout) {
   return bucketItemsToColumns(line, {
     moneyIn: cols.moneyIn ?? cols.credit,
@@ -187,22 +160,10 @@ function deriveAmountFromColumns(
 
 export function extractBalances(fullText: string, lines: TextLine[]): BalanceMeta {
   const meta: BalanceMeta = {};
-
-  /**
-   * Read the balance printed just after a label.
-   *
-   * fullText is every text item joined by spaces, so a hand-rolled character
-   * class like [\d\s.,]+ runs straight past the number and swallows whatever
-   * follows it - "Opening balance R 5,000.00 2026-05-04 ..." captured
-   * "5,000.00 2026" and parsed as nothing at all. Delegating to the shared
-   * tokenizer means the label lookup understands exactly the same amount
-   * formats as the row parser, currency prefix included.
-   */
   const balanceAfterLabel = (label: RegExp): number | undefined => {
     const m = fullText.match(label);
     if (!m || m.index === undefined) return undefined;
     const tail = fullText.slice(m.index + m[0].length, m.index + m[0].length + 40);
-    // FNB writes the direction as a Cr/Dr suffix rather than a sign.
     const fnb = tail.match(/^[:\s]*([\d,]+(?:\.\d{2})?(?:Cr|Dr))\b/i);
     if (fnb) {
       const val = parseFnbAmountToken(fnb[1]);
@@ -212,12 +173,8 @@ export function extractBalances(fullText: string, lines: TextLine[]): BalanceMet
     return amounts.length > 0 ? amounts[0].value : undefined;
   };
 
-  meta.openingBalance = balanceAfterLabel(
-    /(?:opening\s+balance|balance\s+brought\s+forward|b\/f)/i
-  );
-  meta.closingBalance = balanceAfterLabel(
-    /(?:closing\s+balance|balance\s+carried\s+forward|c\/f)/i
-  );
+  meta.openingBalance = balanceAfterLabel(/(?:opening\s+balance|balance\s+brought\s+forward|b\/f)/i);
+  meta.closingBalance = balanceAfterLabel(/(?:closing\s+balance|balance\s+carried\s+forward|c\/f)/i);
 
   if (!meta.openingBalance) {
     for (const line of lines.slice(0, 20)) {
@@ -237,12 +194,7 @@ export function extractBalances(fullText: string, lines: TextLine[]): BalanceMet
 }
 
 export function detectBankFromText(fullText: string): string | null {
-  // Detect the ISSUER from branding only. Transaction descriptions routinely
-  // name OTHER banks (e.g. "Magtape Credit Capitec", "KWANELE CAPITEC",
-  // "ABSA BANK FLAT 9") - matching a bare bank word mis-routes the parser, so
-  // we require issuer-specific markers (e.g. "Capitec Bank" / a bank domain).
   const t = fullText.toLowerCase();
-  // Discovery Bank: distinctive account name + FSP number 48657 (their licence).
   if (/discovery\s+bank|discovery\s+gold\s+transaction|discovery\s+(?:transaction|savings|credit\s+card)\s+account|fsp\s+number\s+48657/.test(t))
     return "discovery";
   if (/capitec\s*bank|capitecbank\.co\.za/.test(t)) return "capitec";
@@ -264,6 +216,30 @@ export function accountLabelFromBank(bank: string | null, fileName?: string): st
   return "Bank account";
 }
 
+export function refineAccountLabel(base: string, fullText: string): string {
+  const product = fullText.match(/product\s+name\s*:?\s*([A-Za-z][A-Za-z0-9 \-]{1,32})/i);
+  const bits = [base];
+  let distinguished = false;
+  if (product) {
+    const name = product[1].replace(/\s+/g, " ").trim();
+    if (name && !base.toLowerCase().includes(name.toLowerCase())) {
+      bits.push(name);
+      distinguished = true;
+    }
+  } else if (/credit\s*card/i.test(fullText) && !/credit\s*card/i.test(base)) {
+    bits.push("Credit Card");
+    distinguished = true;
+  }
+  if (distinguished) {
+    const account = fullText.match(/account\s+number\s*:?\s*([\d\s*]{6,24})/i);
+    if (account) {
+      const digits = account[1].replace(/[^\d]/g, "");
+      if (digits.length >= 4) bits.push(`\u2026${digits.slice(-4)}`);
+    }
+  }
+  return bits.join(" \u00b7 ");
+}
+
 function parseRowFromLine(
   line: TextLine,
   columns: ReturnType<typeof inferAmountColumns>,
@@ -274,9 +250,7 @@ function parseRowFromLine(
 ): ParsedRow | null {
   if (isExcludedLine(line, !!headerCols)) return null;
 
-  const dateToken = headerCols
-    ? dateTokenInColumn(line, headerCols.date)
-    : findDateToken(line.text);
+  const dateToken = headerCols ? dateTokenInColumn(line, headerCols.date) : findDateToken(line.text);
   if (!dateToken) return null;
 
   const iso = parseStatementDate(dateToken, contextYear, previousDate);
@@ -297,20 +271,13 @@ function parseRowFromLine(
 
   const { amount, uncertain } = headerCols
     ? deriveAmountFromColumns(line, headerCols, columns)
-    : (() => {
-        const result = parseRowLegacy(line, columns, dateToken);
-        return result;
-      })();
+    : parseRowLegacy(line, columns, dateToken);
 
   if (amount === null || amount === 0) return null;
 
   const desc = headerCols
     ? descriptionFromGenericColumns(line, headerCols, dateToken)
-    : line.text
-        .replace(dateToken, "")
-        .replace(/R?\s*-?\d[\d\s.,]*/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+    : line.text.replace(dateToken, "").replace(/R?\s*-?\d[\d\s.,]*/g, " ").replace(/\s+/g, " ").trim();
 
   const cleaned = cleanDescription(desc);
   return {
@@ -351,7 +318,6 @@ function parseRowLegacy(
   return { amount: amounts[amounts.length - 1].value, uncertain: true };
 }
 
-/** Generic PDF transaction extractor from positioned text. */
 export function parseGenericPdfLayout(
   items: PositionedItem[],
   fullText: string
@@ -387,9 +353,7 @@ export function parseGenericPdfLayout(
 
     if (isExcludedLine(line, inTable)) return;
 
-    const dateToken = headerCols
-      ? dateTokenInColumn(line, headerCols.date)
-      : findDateToken(line.text);
+    const dateToken = headerCols ? dateTokenInColumn(line, headerCols.date) : findDateToken(line.text);
 
     if (!dateToken && headerCols && rows.length > 0) {
       const balanceAfter = amountInColumn(line, headerCols.balance);
@@ -413,7 +377,6 @@ export function parseGenericPdfLayout(
   return { rows, bankHint, balances };
 }
 
-/** Build lines from a test fixture layout JSON. */
 export function linesFromFixture(
   fixture: { lines: { y: number; page?: number; items: { x: number; text: string }[] }[] }
 ): TextLine[] {

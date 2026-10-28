@@ -8,6 +8,7 @@ import { shareFileBlob } from "@/lib/nativeShare";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
+import { defaultSpendRole, needsVsWantsSplit, type SpendRole } from "@/lib/budget/report/categories";
 import { trackBehaviorEvent } from "@/lib/behaviorTracking";
 import { resolveDefaultBudget, resolveMonthlyBudget, type BudgetTargetRow } from "@/lib/budget/budgetResolve";
 import { CosmoCoachCard } from "@/components/CosmoCoachCard";
@@ -35,6 +36,7 @@ import {
   Building2,
   Car,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Copy,
@@ -122,6 +124,20 @@ type CustomBudgetCat = {
   type: "expense" | "income";
 };
 
+const SPEND_ROLES: { id: SpendRole; label: string }[] = [
+  { id: "need", label: "Need" },
+  { id: "want", label: "Want" },
+  { id: "out", label: "Leave out" },
+];
+
+type BudgetCatOption = {
+  id: string;
+  label: string;
+  color: string;
+  tag: string;
+  Icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
+};
+
 // ─── Icon palette ─────────────────────────────────────────────────────────────
 
 const ICON_PICKER_OPTIONS: { name: string; Icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }> }[] = [
@@ -195,15 +211,20 @@ const BUDGET_EXPENSE_CATS = [
   { id: "entertainment", label: "Entertainment",     color: "#7C4DFF", tag: "wants",   Icon: Tv },
   { id: "airtime",       label: "Airtime & Data",    color: "#F57C00", tag: "needs",   Icon: Smartphone },
   { id: "healthcare",    label: "Healthcare",        color: "#C2185B", tag: "needs",   Icon: Heart },
-  { id: "education",     label: "Education",         color: "#1976D2", tag: "needs",   Icon: GraduationCap },
+  { id: "education",     label: "Education",         color: "#2E7D32", tag: "needs",   Icon: GraduationCap },
+  { id: "shopping",      label: "Shopping",          color: "#DB2777", tag: "wants",   Icon: Shirt },
+  { id: "travel",        label: "Travel",            color: "#0891B2", tag: "wants",   Icon: Plane },
+  { id: "transfers",     label: "Transfers",         color: "#6B7280", tag: "other",   Icon: ArrowLeftRight },
+  { id: "business",      label: "Business",          color: "#6366F1", tag: "other",   Icon: Briefcase },
   { id: "other",         label: "Other",             color: "#9E9E9E", tag: "other",   Icon: MoreHorizontal },
 ] as const;
 
 const BUDGET_INCOME_CATS = [
-  { id: "salary",       label: "Salary / Wages",   Icon: Briefcase },
-  { id: "freelance",    label: "Freelance",         Icon: Zap },
-  { id: "business",     label: "Business Income",  Icon: Building2 },
-  { id: "other-income", label: "Other Income",     Icon: Wallet },
+  { id: "salary",       label: "Salary / Wages",  color: "#007A85", Icon: Briefcase },
+  { id: "freelance",    label: "Freelance",        color: "#7C4DFF", Icon: Zap },
+  { id: "business",     label: "Business Income", color: "#6366F1", Icon: Building2 },
+  { id: "transfers",    label: "Transfers",        color: "#6B7280", Icon: ArrowLeftRight },
+  { id: "other-income", label: "Other Income",    color: "#9E9E9E", Icon: Wallet },
 ] as const;
 
 // ─── Swipeable transaction row (mobile: swipe left to reveal Delete) ───────────
@@ -256,6 +277,40 @@ function SwipeableRow({
 
 // ─── BudgetView ───────────────────────────────────────────────────────────────
 
+
+async function accessTokenForApi(): Promise<string | null> {
+  let { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    const refreshed = await supabase.auth.refreshSession();
+    session = refreshed.data.session;
+  } else {
+    const exp = session.expires_at;
+    if (typeof exp === "number" && exp * 1000 < Date.now() + 30_000) {
+      const refreshed = await supabase.auth.refreshSession();
+      session = refreshed.data.session ?? session;
+    }
+  }
+  return session?.access_token ?? null;
+}
+
+async function postBudgetReport(body: Record<string, unknown>): Promise<Response> {
+  const token = await accessTokenForApi();
+  if (!token) {
+    const err = new Error("Please sign in to export a report.");
+    (err as Error & { status?: number }).status = 401;
+    throw err;
+  }
+  return fetch(`${window.location.origin}/api/budget/report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      "x-notho-access-token": token,
+    },
+    body: JSON.stringify(body),
+  });
+}
+
 export function BudgetView() {
   const now = new Date();
   const [viewMode, setViewMode] = useState<"month" | "year">("month");
@@ -282,6 +337,7 @@ export function BudgetView() {
   const [editDate, setEditDate] = useState("");
   const [editIsTransfer, setEditIsTransfer] = useState(false);
   const [editSaving, setEditSaving] = useState(false);
+  const [expandedBudgetCat, setExpandedBudgetCat] = useState<string | null>(null);
   // "Apply to similar" flow: after a category change, offer to recategorise
   // other transactions from the same merchant (and remember it for imports).
   const [similarPrompt, setSimilarPrompt] = useState<{
@@ -304,6 +360,10 @@ export function BudgetView() {
   const [budgetDraft, setBudgetDraft] = useState<Record<string, string>>({});
   const [budgetSaving, setBudgetSaving] = useState(false);
   const [customCats, setCustomCats] = useState<CustomBudgetCat[]>([]);
+  const [spendRoles, setSpendRoles] = useState<Record<string, SpendRole>>({});
+  const [showSpendRoles, setShowSpendRoles] = useState(false);
+  const [newCatRole, setNewCatRole] = useState<SpendRole>("out");
+  const [roleTouched, setRoleTouched] = useState(false);
   const [showAddCustomCat, setShowAddCustomCat] = useState(false);
   const [newCatType, setNewCatType] = useState<"expense" | "income">("expense");
   const [newCatName, setNewCatName] = useState("");
@@ -319,6 +379,8 @@ export function BudgetView() {
   const [exportCustomEnd, setExportCustomEnd] = useState(() => monthAlignedDefaults().periodEnd);
   const [exportLoading, setExportLoading] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [pdfPreview, setPdfPreview] = useState<{ url: string; fileName: string; blob: Blob } | null>(null);
+  const [pdfFrameReady, setPdfFrameReady] = useState(false);
   // Interactive in-app report (hover + drill-down); PDF stays as the export.
   const [showInteractiveReport, setShowInteractiveReport] = useState(false);
   const [reportPeriod, setReportPeriod] = useState<{ start: string; end: string }>(() => {
@@ -333,7 +395,7 @@ export function BudgetView() {
 
   // Escape closes the topmost open modal (keyboard parity with click-outside)
   useEffect(() => {
-    const anyOpen = showAdd || !!editEntry || showExportModal || showSetBudget || showAddCustomCat || !!similarPrompt;
+    const anyOpen = showAdd || !!editEntry || showExportModal || showSetBudget || showAddCustomCat || !!similarPrompt || !!pdfPreview || showInteractiveReport;
     if (!anyOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
@@ -346,7 +408,20 @@ export function BudgetView() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [showAdd, editEntry, showExportModal, showSetBudget, showAddCustomCat, similarPrompt]);
+  }, [showAdd, editEntry, showExportModal, showSetBudget, showAddCustomCat, similarPrompt, pdfPreview, showInteractiveReport]);
+
+  useEffect(() => {
+    const lock = !!(showAdd || editEntry || showExportModal || showSetBudget || showAddCustomCat || similarPrompt || pdfPreview || showInteractiveReport);
+    if (!lock) return;
+    const prevOverflow = document.body.style.overflow;
+    const prevTouch = document.body.style.touchAction;
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.body.style.touchAction = prevTouch;
+    };
+  }, [showAdd, editEntry, showExportModal, showSetBudget, showAddCustomCat, similarPrompt, pdfPreview, showInteractiveReport]);
 
   // Read the user's onboarding goal from localStorage to show as header context
   useEffect(() => {
@@ -506,6 +581,33 @@ export function BudgetView() {
 
   useEffect(() => { loadCustomCats(); }, [loadCustomCats]);
 
+  const loadSpendRoles = React.useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("budget_category_roles")
+      .select("category_id, role")
+      .eq("user_id", user.id);
+    if (error || !data) return;
+    const next: Record<string, SpendRole> = {};
+    for (const row of data as { category_id: string; role: string }[]) {
+      if (row.role === "need" || row.role === "want" || row.role === "out") next[row.category_id] = row.role;
+    }
+    setSpendRoles(next);
+  }, []);
+
+  useEffect(() => { loadSpendRoles(); }, [loadSpendRoles]);
+
+  const saveSpendRole = async (categoryId: string, role: SpendRole) => {
+    setSpendRoles((prev) => ({ ...prev, [categoryId]: role }));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.from("budget_category_roles").upsert(
+      { user_id: user.id, category_id: categoryId, role, updated_at: new Date().toISOString() },
+      { onConflict: "user_id,category_id" },
+    );
+  };
+
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("budget_benchmarks").select("category, avg_pct, user_count");
@@ -520,6 +622,8 @@ export function BudgetView() {
   const resetCustomCatForm = () => {
     setEditingCatId(null);
     setNewCatName(""); setNewCatColor("#007A85"); setNewCatIcon("MoreHorizontal");
+    setNewCatRole("out");
+    setRoleTouched(false);
   };
 
   // Load an existing custom category into the form for editing.
@@ -529,6 +633,8 @@ export function BudgetView() {
     setNewCatName(c.name);
     setNewCatColor(c.color);
     setNewCatIcon(c.icon_name);
+    setNewCatRole(spendRoles[c.id] ?? defaultSpendRole(c.id, c.name));
+    setRoleTouched(true);
   };
 
   const handleSaveCustomCat = async () => {
@@ -536,15 +642,17 @@ export function BudgetView() {
     setSavingCustomCat(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSavingCustomCat(false); return; }
+    const role = newCatType === "expense" ? newCatRole : "out";
     if (editingCatId) {
-      // Update name / colour / icon of an existing category (id and type kept).
       await supabase.from("custom_budget_categories")
         .update({ name: newCatName.trim(), color: newCatColor, icon_name: newCatIcon })
         .eq("id", editingCatId);
+      if (newCatType === "expense") await saveSpendRole(editingCatId, role);
     } else {
-      await supabase.from("custom_budget_categories").insert({
+      const { data: created } = await supabase.from("custom_budget_categories").insert({
         user_id: user.id, name: newCatName.trim(), color: newCatColor, icon_name: newCatIcon, type: newCatType,
-      });
+      }).select("id").single();
+      if (created?.id && newCatType === "expense") await saveSpendRole(created.id, role);
     }
     setSavingCustomCat(false);
     setShowAddCustomCat(false);
@@ -559,37 +667,55 @@ export function BudgetView() {
     if (editingCatId === id) resetCustomCatForm();
   };
 
-  const allExpCats = useMemo(() => {
-    const statics = BUDGET_EXPENSE_CATS.filter(c => c.id !== "other");
-    const custom = customCats.filter(c => c.type === "expense").map(c => ({
-      id: c.id, label: c.name, color: c.color, tag: "custom" as const, Icon: getIconByName(c.icon_name),
+  const allExpCats = useMemo((): BudgetCatOption[] => {
+    const statics: BudgetCatOption[] = BUDGET_EXPENSE_CATS.filter((c) => c.id !== "other").map((c) => ({
+      id: c.id, label: c.label, color: c.color, tag: c.tag, Icon: c.Icon,
     }));
-    const other = BUDGET_EXPENSE_CATS.find(c => c.id === "other")!;
+    const custom: BudgetCatOption[] = customCats.filter((c) => c.type === "expense").map((c) => ({
+      id: c.id, label: c.name, color: c.color, tag: "custom", Icon: getIconByName(c.icon_name),
+    }));
+    const other: BudgetCatOption = (() => {
+      const o = BUDGET_EXPENSE_CATS.find((c) => c.id === "other")!;
+      return { id: o.id, label: o.label, color: o.color, tag: o.tag, Icon: o.Icon };
+    })();
 
-    const knownIds = new Set([...statics.map(s => s.id), ...custom.map(c => c.id), "other", "transfer"]);
-    const historicalIds = new Set(
-      yearEntries.filter(e => e.type === "expense" && !knownIds.has(e.category)).map(e => e.category)
-    );
-    const historical = Array.from(historicalIds).map(id => ({
-      id, label: id, color: "#9E9E9E", tag: "historical" as const, Icon: getIconByName("MoreHorizontal"),
+    const knownIds = new Set([...statics.map((s) => s.id), ...custom.map((c) => c.id), "other", "transfer", "transfers"]);
+    const historical: BudgetCatOption[] = Array.from(new Set(
+      yearEntries.filter((e) => e.type === "expense" && !knownIds.has(e.category)).map((e) => e.category)
+    )).map((id) => ({
+      id, label: id, color: "#9E9E9E", tag: "historical", Icon: getIconByName("MoreHorizontal"),
     }));
 
-    return [...statics, ...custom, ...historical, other];
+    const byLabel = new Map<string, BudgetCatOption>();
+    for (const c of [...statics, ...historical, ...custom]) {
+      const key = c.label.trim().toLowerCase();
+      const prev = byLabel.get(key);
+      if (!prev || c.tag === "custom") byLabel.set(key, c);
+    }
+    const merged = [...byLabel.values()].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
+    return [...merged, other];
   }, [customCats, yearEntries]);
 
-  const allIncCats = useMemo(() => {
-    const custom = customCats.filter(c => c.type === "income").map(c => ({
-      id: c.id, label: c.name, Icon: getIconByName(c.icon_name),
+  const allIncCats = useMemo((): BudgetCatOption[] => {
+    const statics: BudgetCatOption[] = BUDGET_INCOME_CATS.map((c) => ({
+      id: c.id, label: c.label, color: c.color, tag: "income", Icon: c.Icon,
     }));
-    const knownIds = new Set([...BUDGET_INCOME_CATS.map(s => s.id), ...custom.map(c => c.id), "transfer"]);
-    const historicalIds = new Set(
-      yearEntries.filter(e => e.type === "income" && !knownIds.has(e.category)).map(e => e.category)
-    );
-    const historical = Array.from(historicalIds).map(id => ({
-      id, label: id, Icon: getIconByName("MoreHorizontal"),
+    const custom: BudgetCatOption[] = customCats.filter((c) => c.type === "income").map((c) => ({
+      id: c.id, label: c.name, color: c.color, tag: "custom", Icon: getIconByName(c.icon_name),
     }));
-
-    return [...BUDGET_INCOME_CATS, ...custom, ...historical];
+    const knownIds = new Set([...statics.map((s) => s.id), ...custom.map((c) => c.id), "transfer", "transfers"]);
+    const historical: BudgetCatOption[] = Array.from(new Set(
+      yearEntries.filter((e) => e.type === "income" && !knownIds.has(e.category)).map((e) => e.category)
+    )).map((id) => ({
+      id, label: id, color: "#9E9E9E", tag: "historical", Icon: getIconByName("MoreHorizontal"),
+    }));
+    const byLabel = new Map<string, BudgetCatOption>();
+    for (const c of [...statics, ...historical, ...custom]) {
+      const key = c.label.trim().toLowerCase();
+      const prev = byLabel.get(key);
+      if (!prev || c.tag === "custom") byLabel.set(key, c);
+    }
+    return [...byLabel.values()].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
   }, [customCats, yearEntries]);
 
   const openSetBudget = (scope: "default" | "month" = monthIsCustomised ? "month" : "default") => {
@@ -952,39 +1078,23 @@ export function BudgetView() {
             })
           : resolvePeriod(exportPreset);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) {
-        setExportError("Please sign in to export a report.");
-        return;
-      }
-
-      const res = await fetch(`${window.location.origin}/api/budget/report`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ periodStart, periodEnd }),
-      });
+      const res = await postBudgetReport({ periodStart, periodEnd });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        const msg = (err as { error?: string }).error ?? "Failed to generate report.";
+        const msg = (err as { error?: string }).error ?? (res.status === 401 ? "Please sign in again, then export." : "Failed to generate report.");
         setExportError(msg);
         void reportClientError("report-download", new Error(`Report export failed (${res.status}): ${msg}`));
         return;
       }
 
       const blob = await res.blob();
+      const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
+      // Always blob: — a Capacitor file:// URL inside an iframe takes over
+      // WKWebView and the in-app Close button disappears.
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      setPdfFrameReady(false);
+      setPdfPreview({ url, fileName, blob });
       setShowExportModal(false);
     } catch {
       setExportError("Failed to generate report. Please try again.");
@@ -997,14 +1107,7 @@ export function BudgetView() {
   const downloadReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
     setExportLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) return;
-      const res = await fetch(`${window.location.origin}/api/budget/report`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ periodStart, periodEnd, redactNames }),
-      });
+      const res = await postBudgetReport({ periodStart, periodEnd, redactNames });
       if (!res.ok) return;
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -1029,14 +1132,7 @@ export function BudgetView() {
   const shareReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
     setExportLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) return;
-      const res = await fetch(`${window.location.origin}/api/budget/report`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ periodStart, periodEnd, redactNames }),
-      });
+      const res = await postBudgetReport({ periodStart, periodEnd, redactNames });
       if (!res.ok) return;
       const blob = await res.blob();
       const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
@@ -1054,7 +1150,7 @@ export function BudgetView() {
       }
 
       const file = new File([blob], fileName, { type: "application/pdf" });
-      const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+      const nav = navigator as Navigator & { canShare?: (data: { files?: File[] }) => boolean };
       if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: "Notho budget report" });
         return;
@@ -1087,8 +1183,16 @@ export function BudgetView() {
     total: realEntries.filter((e) => e.type === "expense" && e.category === c.id).reduce((s, e) => s + e.amount, 0),
   })).filter((c) => c.total > 0).sort((a, b) => b.total - a.total);
 
-  const needsTotal = realEntries.filter((e) => e.type === "expense" && ["food","transport","housing","airtime","healthcare","education"].includes(e.category)).reduce((s, e) => s + e.amount, 0);
-  const wantsTotal = realEntries.filter((e) => e.type === "expense" && e.category === "entertainment").reduce((s, e) => s + e.amount, 0);
+  const expenseCatName = (id: string) =>
+    BUDGET_EXPENSE_CATS.find((c) => c.id === id)?.label
+    ?? customCats.find((c) => c.id === id)?.name
+    ?? id;
+  const needsWants = needsVsWantsSplit(
+    realEntries
+      .filter((e) => e.type === "expense")
+      .map((e) => ({ category: e.category, amount: e.amount, name: expenseCatName(e.category) })),
+    spendRoles,
+  );
   const debtTotal = realEntries.filter((e) => e.type === "expense" && e.category === "debt").reduce((s, e) => s + e.amount, 0);
   const explicitSavingsTotal = realEntries.filter((e) => e.type === "expense" && e.category === "savings").reduce((s, e) => s + e.amount, 0);
   const mathSavingsRate = income > 0 ? Math.round(((income - expenses) / income) * 100) : 0;
@@ -1380,13 +1484,17 @@ export function BudgetView() {
                       </div>
                     )}
 
-                    {needsTotal + wantsTotal > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13 }}>
+                    {needsWants.dayToDay > 0 && (
+                      <button type="button" onClick={() => setShowSpendRoles(true)}
+                        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, gap: 12, background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left", width: "100%" }}>
                         <span style={{ color: "var(--color-text-secondary)" }}>Needs vs Wants</span>
-                        <span style={{ fontWeight: 600 }}>
-                          {expenses > 0 ? Math.round((needsTotal / expenses) * 100) : 0}% / {expenses > 0 ? Math.round((wantsTotal / expenses) * 100) : 0}%
+                        <span style={{ fontWeight: 600, textAlign: "right", color: "var(--color-text-primary)" }}>
+                          Needs {needsWants.needsPct}% · Wants {needsWants.wantsPct}%
+                          <span style={{ display: "block", color: "var(--color-text-secondary)", fontSize: 11, fontWeight: 500 }}>
+                            of day-to-day spend{needsWants.excluded > 0 ? ` · ${formatRand(needsWants.excluded)} left out` : ""}
+                          </span>
                         </span>
-                      </div>
+                      </button>
                     )}
 
                     <Link href="/learn?course=saving-investing" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "rgba(0,122,133,0.06)", borderRadius: 10, textDecoration: "none" }}>
@@ -1453,22 +1561,35 @@ export function BudgetView() {
                     const pct = expenses > 0 ? (c.total / expenses) * 100 : 0;
                     const limit = budgetTargets[c.id];
                     const usagePct = limit ? (c.total / limit) * 100 : 0;
-                    const isAmber = limit && usagePct >= 80 && usagePct < 100;
-                    const isOver = limit && usagePct >= 100;
+                    const spentCents = Math.round(c.total * 100);
+                    const limitCents = limit ? Math.round(limit * 100) : 0;
+                    const isAmber = limitCents > 0 && spentCents >= Math.round(limitCents * 0.8) && spentCents < limitCents;
+                    const isOver = limitCents > 0 && spentCents > limitCents;
+                    const isOnBudget = limitCents > 0 && spentCents === limitCents;
+                    const catEntries = realEntries
+                      .filter((e) => e.type === "expense" && e.category === c.id)
+                      .sort((a, b) => b.entry_date.localeCompare(a.entry_date));
+                    const expanded = expandedBudgetCat === c.id;
                     return (
                       <div key={c.id} style={{ marginBottom: 14 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, fontSize: 13 }}>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedBudgetCat(expanded ? null : c.id)}
+                          style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, fontSize: 13, width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer", color: "inherit", textAlign: "left" }}
+                        >
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <ChevronDown size={14} style={{ transform: expanded ? "rotate(0deg)" : "rotate(-90deg)", transition: "transform 0.15s", color: "var(--color-text-secondary)", flexShrink: 0 }} />
                             <div style={{ width: 10, height: 10, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
                             <span style={{ fontWeight: 600 }}>{c.label}</span>
                             {isOver && <span style={{ fontSize: 10, fontWeight: 800, background: OVER_RED_SOFT, color: OVER_RED, borderRadius: 4, padding: "1px 5px" }}>OVER</span>}
+                            {isOnBudget && <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(0,122,133,0.12)", color: "#007A85", borderRadius: 4, padding: "1px 5px" }}>ON BUDGET</span>}
                             {isAmber && !isOver && <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(245,124,0,0.13)", color: "#F57C00", borderRadius: 4, padding: "1px 5px" }}>80%+</span>}
                           </div>
                           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                             <span style={{ fontSize: 11, fontWeight: 700, background: "var(--color-bg)", borderRadius: 6, padding: "2px 6px", color: "var(--color-text-secondary)" }}>{pct.toFixed(1)}%</span>
                             <span style={{ fontWeight: 800, color: isOver ? OVER_RED : "var(--color-text-primary)" }}>{formatRand(c.total)}</span>
                           </div>
-                        </div>
+                        </button>
                         {limit ? (
                           <div>
                             {/* Two-tone bar: the category colour fills up to the budget,
@@ -1487,13 +1608,38 @@ export function BudgetView() {
                             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3, fontSize: 11, color: "var(--color-text-secondary)" }}>
                               <span>{formatRand(c.total)} of {formatRand(limit)}</span>
                               <span style={{ color: isOver ? OVER_RED : isAmber ? "#F57C00" : "#007A85", fontWeight: 700 }}>
-                                {isOver ? `${formatRand(c.total - limit)} over` : `${formatRand(limit - c.total)} left`}
+                                {isOver ? `${formatRand(c.total - limit)} over` : isOnBudget ? "On budget" : `${formatRand(limit - c.total)} left`}
                               </span>
                             </div>
                           </div>
                         ) : (
                           <div style={{ height: 8, borderRadius: 4, background: "var(--color-border)", overflow: "hidden" }}>
                             <div style={{ height: "100%", borderRadius: 4, background: c.color, width: `${Math.min(100, pct)}%`, transition: "width 0.4s ease" }} />
+                          </div>
+                        )}
+                        {expanded && (
+                          <div style={{ marginTop: 8, border: "1px solid var(--color-border)", borderRadius: 10, overflow: "hidden" }}>
+                            {catEntries.length === 0 ? (
+                              <div style={{ padding: "10px 12px", fontSize: 12, color: "var(--color-text-secondary)" }}>No transactions in this category.</div>
+                            ) : catEntries.map((e) => (
+                              <button
+                                key={e.id}
+                                type="button"
+                                onClick={() => openEdit(e)}
+                                style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 12px", background: "var(--color-bg)", border: "none", borderBottom: "1px solid var(--color-border)", cursor: "pointer", textAlign: "left", color: "inherit" }}
+                              >
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {e.description || "No description"}
+                                  </div>
+                                  <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
+                                    {e.entry_date}
+                                  </div>
+                                </div>
+                                <div style={{ fontWeight: 800, fontSize: 12, flexShrink: 0 }}>-{formatRand(e.amount)}</div>
+                                <ChevronRight size={14} style={{ color: "var(--color-text-secondary)", flexShrink: 0 }} />
+                              </button>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -1694,8 +1840,133 @@ export function BudgetView() {
               onClick={handleExportReport}
             >
               <FileText size={16} aria-hidden />
-              {exportLoading ? "Generating PDF…" : "Download PDF"}
+              {exportLoading ? "Generating PDF…" : "Preview PDF"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {pdfPreview && (
+        <div className="fixed inset-0 z-[460] flex flex-col bg-black/70" role="dialog" aria-modal="true">
+          <div style={{ background: "var(--color-surface)", width: "100%", maxWidth: 820, margin: "0 auto", height: "100%", maxHeight: "100dvh", display: "flex", flexDirection: "column" }}>
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+              padding: "max(12px, env(safe-area-inset-top)) 16px 12px",
+              borderBottom: "1px solid var(--color-border)", flexShrink: 0, zIndex: 2,
+            }}>
+              <h3 style={{ fontWeight: 900, fontSize: 16 }}>Budget report</h3>
+              <button type="button" onClick={() => {
+                if (pdfPreview.url.startsWith("blob:")) URL.revokeObjectURL(pdfPreview.url);
+                setPdfPreview(null);
+              }} aria-label="Close preview" style={{
+                background: "var(--color-bg)", border: "1px solid var(--color-border)",
+                borderRadius: 999, cursor: "pointer", width: 44, height: 44,
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
+                <X size={20} />
+              </button>
+            </div>
+            <div style={{ flex: 1, position: "relative", minHeight: 240, background: "var(--color-bg)", overflow: "auto" }}>
+              {typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches ? (
+                <div style={{
+                  minHeight: "100%", display: "flex", flexDirection: "column",
+                  alignItems: "center", justifyContent: "center", gap: 10, padding: 28, textAlign: "center",
+                }}>
+                  <div style={{ fontWeight: 800, fontSize: 18 }}>Your report is ready</div>
+                  <p style={{ margin: 0, fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.45, maxWidth: 320 }}>
+                    Phones cannot paint the PDF pages in this sheet. Use Share or Save PDF to open, send, or keep the file.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {!pdfFrameReady && (
+                    <div style={{
+                      position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+                      alignItems: "center", justifyContent: "center", gap: 8, padding: 24, textAlign: "center",
+                      color: "var(--color-text-secondary)", fontSize: 14, fontWeight: 600, zIndex: 1,
+                    }}>
+                      Preparing your report…
+                    </div>
+                  )}
+                  <iframe
+                    title="Budget report preview"
+                    src={pdfPreview.url}
+                    sandbox="allow-same-origin"
+                    onLoad={() => setPdfFrameReady(true)}
+                    style={{ width: "100%", height: "100%", border: "none", background: "transparent", opacity: pdfFrameReady ? 1 : 0 }}
+                  />
+                </>
+              )}
+            </div>
+            <div style={{ display: "flex", gap: 10, padding: "12px 16px max(16px, env(safe-area-inset-bottom))", borderTop: "1px solid var(--color-border)", flexShrink: 0 }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ padding: 12, minWidth: 88 }}
+                onClick={() => {
+                  if (pdfPreview.url.startsWith("blob:")) URL.revokeObjectURL(pdfPreview.url);
+                  setPdfPreview(null);
+                }}
+              >
+                Done
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ flex: 1, padding: 12 }}
+                onClick={async () => {
+                  const shared = await shareFileBlob({
+                    blob: pdfPreview.blob,
+                    fileName: pdfPreview.fileName,
+                    title: "Notho budget report",
+                    dialogTitle: "Share or save your budget report",
+                  });
+                  if (shared) return;
+                  const file = new File([pdfPreview.blob], pdfPreview.fileName, { type: "application/pdf" });
+                  const nav = navigator as Navigator & { canShare?: (data: { files?: File[] }) => boolean };
+                  if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
+                    try {
+                      await navigator.share({ files: [file], title: "Notho budget report" });
+                    } catch {
+                      /* user cancelled the sheet */
+                    }
+                    return;
+                  }
+                  const a = document.createElement("a");
+                  a.href = pdfPreview.url;
+                  a.download = pdfPreview.fileName;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                }}
+              >
+                Share
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                style={{ flex: 1, padding: 12 }}
+                onClick={async () => {
+                  if (await isNativePlatform()) {
+                    const shared = await shareFileBlob({
+                      blob: pdfPreview.blob,
+                      fileName: pdfPreview.fileName,
+                      title: "Notho budget report",
+                      dialogTitle: "Save your budget report",
+                    });
+                    if (shared) return;
+                  }
+                  const a = document.createElement("a");
+                  a.href = pdfPreview.url;
+                  a.download = pdfPreview.fileName;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                }}
+              >
+                Save PDF
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1851,13 +2122,17 @@ export function BudgetView() {
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Category</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                {(editType === "expense" ? allExpCats : allIncCats).map((c) => (
+                {(editType === "expense" ? allExpCats : allIncCats).map((c) => {
+                  const color = c.color;
+                  const selected = editCategory === c.id;
+                  return (
                   <button key={c.id} type="button" onClick={() => setEditCategory(c.id)}
-                    style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${editCategory === c.id ? "var(--color-primary)" : "var(--color-border)"}`, background: editCategory === c.id ? "rgba(0,122,133,0.08)" : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
-                    <c.Icon size={14} style={{ color: "var(--color-primary)", flexShrink: 0 }} aria-hidden />
+                    style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${selected ? color : "var(--color-border)"}`, background: selected ? `${color}22` : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
+                    <c.Icon size={14} style={{ color, flexShrink: 0 }} aria-hidden />
                     <span>{c.label}</span>
                   </button>
-                ))}
+                  );
+                })}
                 <button type="button" onClick={() => { resetCustomCatForm(); setNewCatType(editType === "income" ? "income" : "expense"); setShowAddCustomCat(true); }}
                   style={{ marginTop: 2, padding: "11px 12px", borderRadius: 10, cursor: "pointer", border: "2px dashed var(--color-border)", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontWeight: 700, fontSize: 13, color: "var(--color-text-secondary)" }}>
                   <Plus size={15} aria-hidden /> Add a category
@@ -2035,13 +2310,17 @@ export function BudgetView() {
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Category</div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                    {(addType === "expense" ? allExpCats : allIncCats).map((c) => (
+                    {(addType === "expense" ? allExpCats : allIncCats).map((c) => {
+                      const color = c.color;
+                      const selected = addCategory === c.id;
+                      return (
                       <button key={c.id} type="button" onClick={() => setAddCategory(c.id)}
-                        style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${addCategory === c.id ? "var(--color-primary)" : "var(--color-border)"}`, background: addCategory === c.id ? "rgba(0,122,133,0.08)" : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
-                        <c.Icon size={14} style={{ color: "var(--color-primary)", flexShrink: 0 }} aria-hidden />
+                        style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${selected ? color : "var(--color-border)"}`, background: selected ? `${color}22` : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
+                        <c.Icon size={14} style={{ color, flexShrink: 0 }} aria-hidden />
                         <span>{c.label}</span>
                       </button>
-                    ))}
+                      );
+                    })}
                     <button type="button" onClick={() => { resetCustomCatForm(); setNewCatType(addType === "income" ? "income" : "expense"); setShowAddCustomCat(true); }}
                       style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: "2px dashed var(--color-border)", background: "transparent", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-secondary)", textAlign: "left" }}>
                       <Plus size={14} style={{ flexShrink: 0 }} aria-hidden /> <span>Add category</span>
@@ -2074,7 +2353,35 @@ export function BudgetView() {
       )}
 
       {/* Add Custom Category Modal */}
-      {showAddCustomCat && (
+      
+      {showSpendRoles && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 80, display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={() => setShowSpendRoles(false)}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "min(560px, 100%)", maxHeight: "80vh", overflow: "auto", background: "var(--color-surface)", borderRadius: "16px 16px 0 0", padding: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+              <h3 style={{ fontWeight: 900, fontSize: 18, margin: 0 }}>What counts</h3>
+              <button type="button" onClick={() => setShowSpendRoles(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)" }}><X size={18} /></button>
+            </div>
+            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: "0 0 14px" }}>Need and Want make the percentage. Leave out keeps savings, business, transfers and anything else off that line. This does not move the money.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {allExpCats.map((c) => {
+                const role = spendRoles[c.id] ?? defaultSpendRole(c.id, c.label);
+                return (
+                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ flex: 1, minWidth: 0, fontWeight: 650, fontSize: 13 }}>{c.label}</span>
+                    {SPEND_ROLES.map((option) => (
+                      <button key={option.id} type="button" onClick={() => saveSpendRole(c.id, option.id)}
+                        style={{ borderRadius: 8, padding: "6px 8px", fontSize: 12, fontWeight: 700, cursor: "pointer", border: `1px solid ${role === option.id ? "var(--color-primary)" : "var(--color-border)"}`, background: role === option.id ? "rgba(0,122,133,0.12)" : "transparent", color: "var(--color-text-primary)" }}>
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+{showAddCustomCat && (
         <div className="fixed inset-0 z-[500] flex items-end justify-center bg-black/70" role="dialog" aria-modal="true" onClick={() => { setShowAddCustomCat(false); resetCustomCatForm(); }}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", padding: "24px 20px 40px", width: "100%", maxWidth: 500, maxHeight: "92vh", overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, position: "sticky", top: -24, background: "var(--color-surface)", paddingTop: 8, marginTop: -8, zIndex: 2 }}>
@@ -2091,7 +2398,11 @@ export function BudgetView() {
             </div>
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Category Name</div>
-              <input type="text" placeholder="e.g. Gym, Pets, Clothing" value={newCatName} onChange={(e) => setNewCatName(e.target.value)}
+              <input type="text" placeholder="e.g. Gym, Pets, Clothing" value={newCatName} onChange={(e) => {
+                const value = e.target.value;
+                setNewCatName(value);
+                if (!roleTouched && newCatType === "expense") setNewCatRole(defaultSpendRole("custom", value));
+              }}
                 style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 15, fontWeight: 700, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
             </div>
             <div style={{ marginBottom: 18 }}>
@@ -2137,6 +2448,21 @@ export function BudgetView() {
                 ))}
               </div>
             </div>
+
+            {newCatType === "expense" && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 8 }}>Counts as</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                  {SPEND_ROLES.map((role) => (
+                    <button key={role.id} type="button" onClick={() => { setRoleTouched(true); setNewCatRole(role.id); }}
+                      style={{ padding: 10, borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", border: `2px solid ${newCatRole === role.id ? "var(--color-primary)" : "var(--color-border)"}`, background: newCatRole === role.id ? "rgba(0,122,133,0.1)" : "var(--color-bg)", color: "var(--color-text-primary)" }}>
+                      {role.label}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 6 }}>Suggested from the name. Change it if that is not how you use this money.</div>
+              </div>
+            )}
             <div style={{ marginBottom: 20, padding: "12px 14px", borderRadius: 12, border: "1px solid var(--color-border)", background: "var(--color-bg)", display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${newCatColor}20`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {(() => { const Ic = getIconByName(newCatIcon); return <Ic size={18} style={{ color: newCatColor }} />; })()}

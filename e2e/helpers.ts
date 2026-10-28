@@ -6,6 +6,8 @@
  *   TEST_EMAIL=test@example.com TEST_PASSWORD=secret npx playwright test
  */
 import { Page, expect } from "@playwright/test";
+import { randomUUID } from "node:crypto";
+import { createClient } from "@supabase/supabase-js";
 
 export const TEST_EMAIL = process.env.TEST_EMAIL ?? "e2e-test@fundiapp.co.za";
 // NOT a brand string. This is the password of an existing Supabase auth
@@ -19,40 +21,47 @@ export const TEST_PASSWORD = process.env.TEST_PASSWORD ?? "FundiE2E_Test#2026";
 export const BASE_URL =
   process.env.BASE_URL ?? "https://www.notho.co.za";
 
+let testUserIdPromise: Promise<string> | null = null;
+
 /**
- * Refill the test account's hearts before the page boots.
- *
- * Why this is needed. A wrong answer costs a heart; five wrong answers and the
- * lesson is replaced by an "You're out of hearts" gate that no amount of
- * clicking gets past. The lesson-flow specs answer by clicking the first option
- * every time, which on a four-option question is wrong about three times in
- * four — so they reliably bankrupt themselves partway through a lesson.
- *
- * It is worse than per-test flakiness, because hearts are not local state.
- * useNothoState syncs them to `user_progress` on the shared TEST_EMAIL account
- * and they regenerate at one per hour. So a single bad run drained the account
- * for the next five, and the three browser projects run against the same
- * account: Desktop Chrome spent the hearts, Mobile Chrome and Mobile Safari
- * started at zero. That is why every project failed together, every run, for
- * days, while the app itself was fine.
- *
- * This is not a test-only backdoor. useNothoState merges local and remote with
- * `Math.max(localEffective, remoteEffective)` and writes the winner back, so
- * seeding localStorage to full is exactly the "this device has more hearts than
- * the server knows about" case the app already handles. addInitScript runs
- * before any page script, on every navigation, so it lands before the merge.
+ * Top up the shared test account through the trusted, ledgered grant RPC.
+ * This runs in Playwright's Node process: the service credential is never sent
+ * to the page, bundled into the app or exposed as a browser refill path.
  */
-export async function resetHearts(page: Page) {
-  await page.addInitScript(() => {
-    try {
-      localStorage.setItem("notho-hearts", "5");
-      // Clearing the timestamp matters: with it set and hearts below cap, the
-      // regen path recomputes from it and can undo the reset.
-      localStorage.removeItem("notho-last-heart-lost");
-    } catch {
-      // Private mode / storage disabled — the test will fail on its own merits.
-    }
+export async function resetServerHearts(): Promise<void> {
+  const url = process.env.TEST_SUPABASE_URL;
+  const serviceKey = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) {
+    throw new Error(
+      "Server-authoritative heart setup requires TEST_SUPABASE_URL and " +
+        "TEST_SUPABASE_SERVICE_ROLE_KEY"
+    );
+  }
+
+  const admin = createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
   });
+  testUserIdPromise ??= (async () => {
+    const { data, error } = await admin.auth.admin.listUsers({
+      page: 1,
+      perPage: 1_000,
+    });
+    if (error) throw error;
+    const user = data.users.find(
+      (candidate) => candidate.email?.toLowerCase() === TEST_EMAIL.toLowerCase()
+    );
+    if (!user) throw new Error(`E2E account ${TEST_EMAIL} was not found`);
+    return user.id;
+  })();
+
+  const userId = await testUserIdPromise;
+  const { error } = await admin.rpc("grant_hearts", {
+    p_user_id: userId,
+    p_amount: 5,
+    p_idempotency_key: randomUUID(),
+    p_metadata: { source: "playwright_e2e" },
+  });
+  if (error) throw error;
 }
 
 /**
@@ -212,17 +221,11 @@ export async function atLessonSummary(page: Page): Promise<boolean> {
 }
 
 /**
- * If the lesson has been replaced by the out-of-hearts gate, refill and resume.
+ * If the lesson has been replaced by the out-of-hearts gate, ask the trusted
+ * server fixture for a ledgered grant and resume.
  *
- * Seeding hearts at page load is not on its own enough. A wrong answer costs a
- * heart and lets you continue, so a spec that answers by clicking option one
- * will spend all five partway through a lesson of eight-plus questions and hit
- * the gate again — same failure, later.
- *
- * The recovery uses the app's own guarantee. The gate says "your progress on
- * this lesson is saved — come back and pick up exactly where you left off", so
- * a reload re-runs the init script (hearts back to five) and returns to the
- * same step. Nothing is faked and no state is skipped.
+ * The recovery uses the app's own durable lesson-resume guarantee; no answer,
+ * completion or browser balance is forged.
  *
  * Returns true if it recovered, so the caller can spend a loop iteration on it.
  */
@@ -230,6 +233,7 @@ export async function recoverIfOutOfHearts(page: Page): Promise<boolean> {
   const gate = page.locator("text=You're out of hearts").first();
   if (!(await gate.isVisible().catch(() => false))) return false;
 
+  await resetServerHearts();
   await page.reload({ waitUntil: "domcontentloaded" });
   // Wait for the lesson to re-render rather than sleeping a fixed amount.
   await page
@@ -244,6 +248,52 @@ export async function recoverIfOutOfHearts(page: Page): Promise<boolean> {
 export const AUTH_STATE_PATH = "e2e/.auth/user.json";
 
 /**
+ * Create the shared browser session through Supabase's trusted admin API.
+ *
+ * The service credential remains in Playwright's Node process. Only the
+ * ordinary E2E user's short-lived session is installed in browser storage.
+ * This keeps setup independent of password-endpoint rate limits while the
+ * desktop auth specs continue to exercise the real sign-in UI.
+ */
+export async function seedAuthenticatedSession(page: Page): Promise<void> {
+  const url = process.env.TEST_SUPABASE_URL;
+  const serviceKey = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) {
+    throw new Error(
+      "Trusted E2E session setup requires TEST_SUPABASE_URL and " +
+        "TEST_SUPABASE_SERVICE_ROLE_KEY"
+    );
+  }
+
+  const admin = createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const { data: link, error: linkError } = await admin.auth.admin.generateLink({
+    type: "magiclink",
+    email: TEST_EMAIL,
+  });
+  if (linkError) throw linkError;
+
+  const { data: verification, error: verificationError } = await admin.auth.verifyOtp({
+    token_hash: link.properties.hashed_token,
+    type: "magiclink",
+  });
+  if (verificationError) throw verificationError;
+  if (!verification.session) throw new Error("Supabase did not return an E2E session");
+
+  const projectRef = new URL(url).hostname.split(".")[0];
+  const storageKey = `sb-${projectRef}-auth-token`;
+  await page.addInitScript(
+    ({ key, session }) => localStorage.setItem(key, JSON.stringify(session)),
+    { key: storageKey, session: verification.session }
+  );
+
+  await resetServerHearts();
+  await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  await expect(page.locator(".app-container").first()).toBeVisible({ timeout: 30_000 });
+}
+
+/**
  * Sign in with email/password, wait for the app shell to appear.
  *
  * Now session-aware. With storageState restored by the setup project the app is
@@ -253,8 +303,7 @@ export const AUTH_STATE_PATH = "e2e/.auth/user.json";
  * sign-ins per run down to one.
  */
 export async function signIn(page: Page) {
-  // Must precede goto: addInitScript only applies to navigations after it.
-  await resetHearts(page);
+  await resetServerHearts();
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded", timeout: 60_000 });
 
   // Already authenticated via cached storageState? Nothing to do.
@@ -266,12 +315,21 @@ export async function signIn(page: Page) {
   try {
     await signInButton.waitFor({ state: "visible", timeout: 15_000 });
     await signInButton.click();
-  } catch (e) {
-    // If button doesn't appear, maybe we're already on the signin form.
+  } catch {
+    // The authenticated shell may have finished loading while we waited for a
+    // landing-page control that never appears for signed-in users.
+    if (await shell.isVisible().catch(() => false)) return;
   }
 
   const emailInput = page.locator('input[type="email"]').first();
-  await emailInput.waitFor({ state: "visible", timeout: 15_000 });
+  try {
+    await emailInput.waitFor({ state: "visible", timeout: 15_000 });
+  } catch (error) {
+    // Re-check the authenticated state before treating a missing form as a
+    // failure. Mobile WebKit can finish hydration after the first shell wait.
+    if (await shell.isVisible().catch(() => false)) return;
+    throw error;
+  }
   await emailInput.fill(TEST_EMAIL);
   await page.locator('input[type="password"]').first().fill(TEST_PASSWORD);
   // Click the primary sign-in/up submit button (has data-testid="auth-submit")

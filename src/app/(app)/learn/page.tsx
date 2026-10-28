@@ -7,6 +7,9 @@ import { useNotho } from "@/context/NothoContext";
 import { analytics } from "@/lib/analytics";
 import { shuffleLessonSteps, lessonShuffleSeed } from "@/lib/lessonShuffle";
 import { assignQids, type WorkingStep } from "@/lib/lessonMastery";
+import type { SavedLessonProgress } from "@/app/pageViews.types";
+import { markCourseFocus } from "@/lib/scrollMemory";
+import { warmCourse, warmLesson, whenIdle } from "@/lib/speculativeWarm";
 
 export default function LearnPage() {
   const {
@@ -17,32 +20,18 @@ export default function LearnPage() {
     userData,
     hearts,
     setShowNoHearts,
-    setCurrentLessonState
+    setCurrentLessonState,
+    lessonResume,
   } = useNotho();
 
-  const [savedProgress, setSavedProgress] = useState<any>(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !userId) return;
-    const item = localStorage.getItem("notho-lesson-progress");
-    if (item) {
-      try {
-        const parsed = JSON.parse(item);
-        const fresh =
-          typeof parsed.savedAt === "number" &&
-          Date.now() - parsed.savedAt <= 7 * 24 * 60 * 60 * 1000;
-        if (parsed.userId === userId && fresh) {
-          setSavedProgress(parsed);
-        } else if (parsed.userId === userId && !fresh) {
-          // Stale save — clean it up so the resume card doesn't point at
-          // a week-old position.
-          localStorage.removeItem("notho-lesson-progress");
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-  }, [userId]);
+  const [dismissed, setDismissed] = useState(false);
+  const savedProgress =
+    dismissed || !lessonResume
+      ? null
+      : ({
+          ...lessonResume,
+          completedAt: lessonResume.savedAt,
+        } as unknown as SavedLessonProgress);
 
   const resumeLesson = React.useCallback(
     (progress: any) => {
@@ -62,9 +51,6 @@ export default function LearnPage() {
         setShowNoHearts(true);
         return;
       }
-      // Prefer the persisted working steps (they carry any re-queued copies
-      // from the mastery loop). Otherwise rebuild from content, tagging question
-      // ids so the mastery loop tracks completion.
       const savedSteps: WorkingStep[] = savedHasSteps
         ? (progress.steps as WorkingStep[])
         : (shuffleLessonSteps(
@@ -80,8 +66,6 @@ export default function LearnPage() {
         lessonId: progress.lessonId,
         stepIndex: stepIdx,
         steps: savedSteps,
-        // Restore the user's actual answers so accuracy/XP aren't understated
-        // after a resume (previously reset to zero).
         answers: progress.answers ?? {},
         correctCount: progress.correctCount ?? 0,
         mistakes: progress.mistakes ?? 0,
@@ -89,11 +73,21 @@ export default function LearnPage() {
         mistakenQids: progress.mistakenQids ?? [],
       });
       setRoute({ name: "lesson", courseId: progress.courseId, lessonId: progress.lessonId });
-      setSavedProgress(null);
-      localStorage.removeItem("notho-lesson-progress");
+      setDismissed(true);
     },
     [hearts, userId, setCurrentLessonState, setRoute, setShowNoHearts]
   );
+
+  useEffect(() => {
+    return whenIdle(() => {
+      if (lessonResume?.courseId && lessonResume?.lessonId) {
+        warmLesson(lessonResume.courseId, lessonResume.lessonId);
+      }
+      for (const course of CONTENT_DATA.courses.slice(0, 4)) {
+        warmCourse(course.id);
+      }
+    }, 1600);
+  }, [lessonResume]);
 
   return (
     <LearnView
@@ -102,6 +96,7 @@ export default function LearnPage() {
       goToCourse={(courseId) => {
         const c = CONTENT_DATA.courses.find((x) => x.id === courseId);
         if (c) analytics.courseOpened(courseId, c.title);
+        markCourseFocus(courseId);
         setRoute({ name: "course", courseId });
       }}
       contentLoaded={progressReady}
