@@ -10,7 +10,7 @@ import {
   normalizeTabPath,
   type AppTabHref,
 } from "@/lib/appTabs";
-import { warmHeavyShell, whenIdle } from "@/lib/speculativeWarm";
+import { warmHeavyShell, warmBudget, whenIdle } from "@/lib/speculativeWarm";
 
 const LearnPage = dynamic(() => import("@/app/(app)/learn/page"), {
   ssr: false,
@@ -36,7 +36,7 @@ const ProfilePage = dynamic(() => import("@/app/(app)/profile/page"), {
 function TabSkeleton() {
   return (
     <div
-      aria-hidden
+      aria-busy="true"
       style={{
         padding: 20,
         display: "flex",
@@ -44,9 +44,11 @@ function TabSkeleton() {
         gap: 12,
       }}
     >
-      <div style={{ height: 18, width: "40%", borderRadius: 8, background: "var(--color-border)", opacity: 0.5 }} />
-      <div style={{ height: 120, borderRadius: 16, background: "var(--color-border)", opacity: 0.35 }} />
-      <div style={{ height: 80, borderRadius: 16, background: "var(--color-border)", opacity: 0.25 }} />
+      <span className="sr-only">Loading</span>
+      <div className="skeleton" style={{ height: 18, width: "42%", borderRadius: 8 }} />
+      <div className="skeleton" style={{ height: 112, borderRadius: 16 }} />
+      <div className="skeleton" style={{ height: 72, borderRadius: 16 }} />
+      <div className="skeleton" style={{ height: 48, width: "70%", borderRadius: 12 }} />
     </div>
   );
 }
@@ -107,6 +109,7 @@ export function PersistentAppTabs({ visible }: { visible: boolean }) {
       void import("@/app/(app)/quests/page");
       void import("@/app/(app)/profile/page");
       warmHeavyShell();
+      warmBudget();
     };
     return whenIdle(warm, 900);
   }, []);
