@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
 import { analytics } from "@/lib/analytics";
 import { markSharedToday } from "@/lib/dailyChallengeFlags";
@@ -230,19 +230,7 @@ export async function shareDuoCard(data: ShareCardData): Promise<"shared" | "can
 
 export function ShareResultButton({ data, label = "Share" }: { data: ShareCardData; label?: string }) {
   const [sharing, setSharing] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "done" | "error">("idle");
-
-  const cardKey = JSON.stringify(data);
-  useEffect(() => {
-    let cancelled = false;
-    generateShareCard(data).then((url) => {
-      if (!cancelled) setPreview(url);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-    // cardKey is the stable snapshot of data
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardKey]);
 
   const handleShare = async () => {
     setSharing(true);
@@ -256,13 +244,6 @@ export function ShareResultButton({ data, label = "Share" }: { data: ShareCardDa
 
   return (
     <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-      {preview ? (
-        <img
-          src={preview}
-          alt=""
-          style={{ width: 132, height: 234, objectFit: "cover", borderRadius: 16, boxShadow: "0 8px 24px rgba(28,36,48,0.08)" }}
-        />
-      ) : null}
       <button
         type="button"
         onClick={handleShare}
