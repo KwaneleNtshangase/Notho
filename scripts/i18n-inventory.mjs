@@ -67,7 +67,7 @@ for (const source of ['AM', 'PM', 'Sep', 'Sept']) add(`strings:${source}`, sourc
 
 // Capture original source locations for UI review, including complete template
 // literals. Candidates are not treated as proven UI coverage until wired.
-const attrs = new Set(['source','one','placeholder','title','alt','aria-label','aria-description','aria-valuetext','label','description']);
+const attrs = new Set(['declineLabel','detail','emptyDetail','emptyLabel','emptyTitle','hint','lede','message','name','note','sub','subtitle','tooltip','source','one','placeholder','title','alt','aria-label','aria-description','aria-valuetext','label','description']);
 const labels = new Set(['label','title','description','message','error','subtitle','sub','desc','hint','text','name','emptyMessage','buttonText']);
 // Only conditional result branches are displayed; comparisons such as
 // frequency === 'monthly' remain control values.

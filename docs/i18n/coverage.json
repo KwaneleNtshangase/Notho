@@ -1,16 +1,16 @@
 {
   "date": "2026-11-02",
-  "scope": "26,212 distinct source strings across 22 courses, 205 lessons and app UI candidates. Structural coverage is not linguistic validation.",
+  "scope": "26,339 distinct sources across 22 courses, 205 lessons and app UI candidates. Structural coverage is not linguistic validation.",
   "bulk": {
-    "generatedAt": "2026-11-02T15:44:09.141Z",
+    "generatedAt": "2026-11-02T15:59:23.089Z",
     "status": "incomplete",
-    "sourceRows": 26424,
-    "uniqueSources": 26212,
+    "sourceRows": 26551,
+    "uniqueSources": 26339,
     "validation": "Structural checks only. Generated drafts have not received human or cultural validation.",
     "languages": [
       {
         "locale": "af",
-        "acceptedPublic": 24934,
+        "acceptedPublic": 25061,
         "acceptedPrivate": 1270,
         "preservedSource": 195,
         "missing": 0,
@@ -19,7 +19,7 @@
       },
       {
         "locale": "nr",
-        "acceptedPublic": 24921,
+        "acceptedPublic": 25048,
         "acceptedPrivate": 1270,
         "preservedSource": 195,
         "missing": 0,
@@ -28,7 +28,7 @@
       },
       {
         "locale": "xh",
-        "acceptedPublic": 24933,
+        "acceptedPublic": 25060,
         "acceptedPrivate": 1270,
         "preservedSource": 195,
         "missing": 0,
@@ -37,16 +37,16 @@
       },
       {
         "locale": "zu",
-        "acceptedPublic": 24934,
+        "acceptedPublic": 25060,
         "acceptedPrivate": 1270,
         "preservedSource": 195,
         "missing": 0,
-        "rejected": 8,
+        "rejected": 9,
         "unchangedRequiringClassification": 186
       },
       {
         "locale": "nso",
-        "acceptedPublic": 24919,
+        "acceptedPublic": 25046,
         "acceptedPrivate": 1270,
         "preservedSource": 195,
         "missing": 0,
@@ -55,7 +55,7 @@
       },
       {
         "locale": "st",
-        "acceptedPublic": 24932,
+        "acceptedPublic": 25059,
         "acceptedPrivate": 1270,
         "preservedSource": 195,
         "missing": 0,
@@ -64,7 +64,7 @@
       },
       {
         "locale": "tn",
-        "acceptedPublic": 24922,
+        "acceptedPublic": 25049,
         "acceptedPrivate": 1270,
         "preservedSource": 195,
         "missing": 0,
@@ -73,16 +73,16 @@
       },
       {
         "locale": "ss",
-        "acceptedPublic": 24836,
+        "acceptedPublic": 24960,
         "acceptedPrivate": 1268,
         "preservedSource": 195,
         "missing": 0,
-        "rejected": 108,
+        "rejected": 111,
         "unchangedRequiringClassification": 265
       },
       {
         "locale": "ve",
-        "acceptedPublic": 24890,
+        "acceptedPublic": 25017,
         "acceptedPrivate": 1270,
         "preservedSource": 195,
         "missing": 0,
@@ -91,85 +91,85 @@
       },
       {
         "locale": "ts",
-        "acceptedPublic": 24882,
+        "acceptedPublic": 25008,
         "acceptedPrivate": 1270,
         "preservedSource": 195,
         "missing": 0,
-        "rejected": 60,
-        "unchangedRequiringClassification": 347
+        "rejected": 61,
+        "unchangedRequiringClassification": 349
       }
     ]
   },
   "effectivePublic": [
     {
       "locale": "af",
-      "totalKeys": 25323,
-      "translated": 24854,
+      "totalKeys": 25450,
+      "translated": 24981,
       "preservedSource": 231,
       "englishFallback": 238
     },
     {
       "locale": "nr",
-      "totalKeys": 25323,
-      "translated": 24869,
+      "totalKeys": 25450,
+      "translated": 24996,
       "preservedSource": 231,
       "englishFallback": 223
     },
     {
       "locale": "xh",
-      "totalKeys": 25323,
-      "translated": 24874,
+      "totalKeys": 25450,
+      "translated": 25001,
       "preservedSource": 231,
       "englishFallback": 218
     },
     {
       "locale": "zu",
-      "totalKeys": 25323,
-      "translated": 24898,
+      "totalKeys": 25450,
+      "translated": 25024,
       "preservedSource": 230,
-      "englishFallback": 195
+      "englishFallback": 196
     },
     {
       "locale": "nso",
-      "totalKeys": 25323,
-      "translated": 24742,
+      "totalKeys": 25450,
+      "translated": 24869,
       "preservedSource": 231,
       "englishFallback": 350
     },
     {
       "locale": "st",
-      "totalKeys": 25323,
-      "translated": 24799,
+      "totalKeys": 25450,
+      "translated": 24926,
       "preservedSource": 231,
       "englishFallback": 293
     },
     {
       "locale": "tn",
-      "totalKeys": 25323,
-      "translated": 24748,
+      "totalKeys": 25450,
+      "translated": 24875,
       "preservedSource": 231,
       "englishFallback": 344
     },
     {
       "locale": "ss",
-      "totalKeys": 25323,
-      "translated": 24706,
+      "totalKeys": 25450,
+      "translated": 24830,
       "preservedSource": 231,
-      "englishFallback": 386
+      "englishFallback": 389
     },
     {
       "locale": "ve",
-      "totalKeys": 25323,
-      "translated": 24661,
+      "totalKeys": 25450,
+      "translated": 24788,
       "preservedSource": 231,
       "englishFallback": 431
     },
     {
       "locale": "ts",
-      "totalKeys": 25323,
-      "translated": 24669,
+      "totalKeys": 25450,
+      "translated": 24793,
       "preservedSource": 231,
-      "englishFallback": 423
+      "englishFallback": 426
     }
   ]
 }

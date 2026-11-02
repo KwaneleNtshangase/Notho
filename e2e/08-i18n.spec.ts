@@ -201,6 +201,8 @@ test('authenticated settings, navigation, course and lesson screens', async ({ p
     await selector.selectOption(locale);
     await expect(page.getByRole('heading', { name: translate(locale, 'settings.title'), exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: localizeString(locale, 'Test voice'), exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: localizeString(locale, 'Save Changes'), exact: true })).toBeVisible();
+    await expect(page.getByText(localizeString(locale, 'Plays on correct / incorrect answers'), { exact: true })).toBeVisible();
     await noOverflow(page);
     await expect(page.getByRole('complementary', { name: localizeString(locale, 'Translation status') })).toBeVisible();
     await page.locator('.translation-notice strong').scrollIntoViewIfNeeded();

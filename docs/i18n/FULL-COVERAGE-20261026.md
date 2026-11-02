@@ -4,7 +4,7 @@ Release candidate prepared for https://www.notho.co.za. Production publication a
 
 ## Scope
 
-All 920 main batches, 111 supplemental batches and the final correction passes completed. Every one of the 26,212 distinct inventoried English sources has a draft attempt for each of the ten languages. The inventory covers 22 courses, all 205 lessons and their question variants, shared controls, public pages, calculators, budgets, reports and secured exam responses. UI candidates include internal identifiers and genuinely shared words, so these totals are not a claim that every displayed phrase is translated correctly.
+All 920 main batches, 111 supplemental batches and the final correction passes completed. Every one of the 26,339 distinct inventoried English sources has a draft attempt for each of the ten languages. The inventory covers 22 courses, all 205 lessons and their question variants, shared controls, public pages, calculators, budgets, reports and secured exam responses. UI candidates include internal identifiers and genuinely shared words, so these totals are not a claim that every displayed phrase is translated correctly.
 
 English stays the default. Other languages display `(under review)`, with a direct English recovery action and saved selection. There is no “About these translations” panel. Unsupported speech controls are hidden; matching device voices use the selected language. Non-Nguni voices receive the speech-only brand hint `Notto`; native Nguni voices retain `Notho`. Visible branding is unchanged.
 
@@ -19,15 +19,15 @@ Zero inventoried sources lack a generation attempt. Rejected drafts and unchange
 | af | 8 | 210 | 238 |
 | nr | 21 | 183 | 223 |
 | xh | 9 | 190 | 218 |
-| zu | 8 | 186 | 195 |
+| zu | 9 | 186 | 196 |
 | nso | 23 | 306 | 350 |
 | st | 10 | 264 | 293 |
 | tn | 20 | 306 | 344 |
-| ss | 108 | 265 | 386 |
+| ss | 111 | 265 | 389 |
 | ve | 52 | 368 | 431 |
-| ts | 60 | 347 | 423 |
+| ts | 61 | 349 | 426 |
 
-Counts overlap and must not be added together. Effective fallbacks include all resolver layers and UI candidates. `coverage.json` contains the structural summary; local phrase-level evidence is under `output/i18n-generation-v3/gaps.json`, `review-metadata.json` and `output/i18n-verification/effective-final-20261102.json`. Secured exam sources stay out of public packs. The Xitsonga credit/debt title remains deliberately held for review.
+Counts overlap and must not be added together. Effective fallbacks include all resolver layers and UI candidates. `coverage.json` contains the structural summary; local phrase-level evidence is under `output/i18n-generation-v3/gaps.json`, `review-metadata.json` and `output/i18n-verification/effective-props-20261102.json`. Secured exam sources stay out of public packs. The Xitsonga credit/debt title remains deliberately held for review.
 
 Priority review: tax and legal duties, credit versus debt, interest rates and calculations, investment/retirement risks, insurance exclusions, RE5/FAIS answers and explanations, consent, privacy, deletion and POPIA, financial metaphors, number order and dynamic plurals. Source financial examples were preserved, not fact-updated by translation.
 
@@ -62,3 +62,5 @@ Then check the canonical alias and `/api/health`. For a durable source rollback,
 ## Final preview verification
 
 The complete release preview https://notho-b7mc06bkd-notho.vercel.app (`dpl_2JR2ofPHkbCvEhhSUdcuZ2ADaeo9`) built successfully and returned HTTP 200 from `/api/health`. All 18 browser scenarios passed on desktop, tablet and 320px mobile, including the calculator assumptions regression. The release worktree separately passed 876 unit tests, TypeScript and catalog integrity with zero failures. The source snapshot is committed on `codex/sa-language-release`; it incorporates current production `39afe20`.
+
+The final screenshot audit added 127 previously omitted custom-component helper texts (settings descriptions, calculator tooltips, public guide introductions and admin hints). All 1,270 additional language drafts were attempted. Browser checks now wait for translated settings copy before capturing screenshots.
