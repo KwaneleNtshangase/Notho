@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * Cosmo - Tier 1 (deterministic, no AI).
@@ -159,7 +160,7 @@ export function CosmoCoachCard({
   const showInsights = !!insights && insights.length > 0;
 
   return (
-    <section
+    <I18nElement as="section"
       aria-label="Cosmo insights"
       style={{
         border: "1.5px solid var(--color-border)",
@@ -182,14 +183,14 @@ export function CosmoCoachCard({
         }}
       >
         <Lightbulb size={18} style={{ color: "var(--color-accent, #EFB343)" }} />
-        <h3 style={{ fontSize: 16, fontWeight: 800, margin: 0 }}>Cosmo</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 800, margin: 0 }}><I18nText source={"Cosmo"} /></h3>
         {showInsights && (
           <span style={{ fontSize: 11, fontWeight: 800, color: "var(--color-accent, #EFB343)", background: "rgba(239,179,67,0.14)", borderRadius: 999, padding: "1px 8px" }}>
-            {insights!.length}
+            <I18nText>{insights!.length}</I18nText>
           </span>
         )}
         <span style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-secondary)", marginLeft: "auto" }}>
-          {collapsed ? (showInsights ? "Show insights" : "Based on your own numbers") : "Hide"}
+          <I18nText>{collapsed ? (showInsights ? "Show insights" : "Based on your own numbers") : "Hide"}</I18nText>
         </span>
         <ChevronDown
           size={18}
@@ -200,9 +201,7 @@ export function CosmoCoachCard({
       {!collapsed && (
       <>
       {!showInsights && (
-        <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}>
-          Nothing flagged on this month yet. Add entries or import a statement.
-        </p>
+        <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}><I18nText source={"Nothing flagged on this month yet. Add entries or import a statement."} /></p>
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -224,12 +223,12 @@ export function CosmoCoachCard({
                   letterSpacing: "0.06em", color: "#fff", background: s.chip,
                   borderRadius: 8, padding: "2px 8px",
                 }}>
-                  {s.chipText}
+                  <I18nText>{s.chipText}</I18nText>
                 </span>
-                <span style={{ fontSize: 14, fontWeight: 700 }}>{i.title}</span>
+                <span style={{ fontSize: 14, fontWeight: 700 }}><I18nText>{i.title}</I18nText></span>
               </div>
               <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: "6px 0 0" }}>
-                {i.body}
+                <I18nText>{i.body}</I18nText>
               </p>
               {i.lesson && (
                 <Link
@@ -238,21 +237,16 @@ export function CosmoCoachCard({
                     display: "inline-block", marginTop: 8, fontSize: 13, fontWeight: 700,
                     color: "var(--color-primary)", textDecoration: "none",
                   }}
-                >
-                  Lesson: {i.lesson.title} →
-                </Link>
+                ><I18nText source={"Lesson: {value0} →"} values={[i.lesson.title]} /></Link>
               )}
             </div>
           );
         })}
       </div>
 
-      <p style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "12px 0 0" }}>
-        Educational information based on your budget data, not financial advice.
-        Notho is not a registered financial services provider.
-      </p>
+      <p style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "12px 0 0" }}><I18nText source={"Educational information based on your budget data, not financial advice. Notho is not a registered financial services provider."} /></p>
       </>
       )}
-    </section>
+    </I18nElement>
   );
 }

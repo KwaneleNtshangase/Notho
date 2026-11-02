@@ -32,9 +32,16 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  ...(process.env.NOTHO_LOW_MEMORY_BUILD === '1' ? {
+    experimental: { cpus: 1, webpackBuildWorker: true, webpackMemoryOptimizations: true },
+  } : {}),
   ...(process.env.VERCEL_DEPLOYMENT_ID && process.env.VERCEL_DEPLOYMENT_ID !== "undefined"
     ? { deploymentId: process.env.VERCEL_DEPLOYMENT_ID }
     : {}),
+  outputFileTracingIncludes: {
+    "/api/mock-attempts/**": ["./src/i18n/private/*.json", "./public/locales/*.json"],
+    "/api/budget/report": ["./public/locales/*.json", "./public/fonts/*.ttf"],
+  },
   serverExternalPackages: ["unpdf"],
   skipTrailingSlashRedirect: true,
   async headers() {

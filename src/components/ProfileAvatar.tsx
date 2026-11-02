@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -351,23 +352,15 @@ export function ProfilePhotoGate() {
             }}
           >
             <div style={{ width: 36, height: 4, borderRadius: 99, background: "var(--color-border)", margin: "4px auto 14px" }} />
-            <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 10 }}>Profile photo</div>
-            <button type="button" className="btn btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={busy} onClick={() => inputRef.current?.click()}>
-              Choose a photo
-            </button>
+            <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 10 }}><I18nText source={"Profile photo"} /></div>
+            <button type="button" className="btn btn-primary" style={{ width: "100%", marginBottom: 8 }} disabled={busy} onClick={() => inputRef.current?.click()}><I18nText source={"Choose a photo"} /></button>
             {googleUrl && (
-              <button type="button" className="btn btn-secondary" style={{ width: "100%", marginBottom: 8 }} disabled={busy} onClick={() => { void useGoogle(); }}>
-                Use my Google photo
-              </button>
+              <button type="button" className="btn btn-secondary" style={{ width: "100%", marginBottom: 8 }} disabled={busy} onClick={() => { void useGoogle(); }}><I18nText source={"Use my Google photo"} /></button>
             )}
             {avatarUrl && (
-              <button type="button" className="btn btn-secondary" style={{ width: "100%", marginBottom: 8, color: "#dc2626" }} disabled={busy} onClick={() => { void remove(); }}>
-                Remove photo
-              </button>
+              <button type="button" className="btn btn-secondary" style={{ width: "100%", marginBottom: 8, color: "#dc2626" }} disabled={busy} onClick={() => { void remove(); }}><I18nText source={"Remove photo"} /></button>
             )}
-            <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={() => setSheet(false)}>
-              Cancel
-            </button>
+            <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={() => setSheet(false)}><I18nText source={"Cancel"} /></button>
           </div>
         </div>
       )}
@@ -391,7 +384,7 @@ export function ProfilePhotoGate() {
             whiteSpace: "nowrap",
           }}
         >
-          {busy ? "Saving photo\u2026" : hint}
+          <I18nText>{busy ? "Saving photo\u2026" : hint}</I18nText>
         </div>
       )}
     </>

@@ -4,6 +4,8 @@ import { renderToBuffer, type DocumentProps } from "@react-pdf/renderer";
 import { buildReport } from "../aggregate";
 import { BudgetReportDocument } from "../pdf";
 import type { BudgetEntryInput, BudgetTargetInput } from "../types";
+import { extractText } from 'unpdf';
+import fs from 'node:fs';
 
 /**
  * Render smoke test: the report PDF must actually render from a rich,
@@ -49,5 +51,22 @@ describe("BudgetReportDocument", () => {
     );
     expect(buffer.length).toBeGreaterThan(10000);
     expect(Buffer.from(buffer.subarray(0, 5)).toString()).toBe("%PDF-");
+    const pages = await extractText(new Uint8Array(buffer), { mergePages: false });
+    expect(pages.text.every(page => page.trim().length > 20)).toBe(true);
+  }, 30_000);
+  it('retains Tshivenda diacritics and personal names in a translated PDF', async () => {
+    const model = richModel();
+    model.displayName = 'Hope';
+    model.expenseCategories[0].categoryId = 'custom-savings-name';
+    model.expenseCategories[0].categoryName = 'Travel';
+    const words: Record<string, string> = { 'Budget report': 'Muvhigo wa mugaganyagwama', 'Income & transactions': 'Mbuelo na zwirengiselano', 'Financial health': 'Mutakalo wa zwa masheleni', 'Hope': 'SHOULD NOT REPLACE A NAME', 'Travel': 'SHOULD NOT REPLACE A CUSTOM CATEGORY', 'Every category': 'Tshigwada tshiṅwe na tshiṅwe' };
+    const buffer = await renderToBuffer(React.createElement(BudgetReportDocument, { model, locale: 've', translate: (source: string) => words[source] ?? source }) as React.ReactElement<DocumentProps>);
+    if (process.env.I18N_PDF_OUTPUT) fs.writeFileSync(process.env.I18N_PDF_OUTPUT, buffer);
+    const { text } = await extractText(new Uint8Array(buffer), { mergePages: true });
+    expect(text.normalize('NFC')).toContain('Tshigwada tshiṅwe na tshiṅwe');
+    expect(text).toContain('Hope');
+    expect(text).not.toContain('SHOULD NOT REPLACE A NAME');
+    expect(text).toContain('Travel');
+    expect(text).not.toContain('SHOULD NOT REPLACE A CUSTOM CATEGORY');
   }, 30_000);
 });

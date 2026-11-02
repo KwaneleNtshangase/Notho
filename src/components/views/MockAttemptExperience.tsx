@@ -1,4 +1,6 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
+import { useLocale } from '@/i18n/LocaleProvider';
 
 import React from "react";
 import { useRouter } from "next/navigation";
@@ -84,6 +86,8 @@ export function MockAttemptExperience({
   lessonId: string;
 }) {
   const router = useRouter();
+  const { locale } = useLocale();
+  const previousLocale = React.useRef(locale);
   const [attempt, setAttempt] = React.useState<MockAttemptSnapshot | null>(null);
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [remainingSeconds, setRemainingSeconds] = React.useState(0);
@@ -338,6 +342,14 @@ export function MockAttemptExperience({
   }, [acceptSnapshot, resolveDrainWaiters]);
 
   React.useEffect(() => {
+    if (previousLocale.current === locale) return;
+    previousLocale.current = locale;
+    // State changes happen after the server response, not synchronously here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (attemptId) void refreshAttempt();
+  }, [locale, attemptId, refreshAttempt]);
+
+  React.useEffect(() => {
     if (!attemptId || attemptStatus !== "in_progress") return;
     const interval = window.setInterval(() => void refreshAttempt(), 30_000);
     const resyncWhenVisible = () => {
@@ -489,8 +501,8 @@ export function MockAttemptExperience({
     return (
       <main className="mock-exam-shell mock-state-screen" aria-live="polite">
         <LoaderCircle className="mock-spinner" size={36} aria-hidden />
-        <h1>Preparing your protected paper…</h1>
-        <p>The server is restoring your fixed deadline and saved answers.</p>
+        <h1><I18nText source={"Preparing your protected paper…"} /></h1>
+        <p><I18nText source={"The server is restoring your fixed deadline and saved answers."} /></p>
       </main>
     );
   }
@@ -522,6 +534,7 @@ export function MockAttemptExperience({
     const submitted = attempt as SubmittedAttempt;
     return (
       <MockAttemptReport
+        key={`${submitted.id}:${locale}`}
         attempt={submitted}
         onExplain={(questionId) =>
           getMockExplanation(submitted.id, questionId)
@@ -571,26 +584,20 @@ export function MockAttemptExperience({
           onDismiss={() => setShowSubmitConfirm(false)}
           icon={<AlertTriangle size={38} aria-hidden />}
         >
-          <p>
-            Blank answers receive no mark. You can keep working, or submit this
-            server-graded attempt now.
-          </p>
+          <p><I18nText source={"Blank answers receive no mark. You can keep working, or submit this server-graded attempt now."} /></p>
           <div className="mock-dialog-actions">
             <button
               type="button"
               className="btn btn-secondary"
               onClick={() => setShowSubmitConfirm(false)}
-            >
-              Keep working
-            </button>
+            ><I18nText source={"Keep working"} /></button>
             <button
               type="button"
               className="btn btn-primary"
               disabled={submitting || Boolean(saveError)}
               onClick={() => void submitCurrentAttempt("learner")}
             >
-              <ShieldCheck size={17} aria-hidden /> Submit mock
-            </button>
+              <ShieldCheck size={17} aria-hidden /> <I18nText source={" Submit mock"} /></button>
           </div>
         </MockDialog>
       )}
@@ -601,30 +608,23 @@ export function MockAttemptExperience({
           onDismiss={() => setShowExitConfirm(false)}
           icon={<AlertCircle size={38} aria-hidden />}
         >
-          <p>
-            Server-acknowledged answers, flags and your place will be here when
-            you return. The fixed timer continues while you are away.
-          </p>
+          <p><I18nText source={"Server-acknowledged answers, flags and your place will be here when you return. The fixed timer continues while you are away."} /></p>
           {saveError && (
-            <p className="mock-dialog-error">
-              Retry the unsaved change before leaving this screen.
-            </p>
+            <p className="mock-dialog-error"><I18nText source={"Retry the unsaved change before leaving this screen."} /></p>
           )}
           <div className="mock-dialog-actions">
             <button
               type="button"
               className="btn btn-secondary"
               onClick={() => setShowExitConfirm(false)}
-            >
-              Stay
-            </button>
+            ><I18nText source={"Stay"} /></button>
             <button
               type="button"
               className="btn btn-primary"
               disabled={pendingSaves > 0 || Boolean(saveError)}
               onClick={() => router.push(`/course/${courseId}`)}
             >
-              {pendingSaves > 0 ? "Saving…" : "Leave mock"}
+              <I18nText>{pendingSaves > 0 ? "Saving…" : "Leave mock"}</I18nText>
             </button>
           </div>
         </MockDialog>
@@ -648,15 +648,11 @@ function MockStateScreen({
     <main className="mock-exam-shell">
       <section className="mock-state-screen" role="alert">
         <AlertCircle size={38} aria-hidden />
-        <h1>{title}</h1>
-        <p>{message}</p>
+        <h1><I18nText>{title}</I18nText></h1>
+        <p><I18nText>{message}</I18nText></p>
         <div className="mock-state-actions">
-          <button type="button" className="btn btn-primary" onClick={onRetry}>
-            Retry
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={onExit}>
-            Back to course
-          </button>
+          <button type="button" className="btn btn-primary" onClick={onRetry}><I18nText source={"Retry"} /></button>
+          <button type="button" className="btn btn-secondary" onClick={onExit}><I18nText source={"Back to course"} /></button>
         </div>
       </section>
     </main>
@@ -702,9 +698,9 @@ function MockDialog({
         aria-labelledby={titleId}
         tabIndex={-1}
       >
-        {icon}
-        <h2 id={titleId}>{title}</h2>
-        {children}
+        <I18nText>{icon}</I18nText>
+        <h2 id={titleId}><I18nText>{title}</I18nText></h2>
+        <I18nText>{children}</I18nText>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -26,13 +27,8 @@ export default function NotFound() {
         height={120}
         priority
       />
-      <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}>
-        Page not found
-      </h1>
-      <p style={{ maxWidth: 420, color: "var(--color-text-secondary)", margin: 0 }}>
-        The page you&apos;re looking for doesn&apos;t exist or may have moved.
-        Your learning path is still right where you left it.
-      </p>
+      <h1 style={{ fontSize: 28, fontWeight: 800, margin: 0 }}><I18nText source={"Page not found"} /></h1>
+      <p style={{ maxWidth: 420, color: "var(--color-text-secondary)", margin: 0 }}><I18nText source={"The page you're looking for doesn't exist or may have moved. Your learning path is still right where you left it."} /></p>
       <Link
         href="/learn"
         style={{
@@ -45,9 +41,7 @@ export default function NotFound() {
           fontWeight: 700,
           textDecoration: "none",
         }}
-      >
-        Back to Notho
-      </Link>
+      ><I18nText source={"Back to Notho"} /></Link>
     </div>
   );
 }

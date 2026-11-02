@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * PEOPLE - every account, searchable, with the drill-down drawer.
@@ -82,7 +83,7 @@ export function PeoplePanel({
       label: "User",
       render: (r) => (
         <div>
-          <div className="nv-strong">{displayName(r)}</div>
+          <div className="nv-strong"><I18nText>{displayName(r)}</I18nText></div>
           <div style={{ fontSize: 11.5, color: p.muted }}>{r.email}</div>
         </div>
       ),
@@ -116,11 +117,11 @@ export function PeoplePanel({
               : "bad"
           }
         >
-          {ago(r.last_seen)}
+          <I18nText>{ago(r.last_seen)}</I18nText>
         </Tag>
       ),
     },
-    { key: "joined", label: "Joined", sortKey: "signup", render: (r) => <span style={{ color: p.muted }}>{ago(r.signed_up)}</span> },
+    { key: "joined", label: "Joined", sortKey: "signup", render: (r) => <span style={{ color: p.muted }}><I18nText>{ago(r.signed_up)}</I18nText></span> },
   ];
 
   return (
@@ -164,9 +165,7 @@ export function PeoplePanel({
             maxHeight={620}
           />
           {rows.length >= 200 && (
-            <p style={{ fontSize: 12, color: p.muted, marginTop: 12 }}>
-              Showing the first 200. Use search to narrow it down.
-            </p>
+            <p style={{ fontSize: 12, color: p.muted, marginTop: 12 }}><I18nText source={"Showing the first 200. Use search to narrow it down."} /></p>
           )}
         </Gate>
       </Panel>
@@ -204,14 +203,12 @@ export function PeoplePanel({
                 }}
               />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: p.ink }}>{x.label}</div>
-                <div style={{ fontSize: 12, color: p.muted, marginTop: 3, lineHeight: 1.55 }}>{x.action}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: p.ink }}><I18nText>{x.label}</I18nText></div>
+                <div style={{ fontSize: 12, color: p.muted, marginTop: 3, lineHeight: 1.55 }}><I18nText>{x.action}</I18nText></div>
               </div>
               <div style={{ textAlign: "right", flex: "none" }}>
-                <div style={{ fontSize: 17, fontWeight: 800, color: p.ink }}>{fmt(x.users)}</div>
-                <div style={{ fontSize: 11, color: p.muted }}>
-                  {fmtPct(x.pct)} · {x.avg_lessons ?? 0} lessons avg
-                </div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: p.ink }}><I18nText>{fmt(x.users)}</I18nText></div>
+                <div style={{ fontSize: 11, color: p.muted }}><I18nText source={"{value0} · {value1} lessons avg"} values={[fmtPct(x.pct), x.avg_lessons ?? 0]} /></div>
               </div>
             </div>
           ))}
@@ -262,7 +259,7 @@ export function UserDrawer({ userId, onClose }: { userId: string; onClose: () =>
   const err = cur?.error ?? null;
 
   return (
-    <div className="nv-scrim" onClick={onClose} role="dialog" aria-modal="true" aria-label="User detail">
+    <I18nElement as="div" className="nv-scrim" onClick={onClose} role="dialog" aria-modal="true" aria-label="User detail">
       <div className="nv-drawer" onClick={(e) => e.stopPropagation()}>
         <div
           style={{
@@ -273,8 +270,8 @@ export function UserDrawer({ userId, onClose }: { userId: string; onClose: () =>
             gap: 12,
           }}
         >
-          <h2 style={{ fontSize: 17, fontWeight: 800, color: p.ink, margin: 0 }}>User detail</h2>
-          <Btn onClick={onClose}>Close</Btn>
+          <h2 style={{ fontSize: 17, fontWeight: 800, color: p.ink, margin: 0 }}><I18nText source={"User detail"} /></h2>
+          <Btn onClick={onClose}><I18nText source={"Close"} /></Btn>
         </div>
 
         {err ? (
@@ -291,7 +288,7 @@ export function UserDrawer({ userId, onClose }: { userId: string; onClose: () =>
           <UserDetailBody d={d} />
         )}
       </div>
-    </div>
+    </I18nElement>
   );
 }
 
@@ -304,26 +301,23 @@ function UserDetailBody({ d }: { d: UserDetail }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <Card className="pad-sm">
-        <div style={{ fontSize: 19, fontWeight: 800, color: p.ink }}>{name}</div>
+        <div style={{ fontSize: 19, fontWeight: 800, color: p.ink }}><I18nText>{name}</I18nText></div>
         <div style={{ fontSize: 13, color: p.body, marginTop: 3 }}>{d.profile?.email}</div>
         <div style={{ display: "flex", gap: 7, marginTop: 12, flexWrap: "wrap" }}>
-          {d.profile?.isAdmin && <Tag tone="warn">Admin</Tag>}
+          {d.profile?.isAdmin && <Tag tone="warn"><I18nText source={"Admin"} /></Tag>}
           {d.daysSinceSeen != null && (
             <Tag tone={d.daysSinceSeen <= 2 ? "good" : d.daysSinceSeen <= 14 ? "warn" : "bad"}>
-              {d.daysSinceSeen <= 0 ? "Active today" : `Quiet ${d.daysSinceSeen} days`}
+              <I18nText>{d.daysSinceSeen <= 0 ? "Active today" : `Quiet ${d.daysSinceSeen} days`}</I18nText>
             </Tag>
           )}
-          {d.profile?.goal && <Tag>Goal: {d.profile.goal}</Tag>}
-          {d.profile?.ageRange && <Tag>Age {d.profile.ageRange}</Tag>}
-          {d.usage?.usesPwa && <Tag tone="good">Installed as app</Tag>}
+          {d.profile?.goal && <Tag><I18nText source={"Goal: {value0}"} values={[d.profile.goal]} preserveValues={[true]} /></Tag>}
+          {d.profile?.ageRange && <Tag><I18nText source={"Age {value0}"} values={[d.profile.ageRange]} preserveValues={[true]} /></Tag>}
+          {d.usage?.usesPwa && <Tag tone="good"><I18nText source={"Installed as app"} /></Tag>}
           {(d.usage?.devices ?? []).map((dev) => (
-            <Tag key={dev}>{dev}</Tag>
+            <Tag key={dev}><I18nText>{dev}</I18nText></Tag>
           ))}
         </div>
-        <div style={{ fontSize: 12, color: p.muted, marginTop: 12 }}>
-          Joined {ago(d.profile?.signedUp)} · Last seen{" "}
-          {ago(d.lastActive ?? d.usage?.lastSeen ?? d.profile?.lastSignIn)}
-        </div>
+        <div style={{ fontSize: 12, color: p.muted, marginTop: 12 }}><I18nText source={"Joined {value0} · Last seen{value1}{value2}"} values={[ago(d.profile?.signedUp), " ", ago(d.lastActive ?? d.usage?.lastSeen ?? d.profile?.lastSignIn)]} preserveValues={[true,false,true]} /></div>
       </Card>
 
       <div
@@ -343,9 +337,7 @@ function UserDetailBody({ d }: { d: UserDetail }) {
 
       {timeline.length > 0 && (
         <Card className="pad-sm">
-          <h3 style={{ fontSize: 14, fontWeight: 800, color: p.ink, margin: "0 0 12px" }}>
-            Last 60 days
-          </h3>
+          <h3 style={{ fontSize: 14, fontWeight: 800, color: p.ink, margin: "0 0 12px" }}><I18nText source={"Last 60 days"} /></h3>
           <Frame height={170}>
             <ComposedChart data={timeline} margin={{ top: 6, right: 6, left: -24, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={p.grid} vertical={false} />
@@ -363,22 +355,14 @@ function UserDetailBody({ d }: { d: UserDetail }) {
               <Line type="monotone" dataKey="answers" name="Answers" stroke={p.gold} strokeWidth={2} dot={false} />
             </ComposedChart>
           </Frame>
-          <div style={{ fontSize: 11.5, color: p.muted, marginTop: 8, lineHeight: 1.5 }}>
-            Answers without minutes means the session heartbeat missed that visit - the person was
-            there, the timer was not.
-          </div>
+          <div style={{ fontSize: 11.5, color: p.muted, marginTop: 8, lineHeight: 1.5 }}><I18nText source={"Answers without minutes means the session heartbeat missed that visit - the person was there, the timer was not."} /></div>
         </Card>
       )}
 
       {(d.courses ?? []).length > 0 && (
         <Card className="pad-sm">
-          <h3 style={{ fontSize: 14, fontWeight: 800, color: p.ink, margin: "0 0 4px" }}>
-            How they are coping, by course
-          </h3>
-          <div style={{ fontSize: 11.5, color: p.muted, marginBottom: 10 }}>
-            First-try accuracy per course. A low number in one course and a high one in another says
-            the course is hard, not the learner.
-          </div>
+          <h3 style={{ fontSize: 14, fontWeight: 800, color: p.ink, margin: "0 0 4px" }}><I18nText source={"How they are coping, by course"} /></h3>
+          <div style={{ fontSize: 11.5, color: p.muted, marginBottom: 10 }}><I18nText source={"First-try accuracy per course. A low number in one course and a high one in another says the course is hard, not the learner."} /></div>
           {d.courses.map((c) => (
             <KV
               key={c.courseId}
@@ -394,9 +378,7 @@ function UserDetailBody({ d }: { d: UserDetail }) {
       )}
 
       <Card className="pad-sm">
-        <h3 style={{ fontSize: 14, fontWeight: 800, color: p.ink, margin: "0 0 10px" }}>
-          Features they use
-        </h3>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: p.ink, margin: "0 0 10px" }}><I18nText source={"Features they use"} /></h3>
         {(d.features ?? []).length === 0 ? (
           <Empty title="No feature activity recorded" />
         ) : (
@@ -427,9 +409,7 @@ function UserDetailBody({ d }: { d: UserDetail }) {
       </Card>
 
       <Card className="pad-sm">
-        <h3 style={{ fontSize: 14, fontWeight: 800, color: p.ink, margin: "0 0 10px" }}>
-          Recent activity
-        </h3>
+        <h3 style={{ fontSize: 14, fontWeight: 800, color: p.ink, margin: "0 0 10px" }}><I18nText source={"Recent activity"} /></h3>
         {(d.recentEvents ?? []).length === 0 ? (
           <Empty title="No recent events" />
         ) : (
@@ -447,12 +427,12 @@ function UserDetailBody({ d }: { d: UserDetail }) {
                 }}
               >
                 <span style={{ color: p.body }}>
-                  {e.event.replace(/_/g, " ")}
+                  <I18nText>{e.event.replace(/_/g, " ")}</I18nText>
                   {e.props?.lessonId ? (
-                    <span style={{ color: p.muted }}> · {String(e.props.lessonId)}</span>
+                    <span style={{ color: p.muted }}> · <I18nText>{String(e.props.lessonId)}</I18nText></span>
                   ) : null}
                 </span>
-                <span style={{ color: p.muted, whiteSpace: "nowrap" }}>{ago(e.at)}</span>
+                <span style={{ color: p.muted, whiteSpace: "nowrap" }}><I18nText>{ago(e.at)}</I18nText></span>
               </div>
             ))}
           </div>

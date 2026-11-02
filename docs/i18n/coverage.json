@@ -1,0 +1,157 @@
+{
+  "coverage": [
+    {
+      "locale": "af",
+      "messages": {
+        "total": 113,
+        "translated": 111
+      },
+      "content": {
+        "total": 274,
+        "translated": 22
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 8
+      }
+    },
+    {
+      "locale": "nr",
+      "messages": {
+        "total": 113,
+        "translated": 111
+      },
+      "content": {
+        "total": 274,
+        "translated": 22
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 8
+      }
+    },
+    {
+      "locale": "xh",
+      "messages": {
+        "total": 113,
+        "translated": 111
+      },
+      "content": {
+        "total": 274,
+        "translated": 22
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 8
+      }
+    },
+    {
+      "locale": "zu",
+      "messages": {
+        "total": 113,
+        "translated": 112
+      },
+      "content": {
+        "total": 274,
+        "translated": 123
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 98
+      }
+    },
+    {
+      "locale": "nso",
+      "messages": {
+        "total": 113,
+        "translated": 111
+      },
+      "content": {
+        "total": 274,
+        "translated": 22
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 8
+      }
+    },
+    {
+      "locale": "st",
+      "messages": {
+        "total": 113,
+        "translated": 111
+      },
+      "content": {
+        "total": 274,
+        "translated": 22
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 8
+      }
+    },
+    {
+      "locale": "tn",
+      "messages": {
+        "total": 113,
+        "translated": 111
+      },
+      "content": {
+        "total": 274,
+        "translated": 22
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 8
+      }
+    },
+    {
+      "locale": "ss",
+      "messages": {
+        "total": 113,
+        "translated": 111
+      },
+      "content": {
+        "total": 274,
+        "translated": 22
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 8
+      }
+    },
+    {
+      "locale": "ve",
+      "messages": {
+        "total": 113,
+        "translated": 111
+      },
+      "content": {
+        "total": 274,
+        "translated": 22
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 8
+      }
+    },
+    {
+      "locale": "ts",
+      "messages": {
+        "total": 113,
+        "translated": 111
+      },
+      "content": {
+        "total": 274,
+        "translated": 21
+      },
+      "strings": {
+        "total": 20016,
+        "translated": 8
+      }
+    }
+  ],
+  "failures": [],
+  "pluralNote": "No plural messages in the shared catalog. Existing count/number wording is preserved; unsupported ICU syntax is rejected, not approximated.",
+  "scope": "Shared message catalog and course title/lesson string hooks. Hardcoded UI outside these hooks remains English."
+}

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * The exit survey: reason picker, save offer, and the modal that wraps both for
@@ -50,7 +51,7 @@ export function ReasonPicker({
 
   return (
     <div>
-      <div role="radiogroup" aria-label="Reason for leaving" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <I18nElement as="div" role="radiogroup" aria-label="Reason for leaving" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {list.map((r) => {
           const on = value === r.code;
           return (
@@ -94,11 +95,11 @@ export function ReasonPicker({
               >
                 {on && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-primary)" }} />}
               </span>
-              {r.label}
+              <I18nText>{r.label}</I18nText>
             </button>
           );
         })}
-      </div>
+      </I18nElement>
 
       {selected && (
         <div style={{ marginTop: 14 }}>
@@ -106,7 +107,7 @@ export function ReasonPicker({
             htmlFor="exit-detail"
             style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--color-text-primary)", marginBottom: 6 }}
           >
-            {selected.prompt} <span style={{ fontWeight: 500, color: "var(--color-text-secondary)" }}>(optional)</span>
+            <I18nText>{selected.prompt}</I18nText> <span style={{ fontWeight: 500, color: "var(--color-text-secondary)" }}><I18nText source={"(optional)"} /></span>
           </label>
           <textarea
             id="exit-detail"
@@ -128,9 +129,7 @@ export function ReasonPicker({
             }}
           />
           {/* Said plainly, because this text is kept after the account is gone. */}
-          <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 5, lineHeight: 1.5 }}>
-            We keep this answer to improve Notho. Please don&apos;t include personal or banking details.
-          </div>
+          <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 5, lineHeight: 1.5 }}><I18nText source={"We keep this answer to improve Notho. Please don't include personal or banking details."} /></div>
         </div>
       )}
     </div>
@@ -164,9 +163,9 @@ export function OfferCard({
         }}
       >
         <div style={{ fontSize: 15, fontWeight: 800, color: "var(--color-primary-dark)", marginBottom: 6 }}>
-          {offer.title}
+          <I18nText>{offer.title}</I18nText>
         </div>
-        <div style={{ fontSize: 13.5, color: "var(--color-text-primary)", lineHeight: 1.55 }}>{offer.body}</div>
+        <div style={{ fontSize: 13.5, color: "var(--color-text-primary)", lineHeight: 1.55 }}><I18nText>{offer.body}</I18nText></div>
       </div>
 
       <button
@@ -176,7 +175,7 @@ export function OfferCard({
         disabled={busy}
         style={{ width: "100%", marginBottom: 10, opacity: busy ? 0.6 : 1 }}
       >
-        {busy ? "One moment…" : offer.cta}
+        <I18nText>{busy ? "One moment…" : offer.cta}</I18nText>
       </button>
 
       {/* The way out stays a plain, equal-weight button. Never a faint link. */}
@@ -196,7 +195,7 @@ export function OfferCard({
           cursor: busy ? "not-allowed" : "pointer",
         }}
       >
-        {declineLabel}
+        <I18nText>{declineLabel}</I18nText>
       </button>
     </div>
   );
@@ -352,17 +351,13 @@ export function ExitSurveyModal({
         {step === "reason" && (
           <>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
-              <div style={{ fontSize: 19, fontWeight: 800, color: "var(--color-text-primary)" }}>
-                Before you go
-              </div>
-              <button type="button" onClick={close} aria-label="Close"
+              <div style={{ fontSize: 19, fontWeight: 800, color: "var(--color-text-primary)" }}><I18nText source={"Before you go"} /></div>
+              <I18nElement as="button" type="button" onClick={close} aria-label="Close"
                 style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", padding: 0 }}>
                 <X size={20} />
-              </button>
+              </I18nElement>
             </div>
-            <p style={{ fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.55, margin: "0 0 18px" }}>
-              What made you decide to delete your account? One answer, and it genuinely shapes what we build next.
-            </p>
+            <p style={{ fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.55, margin: "0 0 18px" }}><I18nText source={"What made you decide to delete your account? One answer, and it genuinely shapes what we build next."} /></p>
 
             <ReasonPicker
               exitType="account_deletion"
@@ -380,12 +375,10 @@ export function ExitSurveyModal({
                 onClick={() => submitReason(false)}
                 style={{ width: "100%", marginBottom: 10, opacity: !reason || busy ? 0.5 : 1 }}
               >
-                {busy ? "Saving…" : "Continue"}
+                <I18nText>{busy ? "Saving…" : "Continue"}</I18nText>
               </button>
               {/* Rule 1: always one click out, always visible without scrolling past the offer. */}
-              <button type="button" disabled={busy} onClick={() => submitReason(true)} style={ghostBtn}>
-                Skip and continue to delete
-              </button>
+              <button type="button" disabled={busy} onClick={() => submitReason(true)} style={ghostBtn}><I18nText source={"Skip and continue to delete"} /></button>
             </div>
           </>
         )}
@@ -393,13 +386,9 @@ export function ExitSurveyModal({
         {/* ── Step 2: the alternative ── */}
         {step === "offer" && offer && (
           <>
-            <div style={{ fontSize: 19, fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 6 }}>
-              One option before you do
-            </div>
-            <p style={{ fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.55, margin: "0 0 18px" }}>
-              Based on what you said. If it isn&apos;t what you want, carry on and we&apos;ll delete everything.
-            </p>
-            {error && <p style={{ fontSize: 13, color: "var(--color-danger)", margin: "0 0 12px" }}>{error}</p>}
+            <div style={{ fontSize: 19, fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 6 }}><I18nText source={"One option before you do"} /></div>
+            <p style={{ fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.55, margin: "0 0 18px" }}><I18nText source={"Based on what you said. If it isn't what you want, carry on and we'll delete everything."} /></p>
+            {error && <p style={{ fontSize: 13, color: "var(--color-danger)", margin: "0 0 12px" }}><I18nText>{error}</I18nText></p>}
             <OfferCard
               offer={offer}
               onAccept={acceptOffer}
@@ -413,25 +402,19 @@ export function ExitSurveyModal({
         {/* ── Step 2b: they took the offer ── */}
         {step === "saved" && (
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 19, fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 8 }}>
-              Done.
-            </div>
+            <div style={{ fontSize: 19, fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 8 }}><I18nText source={"Done."} /></div>
             <p style={{ fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: 20 }}>
-              {savedAction === "email_weekly" && "You'll get one email a week from now on. Your account is untouched."}
-              {savedAction === "email_pause_30" && "All emails are paused for 30 days. Your account is untouched."}
-              {savedAction === "email_off_keep" && "Emails are off. Your account, XP and streak are exactly as they were."}
-              {savedAction === "delete_budget" &&
-                "Your imported statements, transactions and budgets are deleted. Your learning progress is still here."}
-              {savedAction === "report_bug" &&
-                "Thanks. Use Send Feedback in Settings to add anything else and we'll come back to you."}
+              <I18nText>{savedAction === "email_weekly" && "You'll get one email a week from now on. Your account is untouched."}</I18nText>
+              <I18nText>{savedAction === "email_pause_30" && "All emails are paused for 30 days. Your account is untouched."}</I18nText>
+              <I18nText>{savedAction === "email_off_keep" && "Emails are off. Your account, XP and streak are exactly as they were."}</I18nText>
+              <I18nText>{savedAction === "delete_budget" &&
+                "Your imported statements, transactions and budgets are deleted. Your learning progress is still here."}</I18nText>
+              <I18nText>{savedAction === "report_bug" &&
+                "Thanks. Use Send Feedback in Settings to add anything else and we'll come back to you."}</I18nText>
             </p>
-            <button type="button" className="btn btn-primary" onClick={close} style={{ width: "100%", marginBottom: 10 }}>
-              Close
-            </button>
+            <button type="button" className="btn btn-primary" onClick={close} style={{ width: "100%", marginBottom: 10 }}><I18nText source={"Close"} /></button>
             {/* Still leaving is still allowed, without starting over. */}
-            <button type="button" onClick={() => setStep("confirm")} style={ghostBtn}>
-              I still want to delete my account
-            </button>
+            <button type="button" onClick={() => setStep("confirm")} style={ghostBtn}><I18nText source={"I still want to delete my account"} /></button>
           </div>
         )}
 
@@ -439,12 +422,8 @@ export function ExitSurveyModal({
         {step === "confirm" && (
           <div style={{ textAlign: "center" }}>
             <AlertTriangle size={40} style={{ color: "#E03C31", display: "block", margin: "0 auto 12px" }} />
-            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: "var(--color-text-primary)" }}>
-              Delete All My Data?
-            </div>
-            <p style={{ color: "var(--color-text-secondary)", fontSize: 14, marginBottom: 20, lineHeight: 1.5 }}>
-              This permanently deletes your account, XP, progress, and all personal data from Notho. This cannot be undone.
-            </p>
+            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: "var(--color-text-primary)" }}><I18nText source={"Delete All My Data?"} /></div>
+            <p style={{ color: "var(--color-text-secondary)", fontSize: 14, marginBottom: 20, lineHeight: 1.5 }}><I18nText source={"This permanently deletes your account, XP, progress, and all personal data from Notho. This cannot be undone."} /></p>
             <button
               type="button"
               disabled={deleting}
@@ -463,11 +442,9 @@ export function ExitSurveyModal({
                 marginBottom: 10,
               }}
             >
-              {deleting ? "Deleting..." : "Yes, Delete Everything"}
+              <I18nText>{deleting ? "Deleting..." : "Yes, Delete Everything"}</I18nText>
             </button>
-            <button type="button" disabled={deleting} onClick={close} style={ghostBtn}>
-              Cancel
-            </button>
+            <button type="button" disabled={deleting} onClick={close} style={ghostBtn}><I18nText source={"Cancel"} /></button>
           </div>
         )}
       </div>

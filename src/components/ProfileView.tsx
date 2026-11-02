@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -196,7 +197,7 @@ export function FeedbackModal({ open, onClose }: { open: boolean; onClose: () =>
         style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", padding: "24px 20px 40px", width: "100%", maxWidth: 480, maxHeight: "90vh", overflowY: "auto" }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-          <div style={{ fontWeight: 800, fontSize: 18 }}>Send Feedback</div>
+          <div style={{ fontWeight: 800, fontSize: 18 }}><I18nText source={"Send Feedback"} /></div>
           <button type="button" onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)" }}>
             <X size={22} />
           </button>
@@ -205,22 +206,22 @@ export function FeedbackModal({ open, onClose }: { open: boolean; onClose: () =>
         {sent ? (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
             <CheckCircle2 size={48} style={{ color: "var(--color-primary)", margin: "0 auto 12px" }} />
-            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Thank you!</div>
-            <p style={{ fontSize: 14, color: "var(--color-text-secondary)", marginBottom: 20 }}>Your feedback helps us improve Notho.</p>
-            <button type="button" className="btn btn-primary" style={{ width: "100%" }} onClick={onClose}>Close</button>
+            <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}><I18nText source={"Thank you!"} /></div>
+            <p style={{ fontSize: 14, color: "var(--color-text-secondary)", marginBottom: 20 }}><I18nText source={"Your feedback helps us improve Notho."} /></p>
+            <button type="button" className="btn btn-primary" style={{ width: "100%" }} onClick={onClose}><I18nText source={"Close"} /></button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", display: "block", marginBottom: 6 }}>Subject *</label>
-              <input
+              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", display: "block", marginBottom: 6 }}><I18nText source={"Subject *"} /></label>
+              <I18nElement as="input"
                 required value={subject} onChange={(e) => setSubject(e.target.value)}
                 placeholder="Brief summary of your feedback"
                 style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1.5px solid var(--color-border)", fontSize: 14, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }}
               />
             </div>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", display: "block", marginBottom: 6 }}>Description *</label>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", display: "block", marginBottom: 6 }}><I18nText source={"Description *"} /></label>
               <textarea
                 required value={description} onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe your issue or suggestion in detail..."
@@ -229,21 +230,21 @@ export function FeedbackModal({ open, onClose }: { open: boolean; onClose: () =>
               />
             </div>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", display: "block", marginBottom: 6 }}>Type of feedback *</label>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", display: "block", marginBottom: 6 }}><I18nText source={"Type of feedback *"} /></label>
               <select
                 required value={issueType} onChange={(e) => setIssueType(e.target.value)}
                 style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1.5px solid var(--color-border)", fontSize: 14, background: "var(--color-bg)", color: issueType ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}
               >
-                <option value="">Please select one...</option>
-                <option value="bug">Bug report</option>
-                <option value="feature">Feature request</option>
-                <option value="lesson-content">Lesson content issue</option>
-                <option value="account">Account issue</option>
-                <option value="other">Other</option>
+                <I18nElement as="option" value="">Please select one...</I18nElement>
+                <I18nElement as="option" value="bug">Bug report</I18nElement>
+                <I18nElement as="option" value="feature">Feature request</I18nElement>
+                <I18nElement as="option" value="lesson-content">Lesson content issue</I18nElement>
+                <I18nElement as="option" value="account">Account issue</I18nElement>
+                <I18nElement as="option" value="other">Other</I18nElement>
               </select>
             </div>
             <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: 4 }} disabled={sending}>
-              {sending ? "Sending..." : "Send Feedback"}
+              <I18nText>{sending ? "Sending..." : "Send Feedback"}</I18nText>
             </button>
           </form>
         )}
@@ -264,14 +265,14 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
         <button type="button" onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-primary)", display: "flex" }}>
           <ArrowLeft size={22} />
         </button>
-        <div style={{ fontSize: 18, fontWeight: 800 }}>{titles[page]}</div>
+        <div style={{ fontSize: 18, fontWeight: 800 }}><I18nText>{titles[page]}</I18nText></div>
       </div>
 
       {page === "faq" && (
         <div>
           {NOTHO_FAQ.map((section) => (
             <div key={section.section} style={{ marginBottom: 24 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 10 }}>{section.section}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 10 }}><I18nText>{section.section}</I18nText></div>
               <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, overflow: "hidden" }}>
                 {section.items.map((item, i) => {
                   const key = section.section + i;
@@ -283,11 +284,11 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
                         onClick={() => setOpenFaq(isOpen ? null : key)}
                         style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left", gap: 12 }}
                       >
-                        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}>{item.q}</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}><I18nText>{item.q}</I18nText></span>
                         <ChevronRight size={16} style={{ color: "var(--color-text-secondary)", flexShrink: 0, transform: isOpen ? "rotate(90deg)" : "none", transition: "transform 0.2s" }} />
                       </button>
                       {isOpen && (
-                        <div style={{ padding: "0 16px 14px", fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{item.a}</div>
+                        <div style={{ padding: "0 16px 14px", fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.6 }}><I18nText>{item.a}</I18nText></div>
                       )}
                     </div>
                   );
@@ -296,8 +297,8 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
             </div>
           ))}
           <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 20, marginTop: 8, textAlign: "center" }}>
-            <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Still unsure about something?</div>
-            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 16 }}>Our team is happy to help. Send us a message and we'll respond within 2 business days.</p>
+            <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}><I18nText source={"Still unsure about something?"} /></div>
+            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 16 }}><I18nText source={"Our team is happy to help. Send us a message and we'll respond within 2 business days."} /></p>
             <button
               type="button"
               onClick={onFeedback}
@@ -305,15 +306,14 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
               style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "14px 20px", fontSize: 15, fontWeight: 700 }}
             >
               <MessageSquare size={18} />
-              Send Feedback
-            </button>
+              <I18nText source={"Send Feedback"} /></button>
           </div>
         </div>
       )}
 
       {page === "privacy" && (
         <div style={{ fontSize: 14, lineHeight: 1.7, color: "var(--color-text-primary)" }}>
-          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 20 }}>Last revised: 9 August 2026</p>
+          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 20 }}><I18nText source={"Last revised: 9 August 2026"} /></p>
           {[
             { title: "1. General", body: "Notho (\"we\", \"us\") cares about your personal information. This Privacy Policy explains how we collect, use, and protect it when you use the Notho app and related services. By using the service, you agree to the practices described here." },
             { title: "2. Information We Collect", body: "We collect: (a) your email address and display name when you register; (b) your learning progress including lessons completed, XP earned, and streaks; (c) budget entries you create - these are stored securely and only accessible to you; (d) anonymised, aggregated budget data for the community benchmarking feature; (e) app usage data such as which lessons you viewed and how long you spent." },
@@ -327,8 +327,8 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
             { title: "9. Contact", body: "For all privacy enquiries, contact our team at privacy@notho.co.za." },
           ].map((s) => (
             <div key={s.title} style={{ marginBottom: 20 }}>
-              <div style={{ fontWeight: 800, marginBottom: 6 }}>{s.title}</div>
-              <p style={{ color: "var(--color-text-secondary)" }}>{s.body}</p>
+              <div style={{ fontWeight: 800, marginBottom: 6 }}><I18nText>{s.title}</I18nText></div>
+              <p style={{ color: "var(--color-text-secondary)" }}><I18nText>{s.body}</I18nText></p>
             </div>
           ))}
         </div>
@@ -336,7 +336,7 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
 
       {page === "terms" && (
         <div style={{ fontSize: 14, lineHeight: 1.7, color: "var(--color-text-primary)" }}>
-          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 20 }}>Last revised: 5 April 2026</p>
+          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 20 }}><I18nText source={"Last revised: 5 April 2026"} /></p>
           {[
             { title: "1. Acceptance of Terms", body: "By accessing or using Notho (\"Service\"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Service. We may update these terms and will notify you of material changes via the app." },
             { title: "2. Description of Service", body: "Notho is a financial literacy app that provides educational content, budgeting tools, and gamified learning experiences. It is designed for general financial education purposes only and does not constitute financial advice." },
@@ -350,15 +350,14 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
             { title: "10. Contact", body: "For any questions about these Terms, contact us at legal@notho.co.za." },
           ].map((s) => (
             <div key={s.title} style={{ marginBottom: 20 }}>
-              <div style={{ fontWeight: 800, marginBottom: 6 }}>{s.title}</div>
-              <p style={{ color: "var(--color-text-secondary)" }}>{s.body}</p>
+              <div style={{ fontWeight: 800, marginBottom: 6 }}><I18nText>{s.title}</I18nText></div>
+              <p style={{ color: "var(--color-text-secondary)" }}><I18nText>{s.body}</I18nText></p>
             </div>
           ))}
           <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 20, marginTop: 16, textAlign: "center" }}>
-            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 14 }}>Questions about these terms? We're happy to help.</p>
+            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 14 }}><I18nText source={"Questions about these terms? We're happy to help."} /></p>
             <button type="button" className="btn btn-secondary" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }} onClick={onFeedback}>
-              <MessageSquare size={16} /> Contact Us
-            </button>
+              <MessageSquare size={16} /> <I18nText source={" Contact Us"} /></button>
           </div>
         </div>
       )}
@@ -609,9 +608,9 @@ export function ProfileView({
     <main >
       {/* Page header with gear icon */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-        <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--color-text-primary)" }}>Profile</h2>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--color-text-primary)" }}><I18nText source={"Profile"} /></h2>
         {onGoToSettings && (
-          <button
+          <I18nElement as="button"
             type="button"
             onClick={onGoToSettings}
             aria-label="Settings"
@@ -627,7 +626,7 @@ export function ProfileView({
               <circle cx="12" cy="12" r="3" />
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
-          </button>
+          </I18nElement>
         )}
       </div>
 
@@ -642,9 +641,9 @@ export function ProfileView({
           boxShadow: "0 4px 16px rgba(0,122,133,0.25)",
         }}>{initials}</div>
         <div style={{ fontWeight: 800, fontSize: 22, marginBottom: 2 }}>{displayName.split(" ")[0]}</div>
-        <div style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>Financial Learner · Level {userData.level}</div>
+        <div style={{ fontSize: 13, color: "var(--color-text-secondary)" }}><I18nText source={"Financial Learner · Level {value0}"} values={[userData.level]} preserveValues={[true]} /></div>
         {learningSince && (
-          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 4 }}>{learningSince}</div>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 4 }}><I18nText>{learningSince}</I18nText></div>
         )}
         {profileEmail && (
           <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 4 }}>{profileEmail}</div>
@@ -654,7 +653,7 @@ export function ProfileView({
           return (
             <div className={`mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm ${st.bg} ${st.darkBg} ${st.color}`}>
               <Award size={16} className="shrink-0" aria-hidden />
-              <span>{investorProfileLabel} Investor</span>
+              <span><I18nText source={"{value0} Investor"} values={[investorProfileLabel]} /></span>
             </div>
           );
         })()}
@@ -666,21 +665,20 @@ export function ProfileView({
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 14 }}>
               <Target size={16} style={{ color: "var(--color-primary)" }} aria-hidden />
-              My Goal
-            </div>
+              <I18nText source={"My Goal"} /></div>
             <button
               onClick={() => { setProfileGoalEditId(profileGoal ?? ""); setProfileGoalEditDesc(profileGoalDescription ?? ""); setShowProfileGoalEdit(true); }}
               style={{ background: "none", border: "1px solid var(--color-border)", borderRadius: 8, padding: "4px 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "var(--color-primary)" }}
-            >Edit</button>
+            ><I18nText source={"Edit"} /></button>
           </div>
           <p style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)", marginBottom: profileGoalDescription ? 4 : 0 }}>
-            {GOAL_OPTIONS.find((g) => g.id === profileGoal)?.label ?? profileGoal}
+            <I18nText>{GOAL_OPTIONS.find((g) => g.id === profileGoal)?.label ?? profileGoal}</I18nText>
           </p>
           {profileGoalDescription && (
             <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.5 }}>{profileGoalDescription}</p>
           )}
           {!profileGoalDescription && (
-            <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 4, fontStyle: "italic" }}>Tap Edit to describe your goal in more detail.</p>
+            <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 4, fontStyle: "italic" }}><I18nText source={"Tap Edit to describe your goal in more detail."} /></p>
           )}
         </div>
       )}
@@ -689,7 +687,7 @@ export function ProfileView({
       {showProfileGoalEdit && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 600, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
           <div style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", padding: "24px 20px 32px", width: "100%", maxWidth: 480, maxHeight: "85vh", overflowY: "auto" }}>
-            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 16 }}>Edit My Goal</div>
+            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 16 }}><I18nText source={"Edit My Goal"} /></div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
               {ONBOARDING_GOAL_OPTIONS.map((g) => {
                 const sel = profileGoalEditId === g.id;
@@ -702,7 +700,7 @@ export function ProfileView({
                     display: "flex", alignItems: "center", gap: 6,
                   }}>
                     <g.Icon size={16} />
-                    {g.label}
+                    <I18nText>{g.label}</I18nText>
                   </button>
                 );
               })}
@@ -715,7 +713,7 @@ export function ProfileView({
               style={{ width: "100%", borderRadius: 10, border: "1.5px solid var(--color-border)", padding: "10px 12px", fontSize: 14, background: "var(--color-surface)", color: "var(--color-text-primary)", resize: "none", boxSizing: "border-box", marginBottom: 14 }}
             />
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setShowProfileGoalEdit(false)} style={{ flex: 1, padding: "12px", borderRadius: 12, border: "1.5px solid var(--color-border)", background: "transparent", color: "var(--color-text-primary)", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setShowProfileGoalEdit(false)} style={{ flex: 1, padding: "12px", borderRadius: 12, border: "1.5px solid var(--color-border)", background: "transparent", color: "var(--color-text-primary)", fontWeight: 600, cursor: "pointer" }}><I18nText source={"Cancel"} /></button>
               <button
                 disabled={!profileGoalEditId || (profileGoalEditId === "other" && !profileGoalEditDesc.trim())}
                 onClick={async () => {
@@ -732,7 +730,7 @@ export function ProfileView({
                   }
                 }}
                 style={{ flex: 2, padding: "12px", borderRadius: 12, border: "none", background: "var(--color-primary)", color: "#fff", fontWeight: 700, cursor: "pointer", opacity: (!profileGoalEditId || (profileGoalEditId === "other" && !profileGoalEditDesc.trim())) ? 0.5 : 1 }}
-              >Save Goal</button>
+              ><I18nText source={"Save Goal"} /></button>
             </div>
           </div>
         </div>
@@ -743,36 +741,31 @@ export function ProfileView({
         <div style={{ background: "linear-gradient(135deg, rgba(0,122,133,0.07) 0%, rgba(239,179,67,0.05) 100%)", border: "1px solid rgba(0,122,133,0.2)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 14, marginBottom: 8 }}>
             <TrendingUp size={16} style={{ color: "var(--color-primary)" }} aria-hidden />
-            My Savings Projection
-          </div>
-          <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 10 }}>
-            {savedProjection.frequency === "once-off"
+            <I18nText source={"My Savings Projection"} /></div>
+          <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 10 }}><I18nText source={"{value0}{value1}{value2}% return{value3}{value4} years"} values={[savedProjection.frequency === "once-off"
               ? `R${formatWithSpaces(savedProjection.principal)} once-off`
-              : `R${formatWithSpaces(savedProjection.monthly)}/month`}
-            {" · "}{savedProjection.rate}% return{" · "}{savedProjection.years} years
-          </p>
+              : `R${formatWithSpaces(savedProjection.monthly)}/month`, " · ", savedProjection.rate, " · ", savedProjection.years]} /></p>
           <div style={{ display: "flex", gap: 10 }}>
             <div style={{ flex: 1, background: "var(--color-surface)", borderRadius: 10, padding: "10px 14px", border: "1px solid var(--color-border)", textAlign: "center" }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>Projected Value</div>
-              <div style={{ fontSize: 17, fontWeight: 900, color: "var(--color-primary)" }}>{formatRand(projectionFinalValue)}</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}><I18nText source={"Projected Value"} /></div>
+              <div style={{ fontSize: 17, fontWeight: 900, color: "var(--color-primary)" }}><I18nText>{formatRand(projectionFinalValue)}</I18nText></div>
             </div>
             <div style={{ flex: 1, background: "var(--color-surface)", borderRadius: 10, padding: "10px 14px", border: "1px solid var(--color-border)", textAlign: "center" }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>Time Horizon</div>
-              <div style={{ fontSize: 17, fontWeight: 900, color: "var(--color-text-primary)" }}>{savedProjection.years} yrs</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}><I18nText source={"Time Horizon"} /></div>
+              <div style={{ fontSize: 17, fontWeight: 900, color: "var(--color-text-primary)" }}><I18nText source={"{value0} yrs"} values={[savedProjection.years]} /></div>
             </div>
           </div>
           <button type="button" onClick={() => { localStorage.removeItem("notho-calc-saved"); setSavedProjection(null); setProjectionFinalValue(null); onClearCalcSaved?.(); }}
             style={{ marginTop: 12, width: "100%", padding: "9px", borderRadius: 10, border: "1.5px solid rgba(220,38,38,0.35)", background: "rgba(220,38,38,0.06)", color: "#dc2626", fontWeight: 700, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-            <Trash2 size={14} /> Remove Projection
-          </button>
+            <Trash2 size={14} /> <I18nText source={" Remove Projection"} /></button>
         </div>
       )}
 
       {needsProfileUpdate && !editingProfile && (
         <div style={{ background: "var(--color-primary-light, #E8F5EE)", border: "1.5px solid var(--color-primary)", borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4, color: "var(--color-primary)" }}>Complete your profile</div>
-          <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 12 }}>Add your name so we can personalise your experience.</div>
-          <button type="button" className="btn btn-primary" style={{ width: "100%" }} onClick={() => { setEditingProfile(true); if (!editFirstName && profileName) { const parts = profileName.split(" "); setEditFirstName(parts[0] ?? ""); setEditLastName(parts.slice(1).join(" ") ?? ""); } }}>Add details</button>
+          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4, color: "var(--color-primary)" }}><I18nText source={"Complete your profile"} /></div>
+          <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 12 }}><I18nText source={"Add your name so we can personalise your experience."} /></div>
+          <button type="button" className="btn btn-primary" style={{ width: "100%" }} onClick={() => { setEditingProfile(true); if (!editFirstName && profileName) { const parts = profileName.split(" "); setEditFirstName(parts[0] ?? ""); setEditLastName(parts.slice(1).join(" ") ?? ""); } }}><I18nText source={"Add details"} /></button>
         </div>
       )}
 
@@ -785,34 +778,32 @@ export function ProfileView({
           { label: "Lessons", value: userData.totalCompleted, color: "var(--color-text-primary)" },
         ].map((stat, i, arr) => (
           <div key={stat.label} style={{ flex: 1, textAlign: "center", padding: "14px 8px", borderRight: i < arr.length - 1 ? "1px solid var(--color-border)" : "none" }}>
-            <div style={{ fontSize: 20, fontWeight: 900, color: stat.color }}>{stat.value}</div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{stat.label}</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: stat.color }}><I18nText>{stat.value}</I18nText></div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}><I18nText>{stat.label}</I18nText></div>
           </div>
         ))}
       </div>
       <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, marginBottom: 16, padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Streak freezes</div>
-          <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginTop: 2 }}>Apply automatically if you miss a day. 200 XP each.</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}><I18nText source={"Streak freezes"} /></div>
+          <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={"Apply automatically if you miss a day. 200 XP each."} /></div>
         </div>
-        <div style={{ fontSize: 18, fontWeight: 900, color: (userData.freezeCount ?? 0) > 0 ? "#3B82F6" : "var(--color-text-secondary)", whiteSpace: "nowrap" }}>{userData.freezeCount ?? 0}/2</div>
+        <div style={{ fontSize: 18, fontWeight: 900, color: (userData.freezeCount ?? 0) > 0 ? "#3B82F6" : "var(--color-text-secondary)", whiteSpace: "nowrap" }}><I18nText>{userData.freezeCount ?? 0}</I18nText>/2</div>
       </div>
 
       {saveToast && (
-        <div style={{ background: "rgba(0,122,133,0.12)", border: "1px solid var(--color-primary)", borderRadius: 12, padding: "10px 14px", marginBottom: 12, fontSize: 14, fontWeight: 600, color: "var(--color-primary)" }}>{saveToast}</div>
+        <div style={{ background: "rgba(0,122,133,0.12)", border: "1px solid var(--color-primary)", borderRadius: 12, padding: "10px 14px", marginBottom: 12, fontSize: 14, fontWeight: 600, color: "var(--color-primary)" }}><I18nText>{saveToast}</I18nText></div>
       )}
 
       <div style={{ marginBottom: 16, display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button type="button" className="btn btn-secondary" onClick={() => { setEditingProfile(true); const parts = profileName.split(" "); setEditFirstName(parts[0] ?? ""); setEditLastName(parts.slice(1).join(" ") ?? ""); }}>
-          Edit Profile
-        </button>
+        <button type="button" className="btn btn-secondary" onClick={() => { setEditingProfile(true); const parts = profileName.split(" "); setEditFirstName(parts[0] ?? ""); setEditLastName(parts.slice(1).join(" ") ?? ""); }}><I18nText source={"Edit Profile"} /></button>
       </div>
 
       {editingProfile && (
         <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
-          <div style={{ fontWeight: 700, marginBottom: 10 }}>Profile details</div>
+          <div style={{ fontWeight: 700, marginBottom: 10 }}><I18nText source={"Profile details"} /></div>
           <div style={{ marginBottom: 8 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)" }}>Account email</label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)" }}><I18nText source={"Account email"} /></label>
             <input
               type="email"
               value={profileEmail}
@@ -833,12 +824,12 @@ export function ProfileView({
             />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8, marginBottom: 8 }}>
-            <input type="text" placeholder="First name" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 13, boxSizing: "border-box" }} />
-            <input type="text" placeholder="Last name" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 13, boxSizing: "border-box" }} />
+            <I18nElement as="input" type="text" placeholder="First name" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 13, boxSizing: "border-box" }} />
+            <I18nElement as="input" type="text" placeholder="Last name" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 13, boxSizing: "border-box" }} />
           </div>
           <div style={{ marginBottom: 8 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)" }}>Username</label>
-            <input
+            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)" }}><I18nText source={"Username"} /></label>
+            <I18nElement as="input"
               type="text"
               autoCorrect="off"
               spellCheck={false}
@@ -848,19 +839,19 @@ export function ProfileView({
               style={{ width: "100%", marginTop: 4, padding: "8px 10px", borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 13, boxSizing: "border-box" as const }}
             />
           </div>
-          <input type="number" placeholder="Age (optional)" value={editAge} min={13} max={120} onChange={(e) => setEditAge(e.target.value.replace(/\D/g, ""))}
+          <I18nElement as="input" type="number" placeholder="Age (optional)" value={editAge} min={13} max={120} onChange={(e) => setEditAge(e.target.value.replace(/\D/g, ""))}
             style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 13, marginBottom: 8, boxSizing: "border-box" as const }} />
           <div style={{ marginBottom: 8 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)" }}>Daily XP goal</label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)" }}><I18nText source={"Daily XP goal"} /></label>
             <select value={dailyGoal} onChange={(e) => { const v = parseInt(e.target.value, 10); setDailyGoal(v); }}
               style={{ width: "100%", marginTop: 4, padding: "8px 10px", borderRadius: 8, border: "1px solid var(--color-border)", fontSize: 13 }}>
-              {[25, 50, 100, 150, 200].map((g) => (<option key={g} value={g}>{g} XP / day</option>))}
+              {[25, 50, 100, 150, 200].map((g) => (<I18nElement as="option" key={g} value={g}>{g} XP / day</I18nElement>))}
             </select>
           </div>
-          {saveError && <p style={{ color: "var(--error-red)", fontSize: 12 }}>{saveError}</p>}
+          {saveError && <p style={{ color: "var(--error-red)", fontSize: 12 }}><I18nText>{saveError}</I18nText></p>}
           <div style={{ display: "flex", gap: 8 }}>
-            <button type="button" className="btn btn-primary" style={{ flex: 1 }} disabled={saving} onClick={handleSaveProfile}>{saving ? "Saving..." : "Save"}</button>
-            <button type="button" className="btn btn-secondary" onClick={() => { setEditingProfile(false); setSaveError(null); }}>Cancel</button>
+            <button type="button" className="btn btn-primary" style={{ flex: 1 }} disabled={saving} onClick={handleSaveProfile}><I18nText>{saving ? "Saving..." : "Save"}</I18nText></button>
+            <button type="button" className="btn btn-secondary" onClick={() => { setEditingProfile(false); setSaveError(null); }}><I18nText source={"Cancel"} /></button>
           </div>
         </div>
       )}
@@ -868,22 +859,22 @@ export function ProfileView({
       {/* Investor Profile card */}
       <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
-          <div style={{ fontWeight: 800 }}>Investor Profile</div>
+          <div style={{ fontWeight: 800 }}><I18nText source={"Investor Profile"} /></div>
           {investorProfileLabel && (() => {
             const st = INVESTOR_PROFILE_STYLES[investorProfileLabel] ?? INVESTOR_PROFILE_STYLES["Moderate"];
             return (
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${st.bg} ${st.darkBg} ${st.color}`}>
                 <Award size={14} className="shrink-0" aria-hidden />
-                {investorProfileLabel}
+                <I18nText>{investorProfileLabel}</I18nText>
               </span>
             );
           })()}
         </div>
         <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 10 }}>
-          {investorProfileLabel ? `Your style: ${investorProfileLabel}` : "Take a 10-question quiz to see how you think about risk and investing."}
+          <I18nText>{investorProfileLabel ? `Your style: ${investorProfileLabel}` : "Take a 10-question quiz to see how you think about risk and investing."}</I18nText>
         </p>
         <button type="button" className="btn btn-primary" onClick={() => { setInvestorQuizOpen(true); setQuizIdx(0); setQuizScores([]); setQuizSelected(null); }}>
-          {investorProfileLabel ? "Retake Quiz" : "Take Quiz"}
+          <I18nText>{investorProfileLabel ? "Retake Quiz" : "Take Quiz"}</I18nText>
         </button>
       </div>
 
@@ -897,11 +888,11 @@ export function ProfileView({
               return (
                 <div>
                   <div className="flex justify-center mb-2"><Award size={56} style={{ color: res.color }} aria-hidden /></div>
-                  <h2 className="text-xl font-black text-center text-gray-900 dark:text-white">{res.profile} Investor</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-3">{res.description}</p>
-                  <p className="text-xs font-semibold mt-3 text-gray-700 dark:text-gray-200">{res.allocation}</p>
+                  <h2 className="text-xl font-black text-center text-gray-900 dark:text-white"><I18nText source={"{value0} Investor"} values={[res.profile]} /></h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-3"><I18nText>{res.description}</I18nText></p>
+                  <p className="text-xs font-semibold mt-3 text-gray-700 dark:text-gray-200"><I18nText>{res.allocation}</I18nText></p>
                   <ul className="text-sm mt-2 list-disc pl-5 text-gray-700 dark:text-gray-200">
-                    {res.products.map((p) => <li key={p}>{p}</li>)}
+                    {res.products.map((p) => <li key={p}><I18nText>{p}</I18nText></li>)}
                   </ul>
                   <div className="flex flex-col gap-2 mt-6">
                     <button type="button" className="btn btn-primary w-full" onClick={async () => {
@@ -916,24 +907,24 @@ export function ProfileView({
                       setInvestorQuizOpen(false);
                       setSaveToast("Investor profile saved.");
                       setTimeout(() => setSaveToast(null), 2500);
-                    }}>Save to Profile</button>
-                    <button type="button" className="btn btn-secondary w-full" onClick={() => { setQuizIdx(0); setQuizScores([]); setQuizSelected(null); }}>Retake Quiz</button>
-                    <button type="button" className="btn btn-secondary w-full" onClick={() => setInvestorQuizOpen(false)}>Close</button>
+                    }}><I18nText source={"Save to Profile"} /></button>
+                    <button type="button" className="btn btn-secondary w-full" onClick={() => { setQuizIdx(0); setQuizScores([]); setQuizSelected(null); }}><I18nText source={"Retake Quiz"} /></button>
+                    <button type="button" className="btn btn-secondary w-full" onClick={() => setInvestorQuizOpen(false)}><I18nText source={"Close"} /></button>
                   </div>
                 </div>
               );
             })() : (
               <div>
-                <div className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">Question {quizIdx + 1} of {INVESTOR_QUIZ_QUESTIONS.length}</div>
+                <div className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2"><I18nText source={"Question {value0} of {value1}"} values={[quizIdx + 1, INVESTOR_QUIZ_QUESTIONS.length]} /></div>
                 <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full mb-4">
                   <div className="h-2 bg-green-600 rounded-full transition-all" style={{ width: `${((quizIdx + 1) / INVESTOR_QUIZ_QUESTIONS.length) * 100}%` }} />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{INVESTOR_QUIZ_QUESTIONS[quizIdx].question}</h3>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4"><I18nText>{INVESTOR_QUIZ_QUESTIONS[quizIdx].question}</I18nText></h3>
                 <div className="flex flex-col gap-2">
                   {INVESTOR_QUIZ_QUESTIONS[quizIdx].options.map((opt, oi) => (
                     <button key={oi} type="button"
                       className={`text-left px-4 py-3 rounded-xl border-2 transition-colors text-gray-900 dark:text-gray-100 ${quizSelected === oi ? "border-green-600 bg-green-50 dark:bg-green-900/30 dark:border-green-500" : "border-gray-200 dark:border-gray-600 hover:border-green-600 dark:hover:border-green-500"}`}
-                      onClick={() => setQuizSelected(oi)}>{opt.text}</button>
+                      onClick={() => setQuizSelected(oi)}><I18nText>{opt.text}</I18nText></button>
                   ))}
                 </div>
                 <button type="button" className="btn btn-primary w-full mt-4" disabled={quizSelected === null} onClick={() => {
@@ -943,8 +934,8 @@ export function ProfileView({
                   setQuizScores((prev) => [...prev, opt.score]);
                   setQuizIdx((i) => i + 1);
                   setQuizSelected(null);
-                }}>Next</button>
-                <button type="button" className="mt-3 w-full text-sm text-gray-500 dark:text-gray-400" onClick={() => setInvestorQuizOpen(false)}>Cancel</button>
+                }}><I18nText source={"Next"} /></button>
+                <button type="button" className="mt-3 w-full text-sm text-gray-500 dark:text-gray-400" onClick={() => setInvestorQuizOpen(false)}><I18nText source={"Cancel"} /></button>
               </div>
             )}
           </div>
@@ -955,10 +946,10 @@ export function ProfileView({
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
           <Trophy size={18} style={{ color: "var(--color-primary)" }} aria-hidden />
-          <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}>Your Badges</span>
+          <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}><I18nText source={"Your Badges"} /></span>
         </div>
         {earnedBadges.length === 0 ? (
-          <p style={{ color: "var(--color-text-secondary)", fontSize: 14, textAlign: "center", padding: "16px 0" }}>Complete lessons to earn your first badge!</p>
+          <p style={{ color: "var(--color-text-secondary)", fontSize: 14, textAlign: "center", padding: "16px 0" }}><I18nText source={"Complete lessons to earn your first badge!"} /></p>
         ) : (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
@@ -967,15 +958,15 @@ export function ProfileView({
                   style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, background: "var(--color-surface)", border: "1.5px solid var(--color-border)", borderRadius: 14, padding: "14px 8px", cursor: "pointer", transition: "transform 0.15s", color: "var(--color-primary)" }}
                   onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
                   onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}>
-                  <span style={{ color: "var(--color-primary)" }}>{badge.icon}</span>
-                  <span style={{ fontSize: 11, fontWeight: 600, textAlign: "center", color: "var(--color-text-primary)" }}>{badge.name}</span>
+                  <span style={{ color: "var(--color-primary)" }}><I18nText>{badge.icon}</I18nText></span>
+                  <span style={{ fontSize: 11, fontWeight: 600, textAlign: "center", color: "var(--color-text-primary)" }}><I18nText>{badge.name}</I18nText></span>
                 </button>
               ))}
             </div>
             {earnedBadges.length > 3 && (
               <button type="button" onClick={() => setShowAllBadges((v) => !v)}
                 style={{ marginTop: 10, width: "100%", padding: "9px", borderRadius: 10, border: "1.5px solid var(--color-border)", background: "transparent", color: "var(--color-primary)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-                {showAllBadges ? "Show less" : `View all ${earnedBadges.length} badges`}
+                <I18nText>{showAllBadges ? "Show less" : `View all ${earnedBadges.length} badges`}</I18nText>
               </button>
             )}
           </>
@@ -1019,9 +1010,9 @@ export function ProfileView({
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <BarChart2 size={18} style={{ color: primaryColor }} />
-                <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}>This Week&apos;s XP</span>
+                <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}><I18nText source={"This Week's XP"} /></span>
               </div>
-              <span style={{ fontSize: 13, fontWeight: 800, color: primaryColor }}>{weekTotal} XP</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: primaryColor }}><I18nText source={"{value0} XP"} values={[weekTotal]} /></span>
             </div>
             <ResponsiveContainer width="100%" height={140}>
               <BarChart data={weekData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }} barCategoryGap="25%">
@@ -1078,7 +1069,7 @@ export function ProfileView({
           <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
               <Award size={18} style={{ color: "#EFB343" }} />
-              <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}>Personal Bests</span>
+              <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}><I18nText source={"Personal Bests"} /></span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
               {[
@@ -1087,9 +1078,9 @@ export function ProfileView({
                 { label: "Total Lessons", value: String(userData.totalCompleted), icon: <BookOpen size={20} style={{ color: "var(--color-primary)" }} /> },
               ].map((pb) => (
                 <div key={pb.label} style={{ textAlign: "center", padding: "12px 6px", background: "var(--color-bg)", borderRadius: 10, border: "1px solid var(--color-border)" }}>
-                  <div style={{ marginBottom: 6 }}>{pb.icon}</div>
-                  <div style={{ fontSize: 16, fontWeight: 900, color: "var(--color-text-primary)" }}>{pb.value}</div>
-                  <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", marginTop: 2 }}>{pb.label}</div>
+                  <div style={{ marginBottom: 6 }}><I18nText>{pb.icon}</I18nText></div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: "var(--color-text-primary)" }}><I18nText>{pb.value}</I18nText></div>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText>{pb.label}</I18nText></div>
                 </div>
               ))}
             </div>
@@ -1101,7 +1092,7 @@ export function ProfileView({
       <div style={{ marginBottom: 16 }}>
         <button type="button" onClick={() => setShowMore((v) => !v)}
           style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: "14px 16px", cursor: "pointer" }}>
-          <span style={{ fontWeight: 700, fontSize: 14 }}>More</span>
+          <span style={{ fontWeight: 700, fontSize: 14 }}><I18nText source={"More"} /></span>
           <ChevronRight size={18} style={{ color: "var(--color-text-secondary)", transform: showMore ? "rotate(90deg)" : "none", transition: "transform 0.2s" }} />
         </button>
         {showMore && (
@@ -1110,7 +1101,7 @@ export function ProfileView({
               <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <BookOpen size={16} style={{ color: "var(--color-primary)" }} />
-                  <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}>Topic Mastery</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}><I18nText source={"Topic Mastery"} /></span>
                 </div>
                 {courses.map((course) => {
                   const totalLessons = course.units.reduce((s: number, u: Unit) => s + u.lessons.length, 0);
@@ -1121,13 +1112,13 @@ export function ProfileView({
                   return (
                     <div key={course.id} style={{ marginBottom: 12 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13 }}>
-                        <span style={{ fontWeight: 600 }}>{course.title}</span>
-                        <span style={{ fontWeight: 700, fontSize: 12, color: pct === 100 ? "#007A85" : "var(--color-text-secondary)" }}>{pct}%</span>
+                        <span style={{ fontWeight: 600 }}><I18nText>{course.title}</I18nText></span>
+                        <span style={{ fontWeight: 700, fontSize: 12, color: pct === 100 ? "#007A85" : "var(--color-text-secondary)" }}><I18nText>{pct}</I18nText>%</span>
                       </div>
                       <div style={{ height: 7, borderRadius: 4, background: "var(--color-border)", overflow: "hidden" }}>
                         <div style={{ height: "100%", borderRadius: 4, background: pct === 100 ? "#007A85" : "var(--color-primary)", width: `${pct}%`, transition: "width 0.4s ease" }} />
                       </div>
-                      <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>{completedCount}/{totalLessons} lessons</div>
+                      <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={"{value0}/{value1} lessons"} values={[completedCount, totalLessons]} /></div>
                     </div>
                   );
                 })}
@@ -1136,7 +1127,7 @@ export function ProfileView({
             <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <BookOpen size={16} style={{ color: "var(--color-primary)" }} />
-                <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}>Recommended Reading</span>
+                <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)" }}><I18nText source={"Recommended Reading"} /></span>
               </div>
               <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 8 }}>
                 {RECOMMENDED_READING_BOOKS.map((book) => {
@@ -1144,9 +1135,9 @@ export function ProfileView({
                   return (
                     <div key={book.title} style={{ minWidth: 170, background: "var(--color-bg)", border: `1.5px solid ${book.color}40`, borderRadius: 14, padding: "12px 12px 10px", flexShrink: 0, borderTop: `4px solid ${book.color}` }}>
                       <div style={{ marginBottom: 6, color: book.color }}><BookIcon size={24} /></div>
-                      <div style={{ fontWeight: 800, fontSize: 12, marginBottom: 2, color: "var(--color-text-primary)" }}>{book.title}</div>
-                      <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 6 }}>{book.author}</div>
-                      <div style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.4 }}>{book.lesson}</div>
+                      <div style={{ fontWeight: 800, fontSize: 12, marginBottom: 2, color: "var(--color-text-primary)" }}><I18nText>{book.title}</I18nText></div>
+                      <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText>{book.author}</I18nText></div>
+                      <div style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.4 }}><I18nText>{book.lesson}</I18nText></div>
                     </div>
                   );
                 })}
@@ -1156,8 +1147,7 @@ export function ProfileView({
               className="btn btn-primary"
               style={{ width: "100%", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, textDecoration: "none", boxSizing: "border-box" as const }}>
               <ExternalLink size={16} aria-hidden />
-              Free Financial Guides
-            </a>
+              <I18nText source={"Free Financial Guides"} /></a>
           </div>
         )}
       </div>
@@ -1179,10 +1169,10 @@ export function ProfileView({
           style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center", padding: 16 }}>
           <div onClick={(e) => e.stopPropagation()}
             style={{ background: "var(--color-surface)", borderRadius: "20px 20px 14px 14px", padding: "28px 24px 24px", width: "100%", maxWidth: 400, textAlign: "center" }}>
-            <div style={{ color: "var(--color-primary)", marginBottom: 8, display: "flex", justifyContent: "center" }}>{selectedBadge.icon}</div>
-            <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6, color: "var(--color-text-primary)" }}>{selectedBadge.name}</div>
-            <p style={{ color: "var(--color-text-secondary)", marginBottom: 16, fontSize: 14 }}>{selectedBadge.desc}</p>
-            <button className="btn btn-primary" onClick={() => setSelectedBadge(null)}>Got it</button>
+            <div style={{ color: "var(--color-primary)", marginBottom: 8, display: "flex", justifyContent: "center" }}><I18nText>{selectedBadge.icon}</I18nText></div>
+            <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6, color: "var(--color-text-primary)" }}><I18nText>{selectedBadge.name}</I18nText></div>
+            <p style={{ color: "var(--color-text-secondary)", marginBottom: 16, fontSize: 14 }}><I18nText>{selectedBadge.desc}</I18nText></p>
+            <button className="btn btn-primary" onClick={() => setSelectedBadge(null)}><I18nText source={"Got it"} /></button>
           </div>
         </div>
       )}

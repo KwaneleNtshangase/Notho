@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -63,8 +64,8 @@ export function AppleAuthGuard() {
         boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
       }}
     >
-      <div style={{ fontWeight: 700, marginBottom: 4 }}>Apple sign-in needs an email</div>
-      {message}
+      <div style={{ fontWeight: 700, marginBottom: 4 }}><I18nText source={"Apple sign-in needs an email"} /></div>
+      <I18nText>{message}</I18nText>
       <button
         type="button"
         onClick={() => setMessage(null)}
@@ -79,9 +80,7 @@ export function AppleAuthGuard() {
           padding: 0,
           fontSize: 13,
         }}
-      >
-        Dismiss
-      </button>
+      ><I18nText source={"Dismiss"} /></button>
     </div>
   );
 }

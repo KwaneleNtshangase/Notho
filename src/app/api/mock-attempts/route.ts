@@ -1,3 +1,4 @@
+import { localizedMockJson } from "@/server/localizeMock";
 import { NextRequest } from "next/server";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { createServiceSupabase } from "@/lib/supabaseServer";
@@ -9,7 +10,6 @@ import { validateStartBody } from "@/lib/mockAttempts/validation";
 import { buildRe5MockQuestionManifest } from "@/server/re5MockBank";
 import {
   auditMockEvent,
-  mockJson,
   rejectRateLimited,
 } from "@/server/mockAttemptSecurity";
 
@@ -17,16 +17,16 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   const user = await getUserFromRequest(req);
-  if (!user) return mockJson({ error: "Unauthorized" }, 401);
+  if (!user) return localizedMockJson(req, { error: "Unauthorized" }, 401);
 
   let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return mockJson({ error: "Invalid JSON body" }, 400);
+    return localizedMockJson(req, { error: "Invalid JSON body" }, 400);
   }
   const valid = validateStartBody(body);
-  if (!valid.ok) return mockJson({ error: valid.error }, 400);
+  if (!valid.ok) return localizedMockJson(req, { error: valid.error }, 400);
 
   let admin;
   try {
@@ -59,9 +59,9 @@ export async function POST(req: NextRequest) {
       outcome: "allowed",
       metadata: { status: attempt.status },
     });
-    return mockJson({ attempt });
+    return localizedMockJson(req, { attempt });
   } catch (error) {
     console.error("[mock-attempts/start]", error);
-    return mockJson({ error: "The mock attempt could not be started" }, 503);
+    return localizedMockJson(req, { error: "The mock attempt could not be started" }, 503);
   }
 }

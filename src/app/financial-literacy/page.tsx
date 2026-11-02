@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PublicGuide, guideStyles } from "@/components/PublicGuide";
@@ -46,33 +47,19 @@ export default function FinancialLiteracyPage() {
       lede="Financial literacy sticks when you meet an idea, get it wrong safely, see it again, and then use it on a number that looks like your life."
       faqs={faqs}
     >
-      <h2 style={h2}>The Notho loop</h2>
+      <h2 style={h2}><I18nText source={"The Notho loop"} /></h2>
+      <p style={p}><I18nText source={"Lessons are short. After a lesson, cards can return in review so the idea does not vanish in a week. The calculator and budget sit one tap away so \"compounding\" or \"needs versus wants\" is not only a definition."} /></p>
       <p style={p}>
-        Lessons are short. After a lesson, cards can return in review so the
-        idea does not vanish in a week. The calculator and budget sit one tap
-        away so "compounding" or "needs versus wants" is not only a definition.
-      </p>
-      <p style={p}>
-        Start on{" "}
-        <Link href="/learn" style={{ color: guideStyles.teal }}>
-          Learn
-        </Link>
-        . When you want the numbers, use{" "}
-        <Link href="/investment-calculator" style={{ color: guideStyles.teal }}>
-          Calculate
-        </Link>{" "}
-        or{" "}
-        <Link href="/budgeting" style={{ color: guideStyles.teal }}>
-          Budget
-        </Link>
+        <I18nText source={"Start on"} /><I18nText>{" "}</I18nText>
+        <Link href="/learn" style={{ color: guideStyles.teal }}><I18nText source={"Learn"} /></Link>
+        <I18nText source={". When you want the numbers, use"} /><I18nText>{" "}</I18nText>
+        <Link href="/investment-calculator" style={{ color: guideStyles.teal }}><I18nText source={"Calculate"} /></Link><I18nText>{" "}</I18nText>
+        <I18nText source={"or"} /><I18nText>{" "}</I18nText>
+        <Link href="/budgeting" style={{ color: guideStyles.teal }}><I18nText source={"Budget"} /></Link>
         .
       </p>
-      <h2 style={h2}>Built for this country</h2>
-      <p style={p}>
-        Content is framed for South Africa: rand, local products, and the
-        difference between education and advice under FAIS. Notho will not
-        pretend a US article is a local curriculum.
-      </p>
+      <h2 style={h2}><I18nText source={"Built for this country"} /></h2>
+      <p style={p}><I18nText source={"Content is framed for South Africa: rand, local products, and the difference between education and advice under FAIS. Notho will not pretend a US article is a local curriculum."} /></p>
     </PublicGuide>
   );
 }

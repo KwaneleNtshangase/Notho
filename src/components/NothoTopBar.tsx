@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 // v2 - streak freeze, hearts, share
 import { useState } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
@@ -52,7 +53,7 @@ export function NothoTopBar({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <button
+          <I18nElement as="button"
             type="button"
             onClick={() => setShowStreakModal(true)}
             style={{
@@ -67,10 +68,10 @@ export function NothoTopBar({
             aria-label="Streak and freeze info"
           >
             <NothoStreak size={20} style={{ color: "#EFB343", opacity: flameOpacity }} />
-            <span style={{ fontWeight: 700, fontSize: 15, color: "#EFB343", opacity: flameOpacity }}>{streak}</span>
-          </button>
+            <span style={{ fontWeight: 700, fontSize: 15, color: "#EFB343", opacity: flameOpacity }}><I18nText>{streak}</I18nText></span>
+          </I18nElement>
           <StreakFreezeChip count={freezeCount} onClick={() => setShowStreakModal(true)} />
-          <button
+          <I18nElement as="button"
             type="button"
             onClick={() => {
               void shareDuoCard({ type: "streak", streakDays: streak });
@@ -80,15 +81,15 @@ export function NothoTopBar({
             aria-label="Share your streak"
           >
             <Share2 size={18} aria-hidden />
-          </button>
+          </I18nElement>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <NothoXP size={18} style={{ color: "var(--color-primary)" }} />
-          <span style={{ fontWeight: 700, fontSize: 14, color: "var(--color-primary)" }}>{formatWithSpaces(xp)} XP</span>
+          <span style={{ fontWeight: 700, fontSize: 14, color: "var(--color-primary)" }}><I18nText source={"{value0} XP"} values={[formatWithSpaces(xp)]} /></span>
         </div>
 
-        <button
+        <I18nElement as="button"
           onClick={() => hearts < maxHearts && setShowHeartsModal(true)}
           style={{
             display: "flex",
@@ -109,7 +110,7 @@ export function NothoTopBar({
               style={{ color: i < hearts ? "#E03C31" : "#ccc", transition: "color 0.2s" }}
             />
           ))}
-        </button>
+        </I18nElement>
       </div>
 
       {showHeartsModal && (
@@ -147,21 +148,16 @@ export function NothoTopBar({
                 />
               ))}
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>
-              {hearts}/{maxHearts} Hearts
-            </div>
+            <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}><I18nText source={"{value0}/{value1} Hearts"} values={[hearts, maxHearts]} /></div>
             {regen ? (
               <p style={{ color: "var(--color-text-secondary)", marginBottom: 20, lineHeight: 1.6 }}>
-                Next heart in <strong>{regen.nextHeartIn}</strong>.
+                <I18nText source={"Next heart in "} /><strong><I18nText>{regen.nextHeartIn}</I18nText></strong>.
                 <br />
-                Hearts refill 1 per hour automatically.
-              </p>
+                <I18nText source={"Hearts refill 1 per hour automatically."} /></p>
             ) : (
-              <p style={{ color: "var(--color-text-secondary)", marginBottom: 20 }}>You have full hearts. Keep learning!</p>
+              <p style={{ color: "var(--color-text-secondary)", marginBottom: 20 }}><I18nText source={"You have full hearts. Keep learning!"} /></p>
             )}
-            <button className="btn btn-primary" onClick={() => setShowHeartsModal(false)}>
-              Got it
-            </button>
+            <button className="btn btn-primary" onClick={() => setShowHeartsModal(false)}><I18nText source={"Got it"} /></button>
           </div>
         </div>
       )}
@@ -194,9 +190,7 @@ export function NothoTopBar({
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
               <NothoStreak size={52} style={{ color: "#FF9500" }} />
             </div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: "#EFB343", marginBottom: 12 }}>
-              {streak} day streak
-            </div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: "#EFB343", marginBottom: 12 }}><I18nText source={"{value0} day streak"} values={[streak]} /></div>
             <StreakFreezeBody
               freezeCount={freezeCount}
               xp={xp}
@@ -209,9 +203,7 @@ export function NothoTopBar({
               className="btn btn-secondary"
               onClick={() => setShowStreakModal(false)}
               style={{ width: "100%", marginTop: 12 }}
-            >
-              Close
-            </button>
+            ><I18nText source={"Close"} /></button>
           </div>
         </div>
       )}

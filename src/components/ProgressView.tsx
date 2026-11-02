@@ -1,5 +1,7 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
+/* eslint-disable @next/next/no-html-link-for-pages */
+
 
 import React, { useState } from "react";
 import type { ReactNode } from "react";
@@ -74,23 +76,22 @@ export function CourseView({
         <button className="back-button" onClick={goBack}>
           <span className="inline-flex items-center gap-2">
             <ArrowLeft size={20} className="text-current" />
-            Back to Courses
-          </span>
+            <I18nText source={"Back to Courses"} /></span>
         </button>
 
         <div className="course-map-header" style={{ background: colour.bg, borderRadius: 16, padding: "20px 16px", marginBottom: 8 }}>
           <div style={{ marginBottom: 12, color: colour.accent }}>
             <CourseIcon name={course.icon} size={56} />
           </div>
-          <h2 className="course-map-title" style={{ color: colour.accent }}>{course.title}</h2>
-          <p className="course-map-description">{course.description}</p>
+          <h2 className="course-map-title" style={{ color: colour.accent }}><I18nText>{course.title}</I18nText></h2>
+          <p className="course-map-description"><I18nText>{course.description}</I18nText></p>
         </div>
 
         {course.units.map((unit) => (
           <div className="unit" key={unit.id}>
             <div className="unit-header">
-              <div className="unit-title">{unit.title}</div>
-              <div className="unit-description">{unit.description}</div>
+              <div className="unit-title"><I18nText>{unit.title}</I18nText></div>
+              <div className="unit-description"><I18nText>{unit.description}</I18nText></div>
             </div>
 
             <div className="lessons-path">
@@ -151,10 +152,10 @@ export function CourseView({
                         animation: state === "playable" ? "node-pulse 2s ease-in-out infinite" : undefined,
                       }}
                     >
-                      {icon}
+                      <I18nText>{icon}</I18nText>
                     </div>
                     <div className="lesson-label">
-                      {lesson.title}
+                      <I18nText>{lesson.title}</I18nText>
                       {state === "coming_soon" && (
                         <span
                           style={{
@@ -163,9 +164,7 @@ export function CourseView({
                             color: "var(--color-text-secondary)",
                             marginTop: 2,
                           }}
-                        >
-                          Coming soon
-                        </span>
+                        ><I18nText source={"Coming soon"} /></span>
                       )}
                     </div>
                   </div>
@@ -181,13 +180,9 @@ export function CourseView({
             className="btn btn-primary"
             style={{ width: "100%", marginTop: 24 }}
             onClick={onGoToNextCourse}
-          >
-            Next Course: {nextCourse.title}
-          </button>
+          ><I18nText source={"Next Course: {value0}"} values={[nextCourse.title]} /></button>
         ) : (
-          <p style={{ textAlign: "center", marginTop: 24, color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 600 }}>
-            You&apos;ve completed all courses!
-          </p>
+          <p style={{ textAlign: "center", marginTop: 24, color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 600 }}><I18nText source={"You've completed all courses!"} /></p>
         )}
 
         {/* Lock / coming-soon modal */}
@@ -232,7 +227,7 @@ export function CourseView({
                   marginBottom: 8,
                 }}
               >
-                {lockedModal.lessonTitle}
+                <I18nText>{lockedModal.lessonTitle}</I18nText>
               </div>
               <p
                 style={{
@@ -242,14 +237,12 @@ export function CourseView({
                   fontSize: 14,
                 }}
               >
-                {lockedModal.reason}
+                <I18nText>{lockedModal.reason}</I18nText>
               </p>
               <button
                 className="btn btn-primary"
                 onClick={() => setLockedModal(null)}
-              >
-                Got it
-              </button>
+              ><I18nText source={"Got it"} /></button>
             </div>
           </div>
         )}

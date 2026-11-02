@@ -1,4 +1,7 @@
 "use client";
+import { localizeClientString } from "@/i18n/clientString";
+
+import { LocalizedRichText as I18nRich, LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -41,19 +44,17 @@ function LifecycleTestPanel() {
   };
   return (
     <div style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 16, background: "#F5FBF8", marginBottom: 16 }}>
-      <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, color: "#065f46" }}>Lifecycle email tests</div>
-      <p style={{ fontSize: 13, color: "#374151", margin: "0 0 12px" }}>
-        Send a test copy of each lifecycle email to your own address to preview it. Subjects are prefixed with [TEST].
-      </p>
+      <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, color: "#065f46" }}><I18nText source={"Lifecycle email tests"} /></div>
+      <p style={{ fontSize: 13, color: "#374151", margin: "0 0 12px" }}><I18nText source={"Send a test copy of each lifecycle email to your own address to preview it. Subjects are prefixed with [TEST]."} /></p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
         {KINDS.map((k) => (
           <button key={k.key} type="button" onClick={() => send(k.key)} disabled={busy === k.key}
             style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #007A85", background: "#fff", color: "#007A85", fontWeight: 700, fontSize: 13, cursor: "pointer", opacity: busy === k.key ? 0.6 : 1 }}>
-            {busy === k.key ? "Sending…" : k.label}
+            <I18nText>{busy === k.key ? "Sending…" : k.label}</I18nText>
           </button>
         ))}
       </div>
-      {msg && <div style={{ marginTop: 10, fontSize: 13, color: "#374151" }}>{msg}</div>}
+      {msg && <div style={{ marginTop: 10, fontSize: 13, color: "#374151" }}><I18nText>{msg}</I18nText></div>}
     </div>
   );
 }
@@ -98,7 +99,7 @@ function BroadcastPanel() {
   };
 
   const send = async () => {
-    if (!window.confirm(`Schedule the budget announcement to ${count} users, delivered ${prettyDate(scheduledAt)}?\n\nThis cannot be undone from here (only cancelled per-email in Resend).`)) return;
+    if (!window.confirm(localizeClientString(`Schedule the budget announcement to ${count} users, delivered ${prettyDate(scheduledAt)}?\n\nThis cannot be undone from here (only cancelled per-email in Resend).`))) return;
     setStatus("sending"); setMsg(null);
     const t = await authToken();
     const res = await fetch("/api/admin/broadcast", {
@@ -114,40 +115,32 @@ function BroadcastPanel() {
 
   return (
     <div style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 16, background: "#F5FBF8", marginBottom: 20 }}>
-      <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, color: "#065f46" }}>Budget announcement broadcast</div>
-      <p style={{ fontSize: 13, color: "#374151", margin: "0 0 12px" }}>
-        Schedules the &quot;import your bank statement&quot; announcement to every confirmed user, sent from hello@notho.co.za. Delivery is queued in Resend for the set time.
-      </p>
+      <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, color: "#065f46" }}><I18nText source={"Budget announcement broadcast"} /></div>
+      <p style={{ fontSize: 13, color: "#374151", margin: "0 0 12px" }}><I18nText source={"Schedules the \"import your bank statement\" announcement to every confirmed user, sent from hello@notho.co.za. Delivery is queued in Resend for the set time."} /></p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
         <a href="/api/admin/broadcast?preview=1" target="_blank" rel="noopener noreferrer"
-          style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #d1d5db", background: "#fff", color: "#374151", fontWeight: 700, fontSize: 13, textDecoration: "none" }}>
-          Preview email
-        </a>
+          style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #d1d5db", background: "#fff", color: "#374151", fontWeight: 700, fontSize: 13, textDecoration: "none" }}><I18nText source={"Preview email"} /></a>
         <button type="button" onClick={sendTest}
-          style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #d1d5db", background: "#fff", color: "#374151", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-          Send test to me
-        </button>
+          style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #d1d5db", background: "#fff", color: "#374151", fontWeight: 700, fontSize: 13, cursor: "pointer" }}><I18nText source={"Send test to me"} /></button>
         {status !== "done" && (
           <button type="button" onClick={check} disabled={status === "checking" || status === "sending"}
             style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #007A85", background: "#fff", color: "#007A85", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-            {status === "checking" ? "Checking…" : "Check recipients"}
+            <I18nText>{status === "checking" ? "Checking…" : "Check recipients"}</I18nText>
           </button>
         )}
         {status === "ready" && count != null && (
           <>
-            <span style={{ fontSize: 13, color: "#374151" }}>{count} recipients · delivers {prettyDate(scheduledAt)}</span>
+            <span style={{ fontSize: 13, color: "#374151" }}><I18nText source={"{value0} recipients · delivers {value1}"} values={[count, prettyDate(scheduledAt)]} /></span>
             <button type="button" onClick={send}
-              style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: "#007A85", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
-              Schedule send
-            </button>
+              style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: "#007A85", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer" }}><I18nText source={"Schedule send"} /></button>
           </>
         )}
-        {status === "sending" && <span style={{ fontSize: 13, color: "#374151" }}>Scheduling…</span>}
-        {status === "done" && <span style={{ fontSize: 13, color: "#166534", fontWeight: 700 }}>{msg}</span>}
-        {status === "error" && <span style={{ fontSize: 13, color: "#E03C31", fontWeight: 700 }}>{msg}</span>}
+        {status === "sending" && <span style={{ fontSize: 13, color: "#374151" }}><I18nText source={"Scheduling…"} /></span>}
+        {status === "done" && <span style={{ fontSize: 13, color: "#166534", fontWeight: 700 }}><I18nText>{msg}</I18nText></span>}
+        {status === "error" && <span style={{ fontSize: 13, color: "#E03C31", fontWeight: 700 }}><I18nText>{msg}</I18nText></span>}
       </div>
       {msg && (status === "idle" || status === "ready" || status === "checking") && (
-        <div style={{ marginTop: 10, fontSize: 13, color: "#374151" }}>{msg}</div>
+        <div style={{ marginTop: 10, fontSize: 13, color: "#374151" }}><I18nText>{msg}</I18nText></div>
       )}
     </div>
   );
@@ -209,7 +202,7 @@ function RetryUnsentPanel() {
   const sendNow = async () => {
     if (!remaining || remaining.length === 0) return;
     if (!window.confirm(
-      `Send the announcement immediately to ${remaining.length} user(s) who haven't received it yet?\n\nThey will receive it within about a minute. This cannot be undone.`
+      localizeClientString(`Send the announcement immediately to ${remaining.length} user(s) who haven't received it yet?\n\nThey will receive it within about a minute. This cannot be undone.`)
     )) return;
     setStatus("sending"); setMsg(null);
     const t = await authToken();
@@ -238,10 +231,8 @@ function RetryUnsentPanel() {
 
   return (
     <div style={box}>
-      <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, color: "#9A3412" }}>Finish a partial broadcast (retry unsent)</div>
-      <p style={{ fontSize: 13, color: "#374151", margin: "0 0 10px" }}>
-        Paste the addresses that <b>already received</b> the announcement (copy them from Resend). This sends immediately to every confirmed user who is <b>not</b> in that list, so no one is emailed twice.
-      </p>
+      <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, color: "#9A3412" }}><I18nText source={"Finish a partial broadcast (retry unsent)"} /></div>
+      <p style={{ fontSize: 13, color: "#374151", margin: "0 0 10px" }}><I18nRich source={"Paste the addresses that <b0>already received</b0>  the announcement (copy them from Resend). This sends immediately to every confirmed user who is <b1>not</b1>  in that list, so no one is emailed twice."} elements={[<b key="inline-0" />, <b key="inline-1" />]} /></p>
       <textarea
         value={alreadySent}
         onChange={(e) => { setAlreadySent(e.target.value); setStatus("idle"); setRemaining(null); }}
@@ -251,40 +242,36 @@ function RetryUnsentPanel() {
       />
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
         <button type="button" onClick={preview} disabled={status === "previewing" || status === "sending"} style={btn(false)}>
-          {status === "previewing" ? "Checking…" : "Preview who's left"}
+          <I18nText>{status === "previewing" ? "Checking…" : "Preview who's left"}</I18nText>
         </button>
         {status === "ready" && remaining && (
           <>
             <span style={{ fontSize: 13, color: "#374151" }}>
-              {parseEmails(alreadySent).length} already sent · <b>{remaining.length}</b> still to send{total != null ? ` (of ${total} confirmed)` : ""}
+              <I18nText>{parseEmails(alreadySent).length}</I18nText> <I18nText source={" already sent · "} /><b><I18nText>{remaining.length}</I18nText></b> <I18nText source={" still to send"} /><I18nText>{total != null ? ` (of ${total} confirmed)` : ""}</I18nText>
             </span>
             {remaining.length > 0 && (
-              <button type="button" onClick={sendNow} style={btn(true)}>
-                Send now to {remaining.length}
-              </button>
+              <button type="button" onClick={sendNow} style={btn(true)}><I18nText source={"Send now to {value0}"} values={[remaining.length]} /></button>
             )}
           </>
         )}
-        {status === "sending" && <span style={{ fontSize: 13, color: "#374151" }}>Sending…</span>}
-        {status === "done" && <span style={{ fontSize: 13, color: "#166534", fontWeight: 700 }}>{msg}</span>}
-        {status === "error" && <span style={{ fontSize: 13, color: "#E03C31", fontWeight: 700 }}>{msg}</span>}
+        {status === "sending" && <span style={{ fontSize: 13, color: "#374151" }}><I18nText source={"Sending…"} /></span>}
+        {status === "done" && <span style={{ fontSize: 13, color: "#166534", fontWeight: 700 }}><I18nText>{msg}</I18nText></span>}
+        {status === "error" && <span style={{ fontSize: 13, color: "#E03C31", fontWeight: 700 }}><I18nText>{msg}</I18nText></span>}
       </div>
       {status === "ready" && remaining && (
         <div style={{ marginTop: 12 }}>
           {remaining.length === 0 ? (
-            <div style={{ fontSize: 13, color: "#166534", fontWeight: 700 }}>Everyone has already received it. Nothing to send. ✓</div>
+            <div style={{ fontSize: 13, color: "#166534", fontWeight: 700 }}><I18nText source={"Everyone has already received it. Nothing to send. ✓"} /></div>
           ) : (
             <div style={{ fontSize: 12.5, color: "#374151" }}>
-              <div style={{ fontWeight: 700, marginBottom: 4 }}>Will send to:</div>
+              <div style={{ fontWeight: 700, marginBottom: 4 }}><I18nText source={"Will send to:"} /></div>
               <div style={{ maxHeight: 180, overflow: "auto", background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8, padding: 10, whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "ui-monospace, Menlo, monospace" }}>
-                {remaining.join("\n")}
+                <I18nText>{remaining.join("\n")}</I18nText>
               </div>
             </div>
           )}
           {unknownPasted.length > 0 && (
-            <div style={{ marginTop: 8, fontSize: 12, color: "#9A3412" }}>
-              Note: {unknownPasted.length} pasted address(es) don&apos;t match any confirmed user (ignored): {unknownPasted.join(", ")}
-            </div>
+            <div style={{ marginTop: 8, fontSize: 12, color: "#9A3412" }}><I18nText source={"Note: {value0} pasted address(es) don't match any confirmed user (ignored): {value1}"} values={[unknownPasted.length, unknownPasted.join(", ")]} /></div>
           )}
         </div>
       )}
@@ -361,24 +348,24 @@ export default function AdminBugsPage() {
 
   const wrap: React.CSSProperties = { maxWidth: 820, margin: "0 auto", padding: "24px 16px 80px" };
 
-  if (state === "loading") return <main style={wrap}><p style={{ color: "#6b7280" }}>Loading…</p></main>;
+  if (state === "loading") return <main style={wrap}><p style={{ color: "#6b7280" }}><I18nText source={"Loading…"} /></p></main>;
   if (state === "forbidden") return (
     <main style={wrap}>
-      <h1 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8 }}>Bug console</h1>
-      <p style={{ color: "#6b7280" }}>You don&apos;t have access to this page. Sign in with an admin account (set <code>ADMIN_EMAILS</code> in Vercel).</p>
+      <h1 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8 }}><I18nText source={"Bug console"} /></h1>
+      <p style={{ color: "#6b7280" }}><I18nText source={"You don't have access to this page. Sign in with an admin account (set "} /><code>ADMIN_EMAILS</code> <I18nText source={" in Vercel)."} /></p>
     </main>
   );
-  if (state === "error") return <main style={wrap}><p style={{ color: "#E03C31" }}>Couldn&apos;t load bugs. Try again.</p></main>;
+  if (state === "error") return <main style={wrap}><p style={{ color: "#E03C31" }}><I18nText source={"Couldn't load bugs. Try again."} /></p></main>;
 
   const open = items.filter((i) => i.status !== "fixed" && i.status !== "wont_fix");
 
   return (
     <main style={wrap}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 4 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 900 }}>Bug console</h1>
-        <button type="button" onClick={load} style={{ background: "none", border: "1px solid #d1d5db", borderRadius: 8, padding: "6px 12px", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>Refresh</button>
+        <h1 style={{ fontSize: 24, fontWeight: 900 }}><I18nText source={"Bug console"} /></h1>
+        <button type="button" onClick={load} style={{ background: "none", border: "1px solid #d1d5db", borderRadius: 8, padding: "6px 12px", fontWeight: 700, fontSize: 13, cursor: "pointer" }}><I18nText source={"Refresh"} /></button>
       </div>
-      <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 20 }}>{open.length} open · {items.length} total. Auto-captured crashes and user-reported bugs. Tick &quot;Email this user&quot; when you want to tell them it&apos;s fixed.</p>
+      <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 20 }}><I18nText source={"{value0} open · {value1} total. Auto-captured crashes and user-reported bugs. Tick \"Email this user\" when you want to tell them it's fixed."} values={[open.length, items.length]} /></p>
 
       <LifecycleTestPanel />
       <BroadcastPanel />
@@ -391,50 +378,49 @@ export default function AdminBugsPage() {
             <div key={it.id} style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 16, background: "#fff" }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 8 }}>
                 <span style={{ fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 999, background: it.source === "auto" ? "#FEF3C7" : "#DBEAFE", color: it.source === "auto" ? "#92400E" : "#1E40AF" }}>
-                  {it.source === "auto" ? "Auto-captured" : "User reported"}
+                  <I18nText>{it.source === "auto" ? "Auto-captured" : "User reported"}</I18nText>
                 </span>
-                {it.area && <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: "#F3F4F6", color: "#374151" }}>{it.area}</span>}
+                {it.area && <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: "#F3F4F6", color: "#374151" }}><I18nText>{it.area}</I18nText></span>}
                 <span style={{ fontSize: 11, fontWeight: 800, padding: "2px 8px", borderRadius: 999, background: it.status === "fixed" ? "#DCFCE7" : it.status === "wont_fix" ? "#F3F4F6" : "#Fee2e2", color: it.status === "fixed" ? "#166534" : "#374151" }}>
-                  {STATUS_LABEL[it.status] ?? it.status}
+                  <I18nText>{STATUS_LABEL[it.status] ?? it.status}</I18nText>
                 </span>
-                {it.notifiedAt && <span style={{ fontSize: 11, color: "#16a34a", fontWeight: 700 }}>✓ user emailed</span>}
-                <span style={{ marginLeft: "auto", fontSize: 12, color: "#9ca3af" }}>{new Date(it.createdAt).toLocaleString("en-ZA")}</span>
+                {it.notifiedAt && <span style={{ fontSize: 11, color: "#16a34a", fontWeight: 700 }}><I18nText source={"✓ user emailed"} /></span>}
+                <span style={{ marginLeft: "auto", fontSize: 12, color: "#9ca3af" }}><I18nText>{new Date(it.createdAt).toLocaleString("en-ZA")}</I18nText></span>
               </div>
 
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{it.subject ?? "(no subject)"}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}><I18nText>{it.subject ?? "(no subject)"}</I18nText></div>
               <div style={{ fontSize: 12.5, color: "#6b7280", marginBottom: 8 }}>
-                {it.userEmail ? <>From <b>{it.userEmail}</b></> : "Anonymous user"}
+                {it.userEmail ? <><I18nText source={"From "} /><b><I18nText>{it.userEmail}</I18nText></b></> : "Anonymous user"}
               </div>
               <details style={{ marginBottom: 12 }}>
-                <summary style={{ cursor: "pointer", fontSize: 13, color: "#007A85", fontWeight: 700 }}>Details</summary>
+                <summary style={{ cursor: "pointer", fontSize: 13, color: "#007A85", fontWeight: 700 }}><I18nText source={"Details"} /></summary>
                 <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", fontSize: 12, background: "#f9fafb", borderRadius: 8, padding: 12, marginTop: 8, color: "#374151" }}>{it.description}</pre>
               </details>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
                 <select value={d.status} onChange={(e) => setDraft(it.id, { status: e.target.value })}
                   style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #d1d5db", fontSize: 13, fontWeight: 600 }}>
-                  {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
+                  {STATUSES.map((s) => <I18nElement as="option" key={s} value={s}>{STATUS_LABEL[s]}</I18nElement>)}
                 </select>
-                <input type="text" placeholder="What was fixed (optional, goes in the email)" value={d.note}
+                <I18nElement as="input" type="text" placeholder="What was fixed (optional, goes in the email)" value={d.note}
                   onChange={(e) => setDraft(it.id, { note: e.target.value })}
                   style={{ flex: 1, minWidth: 200, padding: "8px 10px", borderRadius: 8, border: "1px solid #d1d5db", fontSize: 13 }} />
                 <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, cursor: it.userEmail ? "pointer" : "not-allowed", color: it.userEmail ? "#111827" : "#9ca3af" }}>
                   <input type="checkbox" disabled={!it.userEmail} checked={d.notify} onChange={(e) => setDraft(it.id, { notify: e.target.checked })} />
-                  Email this user
-                </label>
+                  <I18nText source={"Email this user"} /></label>
                 <button type="button" disabled={busy === it.id} onClick={() => save(it)}
                   style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: "#007A85", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", opacity: busy === it.id ? 0.6 : 1 }}>
-                  {busy === it.id ? "Saving…" : d.notify ? "Save & email" : "Save"}
+                  <I18nText>{busy === it.id ? "Saving…" : d.notify ? "Save & email" : "Save"}</I18nText>
                 </button>
               </div>
             </div>
           );
         })}
-        {items.length === 0 && <p style={{ color: "#6b7280" }}>No bugs captured yet. 🎉</p>}
+        {items.length === 0 && <p style={{ color: "#6b7280" }}><I18nText source={"No bugs captured yet. 🎉"} /></p>}
       </div>
 
       {toast && (
-        <div style={{ position: "fixed", left: "50%", bottom: 24, transform: "translateX(-50%)", background: "#111827", color: "#fff", padding: "10px 18px", borderRadius: 999, fontWeight: 700, fontSize: 14, zIndex: 100 }}>{toast}</div>
+        <div style={{ position: "fixed", left: "50%", bottom: 24, transform: "translateX(-50%)", background: "#111827", color: "#fff", padding: "10px 18px", borderRadius: 999, fontWeight: 700, fontSize: 14, zIndex: 100 }}><I18nText>{toast}</I18nText></div>
       )}
     </main>
   );

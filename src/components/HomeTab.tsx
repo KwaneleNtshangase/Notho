@@ -1,5 +1,7 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
+/* eslint-disable @next/next/no-html-link-for-pages */
+
 
 import React, { useEffect, useState } from "react";
 import {
@@ -151,11 +153,9 @@ export function LearnView({
         >
           <Play size={28} className="shrink-0 text-blue-600 dark:text-blue-400" fill="currentColor" aria-hidden />
           <div>
-            <p className="text-blue-800 dark:text-blue-300 font-bold text-sm">
-              Continue where you left off
-            </p>
+            <p className="text-blue-800 dark:text-blue-300 font-bold text-sm"><I18nText source={"Continue where you left off"} /></p>
             <p className="text-blue-600 dark:text-blue-400 text-xs">
-              {savedProgress.lessonTitle || "Resume lesson"}
+              <I18nText>{savedProgress.lessonTitle || "Resume lesson"}</I18nText>
             </p>
           </div>
           <span className="ml-auto text-blue-400" aria-hidden>
@@ -175,16 +175,10 @@ export function LearnView({
             <NothoBrain size={20} className="text-purple-600 dark:text-purple-300" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-purple-900 dark:text-purple-200 font-bold text-sm">
-              {dueCount} concept{dueCount > 1 ? "s" : ""} to review
-            </p>
-            <p className="text-purple-600 dark:text-purple-400 text-xs">
-              Cards that are due today
-            </p>
+            <p className="text-purple-900 dark:text-purple-200 font-bold text-sm"><I18nText source={"{value0} concepts to review"} values={[dueCount, dueCount > 1 ? "s" : ""]} one={"{value0} concept to review"} count={dueCount} /></p>
+            <p className="text-purple-600 dark:text-purple-400 text-xs"><I18nText source={"Cards that are due today"} /></p>
           </div>
-          <span className="shrink-0 text-xs font-bold text-white bg-purple-600 rounded-full px-2.5 py-1">
-            Start
-          </span>
+          <span className="shrink-0 text-xs font-bold text-white bg-purple-600 rounded-full px-2.5 py-1"><I18nText source={"Start"} /></span>
         </button>
       )}
 
@@ -204,11 +198,11 @@ export function LearnView({
               <Target size={18} className="mt-0.5 shrink-0 text-green-600 dark:text-green-400" aria-hidden />
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-green-800 dark:text-green-300">
-                  {GOAL_OPTIONS.find((g) => g.id === userGoal)?.label ?? userGoal}
+                  <I18nText>{GOAL_OPTIONS.find((g) => g.id === userGoal)?.label ?? userGoal}</I18nText>
                 </p>
                 {goalDescription && (
                   <p className="mt-0.5 text-xs text-green-700 dark:text-green-400 opacity-90 break-words">
-                    {goalDescription}
+                    <I18nText>{goalDescription}</I18nText>
                   </p>
                 )}
               </div>
@@ -222,10 +216,8 @@ export function LearnView({
                   setShowGoalPicker(true);
                 }}
                 className="text-xs font-semibold text-green-600 dark:text-green-400"
-              >
-                Edit
-              </button>
-              <button
+              ><I18nText source={"Edit"} /></button>
+              <I18nElement as="button"
                 type="button"
                 onClick={() => {
                   setGoalBannerDismissed(true);
@@ -235,7 +227,7 @@ export function LearnView({
                 aria-label="Dismiss goal banner"
               >
                 ✕
-              </button>
+              </I18nElement>
             </div>
           </div>
         </div>
@@ -249,20 +241,17 @@ export function LearnView({
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: "var(--color-primary)", marginBottom: 4 }}>
           <Lightbulb size={14} aria-hidden />
-          Today
-        </div>
-        <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.5 }}>{todayFact}</div>
+          <I18nText source={"Today"} /></div>
+        <div style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.5 }}><I18nText>{todayFact}</I18nText></div>
       </div>
 
-      <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 16 }}>
-        Courses
-      </h2>
+      <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 16 }}><I18nText source={"Courses"} /></h2>
 
       {!search.trim() && recommendedCourseIds.length > 0 && (
         <div className="mb-6">
           <div className="mb-3 flex items-center justify-between px-1">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white">First up</h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400">From the goal you picked</span>
+            <h3 className="text-base font-bold text-gray-900 dark:text-white"><I18nText source={"First up"} /></h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400"><I18nText source={"From the goal you picked"} /></span>
           </div>
           <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
             {recommendedCourseIds.map((courseId) => {
@@ -278,8 +267,8 @@ export function LearnView({
                   <div className="mb-2 flex justify-center text-[var(--color-primary)]" aria-hidden>
                     <CourseIcon name={course.icon} size={40} />
                   </div>
-                  <p className="text-sm font-bold leading-tight text-gray-900 dark:text-white">{course.title}</p>
-                  <p className="mt-1 text-xs font-medium text-green-600 dark:text-green-400">Open course</p>
+                  <p className="text-sm font-bold leading-tight text-gray-900 dark:text-white"><I18nText>{course.title}</I18nText></p>
+                  <p className="mt-1 text-xs font-medium text-green-600 dark:text-green-400"><I18nText source={"Open course"} /></p>
                 </button>
               );
             })}
@@ -289,7 +278,7 @@ export function LearnView({
 
       {/* Search */}
       <div style={{ position: "relative", marginBottom: 24 }}>
-        <input
+        <I18nElement as="input"
           type="text"
           placeholder="Search courses"
           value={search}
@@ -311,12 +300,8 @@ export function LearnView({
           <div className="mb-3 flex justify-center text-gray-400 dark:text-gray-500" aria-hidden>
             <Search size={40} strokeWidth={1.5} />
           </div>
-          <p className="text-gray-700 dark:text-gray-300 font-semibold">
-            No results for &quot;{search.trim()}&quot;
-          </p>
-          <p className="text-gray-500 dark:text-gray-500 text-sm mt-1">
-            Try searching for a topic like &quot;budget&quot;, &quot;TFSA&quot;, or &quot;debt&quot;
-          </p>
+          <p className="text-gray-700 dark:text-gray-300 font-semibold"><I18nText source={"No results for \"{value0}\""} values={[search.trim()]} /></p>
+          <p className="text-gray-500 dark:text-gray-500 text-sm mt-1"><I18nText source={"Try searching for a topic like \"budget\", \"TFSA\", or \"debt\""} /></p>
         </div>
       )}
 
@@ -332,11 +317,9 @@ export function LearnView({
             {challengeComplete ? <NothoTrophy size={28} /> : <NothoXP size={28} />}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-primary)", marginBottom: 2 }}>
-              Weekly Challenge
-            </div>
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-primary)", marginBottom: 2 }}><I18nText source={"Weekly Challenge"} /></div>
             <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
-                {weeklyChallenge?.text}
+                <I18nText>{weeklyChallenge?.text}</I18nText>
             </div>
             <div style={{ background: "var(--color-border)", borderRadius: 4, height: 5, overflow: "hidden" }}>
               <div style={{
@@ -345,35 +328,28 @@ export function LearnView({
                 transition: "width 0.5s ease",
               }} />
             </div>
-            <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 4 }}>
-              {challengeProgress || 0}/{weeklyChallenge.target} · Reward: +{weeklyChallenge.xp} XP
-            </div>
+            <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 4 }}><I18nText source={"{value0}/{value1} · Reward: +{value2} XP"} values={[challengeProgress || 0, weeklyChallenge.target, weeklyChallenge.xp]} /></div>
             {weeklyProgress && weeklyChallenge && (
               <div
                 className="text-gray-500 dark:text-gray-400"
                 style={{ fontSize: 10, marginTop: 6, lineHeight: 1.4 }}
               >
-                {weeklyChallenge.unit === "lessons" &&
-                  `${weeklyProgress.lessonsCompleted} lesson${weeklyProgress.lessonsCompleted === 1 ? "" : "s"} this week`}
-                {weeklyChallenge.unit === "perfect" &&
-                  `${weeklyProgress.perfectLessons} perfect lesson${weeklyProgress.perfectLessons === 1 ? "" : "s"}`}
-                {weeklyChallenge.unit === "daily_xp" &&
-                  `${weeklyProgress.dailyXp} XP earned today (goal ${weeklyChallenge.target})`}
-                {weeklyChallenge.unit === "streak_days" &&
-                  `Uses your learning streak (goal: ${weeklyChallenge.target} days)`}
+                {weeklyChallenge.unit === "lessons" && <I18nText source="{value0} lessons this week" one="{value0} lesson this week" count={weeklyProgress.lessonsCompleted} values={[weeklyProgress.lessonsCompleted]} />}
+                {weeklyChallenge.unit === "perfect" && <I18nText source="{value0} perfect lessons" one="{value0} perfect lesson" count={weeklyProgress.perfectLessons} values={[weeklyProgress.perfectLessons]} />}
+                <I18nText>{weeklyChallenge.unit === "daily_xp" &&
+                  `${weeklyProgress.dailyXp} XP earned today (goal ${weeklyChallenge.target})`}</I18nText>
+                <I18nText>{weeklyChallenge.unit === "streak_days" &&
+                  `Uses your learning streak (goal: ${weeklyChallenge.target} days)`}</I18nText>
               </div>
             )}
           </div>
           {challengeComplete && !challengeRewardClaimed && (
             <button className="btn btn-primary" style={{ fontSize: 12, padding: "6px 14px", flexShrink: 0 }}
-              onClick={claimChallengeReward}>
-              Claim
-            </button>
+              onClick={claimChallengeReward}><I18nText source={"Claim"} /></button>
           )}
           {challengeRewardClaimed && (
             <div style={{ fontSize: 11, color: "var(--color-primary)", fontWeight: 700, flexShrink: 0, display: "flex", alignItems: "center", gap: 4 }}>
-              <CheckCircle2 size={14} /> Claimed
-            </div>
+              <CheckCircle2 size={14} /> <I18nText source={" Claimed"} /></div>
           )}
         </div>
       )}
@@ -416,12 +392,12 @@ export function LearnView({
                   <div style={{ fontSize: 48, marginBottom: 12, color: colour.accent }}>
                     <CourseIcon name={course.icon} size={48} />
                   </div>
-                  <div className="course-title" style={{ color: colour.accent }}>{course.title}</div>
-                  <div className="course-description">{course.description}</div>
+                  <div className="course-title" style={{ color: colour.accent }}><I18nText>{course.title}</I18nText></div>
+                  <div className="course-description"><I18nText>{course.description}</I18nText></div>
                 </div>
                 <div className="course-progress">
-                  <div className="course-percentage" style={{ color: colour.accent }}>{percentage}%</div>
-                  <div className="course-percentage-label">Complete</div>
+                  <div className="course-percentage" style={{ color: colour.accent }}><I18nText>{percentage}</I18nText>%</div>
+                  <div className="course-percentage-label"><I18nText source={"Complete"} /></div>
                 </div>
               </div>
               {/* Coloured progress bar */}
@@ -430,11 +406,9 @@ export function LearnView({
               </div>
               <div className="course-stats">
                 <div className="course-stat">
-                  <strong>{completedLessons}</strong> / {totalLessons} lessons
-                </div>
+                  <strong><I18nText>{completedLessons}</I18nText></strong> / <I18nText>{totalLessons}</I18nText> <I18nText source={" lessons"} /></div>
                 <div className="course-stat">
-                  <strong>{course.units.length}</strong> units
-                </div>
+                  <strong><I18nText>{course.units.length}</I18nText></strong> <I18nText source={" units"} /></div>
               </div>
             </div>
           );
@@ -449,12 +423,8 @@ export function LearnView({
           aria-labelledby="goal-picker-title"
         >
           <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 dark:bg-gray-800">
-            <h2 id="goal-picker-title" className="mb-1 text-lg font-bold text-gray-900 dark:text-white">
-              Your money goal
-            </h2>
-            <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-              We&apos;ll prioritise courses that match what you want to achieve.
-            </p>
+            <h2 id="goal-picker-title" className="mb-1 text-lg font-bold text-gray-900 dark:text-white"><I18nText source={"Your money goal"} /></h2>
+            <p className="mb-4 text-sm text-gray-500 dark:text-gray-400"><I18nText source={"We'll prioritise courses that match what you want to achieve."} /></p>
             <div className="mb-3 grid grid-cols-2 gap-2">
               {GOAL_OPTIONS.map((g) => (
                 <button
@@ -471,7 +441,7 @@ export function LearnView({
                   }`}
                 >
                   <g.Icon size={16} className="mr-1 inline align-text-bottom text-green-600 dark:text-green-400" aria-hidden />
-                  {g.label}
+                  <I18nText>{g.label}</I18nText>
                 </button>
               ))}
             </div>
@@ -498,9 +468,7 @@ export function LearnView({
                 type="button"
                 className="flex-1 rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200"
                 onClick={() => setShowGoalPicker(false)}
-              >
-                Cancel
-              </button>
+              ><I18nText source={"Cancel"} /></button>
               <button
                 type="button"
                 className="flex-1 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white disabled:opacity-40"
@@ -514,9 +482,7 @@ export function LearnView({
                   setGoalBannerDismissed(false);
                   setShowGoalPicker(false);
                 }}
-              >
-                Save
-              </button>
+              ><I18nText source={"Save"} /></button>
             </div>
           </div>
         </div>

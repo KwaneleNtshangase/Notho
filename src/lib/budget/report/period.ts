@@ -159,19 +159,21 @@ const MONTH_NAMES = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-export function formatPeriodLabel(periodStart: string, periodEnd: string): string {
+export function formatPeriodLabel(periodStart: string, periodEnd: string, translate: (source: string) => string = source => source): string {
   const s = parseYmd(periodStart);
   const e = parseYmd(periodEnd);
+  const startMonth = translate(MONTH_NAMES[s.m - 1]);
+  const endMonth = translate(MONTH_NAMES[e.m - 1]);
   if (periodStart === periodEnd) {
-    return `${s.d} ${MONTH_NAMES[s.m - 1]} ${s.y}`;
+    return `${s.d} ${startMonth} ${s.y}`;
   }
   if (s.y === e.y && s.m === e.m) {
-    return `${s.d}–${e.d} ${MONTH_NAMES[s.m - 1]} ${s.y}`;
+    return `${s.d}–${e.d} ${startMonth} ${s.y}`;
   }
   if (s.y === e.y) {
-    return `${s.d} ${MONTH_NAMES[s.m - 1]} – ${e.d} ${MONTH_NAMES[e.m - 1]} ${s.y}`;
+    return `${s.d} ${startMonth} – ${e.d} ${endMonth} ${s.y}`;
   }
-  return `${s.d} ${MONTH_NAMES[s.m - 1]} ${s.y} – ${e.d} ${MONTH_NAMES[e.m - 1]} ${e.y}`;
+  return `${s.d} ${startMonth} ${s.y} – ${e.d} ${endMonth} ${e.y}`;
 }
 
 export function monthAlignedDefaults(today: string = sastToday()): PeriodRange {

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import { useState } from "react";
 import { NothoFreeze } from "@/components/icons/NothoIcons";
@@ -19,7 +20,7 @@ export function StreakFreezeChip({
 }) {
   const equipped = count > 0;
   return (
-    <button
+    <I18nElement as="button"
       type="button"
       onClick={onClick}
       className="streak-freeze-chip"
@@ -37,8 +38,8 @@ export function StreakFreezeChip({
       }}
     >
       <NothoFreeze size={16} style={{ color: equipped ? "#3B82F6" : "var(--color-text-secondary)" }} />
-      <span style={{ fontWeight: 800, fontSize: 13, lineHeight: 1 }}>{count}/{STREAK_FREEZE_MAX}</span>
-    </button>
+      <span style={{ fontWeight: 800, fontSize: 13, lineHeight: 1 }}><I18nText>{count}</I18nText>/<I18nText>{STREAK_FREEZE_MAX}</I18nText></span>
+    </I18nElement>
   );
 }
 
@@ -83,16 +84,12 @@ export function StreakFreezeBody({
     <div style={{ textAlign: compact ? "left" : "center" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: compact ? "flex-start" : "center", gap: 8, marginBottom: 8 }}>
         <NothoFreeze size={compact ? 22 : 28} style={{ color: freezeCount > 0 ? "#3B82F6" : "var(--color-text-secondary)" }} />
-        <span style={{ fontWeight: 800, fontSize: compact ? 16 : 18, color: freezeCount > 0 ? "#3B82F6" : "var(--color-text-secondary)" }}>
-          {freezeCount}/{STREAK_FREEZE_MAX} equipped
-        </span>
+        <span style={{ fontWeight: 800, fontSize: compact ? 16 : 18, color: freezeCount > 0 ? "#3B82F6" : "var(--color-text-secondary)" }}><I18nText source={"{value0}/{value1} equipped"} values={[freezeCount, STREAK_FREEZE_MAX]} /></span>
       </div>
       <p style={{ fontSize: 13, color: lessonsToday > 0 ? "#22C55E" : "var(--color-text-secondary)", margin: "0 0 8px", lineHeight: 1.45, fontWeight: lessonsToday > 0 ? 700 : 500 }}>
-        {status}
+        <I18nText>{status}</I18nText>
       </p>
-      <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "0 0 12px", lineHeight: 1.45 }}>
-        One freeze covers one missed day and does not add a day. Miss more days than you have equipped and the streak breaks. The freezes stay.
-      </p>
+      <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "0 0 12px", lineHeight: 1.45 }}><I18nText source={"One freeze covers one missed day and does not add a day. Miss more days than you have equipped and the streak breaks. The freezes stay."} /></p>
       {onBuy && (
         <button
           type="button"
@@ -101,11 +98,11 @@ export function StreakFreezeBody({
           disabled={block !== "ok" || pending}
           style={{ marginTop: 0 }}
         >
-          {pending ? "Equipping…" : freezeBuyLabel(block)}
+          <I18nText>{pending ? "Equipping…" : freezeBuyLabel(block)}</I18nText>
         </button>
       )}
       {note && (
-        <p style={{ fontSize: 12, margin: "8px 0 0", color: note.startsWith("Equipped") ? "#22C55E" : "#E03C31" }}>{note}</p>
+        <p style={{ fontSize: 12, margin: "8px 0 0", color: note.startsWith("Equipped") ? "#22C55E" : "#E03C31" }}><I18nText>{note}</I18nText></p>
       )}
     </div>
   );

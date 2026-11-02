@@ -1,0 +1,102 @@
+{
+  "af": {
+    "Fill in the blank": "Vul die oop spasie in",
+    "True or False?": "Waar of onwaar?",
+    "True": "Waar",
+    "False": "Onwaar",
+    "Money is More Than Cash": "Geld is meer as kontant",
+    "The Three Jobs of Money": "Die drie take van geld",
+    "Why Money Loses Value": "Waarom geld waarde verloor",
+    "Money Is More Than Cash": "Geld is meer as kontant"
+  },
+  "nr": {
+    "Fill in the blank": "Zalisa isikhala",
+    "True or False?": "Liqiniso namkha akusilo?",
+    "True": "Liqiniso",
+    "False": "Akusilo iqiniso",
+    "Money is More Than Cash": "Imali ingaphezu kukakheshi",
+    "The Three Jobs of Money": "Imisebenzi emithathu yemali",
+    "Why Money Loses Value": "Kubayini imali ilahlekelwa linani",
+    "Money Is More Than Cash": "Imali ingaphezu kukakheshi"
+  },
+  "xh": {
+    "Fill in the blank": "Gcwalisa isithuba",
+    "True or False?": "Yinyani okanye bubuxoki?",
+    "True": "Yinyani",
+    "False": "Bubuxoki",
+    "Money is More Than Cash": "Imali ingaphezulu kwemali eyikheshi",
+    "The Three Jobs of Money": "Imisebenzi emithathu yemali",
+    "Why Money Loses Value": "Kutheni imali iphulukana nexabiso",
+    "Money Is More Than Cash": "Imali ingaphezulu kwemali eyikheshi"
+  },
+  "zu": {
+    "Fill in the blank": "Gcwalisa isikhala",
+    "True or False?": "Iqiniso noma amanga?",
+    "True": "Iqiniso",
+    "False": "Amanga",
+    "Money is More Than Cash": "Imali ingaphezu kukakheshi",
+    "The Three Jobs of Money": "Imisebenzi emithathu yemali",
+    "Why Money Loses Value": "Kungani imali ilahlekelwa yinani",
+    "Money Is More Than Cash": "Imali ingaphezu kukakheshi"
+  },
+  "nso": {
+    "Fill in the blank": "Tlatša sekgoba",
+    "True or False?": "Nnete goba maaka?",
+    "True": "Nnete",
+    "False": "Maaka",
+    "Money is More Than Cash": "Tšhelete e feta kheše",
+    "The Three Jobs of Money": "Mešomo ye meraro ya tšhelete",
+    "Why Money Loses Value": "Lebaka leo tšhelete e lahlegelwago ke boleng",
+    "Money Is More Than Cash": "Tšhelete e feta kheše"
+  },
+  "st": {
+    "Fill in the blank": "Tlatsa sekgeo",
+    "True or False?": "Nnete kapa leshano?",
+    "True": "Nnete",
+    "False": "Leshano",
+    "Money is More Than Cash": "Tjhelete e feta kheše",
+    "The Three Jobs of Money": "Mesebetsi e meraro ya tjhelete",
+    "Why Money Loses Value": "Hobaneng tjhelete e lahlehelwa ke boleng",
+    "Money Is More Than Cash": "Tjhelete e feta kheše"
+  },
+  "tn": {
+    "Fill in the blank": "Tlatsa phatlha",
+    "True or False?": "Boammaaruri kgotsa maaka?",
+    "True": "Boammaaruri",
+    "False": "Maaka",
+    "Money is More Than Cash": "Madi a feta kheše",
+    "The Three Jobs of Money": "Ditiro tse tharo tsa madi",
+    "Why Money Loses Value": "Goreng madi a latlhegelwa ke boleng",
+    "Money Is More Than Cash": "Madi a feta kheše"
+  },
+  "ss": {
+    "Fill in the blank": "Gcwalisa sikhala",
+    "True or False?": "Liciniso nobe emanga?",
+    "True": "Liciniso",
+    "False": "Emanga",
+    "Money is More Than Cash": "Imali ingetulu kwakheshi",
+    "The Three Jobs of Money": "Imisebenti lemitsatfu yemali",
+    "Why Money Loses Value": "Kungani imali ilahlekelwa linani",
+    "Money Is More Than Cash": "Imali ingetulu kwakheshi"
+  },
+  "ve": {
+    "Fill in the blank": "Ḓadzani tshikhala",
+    "True or False?": "Ndi ngoho kana mazwifhi?",
+    "True": "Ngoho",
+    "False": "Mazwifhi",
+    "Money is More Than Cash": "Tshelede i fhira kheshe",
+    "The Three Jobs of Money": "Mishumo miraru ya tshelede",
+    "Why Money Loses Value": "Zwi itaho uri tshelede i xelelwe nga ndeme",
+    "Money Is More Than Cash": "Tshelede i fhira kheshe"
+  },
+  "ts": {
+    "Fill in the blank": "Tata xivandla lexi nga riki na nhlamulo",
+    "True or False?": "I ntiyiso kumbe mavunwa?",
+    "True": "Ntiyiso",
+    "False": "Mavunwa",
+    "Money is More Than Cash": "Mali yi hundza khexe",
+    "The Three Jobs of Money": "Mitirho yinharhu ya mali",
+    "Why Money Loses Value": "Lexi endlaka mali yi lahlekeriwa hi nkoka",
+    "Money Is More Than Cash": "Mali yi hundza khexe"
+  }
+}

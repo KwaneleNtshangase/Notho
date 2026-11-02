@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * /admin — operator hub.
@@ -49,12 +50,12 @@ function Hub() {
       <header className="nv-head">
         <div className="nv-title">
           <div className="nv-mark">
-            <img src="/notho-icon-192.png" alt="Notho" />
+            <I18nElement as="img" src="/notho-icon-192.png" alt="Notho" />
           </div>
           <div>
-            <h1 className="nv-h1">Notho backend</h1>
-            <p className="nv-lockup">Learn · Grow · Build wealth</p>
-            <p className="nv-sub">Operator tools. Sign in here — not in the learner app.</p>
+            <h1 className="nv-h1"><I18nText source={"Notho backend"} /></h1>
+            <p className="nv-lockup"><I18nText source={"Learn · Grow · Build wealth"} /></p>
+            <p className="nv-sub"><I18nText source={"Operator tools. Sign in here — not in the learner app."} /></p>
           </div>
         </div>
       </header>
@@ -66,25 +67,19 @@ function Hub() {
       {state === "in" && (
         <div className="nv-stack">
           <p style={{ margin: 0, fontSize: 13.5, color: "var(--body)" }}>
-            Signed in as <strong style={{ color: "var(--ink)" }}>{email}</strong>
+            <I18nText source={"Signed in as "} /><strong style={{ color: "var(--ink)" }}><I18nText>{email}</I18nText></strong>
           </p>
           <div className="nv-grid two">
             <Link href="/admin/analytics" className="nv-card" style={{ textDecoration: "none", color: "inherit" }}>
-              <h2 className="nv-card-title">Desk</h2>
-              <p className="nv-card-sub" style={{ marginBottom: 0 }}>
-                Live analytics. Pulse, growth, engagement, retention, content, churn, people.
-              </p>
+              <h2 className="nv-card-title"><I18nText source={"Desk"} /></h2>
+              <p className="nv-card-sub" style={{ marginBottom: 0 }}><I18nText source={"Live analytics. Pulse, growth, engagement, retention, content, churn, people."} /></p>
             </Link>
             <Link href="/admin/bugs" className="nv-card" style={{ textDecoration: "none", color: "inherit" }}>
-              <h2 className="nv-card-title">Bug console</h2>
-              <p className="nv-card-sub" style={{ marginBottom: 0 }}>
-                Crash inbox, lifecycle email tests, and broadcasts.
-              </p>
+              <h2 className="nv-card-title"><I18nText source={"Bug console"} /></h2>
+              <p className="nv-card-sub" style={{ marginBottom: 0 }}><I18nText source={"Crash inbox, lifecycle email tests, and broadcasts."} /></p>
             </Link>
           </div>
-          <p className="nv-card-sub" style={{ margin: 0 }}>
-            Google, a password, or a magic link all stay on /admin. They do not open Learn.
-          </p>
+          <p className="nv-card-sub" style={{ margin: 0 }}><I18nText source={"Google, a password, or a magic link all stay on /admin. They do not open Learn."} /></p>
           <button
             type="button"
             className="nv-btn"
@@ -93,9 +88,7 @@ function Hub() {
               setState("out");
             }}
             style={{ width: "fit-content" }}
-          >
-            Sign out
-          </button>
+          ><I18nText source={"Sign out"} /></button>
         </div>
       )}
     </div>

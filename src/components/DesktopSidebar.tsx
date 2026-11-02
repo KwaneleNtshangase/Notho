@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -56,8 +57,8 @@ export function DesktopSidebar() {
     <nav className="sidebar" style={{ background: "var(--color-bg)", border: "none" }}>
       <div className="sidebar-lockup">
         {/* Theme CSS swaps these. Do not set display inline — it beats html.dark .logo-light. */}
-        <img className="logo-light" src="/notho-logo.png" alt="Notho" />
-        <img className="logo-dark" src="/notho-logo-on-dark.png" alt="" />
+        <I18nElement as="img" className="logo-light" src="/notho-logo.png" alt="Notho" />
+        <I18nElement as="img" className="logo-dark" src="/notho-logo-on-dark.png" alt="" />
       </div>
       <ul className="nav-menu">
         {items.map(({ key, label, Icon }) => (
@@ -70,7 +71,7 @@ export function DesktopSidebar() {
               <span className="nav-icon">
                 {key === "profile" ? <NavProfileMark size={20} /> : Icon ? <Icon size={20} className="text-current" /> : null}
               </span>
-              {label}
+              <I18nText>{label}</I18nText>
             </button>
           </li>
         ))}

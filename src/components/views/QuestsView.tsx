@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 /* eslint-disable @next/next/no-html-link-for-pages */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -203,9 +204,7 @@ export function QuestsView({
           <Target size={16} className="text-[var(--color-primary)]" aria-hidden />
           <span style={{ fontSize: 13, fontWeight: 700 }}>{t("goals.daily")}</span>
         </div>
-        <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 8 }}>
-          {dailyXP} / {dailyGoal} XP today
-        </p>
+        <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"{value0} / {value1} XP today"} values={[dailyXP, dailyGoal]} preserveValues={[false,true]} /></p>
         <div style={{ height: 8, background: "var(--color-border)", borderRadius: 999, overflow: "hidden" }}>
           <div style={{ width: `${goalPct}%`, height: "100%", background: "var(--color-primary)", transition: "width 0.4s ease" }} />
         </div>
@@ -224,19 +223,17 @@ export function QuestsView({
             <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-primary)", marginBottom: 2 }}>
               {t("goals.weekly")}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{weeklyChallenge.text}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}><I18nText>{weeklyChallenge.text}</I18nText></div>
             <div style={{ background: "var(--color-border)", borderRadius: 4, height: 5, overflow: "hidden" }}>
               <div style={{ height: "100%", borderRadius: 4, background: "var(--color-primary)", width: `${Math.min(((challengeProgress || 0) / weeklyChallenge.target) * 100, 100)}%` }} />
             </div>
-            <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 4 }}>
-              {challengeProgress || 0}/{weeklyChallenge.target} · Reward: +{weeklyChallenge.xp} XP
-            </div>
+            <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 4 }}><I18nText source={"{value0}/{value1} · Reward: +{value2} XP"} values={[challengeProgress || 0, weeklyChallenge.target, weeklyChallenge.xp]} /></div>
             {weeklyProgress && (
               <div className="text-gray-500 dark:text-gray-400" style={{ fontSize: 10, marginTop: 6, lineHeight: 1.4 }}>
-                {weeklyChallenge.unit === "lessons" && `${weeklyProgress.lessonsCompleted} lesson${weeklyProgress.lessonsCompleted === 1 ? "" : "s"} this week`}
-                {weeklyChallenge.unit === "perfect" && `${weeklyProgress.perfectLessons} perfect lesson${weeklyProgress.perfectLessons === 1 ? "" : "s"}`}
-                {weeklyChallenge.unit === "daily_xp" && `${weeklyProgress.dailyXp} XP earned today (goal ${weeklyChallenge.target})`}
-                {weeklyChallenge.unit === "streak_days" && `${weeklyProgress.streakDaysThisWeek} day${weeklyProgress.streakDaysThisWeek === 1 ? "" : "s"} with lessons this week (goal: ${weeklyChallenge.target})`}
+                {weeklyChallenge.unit === "lessons" && <I18nText source={"{value0} lessons this week"} one={"{value0} lesson this week"} count={weeklyProgress.lessonsCompleted} values={[weeklyProgress.lessonsCompleted]} />}
+                {weeklyChallenge.unit === "perfect" && <I18nText source={"{value0} perfect lessons"} one={"{value0} perfect lesson"} count={weeklyProgress.perfectLessons} values={[weeklyProgress.perfectLessons]} />}
+                <I18nText>{weeklyChallenge.unit === "daily_xp" && `${weeklyProgress.dailyXp} XP earned today (goal ${weeklyChallenge.target})`}</I18nText>
+                {weeklyChallenge.unit === "streak_days" && <I18nText source={"{value0} days with lessons this week (goal: {value1})"} one={"{value0} day with lessons this week (goal: {value1})"} count={weeklyProgress.streakDaysThisWeek} values={[weeklyProgress.streakDaysThisWeek, weeklyChallenge.target]} />}
               </div>
             )}
           </div>

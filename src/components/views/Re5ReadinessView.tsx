@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import React from "react";
 import { ArrowLeft, CheckCircle2, CircleAlert, CircleDashed, ShieldCheck } from "lucide-react";
@@ -96,13 +97,10 @@ export function Re5ReadinessView({
       <button className="back-button" onClick={onBack}>
         <span className="inline-flex items-center gap-2">
           <ArrowLeft size={20} className="text-current" />
-          Back to course
-        </span>
+          <I18nText source={"Back to course"} /></span>
       </button>
 
-      <h2 style={{ fontSize: 24, fontWeight: 900, margin: "12px 0 4px" }}>
-        RE5 readiness
-      </h2>
+      <h2 style={{ fontSize: 24, fontWeight: 900, margin: "12px 0 4px" }}><I18nText source={"RE5 readiness"} /></h2>
       <p
         style={{
           fontSize: 13.5,
@@ -110,13 +108,10 @@ export function Re5ReadinessView({
           lineHeight: 1.6,
           margin: "0 0 18px",
         }}
-      >
-        The FSCA RE5 is 50 questions in 2 hours, and you need 33 correct to
-        pass. Everything below is from your own recorded attempts.
-      </p>
+      ><I18nText source={"The FSCA RE5 is 50 questions in 2 hours, and you need 33 correct to pass. Everything below is from your own recorded attempts."} /></p>
 
       {loading ? (
-        <p style={{ color: "var(--color-text-secondary)" }}>Loading your results…</p>
+        <p style={{ color: "var(--color-text-secondary)" }}><I18nText source={"Loading your results…"} /></p>
       ) : (
         <>
           {/* ── Verdict ─────────────────────────────────────────────────── */}
@@ -138,20 +133,18 @@ export function Re5ReadinessView({
                 marginBottom: 8,
               }}
             >
-              {style.icon}
+              <I18nText>{style.icon}</I18nText>
               <span style={{ fontSize: 20, fontWeight: 900 }}>
-                {readiness.headline}
+                <I18nText>{readiness.headline}</I18nText>
               </span>
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.65, margin: 0, fontWeight: 500 }}>
-              {readiness.detail}
+              <I18nText>{readiness.detail}</I18nText>
             </p>
           </div>
 
           {/* ── Mock exams ──────────────────────────────────────────────── */}
-          <h3 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 10px" }}>
-            Mock exams
-          </h3>
+          <h3 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 10px" }}><I18nText source={"Mock exams"} /></h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 22 }}>
             {readiness.mocks.map((mock) => (
               <div
@@ -173,7 +166,7 @@ export function Re5ReadinessView({
                   }}
                 >
                   <span style={{ fontSize: 15, fontWeight: 800 }}>
-                    {mock.spec.label}
+                    <I18nText>{mock.spec.label}</I18nText>
                   </span>
                   {mock.latest && mock.latest.passed !== null && (
                     <PassPill
@@ -198,16 +191,13 @@ export function Re5ReadinessView({
                       }}
                     >
                       <span style={{ fontSize: 20, fontWeight: 900, color: "var(--color-text-primary)" }}>
-                        {mock.latest.firstTryCorrect}/{mock.latest.totalQuestions}
+                        <I18nText>{mock.latest.firstTryCorrect}</I18nText>/<I18nText>{mock.latest.totalQuestions}</I18nText>
                       </span>
                       <GradeBadge scorePct={mock.latest.scorePct} size="sm" />
-                      <span>{formatDuration(mock.latest.durationSeconds)}</span>
-                      <span>
-                        {mock.attempts} attempt{mock.attempts === 1 ? "" : "s"}
-                        {mock.best && mock.best.firstTryCorrect !== mock.latest.firstTryCorrect
+                      <span><I18nText>{formatDuration(mock.latest.durationSeconds)}</I18nText></span>
+                      <span><I18nText source={"{value0} attempts{value2}"} values={[mock.attempts, mock.attempts === 1 ? "" : "s", mock.best && mock.best.firstTryCorrect !== mock.latest.firstTryCorrect
                           ? ` · best ${mock.best.firstTryCorrect}`
-                          : ""}
-                      </span>
+                          : ""]} one={"{value0} attempt{value2}"} count={mock.attempts} /></span>
                     </div>
                     <button
                       type="button"
@@ -220,9 +210,7 @@ export function Re5ReadinessView({
                         border: "1.5px solid var(--color-border)",
                       }}
                       onClick={() => onGoToLesson(mock.spec.lessonId)}
-                    >
-                      Re-sit {mock.spec.label}
-                    </button>
+                    ><I18nText source={"Re-sit {value0}"} values={[mock.spec.label]} /></button>
                   </>
                 ) : (
                   <>
@@ -233,19 +221,13 @@ export function Re5ReadinessView({
                         margin: "0 0 10px",
                         lineHeight: 1.6,
                       }}
-                    >
-                      Not sat yet. {mock.spec.totalQuestions} questions ·{" "}
-                      {mock.spec.timeLimitMinutes} minutes · pass at{" "}
-                      {mock.spec.passMarkCorrect}.
-                    </p>
+                    ><I18nText source={"Not sat yet. {value0} questions ·{value1}{value2} minutes · pass at{value3}{value4}."} values={[mock.spec.totalQuestions, " ", mock.spec.timeLimitMinutes, " ", mock.spec.passMarkCorrect]} /></p>
                     <button
                       type="button"
                       className="btn btn-primary"
                       style={{ width: "100%" }}
                       onClick={() => onGoToLesson(mock.spec.lessonId)}
-                    >
-                      Sit {mock.spec.label}
-                    </button>
+                    ><I18nText source={"Sit {value0}"} values={[mock.spec.label]} /></button>
                   </>
                 )}
               </div>
@@ -255,9 +237,7 @@ export function Re5ReadinessView({
           {/* ── Knowledge areas ─────────────────────────────────────────── */}
           {readiness.areas.length > 0 && (
             <>
-              <h3 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 4px" }}>
-                Knowledge areas
-              </h3>
+              <h3 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 4px" }}><I18nText source={"Knowledge areas"} /></h3>
               <p
                 style={{
                   fontSize: 13,
@@ -265,10 +245,7 @@ export function Re5ReadinessView({
                   margin: "0 0 12px",
                   lineHeight: 1.6,
                 }}
-              >
-                Combined across your most recent sitting of each mock — where you
-                stand now, not your best-ever paper.
-              </p>
+              ><I18nText source={"Combined across your most recent sitting of each mock — where you stand now, not your best-ever paper."} /></p>
               <div
                 style={{
                   background: "var(--color-surface)",
@@ -294,9 +271,7 @@ export function Re5ReadinessView({
           )}
 
           {/* ── Weakest lessons ─────────────────────────────────────────── */}
-          <h3 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 4px" }}>
-            Lessons to revisit
-          </h3>
+          <h3 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 4px" }}><I18nText source={"Lessons to revisit"} /></h3>
           <p
             style={{
               fontSize: 13,
@@ -304,14 +279,9 @@ export function Re5ReadinessView({
               margin: "0 0 12px",
               lineHeight: 1.6,
             }}
-          >
-            Your best first-try score on each teaching lesson, weakest first.
-          </p>
+          ><I18nText source={"Your best first-try score on each teaching lesson, weakest first."} /></p>
           {gradedLessons.length === 0 ? (
-            <p style={{ fontSize: 13.5, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
-              No lesson scores recorded yet. Finish a lesson and its grade shows
-              up here and on the course map.
-            </p>
+            <p style={{ fontSize: 13.5, color: "var(--color-text-secondary)", lineHeight: 1.6 }}><I18nText source={"No lesson scores recorded yet. Finish a lesson and its grade shows up here and on the course map."} /></p>
           ) : weakestLessons.length === 0 ? (
             <div
               style={{
@@ -324,7 +294,7 @@ export function Re5ReadinessView({
               }}
             >
               <CheckCircle2 size={18} />
-              Every graded lesson is at or above {RE5_AREA_FLOOR_PCT}%.
+              <I18nText source={"Every graded lesson is at or above "} /><I18nText>{RE5_AREA_FLOOR_PCT}</I18nText>%.
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -349,7 +319,7 @@ export function Re5ReadinessView({
                 >
                   <span style={{ minWidth: 0 }}>
                     <span style={{ display: "block", fontSize: 14, fontWeight: 700 }}>
-                      {l.title}
+                      <I18nText>{l.title}</I18nText>
                     </span>
                     <span
                       style={{
@@ -359,7 +329,7 @@ export function Re5ReadinessView({
                         fontWeight: 600,
                       }}
                     >
-                      {l.unitTitle}
+                      <I18nText>{l.unitTitle}</I18nText>
                     </span>
                   </span>
                   <GradeBadge scorePct={l.result.scorePct} size="sm" />
@@ -375,12 +345,7 @@ export function Re5ReadinessView({
               lineHeight: 1.65,
               marginTop: 24,
             }}
-          >
-            Scores are first-try accuracy: each question counts once, as you
-            answered it the first time it appeared. Notho is not the FSCA —
-            confirm the current RE5 format and pass mark on the FSCA site before
-            booking.
-          </p>
+          ><I18nText source={"Scores are first-try accuracy: each question counts once, as you answered it the first time it appeared. Notho is not the FSCA — confirm the current RE5 format and pass mark on the FSCA site before booking."} /></p>
         </>
       )}
     </main>

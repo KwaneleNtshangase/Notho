@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 /**
  * CHURN - why the ones who left, left, in their own words.
@@ -102,7 +103,7 @@ export function ChurnPanel({ days, nonce }: { days: number; nonce: number }) {
       label: "Reason",
       render: (r) =>
         r.reason === "skipped" ? (
-          <Tag tone="neutral">{REASON_LABELS.skipped}</Tag>
+          <Tag tone="neutral"><I18nText>{REASON_LABELS.skipped}</I18nText></Tag>
         ) : (
           REASON_LABELS[r.reason] ?? r.reason
         ),
@@ -112,7 +113,7 @@ export function ChurnPanel({ days, nonce }: { days: number; nonce: number }) {
       key: "left",
       label: "Left anyway",
       numeric: true,
-      render: (r) => (r.n_left < r.n ? <Tag tone="good">{fmt(r.n_left)}</Tag> : fmt(r.n_left)),
+      render: (r) => (r.n_left < r.n ? <Tag tone="good"><I18nText>{fmt(r.n_left)}</I18nText></Tag> : fmt(r.n_left)),
     },
     {
       key: "tenure",
@@ -135,7 +136,7 @@ export function ChurnPanel({ days, nonce }: { days: number; nonce: number }) {
           "—"
         ) : (
           <Tag tone={r.n_offer_taken > 0 ? "good" : "neutral"}>
-            {r.n_offer_taken} / {r.n_offer_shown}
+            <I18nText>{r.n_offer_taken}</I18nText> / <I18nText>{r.n_offer_shown}</I18nText>
           </Tag>
         ),
     },
@@ -229,9 +230,9 @@ export function ChurnPanel({ days, nonce }: { days: number; nonce: number }) {
       >
         {!showWords ? (
           <Note>
-            {(v.data?.length ?? 0) > 0
+            <I18nText>{(v.data?.length ?? 0) > 0
               ? `${v.data?.length} written comment${v.data?.length === 1 ? "" : "s"} in the last ${days} days.`
-              : "No written comments yet."}
+              : "No written comments yet."}</I18nText>
           </Note>
         ) : (
           <Gate
@@ -254,16 +255,16 @@ export function ChurnPanel({ days, nonce }: { days: number; nonce: number }) {
                   }}
                 >
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
-                    <Tag tone="neutral">{EXIT_LABELS[row.exit_type] ?? row.exit_type}</Tag>
-                    {row.reason && <Tag tone="warn">{REASON_LABELS[row.reason] ?? row.reason}</Tag>}
+                    <Tag tone="neutral"><I18nText>{EXIT_LABELS[row.exit_type] ?? row.exit_type}</I18nText></Tag>
+                    {row.reason && <Tag tone="warn"><I18nText>{REASON_LABELS[row.reason] ?? row.reason}</I18nText></Tag>}
                     <span style={{ fontSize: 11.5, color: p.muted }}>
-                      {ago(row.created_at)}
-                      {row.days_since_signup != null && ` · ${row.days_since_signup} days signed up`}
-                      {row.lessons_completed != null && ` · ${row.lessons_completed} lessons`}
+                      <I18nText>{ago(row.created_at)}</I18nText>
+                      <I18nText>{row.days_since_signup != null && ` · ${row.days_since_signup} days signed up`}</I18nText>
+                      <I18nText>{row.lessons_completed != null && ` · ${row.lessons_completed} lessons`}</I18nText>
                     </span>
                   </div>
                   <div style={{ fontSize: 13.5, color: p.ink, lineHeight: 1.65, whiteSpace: "pre-wrap" }}>
-                    {row.detail}
+                    <I18nText>{row.detail}</I18nText>
                   </div>
                 </div>
               ))}

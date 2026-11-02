@@ -1,56 +1,30 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useId } from "react";
 import { Volume2 } from "lucide-react";
-import { VOICE_STORAGE_KEY, voiceKey, getSavedVoice } from "@/components/SpeakButton";
+import { voiceKey, speechText } from "@/lib/speech";
+import { useSpeechVoice } from "./useSpeechVoice";
+import { useLocale } from "@/i18n/LocaleProvider";
 
 export function VoiceSettings() {
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [selected, setSelected] = useState<string>("");
-  const [supported, setSupported] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
-    setSupported(true);
-
-    const load = () => {
-      const available = window.speechSynthesis.getVoices();
-      const sorted = [...available].sort((a, b) => {
-        const aScore = (a.lang.startsWith("en") ? 10 : 0) + (a.lang.toLowerCase().includes("za") ? 5 : 0) + (a.localService ? 1 : 0);
-        const bScore = (b.lang.startsWith("en") ? 10 : 0) + (b.lang.toLowerCase().includes("za") ? 5 : 0) + (b.localService ? 1 : 0);
-        return bScore - aScore;
-      });
-      setVoices(sorted);
-
-      const saved = localStorage.getItem(VOICE_STORAGE_KEY);
-      if (saved && sorted.some((v) => voiceKey(v) === saved)) {
-        setSelected(saved);
-      } else if (sorted.length > 0) {
-        setSelected(voiceKey(sorted[0]));
-      }
-    };
-
-    load();
-    window.speechSynthesis.addEventListener("voiceschanged", load);
-    return () => window.speechSynthesis.removeEventListener("voiceschanged", load);
-  }, []);
-
-  const choose = (key: string) => {
-    setSelected(key);
-    localStorage.setItem(VOICE_STORAGE_KEY, key);
-  };
+  const { locale, t } = useLocale();
+  const { voices, voice, choose } = useSpeechVoice(locale);
+  const id = useId();
+  const voiceId = voice ? voiceKey(voice) : "";
+  useEffect(() => () => { window.speechSynthesis?.cancel(); }, [locale, voiceId]);
 
   const test = () => {
-    if (!window.speechSynthesis) return;
+    if (!window.speechSynthesis || !voice) return;
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance("This is how Notho will read lessons to you.");
+    const u = new SpeechSynthesisUtterance(speechText(locale === "en" ? "This is how Notho will read lessons to you." : t("share.lessonDone"), locale));
     u.rate = 0.95;
-    const voice = getSavedVoice();
-    if (voice) u.voice = voice;
+    u.voice = voice;
+    u.lang = voice.lang;
     window.speechSynthesis.speak(u);
   };
 
-  if (!supported) return null;
+  if (!voice) return null;
 
   return (
     <div style={{
@@ -60,12 +34,13 @@ export function VoiceSettings() {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
         <span style={{ color: "var(--color-primary)" }}><Volume2 size={18} /></span>
         <div>
-          <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>Read-aloud voice</div>
-          <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>Used when you tap the speaker in lessons</div>
+          <label htmlFor={id} style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}><I18nText source={"Read-aloud voice"} /></label>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}><I18nText source={"Used when you tap the speaker in lessons"} /></div>
         </div>
       </div>
       <select
-        value={selected}
+        id={id}
+        value={voiceKey(voice)}
         onChange={(e) => choose(e.target.value)}
         style={{
           width: "100%", padding: "8px 10px", borderRadius: 8,
@@ -74,14 +49,12 @@ export function VoiceSettings() {
         }}
       >
         {voices.map((v) => (
-          <option key={voiceKey(v)} value={voiceKey(v)}>
+          <I18nElement as="option" key={voiceKey(v)} value={voiceKey(v)}>
             {v.name} ({v.lang})
-          </option>
+          </I18nElement>
         ))}
       </select>
-      <button type="button" className="btn btn-secondary" onClick={test} style={{ fontSize: 13 }}>
-        Test voice
-      </button>
+      <button type="button" className="btn btn-secondary" onClick={test} style={{ fontSize: 13 }}><I18nText source={"Test voice"} /></button>
     </div>
   );
 }

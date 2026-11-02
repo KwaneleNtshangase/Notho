@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-23",
+  "generator": "Codex",
+  "sourceLanguage": "en-ZA",
+  "status": "machine-generated-awaiting-human-review",
+  "humanReviewed": false,
+  "culturallyValidated": false,
+  "sentenceVerification": "No generated sentence has been verified against a source or approved by a human.",
+  "references": "docs/i18n/SOURCES.md",
+  "reviewPriorities": "docs/i18n/REVIEW.md",
+  "fallbackHolds": "src/i18n/drafts/holds.json",
+  "legacyPolicy": "Preserve existing isiZulu values separately; do not assert their provenance.",
+  "paidTranslationServicesUsed": false
+}

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -87,7 +88,7 @@ export function NotificationOptIn() {
   if (!show) return null;
 
   return (
-    <div
+    <I18nElement as="div"
       role="dialog"
       aria-label="Reminders"
       style={{
@@ -104,13 +105,12 @@ export function NotificationOptIn() {
         padding: "14px 16px",
         boxShadow: "0 12px 32px rgba(0, 0, 0, 0.28)",
         display: "flex",
+        flexWrap: "wrap",
         alignItems: "center",
         gap: 12,
       }}
     >
-      <div style={{ flex: 1, fontSize: 15, fontWeight: 700, color: "var(--color-text-primary)", lineHeight: 1.3 }}>
-        Remind you for the next lesson?
-      </div>
+      <div style={{ flex: 1, fontSize: 15, fontWeight: 700, color: "var(--color-text-primary)", lineHeight: 1.3 }}><I18nText source={"Remind you for the next lesson?"} /></div>
       <button
         type="button"
         onClick={() => close(true)}
@@ -124,9 +124,7 @@ export function NotificationOptIn() {
           padding: "8px 10px",
           flexShrink: 0,
         }}
-      >
-        No
-      </button>
+      ><I18nText source={"No"} /></button>
       <button
         type="button"
         onClick={() => void enable()}
@@ -144,8 +142,8 @@ export function NotificationOptIn() {
           flexShrink: 0,
         }}
       >
-        {busy ? "…" : "Remind me"}
+        <I18nText>{busy ? "…" : "Remind me"}</I18nText>
       </button>
-    </div>
+    </I18nElement>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import { useLayoutEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -113,7 +114,7 @@ export function NavProfileMark({ size = 24 }: { size?: number }) {
 
   if (url && !failed) {
     return (
-      <img
+      <I18nElement as="img"
         src={url}
         alt=""
         width={size}

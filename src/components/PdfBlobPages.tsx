@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import { useEffect, useState } from "react";
 
@@ -88,7 +89,7 @@ export function PdfBlobPages({ blob }: Props) {
   if (error) {
     return (
       <div style={{ padding: 28, textAlign: "center", color: "var(--color-text-secondary)", fontSize: 14 }}>
-        {error}
+        <I18nText>{error}</I18nText>
       </div>
     );
   }
@@ -96,7 +97,7 @@ export function PdfBlobPages({ blob }: Props) {
   return (
     <div style={{ padding: "8px 8px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
       {pages.map((src, i) => (
-        <img
+        <I18nElement as="img"
           key={i}
           src={src}
           alt={`Report page ${i + 1}`}
@@ -105,7 +106,7 @@ export function PdfBlobPages({ blob }: Props) {
       ))}
       {progress ? (
         <div style={{ textAlign: "center", padding: 20, fontSize: 14, fontWeight: 600, color: "var(--color-text-secondary)" }}>
-          {progress}
+          <I18nText>{progress}</I18nText>
         </div>
       ) : null}
     </div>

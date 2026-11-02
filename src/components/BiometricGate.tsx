@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * Face ID / Touch ID / fingerprint lock in front of a screen.
@@ -59,10 +60,10 @@ export function BiometricGate({
   }, [state]);
 
   if (state === "checking") return null;
-  if (state === "skip" || state === "unlocked") return <>{children}</>;
+  if (state === "skip" || state === "unlocked") return <><I18nText>{children}</I18nText></>;
 
   return (
-    <div
+    <I18nElement as="div"
       role="dialog"
       aria-label="Budget locked"
       style={{
@@ -82,14 +83,10 @@ export function BiometricGate({
       }}>
         <Fingerprint size={34} style={{ color: "var(--color-primary, #007A85)" }} />
       </div>
-      <div style={{ fontSize: 18, fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 6 }}>
-        Budget locked
-      </div>
-      <div style={{ fontSize: 13.5, color: "var(--color-text-secondary)", marginBottom: 22, maxWidth: 280, lineHeight: 1.5 }}>
-        Verify it&apos;s you to see your budget and transactions.
-      </div>
+      <div style={{ fontSize: 18, fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 6 }}><I18nText source={"Budget locked"} /></div>
+      <div style={{ fontSize: 13.5, color: "var(--color-text-secondary)", marginBottom: 22, maxWidth: 280, lineHeight: 1.5 }}><I18nText source={"Verify it's you to see your budget and transactions."} /></div>
       {error && (
-        <div style={{ fontSize: 12.5, color: "#DE6B62", marginBottom: 14, maxWidth: 280 }}>{error}</div>
+        <div style={{ fontSize: 12.5, color: "#DE6B62", marginBottom: 14, maxWidth: 280 }}><I18nText>{error}</I18nText></div>
       )}
       <button
         type="button"
@@ -102,8 +99,8 @@ export function BiometricGate({
           opacity: busy ? 0.6 : 1,
         }}
       >
-        {busy ? "Verifying…" : "Unlock"}
+        <I18nText>{busy ? "Verifying…" : "Unlock"}</I18nText>
       </button>
-    </div>
+    </I18nElement>
   );
 }

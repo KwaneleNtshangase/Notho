@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -24,7 +25,7 @@ import { VoiceSettings } from "@/components/VoiceSettings";
 import { ExitSurveyModal } from "@/components/churn/ExitSurvey";
 import { isAdminEmail } from "@/lib/admin";
 import { useLocale } from "@/i18n/LocaleProvider";
-import type { Locale } from "@/i18n/locales";
+import { LanguageSelector } from "@/i18n/LanguageSelector";
 
 function SettingsAccountSection() {
   const [name, setName] = useState("");
@@ -71,24 +72,24 @@ function SettingsAccountSection() {
 
   return (
     <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 12, padding: "14px 16px", marginBottom: 8 }}>
-      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12, color: "var(--color-text-primary)" }}>Edit Details</div>
+      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12, color: "var(--color-text-primary)" }}><I18nText source={"Edit Details"} /></div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <input type="text" placeholder="Full name" value={name}
+        <I18nElement as="input" type="text" placeholder="Full name" value={name}
           onChange={(e) => setName(e.target.value)} style={inputStyle} />
-        <input type="email" placeholder="Email (cannot be changed here)" value={email}
+        <I18nElement as="input" type="email" placeholder="Email (cannot be changed here)" value={email}
           disabled style={{ ...inputStyle, opacity: 0.5, cursor: "not-allowed" }} />
         <div style={{ position: "relative" }}>
-          <input type={showPw ? "text" : "password"} placeholder="New password (min 6 chars)"
+          <I18nElement as="input" type={showPw ? "text" : "password"} placeholder="New password (min 6 chars)"
             value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
             style={{ ...inputStyle, paddingRight: 52 }} />
           <button type="button" onClick={() => setShowPw(v => !v)}
             style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#888", fontSize: 12 }}>
-            {showPw ? "Hide" : "Show"}
+            <I18nText>{showPw ? "Hide" : "Show"}</I18nText>
           </button>
         </div>
-        {msg && <p style={{ fontSize: 13, color: msg === "Saved!" ? "var(--color-primary)" : "var(--error-red)", margin: 0 }}>{msg}</p>}
+        {msg && <p style={{ fontSize: 13, color: msg === "Saved!" ? "var(--color-primary)" : "var(--error-red)", margin: 0 }}><I18nText>{msg}</I18nText></p>}
         <button className="btn btn-primary" style={{ width: "100%" }} onClick={handleSave} disabled={saving}>
-          {saving ? "Saving…" : "Save Changes"}
+          <I18nText>{saving ? "Saving…" : "Save Changes"}</I18nText>
         </button>
       </div>
     </div>
@@ -114,7 +115,7 @@ export function SettingsView({
   onDeleteAccount?: (exitId?: string | null) => Promise<void>;
   onDownloadData?: () => void;
 }) {
-  const { locale, setLocale, t } = useLocale();
+  const { t } = useLocale();
   const [showLegalPage, setShowLegalPage] = useState<"faq" | "privacy" | "terms" | null>(null);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -185,13 +186,13 @@ export function SettingsView({
       borderRadius: 12, padding: "14px 16px", marginBottom: 8,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0, flex: 1 }}>
-        <span style={{ color: "var(--color-primary)", flexShrink: 0 }}>{icon}</span>
+        <span style={{ color: "var(--color-primary)", flexShrink: 0 }}><I18nText>{icon}</I18nText></span>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>{label}</div>
-          {sub && <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 1, lineHeight: 1.4, overflowWrap: "anywhere" }}>{sub}</div>}
+          <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}><I18nText>{label}</I18nText></div>
+          {sub && <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 1, lineHeight: 1.4, overflowWrap: "anywhere" }}><I18nText>{sub}</I18nText></div>}
         </div>
       </div>
-      {children}
+      <I18nText>{children}</I18nText>
     </div>
   );
 
@@ -203,36 +204,13 @@ export function SettingsView({
     <main style={{ paddingBottom: 28 }}>
       <h2 className="text-gray-900 dark:text-gray-100" style={{ fontSize: 32, fontWeight: 800, marginBottom: 24 }}>{t("settings.title")}</h2>
 
-      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 8 }}>{t("settings.language")}</div>
-      <div style={{
-        background: "var(--color-surface)", border: "1px solid var(--color-border)",
-        borderRadius: 12, padding: "14px 16px", marginBottom: 16,
-      }}>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-          {(["en", "zu"] as Locale[]).map((code) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => setLocale(code)}
-              style={{
-                padding: "6px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: "pointer",
-                border: "1.5px solid",
-                borderColor: locale === code ? "var(--color-primary)" : "var(--color-border)",
-                background: locale === code ? "var(--color-primary)" : "transparent",
-                color: locale === code ? "white" : "var(--color-text-secondary)",
-                transition: "all 0.15s",
-              }}
-            >{code === "en" ? t("settings.languageEn") : t("settings.languageZu")}</button>
-          ))}
-        </div>
-        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.4 }}>{t("settings.languageHint")}</div>
-      </div>
+      <LanguageSelector />
 
-      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 8 }}>Learning</div>
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Learning"} /></div>
 
       <VoiceSettings />
 
-      <Row icon={<Zap size={18} />} label="Sound effects" sub="Plays on correct / incorrect answers">
+      <Row icon={<Zap size={18} />} label={t("settings.sound")} sub="Plays on correct / incorrect answers">
         <button
           role="switch"
           aria-checked={soundEnabled}
@@ -282,7 +260,7 @@ export function SettingsView({
           <span style={{ color: "var(--color-primary)" }}><Target size={18} /></span>
           <div>
             <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>{t("settings.dailyGoal")}</div>
-            <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>How much XP you aim to earn per day</div>
+            <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}><I18nText source={"How much XP you aim to earn per day"} /></div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -298,15 +276,15 @@ export function SettingsView({
                 color: selectedGoal === g ? "white" : "var(--color-text-secondary)",
                 transition: "all 0.15s",
               }}
-            >{g} XP</button>
+            ><I18nText source={"{value0} XP"} values={[g]} /></button>
           ))}
         </div>
       </div>
 
-      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Account</div>
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}><I18nText source={"Account"} /></div>
       <SettingsAccountSection />
 
-      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Support</div>
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}><I18nText source={"Support"} /></div>
       <a href="https://wealthwithkwanele.co.za" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
         <Row icon={<Shield size={18} />} label="Help and consultations" sub="Book or enquire via the official site">
           <ArrowLeft size={16} style={{ transform: "rotate(180deg)", color: "var(--color-text-secondary)" }} />
@@ -315,14 +293,14 @@ export function SettingsView({
 
       {isAdmin && (
         <>
-          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Admin</div>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}><I18nText source={"Admin"} /></div>
           <a href="/admin/bugs" style={{ textDecoration: "none" }}>
             <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, marginBottom: 8, overflow: "hidden" }}>
               <div style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px" }}>
                 <Bug size={16} style={{ color: "var(--color-primary)", flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}>Bug console</div>
-                  <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>Triage reported & auto-captured bugs · notify users when fixed</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}><I18nText source={"Bug console"} /></div>
+                  <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={"Triage reported & auto-captured bugs · notify users when fixed"} /></div>
                 </div>
                 <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />
               </div>
@@ -333,7 +311,7 @@ export function SettingsView({
 
       <ShakeReportSetting />
 
-      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Help & Legal</div>
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}><I18nText source={"Help & Legal"} /></div>
       <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, marginBottom: 8, overflow: "hidden" }}>
         {[
           { label: "FAQ & Help", icon: <HelpCircle size={16} />, action: () => setShowLegalPage("faq") },
@@ -343,8 +321,8 @@ export function SettingsView({
         ].map((item, i, arr) => (
           <button key={item.label} type="button" onClick={item.action}
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "none", border: "none", borderBottom: i < arr.length - 1 ? "1px solid var(--color-border)" : "none", cursor: "pointer", textAlign: "left" }}>
-            <span style={{ color: "var(--color-text-secondary)" }}>{item.icon}</span>
-            <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}>{item.label}</span>
+            <span style={{ color: "var(--color-text-secondary)" }}><I18nText>{item.icon}</I18nText></span>
+            <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}><I18nText>{item.label}</I18nText></span>
             <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />
           </button>
         ))}
@@ -352,15 +330,15 @@ export function SettingsView({
 
       {onDeleteAccount && (
         <>
-          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}>Account & Data</div>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}><I18nText source={"Account & Data"} /></div>
           <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, marginBottom: 8, overflow: "hidden" }}>
             {onDownloadData && (
               <button type="button" onClick={onDownloadData}
                 style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "none", border: "none", borderBottom: "1px solid var(--color-border)", cursor: "pointer", textAlign: "left" }}>
                 <FileText size={16} style={{ color: "var(--color-primary)", flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}>Download My Data</div>
-                  <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>Export your progress as a JSON file (POPIA right to access)</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}><I18nText source={"Download My Data"} /></div>
+                  <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={"Export your progress as a JSON file (POPIA right to access)"} /></div>
                 </div>
               </button>
             )}
@@ -368,8 +346,8 @@ export function SettingsView({
               style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>
               <Trash2 size={16} style={{ color: "var(--color-danger)", flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-danger)" }}>Delete My Data</div>
-                <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>Permanently removes all your account data</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-danger)" }}><I18nText source={"Delete My Data"} /></div>
+                <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={"Permanently removes all your account data"} /></div>
               </div>
             </button>
           </div>
@@ -379,8 +357,7 @@ export function SettingsView({
       {onSignOut && (
         <button type="button" onClick={onSignOut} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 600, color: "var(--color-danger)", background: "none", border: "none", cursor: "pointer", padding: "8px 0", marginTop: 4, marginBottom: 32 }}>
           <LogOut size={18} />
-          Sign Out
-        </button>
+          <I18nText source={"Sign Out"} /></button>
       )}
 
       <ExitSurveyModal

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
@@ -74,7 +75,7 @@ export function MobileBottomNav({
       <style>{`
         html.notho-overlay-open .bottom-nav { display: none !important; }
       `}</style>
-      <nav
+      <I18nElement as="nav"
         className="bottom-nav fixed left-0 right-0 z-[200] md:hidden"
         style={{
           bottom: "calc(env(safe-area-inset-bottom) + 10px)",
@@ -141,13 +142,13 @@ export function MobileBottomNav({
               onClick={item.onClick}
             >
               <span className="nav-ico" aria-hidden="true">
-                {item.icon}
+                <I18nText>{item.icon}</I18nText>
               </span>
-              <span className="nav-lbl">{item.label === "Quests" ? "Goals" : item.label}</span>
+              <span className="nav-lbl"><I18nText>{item.label === "Quests" ? "Goals" : item.label}</I18nText></span>
             </button>
           ))}
         </div>
-      </nav>
+      </I18nElement>
     </>
   );
 }

@@ -1,5 +1,9 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
+import { LocalizedRichText as I18nRich, LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
+import { useLocale } from '@/i18n/LocaleProvider';
+import { localizeString } from '@/i18n/stringZu';
+/* eslint-disable @next/next/no-html-link-for-pages */
+
 
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -77,7 +81,7 @@ function FieldTip({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
   return (
     <span className="relative inline-flex align-middle">
-      <button
+      <I18nElement as="button"
         type="button"
         className="rounded-full p-0.5 text-gray-400 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:text-gray-500 dark:hover:text-gray-300"
         aria-label="More info"
@@ -87,13 +91,13 @@ function FieldTip({ text }: { text: string }) {
         onBlur={() => setOpen(false)}
       >
         <Info size={14} strokeWidth={2.5} aria-hidden />
-      </button>
+      </I18nElement>
       {open ? (
         <span
           role="tooltip"
           className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 w-max max-w-[220px] -translate-x-1/2 rounded-lg bg-gray-900 px-2.5 py-2 text-left text-xs font-medium leading-snug text-white shadow-lg dark:bg-gray-700"
         >
-          {text}
+          <I18nText>{text}</I18nText>
         </span>
       ) : null}
     </span>
@@ -123,10 +127,10 @@ function CalcNumberRow({
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)" }}>{label}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)" }}><I18nText>{label}</I18nText></span>
         <FieldTip text={tooltip} />
       </div>
-      <input
+      <I18nElement as="input"
         type="number"
         step={step}
         min={min}
@@ -173,45 +177,45 @@ function FormulaePanel() {
         onClick={() => setOpen(o => !o)}
         style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--color-text-primary)" }}
       >
-        <span>📐 Calculator Formulae (for comparison with Liberty Life / any calculator)</span>
+        <span><I18nText source={"📐 Calculator Formulae (for comparison with Liberty Life / any calculator)"} /></span>
         {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
       {open && (
         <div style={{ padding: "0 16px 16px", fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
 
           <div style={{ marginBottom: 12 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>🔢 Core simulation (what this calculator runs)</strong>
-            <p style={{ margin: "0 0 4px" }}>Every month, balance compounds and the contribution is added:</p>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}><I18nText source={"🔢 Core simulation (what this calculator runs)"} /></strong>
+            <p style={{ margin: "0 0 4px" }}><I18nText source={"Every month, balance compounds and the contribution is added:"} /></p>
             <code style={{ display: "block", background: "var(--color-bg)", padding: "8px 10px", borderRadius: 8, fontSize: 12, marginBottom: 4 }}>
               balance = balance × (1 + r / 12) + PMT
             </code>
-            <p style={{ margin: 0 }}>Where <strong>r</strong> = annual rate (e.g. 10% → 0.10), <strong>PMT</strong> = monthly contribution (increases by escalation% each year).</p>
+            <p style={{ margin: 0 }}><I18nRich source={"Where <strong0>r</strong0>  = annual rate (e.g. 10% → 0.10), <strong1>PMT</strong1>  = monthly contribution (increases by escalation% each year)."} elements={[<strong key="inline-0" />, <strong key="inline-1" />]} /></p>
           </div>
 
           <div style={{ marginBottom: 12 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Closed-form equivalent (no escalation, lump sum only)</strong>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}><I18nText source={"Closed-form equivalent (no escalation, lump sum only)"} /></strong>
             <code style={{ display: "block", background: "var(--color-bg)", padding: "8px 10px", borderRadius: 8, fontSize: 12, marginBottom: 4 }}>
               FV = P × (1 + r/n)^(n×t)
             </code>
-            <p style={{ margin: 0 }}>P = initial lump sum, n = 12 (monthly), t = years</p>
+            <p style={{ margin: 0 }}><I18nText source={"P = initial lump sum, n = 12 (monthly), t = years"} /></p>
           </div>
 
           <div style={{ marginBottom: 12 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Closed-form (monthly contributions, no escalation)</strong>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}><I18nText source={"Closed-form (monthly contributions, no escalation)"} /></strong>
             <code style={{ display: "block", background: "var(--color-bg)", padding: "8px 10px", borderRadius: 8, fontSize: 12, marginBottom: 4 }}>
               FV = P × (1 + r/12)^(12t) + PMT × [(1 + r/12)^(12t) − 1] / (r/12)
             </code>
-            <p style={{ margin: 0 }}>Add lump sum growth + annuity growth. When escalation = 0%, this matches the simulation exactly.</p>
+            <p style={{ margin: 0 }}><I18nText source={"Add lump sum growth + annuity growth. When escalation = 0%, this matches the simulation exactly."} /></p>
           </div>
 
           <div style={{ marginBottom: 12 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Annual escalation (growing annuity)</strong>
-            <p style={{ margin: "0 0 4px" }}>Contribution after year y: <code>PMT × (1 + g)^y</code> where g = escalation rate (e.g. 5% → 0.05)</p>
-            <p style={{ margin: "0 0 4px" }}>There's no simple closed-form when escalation is applied monthly. The simulation loop handles this correctly.</p>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}><I18nText source={"Annual escalation (growing annuity)"} /></strong>
+            <p style={{ margin: "0 0 4px" }}><I18nText source={"Contribution after year y: "} /><code>PMT × (1 + g)^y</code> <I18nText source={" where g = escalation rate (e.g. 5% → 0.05)"} /></p>
+            <p style={{ margin: "0 0 4px" }}><I18nText source={"There's no simple closed-form when escalation is applied monthly. The simulation loop handles this correctly."} /></p>
           </div>
 
           <div style={{ marginBottom: 12 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Total contributions & interest</strong>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}><I18nText source={"Total contributions & interest"} /></strong>
             <code style={{ display: "block", background: "var(--color-bg)", padding: "8px 10px", borderRadius: 8, fontSize: 12, marginBottom: 4 }}>
               {`Total Contributions = initial lump sum + Σ(monthly payments made)`}{"\n"}
               {`Interest Earned = Final Value − Total Contributions`}{"\n"}
@@ -220,13 +224,13 @@ function FormulaePanel() {
           </div>
 
           <div style={{ marginBottom: 4 }}>
-            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}>Key assumptions</strong>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", marginBottom: 4 }}><I18nText source={"Key assumptions"} /></strong>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
-              <li>Rate is the gross annual return before fees/inflation</li>
-              <li>Monthly contributions are paid at end of each month (ordinary annuity)</li>
-              <li>Escalation applies once per year (at each year-end)</li>
-              <li>"Once-off" mode: only lump sum compounds, no monthly additions</li>
-              <li>"Annually" mode: 12 × monthly contribution added once per year (approximation)</li>
+              <li><I18nText source={"Rate is the gross annual return before fees/inflation"} /></li>
+              <li><I18nText source={"Monthly contributions are paid at end of each month (ordinary annuity)"} /></li>
+              <li><I18nText source={"Escalation applies once per year (at each year-end)"} /></li>
+              <li><I18nText source={"\"Once-off\" mode: only lump sum compounds, no monthly additions"} /></li>
+              <li><I18nText source={"\"Annually\" mode: 12 × monthly contribution added once per year (approximation)"} /></li>
             </ul>
           </div>
         </div>
@@ -242,6 +246,7 @@ function FormulaePanel() {
 type SolveMode = "goal" | "time" | "monthly" | "rate" | "initial";
 
 export function CalculatorView() {
+  const { locale } = useLocale();
   const defaultInputs: CalcInputs = {
     principal: 50000,
     monthly: 1000,
@@ -314,7 +319,7 @@ export function CalculatorView() {
         } else {
           const roundedYrs = Math.ceil(yrs);
           effectiveA = { ...inputsA, years: roundedYrs };
-          result = { label: "Time Needed", value: `${roundedYrs} year${roundedYrs !== 1 ? "s" : ""}`, sub: `to reach ${formatZAR(goal)}` };
+          result = { label: "Time Needed", value: new Intl.PluralRules(locale).select(roundedYrs) === "one" ? `${roundedYrs} year` : `${roundedYrs} years`, sub: `to reach ${formatZAR(goal)}` };
         }
       } else if (solveMode === "monthly") {
         const monthly = solveForMonthly(inputsA, goal);
@@ -416,7 +421,7 @@ export function CalculatorView() {
           marginBottom: 6,
         }}
       >
-        {label}
+        <I18nText>{label}</I18nText>
       </div>
       <div
         style={{
@@ -425,7 +430,7 @@ export function CalculatorView() {
           color: highlight ? "white" : "var(--color-text-primary)",
         }}
       >
-        {value}
+        <I18nText>{value}</I18nText>
       </div>
     </div>
   );
@@ -463,7 +468,7 @@ export function CalculatorView() {
     >
       {label && (
         <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", marginBottom: 16, textTransform: "uppercase", letterSpacing: 1 }}>
-          {label}
+          <I18nText>{label}</I18nText>
         </div>
       )}
 
@@ -493,11 +498,11 @@ export function CalculatorView() {
       )}
 
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Investment Frequency</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Investment Frequency"} /></div>
         <div style={{ display: "flex", gap: 8 }}>
           {(["monthly", "annually", "once-off"] as const).map((f) => (
             <button key={f} onClick={() => setInputs({ ...inputs, frequency: f })} style={{ flex: 1, padding: "8px 4px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "2px solid", borderColor: inputs.frequency === f ? "var(--color-primary)" : "var(--color-border)", background: inputs.frequency === f ? "var(--color-primary-light)" : "white", color: inputs.frequency === f ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
-              {f === "once-off" ? "Once-off" : f.charAt(0).toUpperCase() + f.slice(1)}
+              <I18nText>{f === "monthly" ? "Monthly" : f === "annually" ? "Annually" : "Once-off"}</I18nText>
             </button>
           ))}
         </div>
@@ -516,11 +521,11 @@ export function CalculatorView() {
   return (
     <main id="mainContent">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, gap: 10 }}>
-        <h2 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}>Investment Calculator</h2>
+        <h2 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}><I18nText source={"Investment Calculator"} /></h2>
         {solveMode === "goal" && (
           <div style={{ display: "flex", gap: 8 }}>
-            <button className={mode === "single" ? "btn btn-primary" : "btn btn-secondary"} style={{ padding: "8px 12px", fontSize: 13 }} onClick={() => setMode("single")}>Single</button>
-            <button className={mode === "compare" ? "btn btn-primary" : "btn btn-secondary"} style={{ padding: "8px 12px", fontSize: 13 }} onClick={() => setMode("compare")}>Compare</button>
+            <button className={mode === "single" ? "btn btn-primary" : "btn btn-secondary"} style={{ padding: "8px 12px", fontSize: 13 }} onClick={() => setMode("single")}><I18nText source={"Single"} /></button>
+            <button className={mode === "compare" ? "btn btn-primary" : "btn btn-secondary"} style={{ padding: "8px 12px", fontSize: 13 }} onClick={() => setMode("compare")}><I18nText source={"Compare"} /></button>
           </div>
         )}
       </div>
@@ -530,7 +535,7 @@ export function CalculatorView() {
 
       {/* ── Solve For selector ── */}
       <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 12 }}>What are you solving for?</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 12 }}><I18nText source={"What are you solving for?"} /></div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 8 }}>
           {SOLVE_OPTIONS.map((opt) => (
             <button key={opt.id} onClick={() => { setSolveMode(opt.id); setHasCalculated(false); setSolveResult(null); }}
@@ -538,16 +543,14 @@ export function CalculatorView() {
               <div style={{ display: "flex", justifyContent: "center", marginBottom: 4, color: solveMode === opt.id ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
                 <opt.Icon size={18} />
               </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: solveMode === opt.id ? "var(--color-primary)" : "var(--color-text-primary)" }}>{opt.label}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: solveMode === opt.id ? "var(--color-primary)" : "var(--color-text-primary)" }}><I18nText>{opt.label}</I18nText></div>
             </button>
           ))}
         </div>
         {solveMode !== "goal" && (
           <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--color-border)" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>
-              {SOLVE_OPTIONS.find(o => o.id === solveMode)?.desc} - Target Goal Amount (R)
-            </div>
-            <input
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"{value0} - Target Goal Amount (R)"} values={[SOLVE_OPTIONS.find(o => o.id === solveMode)?.desc]} /></div>
+            <I18nElement as="input"
               type="number" inputMode="decimal" placeholder="e.g. 1000000"
               value={goalTarget} onChange={(e) => setGoalTarget(e.target.value)}
               style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1.5px solid var(--color-primary)", fontSize: 16, fontWeight: 700, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" }}
@@ -578,12 +581,11 @@ export function CalculatorView() {
       {/* Results + chart section (clean) */}
       <button className="btn btn-primary" style={{ width: "100%", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }} onClick={handleCalculate}>
         <BarChart2 size={20} aria-hidden />
-        Calculate
-      </button>
+        <I18nText source={"Calculate"} /></button>
 
       {!hasCalculated && (
         <div style={{ textAlign: "center", padding: "18px 0", color: "var(--color-text-secondary)" }}>
-          {solveMode === "goal" ? "Set your values above, then tap Calculate" : "Set your inputs above and enter a target goal, then tap Calculate"}
+          <I18nText>{solveMode === "goal" ? "Set your values above, then tap Calculate" : "Set your inputs above and enter a target goal, then tap Calculate"}</I18nText>
         </div>
       )}
 
@@ -591,9 +593,9 @@ export function CalculatorView() {
       {hasCalculated && solveResult && (
         <>
           <div style={{ background: "linear-gradient(135deg, var(--color-primary) 0%, #005F68 100%)", borderRadius: 16, padding: "20px 24px", marginBottom: 12, color: "white", textAlign: "center" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, opacity: 0.8, marginBottom: 8 }}>{solveResult.label}</div>
-            <div style={{ fontSize: 32, fontWeight: 900, marginBottom: 4 }}>{solveResult.value}</div>
-            {solveResult.sub && <div style={{ fontSize: 13, opacity: 0.85 }}>{solveResult.sub}</div>}
+            <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, opacity: 0.8, marginBottom: 8 }}><I18nText>{solveResult.label}</I18nText></div>
+            <div style={{ fontSize: 32, fontWeight: 900, marginBottom: 4 }}><I18nText>{solveResult.value}</I18nText></div>
+            {solveResult.sub && <div style={{ fontSize: 13, opacity: 0.85 }}><I18nText>{solveResult.sub}</I18nText></div>}
           </div>
           <div style={{ marginBottom: 20 }}>
             <ShareResultButton
@@ -642,15 +644,9 @@ export function CalculatorView() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
               <thead>
                 <tr style={{ background: "var(--color-bg)" }}>
-                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "var(--color-text-secondary)" }}>
-                    Metric
-                  </th>
-                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700, color: "var(--color-primary)" }}>
-                    Investment A
-                  </th>
-                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700, color: "var(--color-secondary)" }}>
-                    Investment B
-                  </th>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "var(--color-text-secondary)" }}><I18nText source={"Metric"} /></th>
+                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700, color: "var(--color-primary)" }}><I18nText source={"Investment A"} /></th>
+                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700, color: "var(--color-secondary)" }}><I18nText source={"Investment B"} /></th>
                 </tr>
               </thead>
               <tbody>
@@ -663,9 +659,9 @@ export function CalculatorView() {
                   ["Ends at year", `${calcA.years}`, `${calcStartYearB + calcB.years}`],
                 ].map(([metric, a, b]) => (
                   <tr key={metric} style={{ borderTop: "1px solid var(--color-border)" }}>
-                    <td style={{ padding: "12px 16px", color: "var(--color-text-secondary)", fontWeight: 600 }}>{metric}</td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700, color: "var(--color-primary)" }}>{a}</td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700, color: "var(--color-secondary)" }}>{b}</td>
+                    <td style={{ padding: "12px 16px", color: "var(--color-text-secondary)", fontWeight: 600 }}><I18nText>{metric}</I18nText></td>
+                    <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700, color: "var(--color-primary)" }}><I18nText>{a}</I18nText></td>
+                    <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700, color: "var(--color-secondary)" }}><I18nText>{b}</I18nText></td>
                   </tr>
                 ))}
               </tbody>
@@ -684,8 +680,8 @@ export function CalculatorView() {
                 fontSize: 14, fontWeight: 600, color: "var(--color-primary)", textAlign: "center",
               }}>
                 {calcStartYearB > 0
-                  ? `Starting ${calcStartYearB} year${calcStartYearB > 1 ? "s" : ""} earlier is worth ${formatZAR(Math.abs(diff))} extra`
-                  : `Investment ${winner} ends ${formatZAR(Math.abs(diff))} ahead`}
+                  ? <I18nText source="Starting {value0} years earlier is worth {value1} extra" one="Starting {value0} year earlier is worth {value1} extra" count={calcStartYearB} values={[calcStartYearB, formatZAR(Math.abs(diff))]} />
+                  : <I18nText source="Investment {value0} ends {value1} ahead" values={[winner, formatZAR(Math.abs(diff))]} />}
               </div>
             );
           })()}
@@ -707,35 +703,33 @@ export function CalculatorView() {
 
       {hasCalculated && (
         <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 16, padding: 20, marginBottom: 24 }}>
-          <div style={{ fontWeight: 700, marginBottom: 16, fontSize: 16 }}>Growth Over Time</div>
+          <div style={{ fontWeight: 700, marginBottom: 16, fontSize: 16 }}><I18nText source={"Growth Over Time"} /></div>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="year" tickFormatter={(v) => `Yr ${v}`} tick={{ fontSize: 11, fill: "var(--color-text-secondary)" }} />
+              <XAxis dataKey="year" tickFormatter={(v) => localizeString(locale, "Yr {value0}").replace("{value0}", String(v))} tick={{ fontSize: 11, fill: "var(--color-text-secondary)" }} />
               <YAxis tickFormatter={formatYAxis} tick={{ fontSize: 11, fill: "var(--color-text-secondary)" }} width={58} />
               <Tooltip
                 formatter={(v) => v === null || v === undefined ? "-" : formatZAR(typeof v === "number" ? v : Number(v ?? 0))}
-                labelFormatter={(l) => `Year ${l}`}
+                labelFormatter={(l) => localizeString(locale, "Year {value0}").replace("{value0}", String(l))}
                 contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 13 }}
               />
               <Legend wrapperStyle={{ fontSize: 13 }} />
               {mode === "single" ? (
                 <>
-                  <Line type="monotone" dataKey="Portfolio Value" stroke="var(--color-primary)" strokeWidth={2.5} dot={false} connectNulls={false} />
-                  <Line type="monotone" dataKey="Total Contributions" stroke="#EFB343" strokeWidth={2} dot={false} strokeDasharray="5 5" connectNulls={false} />
+                  <Line type="monotone" dataKey="Portfolio Value" name={localizeString(locale, "Portfolio Value")}  stroke="var(--color-primary)" strokeWidth={2.5} dot={false} connectNulls={false} />
+                  <Line type="monotone" dataKey="Total Contributions" name={localizeString(locale, "Total Contributions")}  stroke="#EFB343" strokeWidth={2} dot={false} strokeDasharray="5 5" connectNulls={false} />
                 </>
               ) : (
                 <>
-                  <Line type="monotone" dataKey="Investment A" stroke="var(--color-primary)" strokeWidth={2.5} dot={false} connectNulls={false} />
-                  <Line type="monotone" dataKey="Investment B" stroke="#EFB343" strokeWidth={2.5} dot={false} connectNulls={false} />
+                  <Line type="monotone" dataKey="Investment A" name={localizeString(locale, "Investment A")}  stroke="var(--color-primary)" strokeWidth={2.5} dot={false} connectNulls={false} />
+                  <Line type="monotone" dataKey="Investment B" name={localizeString(locale, "Investment B")}  stroke="#EFB343" strokeWidth={2.5} dot={false} connectNulls={false} />
                 </>
               )}
             </LineChart>
           </ResponsiveContainer>
           {mode === "compare" && calcStartYearB > 0 && (
-            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", textAlign: "center", marginTop: 8 }}>
-              Investment B (orange) begins at Year {calcStartYearB} and ends at Year {calcStartYearB + calcB.years}
-            </div>
+            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", textAlign: "center", marginTop: 8 }}><I18nText source={"Investment B (orange) begins at Year {value0} and ends at Year {value1}"} values={[calcStartYearB, calcStartYearB + calcB.years]} /></div>
           )}
         </div>
       )}
@@ -751,13 +745,12 @@ export function CalculatorView() {
           }}
         >
           <TrendingUp size={16} aria-hidden />
-          Save this projection to my Profile
-        </button>
+          <I18nText source={"Save this projection to my Profile"} /></button>
       )}
       {projectionSaved && (
         <div className="mb-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 dark:border-green-700 dark:bg-green-900/20 dark:text-green-300">
           <CheckCircle2 size={16} className="shrink-0" aria-hidden />
-          <span>Projection pinned to your Profile - tap Profile to view it.</span>
+          <span><I18nText source={"Projection pinned to your Profile - tap Profile to view it."} /></span>
         </div>
       )}
 
@@ -767,11 +760,9 @@ export function CalculatorView() {
       >
         <div className="mb-3 flex items-center gap-2">
           <span className="inline-flex h-2.5 w-2.5 rounded-full bg-green-400 shrink-0" />
-          <span className="text-xs font-semibold uppercase tracking-wide text-green-100/90">Available</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-green-100/90"><I18nText source={"Available"} /></span>
         </div>
-        <p className="text-green-100 text-sm leading-relaxed mb-4">
-          See how your investments could grow with projections built around your numbers.
-        </p>
+        <p className="text-green-100 text-sm leading-relaxed mb-4"><I18nText source={"See how your investments could grow with projections built around your numbers."} /></p>
         <button
           type="button"
           onClick={() => {
@@ -779,9 +770,7 @@ export function CalculatorView() {
             window.open("https://wealthwithkwanele.co.za", "_blank", "noopener,noreferrer");
           }}
           className="block w-full py-3 bg-white text-green-800 rounded-xl font-bold text-center text-sm hover:bg-green-50 transition-colors"
-        >
-          Get Your Free Investment Plan
-        </button>
+        ><I18nText source={"Get Your Free Investment Plan"} /></button>
       </div>
     </main>
   );

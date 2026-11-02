@@ -1,6 +1,8 @@
 "use client";
+import { localizeClientString } from "@/i18n/clientString";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
 import { analytics } from "@/lib/analytics";
 import { markSharedToday } from "@/lib/dailyChallengeFlags";
@@ -95,7 +97,7 @@ function drawWordmark(ctx: CanvasRenderingContext2D, mark: HTMLImageElement | nu
 export function shareCaption(data: ShareCardData): string {
   if (data.type === "streak") return generateShareText("streak", { streakDays: data.streakDays });
   if (data.type === "calculator") {
-    return `${data.headline}\n\n${data.sub}\n\nFree South African money lessons. notho.co.za`;
+    return `${localizeClientString(data.headline)}\n\n${localizeClientString(data.sub)}\n\n${localizeClientString("Free South African money lessons. notho.co.za")}`;
   }
   return generateShareText("lesson", { lessonTitle: data.lessonTitle, xp: data.xpEarned });
 }
@@ -120,6 +122,7 @@ export function generateShareCard(data: ShareCardData): Promise<string> {
       streakDays: data.type === "streak" ? data.streakDays : undefined,
       headline: data.type === "calculator" ? data.headline : undefined,
     });
+    for (const key of ["eyebrow", "number", "title", "footnote"] as const) copy[key] = localizeClientString(copy[key]);
     const accent = data.type === "lesson" && data.isPerfect ? GOLD : data.type === "streak" ? GOLD : TEAL;
     const glow = ctx.createRadialGradient(W / 2, 620, 40, W / 2, 620, 460);
     glow.addColorStop(0, data.type === "streak" || (data.type === "lesson" && data.isPerfect) ? "rgba(224,160,32,0.28)" : "rgba(255,236,190,0.85)");
@@ -143,7 +146,7 @@ export function generateShareCard(data: ShareCardData): Promise<string> {
     if (copy.eyebrow) {
       ctx.fillStyle = accent;
       ctx.font = "600 34px -apple-system, BlinkMacSystemFont, sans-serif";
-      ctx.fillText(copy.eyebrow, W / 2, 860);
+      ctx.fillText(copy.eyebrow, W / 2, 860, W - 160);
     }
 
     if (data.type === "streak") {
@@ -151,7 +154,7 @@ export function generateShareCard(data: ShareCardData): Promise<string> {
       ctx.font = "300 180px -apple-system, BlinkMacSystemFont, sans-serif";
       ctx.fillText(copy.number, W / 2, 1040);
       ctx.font = "400 42px -apple-system, BlinkMacSystemFont, sans-serif";
-      ctx.fillText(copy.footnote, W / 2, 1120);
+      wrapLines(ctx, copy.footnote, W - 160).forEach((line, i) => ctx.fillText(line, W / 2, 1120 + i * 54));
     } else {
       ctx.fillStyle = INK;
       ctx.font = "700 72px -apple-system, BlinkMacSystemFont, sans-serif";
@@ -165,7 +168,7 @@ export function generateShareCard(data: ShareCardData): Promise<string> {
       if (copy.footnote) {
         ctx.fillStyle = MUTED;
         ctx.font = "400 34px -apple-system, BlinkMacSystemFont, sans-serif";
-        ctx.fillText(copy.footnote, W / 2, 980 + lines.length * 86 + 92);
+        wrapLines(ctx, copy.footnote, W - 160).forEach((line, i) => ctx.fillText(line, W / 2, 980 + lines.length * 86 + 92 + i * 48));
       }
     }
 
@@ -230,19 +233,7 @@ export async function shareDuoCard(data: ShareCardData): Promise<"shared" | "can
 
 export function ShareResultButton({ data, label = "Share" }: { data: ShareCardData; label?: string }) {
   const [sharing, setSharing] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "done" | "error">("idle");
-
-  const cardKey = JSON.stringify(data);
-  useEffect(() => {
-    let cancelled = false;
-    generateShareCard(data).then((url) => {
-      if (!cancelled) setPreview(url);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-    // cardKey is the stable snapshot of data
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardKey]);
 
   const handleShare = async () => {
     setSharing(true);
@@ -256,13 +247,6 @@ export function ShareResultButton({ data, label = "Share" }: { data: ShareCardDa
 
   return (
     <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-      {preview ? (
-        <img
-          src={preview}
-          alt=""
-          style={{ width: 132, height: 234, objectFit: "cover", borderRadius: 16, boxShadow: "0 8px 24px rgba(28,36,48,0.08)" }}
-        />
-      ) : null}
       <button
         type="button"
         onClick={handleShare}
@@ -277,7 +261,7 @@ export function ShareResultButton({ data, label = "Share" }: { data: ShareCardDa
         }}
       >
         <Share2 size={16} />
-        {sharing ? "Preparing…" : status === "done" ? "Shared" : status === "error" ? "Try again" : label}
+        <I18nText>{sharing ? "Preparing…" : status === "done" ? "Shared" : status === "error" ? "Try again" : label}</I18nText>
       </button>
     </div>
   );
@@ -319,7 +303,7 @@ export function ShareButton({
       className="flex w-full items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 py-3 text-sm font-semibold text-green-700 transition-colors hover:bg-green-100 dark:border-green-700 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
     >
       <Share2 size={16} className="shrink-0" aria-hidden />
-      <span>{label}</span>
+      <span><I18nText>{label}</I18nText></span>
     </button>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import { useEffect, useState } from "react";
 import { formatWithSpaces } from "@/lib/formatters";
@@ -28,7 +29,7 @@ export function ThisWeekCard({
         : "Level with last week";
 
   return (
-    <section
+    <I18nElement as="section"
       aria-label="This week's XP"
       style={{
         maxWidth: 760,
@@ -40,20 +41,16 @@ export function ThisWeekCard({
         padding: "14px 16px",
       }}
     >
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-primary)", marginBottom: 4 }}>
-        You vs last week
-      </div>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-primary)", marginBottom: 4 }}><I18nText source={"You vs last week"} /></div>
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div>
-          <div style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, color: "var(--color-text-primary)" }}>
-            {formatWithSpaces(weeklyXp)} XP
-          </div>
+          <div style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, color: "var(--color-text-primary)" }}><I18nText source={"{value0} XP"} values={[formatWithSpaces(weeklyXp)]} /></div>
           <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginTop: 4 }}>
-            {deltaLabel}
-            {hasLastWeek ? ` · last week ${formatWithSpaces(lastWeekXp)} XP` : ""}
+            <I18nText>{deltaLabel}</I18nText>
+            <I18nText>{hasLastWeek ? ` · last week ${formatWithSpaces(lastWeekXp)} XP` : ""}</I18nText>
           </div>
         </div>
       </div>
-    </section>
+    </I18nElement>
   );
 }

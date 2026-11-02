@@ -1,9 +1,11 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useState, useEffect } from "react";
 import { Mail, KeyRound, AlertTriangle, ClipboardCopy, CheckCircle, NothoLearn, NothoBudget, NothoCalculate } from "@/components/icons/NothoIcons";
 import { supabase } from "@/lib/supabaseClient";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
+import { LanguageSelector } from "@/i18n/LanguageSelector";
 import { useLocale } from "@/i18n/LocaleProvider";
 
 // Google OAuth is blocked only in LinkedIn's in-app browser.
@@ -66,7 +68,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [oauthBlocked, setOauthBlocked] = useState(false);
 
-  const { locale, setLocale, t } = useLocale();
+  const { t } = useLocale();
 
   const handleForgotPassword = async () => {
     if (!forgotEmail.trim()) { setError(t("auth.errorEmailRequired")); return; }
@@ -274,7 +276,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               to a dark surface, leaving a navy-on-dark logo that reads as dim.
               The icon's teal + gold carry on both light and dark. */}
           <div className="splash-logo-wrap" style={{ position: "relative", zIndex: 1 }}>
-            <img
+            <I18nElement as="img"
               src="/notho-icon.png"
               alt="Notho"
               style={{ width: 168, height: 168, objectFit: "contain", display: "block" }}
@@ -312,13 +314,13 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             {/* Full lockup, large. Mode-aware so it stays crisp if the landing
                 background flips to dark. Wide aspect (not a 200x200 square that
                 rendered it tiny). */}
-            <img
+            <I18nElement as="img"
               className="logo-light"
               src="/notho-logo.png"
               alt="Notho"
               style={{ width: "min(340px, 78vw)", height: "auto", objectFit: "contain", marginBottom: 32 }}
             />
-            <img
+            <I18nElement as="img"
               className="logo-dark"
               src="/notho-logo-on-dark.png"
               alt="Notho"
@@ -342,7 +344,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                   padding: "6px 4px",
                 }}>
                   <f.Icon size={20} style={{ color: "#007A85", flexShrink: 0 }} />
-                  <span style={{ fontSize: 13, color: "#4B5563", lineHeight: 1.45, textAlign: "left" }}>{f.text}</span>
+                  <span style={{ fontSize: 13, color: "#4B5563", lineHeight: 1.45, textAlign: "left" }}><I18nText>{f.text}</I18nText></span>
                 </div>
               ))}
               <p style={{ fontSize: 11, color: "#9CA3AF", textAlign: "center", margin: "10px 0 0" }}>
@@ -356,17 +358,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             width: "100%", maxWidth: 400, paddingBottom: 48,
             display: "flex", flexDirection: "column", gap: 12,
           }}>
-            <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 4 }}>
-              <button type="button" onClick={() => setLocale("en")}
-                style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: locale === "en" ? 700 : 500, color: locale === "en" ? "#007A85" : "#6B7280" }}>
-                {t("settings.languageEn")}
-              </button>
-              <span style={{ color: "#D1D5DB", fontSize: 12 }}>|</span>
-              <button type="button" onClick={() => setLocale("zu")}
-                style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: locale === "zu" ? 700 : 500, color: locale === "zu" ? "#007A85" : "#6B7280" }}>
-                {t("settings.languageZu")}
-              </button>
-            </div>
+            <LanguageSelector />
             <button
               onClick={() => setMode("signup")}
               style={{
@@ -410,12 +402,12 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               {t("auth.sentLinkTo")}
             </p>
             <p style={{ fontWeight: 700, fontSize: 15, color: "var(--color-primary)", marginBottom: 20 }}>
-              {verificationEmail}
+              <I18nText>{verificationEmail}</I18nText>
             </p>
             <p style={{ color: "var(--color-text-secondary)", fontSize: 13, marginBottom: 24, lineHeight: 1.6 }}>
               {t("auth.clickLink")}
             </p>
-            {error && <p style={{ color: "var(--error-red)", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+            {error && <p style={{ color: "var(--error-red)", fontSize: 13, marginBottom: 12 }}><I18nText>{error}</I18nText></p>}
             <button
               className="btn btn-primary" style={{ width: "100%", marginBottom: 10 }}
               onClick={handleResendVerification}
@@ -443,7 +435,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 <KeyRound size={48} style={{ color: "var(--color-primary)" }} aria-hidden />
               </div>
               <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{t("auth.resetTitle")}</h2>
-              <p style={{ color: "#888", fontSize: 14 }}>We&apos;ll send you a reset link</p>
+              <p style={{ color: "#888", fontSize: 14 }}><I18nText source={"We'll send you a reset link"} /></p>
             </div>
             {forgotSent ? (
               <div style={{ textAlign: "center" }}>
@@ -461,10 +453,10 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <input type="email" placeholder={t("auth.yourEmail")} value={forgotEmail}
+                <I18nElement as="input" type="email" placeholder={t("auth.yourEmail")} value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   style={{ padding: 12, borderRadius: 8, border: "1px solid var(--border-light)", fontSize: 14, width: "100%", boxSizing: "border-box" as const }} />
-                {error && <p style={{ color: "var(--error-red)", fontSize: 13, margin: 0 }}>{error}</p>}
+                {error && <p style={{ color: "var(--error-red)", fontSize: 13, margin: 0 }}><I18nText>{error}</I18nText></p>}
                 <button className="btn btn-primary" style={{ width: "100%" }} onClick={handleForgotPassword}>
                   {t("auth.sendReset")}
                 </button>
@@ -491,9 +483,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               read NOTHO, matching the logo lockup. Tight gap so it reads as one
               word, not "N  OTHO". */}
           <div className="flex items-center justify-center" style={{ gap: 3, marginBottom: 20, marginTop: 8 }}>
-            <img src="/notho-icon.png" alt="Notho" width={40} height={40} style={{ objectFit: "contain" }} />
-            <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "0.02em", margin: 0 }}>OTHO</h1>
+            <I18nElement as="img" src="/notho-icon.png" alt="Notho" width={40} height={40} style={{ objectFit: "contain" }} />
+            <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "0.02em", margin: 0 }}><I18nText source={"OTHO"} /></h1>
           </div>
+
+          <LanguageSelector />
 
           {/* Tab switcher */}
           <div style={{ display: "flex", background: "#f5f5f5", borderRadius: 10, padding: 3, marginBottom: 20 }}>
@@ -566,22 +560,20 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 }}
               >
                 {linkCopied
-                  ? <><CheckCircle size={16} /> Link copied &mdash; paste in Chrome or Safari</>
+                  ? <><CheckCircle size={16} /> <I18nText source={" Link copied — paste in Chrome or Safari"} /></>
                   : <><ClipboardCopy size={16} /> {t("auth.copyLink")}</>
                 }
               </button>
-              <p style={{ fontSize: 11, color: "#92400E", margin: "8px 0 0", textAlign: "center", opacity: 0.7 }}>
-                Or sign in with email and password below
-              </p>
+              <p style={{ fontSize: 11, color: "#92400E", margin: "8px 0 0", textAlign: "center", opacity: 0.7 }}><I18nText source={"Or sign in with email and password below"} /></p>
             </div>
           )}
 
           {/* ── Social sign-in buttons ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 4 }}>
-            <button
+            <I18nElement as="button"
               type="button"
               data-testid="apple-oauth"
-              aria-label="Continue with Apple"
+              aria-label={t("auth.continueApple")}
               onClick={() => handleOAuthSignIn("apple")}
               style={{
                 width: "100%", minHeight: 44, padding: 0, borderRadius: 10,
@@ -589,7 +581,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
               }}
             >
-              <img
+              <I18nElement as="img"
                 src="https://appleid.cdn-apple.com/appleid/button?height=44&width=375&color=black&border=false&type=continue&border_radius=10&scale=3&locale=en_GB"
                 alt=""
                 width={375}
@@ -597,7 +589,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 aria-hidden="true"
                 style={{ width: "100%", height: "auto", maxHeight: 44, objectFit: "contain", display: "block" }}
               />
-            </button>
+            </I18nElement>
             <button
               type="button"
               onClick={() => handleOAuthSignIn("google")}
@@ -643,28 +635,28 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             {mode === "signup" && (
               <>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <input type="text" placeholder={t("auth.firstName")} value={firstName}
+                  <I18nElement as="input" type="text" placeholder={t("auth.firstName")} value={firstName}
                     onChange={(e) => setFirstName(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
-                  <input type="text" placeholder={t("auth.lastName")} value={lastName}
+                  <I18nElement as="input" type="text" placeholder={t("auth.lastName")} value={lastName}
                     onChange={(e) => setLastName(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
                 </div>
-                <input type="number" placeholder={t("auth.age")} value={age} min={13} max={120}
+                <I18nElement as="input" type="number" placeholder={t("auth.age")} value={age} min={13} max={120}
                   inputMode="numeric"
                   onKeyDown={(e) => { if (["e","E","+","-","."].includes(e.key)) e.preventDefault(); }}
                   onChange={(e) => setAge(e.target.value.replace(/D/g, ""))} style={inputStyle} />
               </>
             )}
-            <input type="email" placeholder={t("auth.email")} value={email}
+            <I18nElement as="input" type="email" placeholder={t("auth.email")} value={email}
               onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
             <div style={{ position: "relative" }}>
-              <input
+              <I18nElement as="input"
                 type={showPassword ? "text" : "password"}
                 placeholder={t("auth.password")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{ ...inputStyle, paddingRight: 44 }}
               />
-              <button
+              <I18nElement as="button"
                 type="button"
                 onClick={() => setShowPassword(v => !v)}
                 style={{
@@ -675,9 +667,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
               >
                 {showPassword ? t("auth.hide") : t("auth.show")}
-              </button>
+              </I18nElement>
             </div>
-            {error && <p style={{ color: "var(--error-red)", fontSize: 13, margin: 0 }}>{error}</p>}
+            {error && <p style={{ color: "var(--error-red)", fontSize: 13, margin: 0 }}><I18nText>{error}</I18nText></p>}
             <button
               data-testid="auth-submit"
               className="btn btn-primary"
@@ -693,7 +685,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                   {t("auth.forgotPassword")}
                 </button>
                 <p style={{ fontSize: 13, color: "#888", margin: "8px 0 0" }}>
-                  {t("auth.newHere")}{" "}
+                  {t("auth.newHere")}<I18nText>{" "}</I18nText>
                   <button onClick={() => setMode("signup")}
                     style={{ background: "none", border: "none", color: "var(--color-primary)", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
                     {t("auth.createFree")}
@@ -707,5 +699,5 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <>{children}</>;
+  return <><I18nText>{children}</I18nText></>;
 }

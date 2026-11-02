@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 /**
  * ENGAGEMENT - which parts of Notho earn their place, and when people show up.
@@ -91,7 +92,7 @@ export function EngagementPanel({ days, nonce }: { days: number; nonce: number }
     {
       key: "feature",
       label: "Feature",
-      render: (r) => <span className="nv-strong">{featureLabel(r.feature)}</span>,
+      render: (r) => <span className="nv-strong"><I18nText>{featureLabel(r.feature)}</I18nText></span>,
     },
     { key: "users", label: "People", numeric: true, render: (r) => fmt(r.users) },
     {
@@ -100,7 +101,7 @@ export function EngagementPanel({ days, nonce }: { days: number; nonce: number }
       numeric: true,
       render: (r) => (
         <Tag tone={r.adoption_pct >= 50 ? "good" : r.adoption_pct >= 20 ? "warn" : "bad"}>
-          {fmtPct(r.adoption_pct)}
+          <I18nText>{fmtPct(r.adoption_pct)}</I18nText>
         </Tag>
       ),
     },
@@ -117,13 +118,13 @@ export function EngagementPanel({ days, nonce }: { days: number; nonce: number }
       label: "Read as",
       render: (r) => {
         const v = quadrant(r.adoption_pct ?? 0, r.events_per_user ?? 0, mid);
-        return <Tag tone={v.tone}>{v.label}</Tag>;
+        return <Tag tone={v.tone}><I18nText>{v.label}</I18nText></Tag>;
       },
     },
     {
       key: "last",
       label: "Last used",
-      render: (r) => <span style={{ color: p.muted }}>{ago(r.last_used)}</span>,
+      render: (r) => <span style={{ color: p.muted }}><I18nText>{ago(r.last_used)}</I18nText></span>,
     },
   ];
 
@@ -219,19 +220,14 @@ export function EngagementPanel({ days, nonce }: { days: number; nonce: number }
             {scatter.map((sc, i) => (
               <span key={sc.key}>
                 <i style={{ background: p.series[i % p.series.length] }} />
-                {sc.name}
+                <I18nText>{sc.name}</I18nText>
               </span>
             ))}
           </div>
 
           <div style={{ marginTop: 14 }}>
             <Note>
-              <strong>Top right</strong> is your core - protect it. <strong>Bottom right</strong> is a
-              curiosity click: everyone tries it once, nobody returns, so either make it useful or
-              stop giving it prime navigation. <strong>Top left</strong> is a power-user niche worth
-              keeping even though few people find it. <strong>Bottom left</strong> is dead weight -
-              promote it deliberately or remove it.
-            </Note>
+              <strong><I18nText source={"Top right"} /></strong> <I18nText source={" is your core - protect it. "} /><strong><I18nText source={"Bottom right"} /></strong> <I18nText source={" is a curiosity click: everyone tries it once, nobody returns, so either make it useful or stop giving it prime navigation. "} /><strong><I18nText source={"Top left"} /></strong> <I18nText source={" is a power-user niche worth keeping even though few people find it. "} /><strong><I18nText source={"Bottom left"} /></strong> <I18nText source={" is dead weight - promote it deliberately or remove it."} /></Note>
           </div>
 
           <div style={{ marginTop: 18 }}>
@@ -274,11 +270,7 @@ export function EngagementPanel({ days, nonce }: { days: number; nonce: number }
                 </Bar>
               </BarChart>
             </Frame>
-            <Note>
-              Time is attributed to the screen a person was last on in each session, so read this as
-              a strong indication rather than a stopwatch. Compare features against each other, not
-              against a target.
-            </Note>
+            <Note><I18nText source={"Time is attributed to the screen a person was last on in each session, so read this as a strong indication rather than a stopwatch. Compare features against each other, not against a target."} /></Note>
           </Gate>
         </Panel>
 
@@ -363,11 +355,9 @@ export function EngagementPanel({ days, nonce }: { days: number; nonce: number }
           {bestSlot && bestSlot.users > 0 && (
             <div style={{ marginTop: 16 }}>
               <Note>
-                <strong>Peak:</strong> {DOW_LABELS[Math.max(0, bestSlot.dow - 1)]} at{" "}
-                {String(bestSlot.hour).padStart(2, "0")}:00, with {bestSlot.users}{" "}
-                {bestSlot.users === 1 ? "person" : "people"} active. Send the daily nudge about an
-                hour before that, not on a round number.
-              </Note>
+                <strong><I18nText source={"Peak:"} /></strong> <I18nText>{DOW_LABELS[Math.max(0, bestSlot.dow - 1)]}</I18nText> <I18nText source={" at"} /><I18nText>{" "}</I18nText>
+                <I18nText>{String(bestSlot.hour).padStart(2, "0")}</I18nText><I18nText source={":00, with "} /><I18nText>{bestSlot.users}</I18nText><I18nText>{" "}</I18nText>
+                <I18nText>{bestSlot.users === 1 ? "person" : "people"}</I18nText> <I18nText source={" active. Send the daily nudge about an hour before that, not on a round number."} /></Note>
             </div>
           )}
         </Gate>

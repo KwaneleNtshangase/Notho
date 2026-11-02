@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * Presentational building blocks.
@@ -66,7 +67,7 @@ export function Card({
 }) {
   return (
     <div className={`nv-card nv-rise ${className}`} style={style}>
-      {children}
+      <I18nText>{children}</I18nText>
     </div>
   );
 }
@@ -87,11 +88,11 @@ export function Panel({
   return (
     <Card className={className}>
       <div className="nv-card-head">
-        <h2 className="nv-card-title">{title}</h2>
-        {action}
+        <h2 className="nv-card-title"><I18nText>{title}</I18nText></h2>
+        <I18nText>{action}</I18nText>
       </div>
-      {subtitle && <p className="nv-card-sub">{subtitle}</p>}
-      {children}
+      {subtitle && <p className="nv-card-sub"><I18nText>{subtitle}</I18nText></p>}
+      <I18nText>{children}</I18nText>
     </Card>
   );
 }
@@ -134,14 +135,14 @@ export function Stat({
 
   return (
     <div className="nv-stat nv-rise" style={{ ["--accent" as string]: tone }}>
-      <div className="nv-stat-label">{label}</div>
+      <div className="nv-stat-label"><I18nText>{label}</I18nText></div>
       <div className="nv-stat-value">
-        <span className="nv-stat-num">{value}</span>
-        {unit && <span className="nv-stat-unit">{unit}</span>}
+        <span className="nv-stat-num"><I18nText>{value}</I18nText></span>
+        {unit && <span className="nv-stat-unit"><I18nText>{unit}</I18nText></span>}
         {trend && trend.pct !== null && (
           <span className={`nv-delta ${cls}`}>
-            {trend.dir === "up" ? "▲" : trend.dir === "down" ? "▼" : "—"}
-            {Math.abs(trend.pct)}%
+            <I18nText>{trend.dir === "up" ? "▲" : trend.dir === "down" ? "▼" : "—"}</I18nText>
+            <I18nText>{Math.abs(trend.pct)}</I18nText>%
           </span>
         )}
       </div>
@@ -150,13 +151,13 @@ export function Stat({
           <Sparkline values={spark} color={tone} />
         </div>
       )}
-      {hint && <div className="nv-stat-hint">{hint}</div>}
+      {hint && <div className="nv-stat-hint"><I18nText>{hint}</I18nText></div>}
     </div>
   );
 }
 
 export function StatGrid({ children }: { children: React.ReactNode }) {
-  return <div className="nv-stats">{children}</div>;
+  return <div className="nv-stats"><I18nText>{children}</I18nText></div>;
 }
 
 // ── Sparkline ────────────────────────────────────────────────────────────────
@@ -208,7 +209,7 @@ export function Tag({
   children: React.ReactNode;
   tone?: "good" | "warn" | "bad" | "info" | "neutral";
 }) {
-  return <span className={`nv-tag ${tone}`}>{children}</span>;
+  return <span className={`nv-tag ${tone}`}><I18nText>{children}</I18nText></span>;
 }
 
 export function Btn({
@@ -225,15 +226,15 @@ export function Btn({
   title?: string;
 }) {
   return (
-    <button
+    <I18nElement as="button"
       type="button"
       className={`nv-btn ${variant === "primary" ? "primary" : ""}`}
       onClick={onClick}
       disabled={disabled}
       title={title}
     >
-      {children}
-    </button>
+      <I18nText>{children}</I18nText>
+    </I18nElement>
   );
 }
 
@@ -249,7 +250,7 @@ export function Segmented<T extends string>({
   label?: string;
 }) {
   return (
-    <div className="nv-seg" role="group" aria-label={label}>
+    <I18nElement as="div" className="nv-seg" role="group" aria-label={label}>
       {options.map((o) => (
         <button
           key={o.value}
@@ -257,10 +258,10 @@ export function Segmented<T extends string>({
           aria-pressed={o.value === value}
           onClick={() => onChange(o.value)}
         >
-          {o.label}
+          <I18nText>{o.label}</I18nText>
         </button>
       ))}
-    </div>
+    </I18nElement>
   );
 }
 
@@ -289,11 +290,11 @@ export function KV({
   return (
     <div className="nv-kv">
       <div>
-        <div className="nv-kv-l">{label}</div>
-        {detail && <div className="nv-kv-d">{detail}</div>}
+        <div className="nv-kv-l"><I18nText>{label}</I18nText></div>
+        {detail && <div className="nv-kv-d"><I18nText>{detail}</I18nText></div>}
       </div>
       <div className="nv-kv-v" style={accent ? { color: accent } : undefined}>
-        {value}
+        <I18nText>{value}</I18nText>
       </div>
     </div>
   );
@@ -319,7 +320,7 @@ export function ErrorNote({ message }: { message: string }) {
   const [head, ...rest] = message.split("\n");
   return (
     <div className="nv-error">
-      <strong>{head}</strong>
+      <strong><I18nText>{head}</I18nText></strong>
       {rest.length > 0 && <code>{rest.join(" ")}</code>}
     </div>
   );
@@ -333,14 +334,14 @@ export function ErrorNote({ message }: { message: string }) {
 export function Empty({ title, detail }: { title: string; detail?: string }) {
   return (
     <div className="nv-empty">
-      <div className="nv-empty-t">{title}</div>
-      {detail && <div className="nv-empty-d">{detail}</div>}
+      <div className="nv-empty-t"><I18nText>{title}</I18nText></div>
+      {detail && <div className="nv-empty-d"><I18nText>{detail}</I18nText></div>}
     </div>
   );
 }
 
 export function Note({ children }: { children: React.ReactNode }) {
-  return <div className="nv-note">{children}</div>;
+  return <div className="nv-note"><I18nText>{children}</I18nText></div>;
 }
 
 /** One wrapper for the load / error / empty dance every panel repeats. */
@@ -364,7 +365,7 @@ export function Gate({
   if (error) return <ErrorNote message={error} />;
   if (loading) return <Skeleton height={skeleton} />;
   if (empty) return <Empty title={emptyTitle ?? "Nothing here yet"} detail={emptyDetail} />;
-  return <>{children}</>;
+  return <><I18nText>{children}</I18nText></>;
 }
 
 // ── Table ────────────────────────────────────────────────────────────────────
@@ -416,8 +417,8 @@ export function DataTable<T>({
                     .join(" ")}
                   style={{ width: c.width }}
                 >
-                  {c.label}
-                  {active ? " ▼" : sortable ? " ⇅" : ""}
+                  <I18nText>{c.label}</I18nText>
+                  <I18nText>{active ? " ▼" : sortable ? " ⇅" : ""}</I18nText>
                 </th>
               );
             })}
@@ -432,7 +433,7 @@ export function DataTable<T>({
             >
               {columns.map((c) => (
                 <td key={c.key} className={c.numeric ? "num" : ""}>
-                  {c.render(row)}
+                  <I18nText>{c.render(row)}</I18nText>
                 </td>
               ))}
             </tr>
@@ -468,7 +469,7 @@ export function Ring({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-      <svg width={size} height={size} role="img" aria-label={`${label}: ${Math.round(pct)} out of 100`}>
+      <I18nElement as="svg" width={size} height={size} role="img" aria-label={`${label}: ${Math.round(pct)} out of 100`}>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={p.grid} strokeWidth={stroke} />
         <circle
           cx={size / 2}
@@ -491,15 +492,15 @@ export function Ring({
           fill={p.ink}
           style={{ fontVariantNumeric: "tabular-nums" }}
         >
-          {Math.round(pct)}
+          <I18nText>{Math.round(pct)}</I18nText>
         </text>
         <text x="50%" y="63%" textAnchor="middle" fontSize={11.5} fontWeight="700" fill={p.muted}>
-          {label}
+          <I18nText>{label}</I18nText>
         </text>
-      </svg>
+      </I18nElement>
       {caption && (
         <div style={{ fontSize: 12, color: p.muted, textAlign: "center", maxWidth: 230, lineHeight: 1.5 }}>
-          {caption}
+          <I18nText>{caption}</I18nText>
         </div>
       )}
     </div>
@@ -530,8 +531,8 @@ export function FunnelBars({
         const width = Math.max(2, (r.users / top) * 100);
         const isWorst = i === worst.i && worst.drop > 0;
         return (
-          <div key={r.label} className="nv-funnel-row" title={r.hint}>
-            <div className="nv-funnel-label">{r.label}</div>
+          <I18nElement as="div" key={r.label} className="nv-funnel-row" title={r.hint}>
+            <div className="nv-funnel-label"><I18nText>{r.label}</I18nText></div>
             <div className="nv-funnel-bar">
               <div
                 className="nv-funnel-fill"
@@ -542,16 +543,16 @@ export function FunnelBars({
                   })`,
                 }}
               >
-                {r.users} · {r.pct ?? 0}%
+                <I18nText>{r.users}</I18nText> · <I18nText>{r.pct ?? 0}</I18nText>%
               </div>
             </div>
             <div
               className="nv-funnel-drop"
               style={{ color: isWorst ? p.red : r.drop_pct ? p.muted : "transparent" }}
             >
-              {r.drop_pct != null && r.drop_pct > 0 ? `−${r.drop_pct}%` : ""}
+              <I18nText>{r.drop_pct != null && r.drop_pct > 0 ? `−${r.drop_pct}%` : ""}</I18nText>
             </div>
-          </div>
+          </I18nElement>
         );
       })}
     </div>
@@ -590,7 +591,7 @@ export function HeatGrid({
           <div />
           {Array.from({ length: columns }).map((_, c) => (
             <div key={c} className="nv-axis" style={{ textAlign: "center" }}>
-              {colLabels(c)}
+              <I18nText>{colLabels(c)}</I18nText>
             </div>
           ))}
         </div>
@@ -605,12 +606,12 @@ export function HeatGrid({
             }}
           >
             <div className="nv-axis" style={{ display: "flex", alignItems: "center" }}>
-              {rowLabels(r)}
+              <I18nText>{rowLabels(r)}</I18nText>
             </div>
             {Array.from({ length: columns }).map((_, c) => {
               const d = cell(r, c);
               return (
-                <div
+                <I18nElement as="div"
                   key={c}
                   className="nv-heat-cell"
                   title={d.title}
@@ -619,8 +620,8 @@ export function HeatGrid({
                     color: d.value != null && d.value > 55 ? "#04121B" : p.body,
                   }}
                 >
-                  {d.text ?? ""}
-                </div>
+                  <I18nText>{d.text ?? ""}</I18nText>
+                </I18nElement>
               );
             })}
           </div>

@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import {
@@ -79,10 +80,10 @@ export function PublicGuide({
       <div style={inner}>
         <nav style={{ marginBottom: 28, fontSize: 14 }}>
           <Link href="/about" style={{ color: teal, fontWeight: 700 }}>
-            {SITE_NAME}
+            <I18nText>{SITE_NAME}</I18nText>
           </Link>
           <span style={{ color: "#666", margin: "0 8px" }}>/</span>
-          <span style={{ color: "#a0a0a0" }}>{title}</span>
+          <span style={{ color: "#a0a0a0" }}><I18nText>{title}</I18nText></span>
         </nav>
 
         <div
@@ -99,7 +100,7 @@ export function PublicGuide({
             marginBottom: 16,
           }}
         >
-          {badge}
+          <I18nText>{badge}</I18nText>
         </div>
         <h1
           style={{
@@ -109,31 +110,27 @@ export function PublicGuide({
             margin: "0 0 14px",
           }}
         >
-          {title}
+          <I18nText>{title}</I18nText>
         </h1>
-        <p style={{ ...p, fontSize: 17, color: "#c8c8c8" }}>{lede}</p>
+        <p style={{ ...p, fontSize: 17, color: "#c8c8c8" }}><I18nText>{lede}</I18nText></p>
 
         <div style={{ margin: "8px 0 32px" }}>
-          <Link href="/learn" style={cta}>
-            Open Notho
-          </Link>
+          <Link href="/learn" style={cta}><I18nText source={"Open Notho"} /></Link>
           <Link
             href="/about"
             style={{ ...cta, background: "transparent", border: `1px solid ${teal}` }}
-          >
-            What Notho is
-          </Link>
+          ><I18nText source={"What Notho is"} /></Link>
         </div>
 
-        {children}
+        <I18nText>{children}</I18nText>
 
-        <h2 style={h2}>Questions people ask</h2>
+        <h2 style={h2}><I18nText source={"Questions people ask"} /></h2>
         {faqs.map((item) => (
           <div key={item.q} style={card}>
             <h3 style={{ margin: "0 0 8px", fontSize: 16, color: "#fff" }}>
-              {item.q}
+              <I18nText>{item.q}</I18nText>
             </h3>
-            <p style={{ ...p, margin: 0 }}>{item.a}</p>
+            <p style={{ ...p, margin: 0 }}><I18nText>{item.a}</I18nText></p>
           </div>
         ))}
 
@@ -146,12 +143,7 @@ export function PublicGuide({
             fontSize: 14,
             lineHeight: 1.7,
           }}
-        >
-          Notho is financial-literacy education from {SITE_NAME}. Lessons,
-          calculators and budgets are illustrative. Notho is not an FSP and does
-          not give personal financial advice. Operated by The Solution Org
-          (Pty) Ltd, Durban, South Africa.
-        </p>
+        ><I18nText source={"Notho is financial-literacy education from {value0}. Lessons, calculators and budgets are illustrative. Notho is not an FSP and does not give personal financial advice. Operated by The Solution Org (Pty) Ltd, Durban, South Africa."} values={[SITE_NAME]} /></p>
       </div>
     </main>
   );

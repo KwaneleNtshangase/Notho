@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 import { useLocale } from "@/i18n/LocaleProvider";
 import { localizeContent } from "@/i18n/contentZu";
 /* eslint-disable @next/next/no-html-link-for-pages */
@@ -241,10 +242,10 @@ function CourseSectionHeader({
 }) {
   const inner = (
     <>
-      {icon}
+      <I18nText>{icon}</I18nText>
       <span>
-        {label}
-        {typeof count === "number" ? ` (${count})` : ""}
+        <I18nText>{label}</I18nText>
+        <I18nText>{typeof count === "number" ? ` (${count})` : ""}</I18nText>
       </span>
       {onToggle && (
         <ChevronDown
@@ -277,14 +278,14 @@ function CourseSectionHeader({
             textAlign: "left",
           }}
         >
-          {inner}
+          <I18nText>{inner}</I18nText>
         </button>
       ) : (
-        <div style={SECTION_HEADER_STYLE}>{inner}</div>
+        <div style={SECTION_HEADER_STYLE}><I18nText>{inner}</I18nText></div>
       )}
       {note && !open && (
         <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>
-          {note}
+          <I18nText>{note}</I18nText>
         </div>
       )}
     </div>
@@ -426,8 +427,8 @@ export function DailyChallenges({ streak = 0, onXpClaimed }: { streak?: number; 
     <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 24 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
         <Sparkles size={18} style={{ color: "#EFB343" }} />
-        <div style={{ fontWeight: 800, fontSize: 14 }}>Daily Challenges</div>
-        {allClaimed && <span style={{ fontSize: 11, fontWeight: 700, color: "#007A85", marginLeft: "auto" }}>All done!</span>}
+        <div style={{ fontWeight: 800, fontSize: 14 }}><I18nText source={"Daily Challenges"} /></div>
+        {allClaimed && <span style={{ fontSize: 11, fontWeight: 700, color: "#007A85", marginLeft: "auto" }}><I18nText source={"All done!"} /></span>}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {challenges.map((ch) => {
@@ -446,22 +447,18 @@ export function DailyChallenges({ streak = 0, onXpClaimed }: { streak?: number; 
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 600, fontSize: 13, color: done ? "#007A85" : "var(--color-text-primary)", textDecoration: done ? "line-through" : "none" }}>
-                  {ch.text}
+                  <I18nText>{ch.text}</I18nText>
                 </div>
                 {!done && !achieved && (
-                  <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 1 }}>
-                    Complete the task first
-                  </div>
+                  <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 1 }}><I18nText source={"Complete the task first"} /></div>
                 )}
               </div>
               <div style={{ fontSize: 11, fontWeight: 700, color: done ? "#007A85" : achieved ? "#EFB343" : "var(--color-text-secondary)", flexShrink: 0 }}>
-                {done ? "Done" : `+${ch.xp} XP`}
+                <I18nText>{done ? "Done" : `+${ch.xp} XP`}</I18nText>
               </div>
               {!done && achieved && (
                 <button type="button" onClick={() => claimChallenge(ch.id, ch.xp)}
-                  style={{ background: "var(--color-primary)", color: "white", border: "none", borderRadius: 8, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
-                  Claim
-                </button>
+                  style={{ background: "var(--color-primary)", color: "white", border: "none", borderRadius: 8, padding: "5px 10px", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}><I18nText source={"Claim"} /></button>
               )}
               {!done && !achieved && (
                 <Lock size={13} style={{ color: "var(--color-text-secondary)", flexShrink: 0 }} />
@@ -470,9 +467,7 @@ export function DailyChallenges({ streak = 0, onXpClaimed }: { streak?: number; 
           );
         })}
       </div>
-      <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 10, textAlign: "center" }}>
-        Resets at midnight · Complete each task to unlock its reward
-      </div>
+      <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 10, textAlign: "center" }}><I18nText source={"Resets at midnight · Complete each task to unlock its reward"} /></div>
     </div>
   );
 }
@@ -600,7 +595,7 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
         <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
-          <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">Loading review...</p>
+          <p className="text-sm font-semibold text-gray-600 dark:text-gray-300"><I18nText source={"Loading review..."} /></p>
         </div>
       </div>
     );
@@ -610,17 +605,13 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
         <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Review</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
-            Nothing due for review. Come back tomorrow to keep your streak strong.
-          </p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2"><I18nText source={"Review"} /></h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-6"><I18nText source={"Nothing due for review. Come back tomorrow to keep your streak strong."} /></p>
           <button
             type="button"
             onClick={onClose}
             className="w-full rounded-xl bg-green-600 py-3 text-sm font-bold text-white"
-          >
-            Back to Learn
-          </button>
+          ><I18nText source={"Back to Learn"} /></button>
         </div>
       </div>
     );
@@ -636,19 +627,13 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
         <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
           <Brain size={52} className="mx-auto mb-3" style={{ color: "#3B7DD8" }} />
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Review complete!</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-            {correctCount} of {queue.length} correct
-          </p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1"><I18nText source={"Review complete!"} /></h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2"><I18nText source={"{value0} of {value1} correct"} values={[correctCount, queue.length]} /></p>
           {outcome.counted && outcome.xpAwarded > 0 && (
-            <p className="text-sm font-bold text-green-600 dark:text-green-400 mb-4">
-              +{outcome.xpAwarded} XP · Streak kept
-            </p>
+            <p className="text-sm font-bold text-green-600 dark:text-green-400 mb-4"><I18nText source={"+{value0} XP · Streak kept"} values={[outcome.xpAwarded]} /></p>
           )}
           {outcome.counted && outcome.alreadyCountedToday && (
-            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-4">
-              Streak kept · today&apos;s review was already counted
-            </p>
+            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-4"><I18nText source={"Streak kept · today's review was already counted"} /></p>
           )}
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">
             <div
@@ -657,17 +642,15 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
             />
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
-            {outcome.counted
+            <I18nText>{outcome.counted
               ? "Cards are rescheduled. Keep it up daily to master your finances!"
-              : `Cards are rescheduled. ${outcome.cardsRequired} cards in one session keep your streak going — this one was ${queue.length}.`}
+              : `Cards are rescheduled. ${outcome.cardsRequired} cards in one session keep your streak going — this one was ${queue.length}.`}</I18nText>
           </p>
           <button
             type="button"
             onClick={onClose}
             className="w-full rounded-xl bg-green-600 py-3 text-sm font-bold text-white"
-          >
-            Done
-          </button>
+          ><I18nText source={"Done"} /></button>
         </div>
       </div>
     );
@@ -686,14 +669,14 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-[300] flex flex-col bg-white dark:bg-gray-950">
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-safe-top pb-3 pt-4 border-b border-gray-100 dark:border-gray-800">
-        <button
+        <I18nElement as="button"
           type="button"
           onClick={onClose}
           className="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
           aria-label="Close review"
         >
           <X size={20} />
-        </button>
+        </I18nElement>
         <div className="flex-1 mx-4">
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
             <div
@@ -703,7 +686,7 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
           </div>
         </div>
         <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
-          {currentIdx + 1} / {queue.length}
+          <I18nText>{currentIdx + 1}</I18nText> / <I18nText>{queue.length}</I18nText>
         </span>
       </div>
 
@@ -712,11 +695,11 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
         <div className="mb-1 flex items-center gap-1.5">
           <Brain size={13} className="text-purple-500" aria-hidden />
           <span className="text-xs font-semibold uppercase tracking-widest text-purple-500">
-            {concept.category}
+            <I18nText>{concept.category}</I18nText>
           </span>
         </div>
         <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 leading-snug">
-          {card.question}
+          <I18nText>{card.question}</I18nText>
         </h2>
 
         <div className="space-y-3">
@@ -738,9 +721,9 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
                 className={`w-full flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition-all ${bg}`}
               >
                 <span className="shrink-0 w-7 h-7 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-xs font-bold text-gray-500">
-                  {optionLetters[i]}
+                  <I18nText>{optionLetters[i]}</I18nText>
                 </span>
-                <span className="text-sm font-medium">{opt}</span>
+                <span className="text-sm font-medium"><I18nText>{opt}</I18nText></span>
                 {selected !== null && isCorrect && (
                   <CheckCircle2 size={16} className="ml-auto text-green-500 shrink-0" aria-hidden />
                 )}
@@ -755,10 +738,10 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
         {showExplanation && (
           <div className={`mt-5 rounded-xl p-4 ${selected === correctIdx ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" : "bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"}`}>
             <p className={`text-xs font-bold mb-1 ${selected === correctIdx ? "text-green-700 dark:text-green-400" : "text-orange-700 dark:text-orange-400"}`}>
-              {selected === correctIdx ? "✓ Correct!" : "Not quite"}
+              <I18nText>{selected === correctIdx ? "✓ Correct!" : "Not quite"}</I18nText>
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-              {card.explanation}
+              <I18nText>{card.explanation}</I18nText>
             </p>
           </div>
         )}
@@ -772,7 +755,7 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
             onClick={handleNext}
             className="w-full rounded-xl bg-purple-600 py-3.5 text-sm font-bold text-white"
           >
-            {currentIdx + 1 >= queue.length ? "See Results" : "Next →"}
+            <I18nText>{currentIdx + 1 >= queue.length ? "See Results" : "Next →"}</I18nText>
           </button>
         </div>
       )}
@@ -801,7 +784,7 @@ export function LearnView({
   /** Current total XP. Used to show how much XP is still needed to unlock gated courses. */
   userXP?: number;
 }) {
-  const { locale, t } = useLocale();
+  const { locale, t, catalogRevision } = useLocale();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [userGoal, setUserGoal] = useState<string | null>(null);
@@ -827,8 +810,8 @@ export function LearnView({
 
   // Build the search index once from courses + concept tags
   const searchIndex = useMemo(
-    () => buildSearchIndex(courses, CONCEPTS),
-    [courses]
+    () => buildSearchIndex(courses, CONCEPTS, locale),
+    [courses, locale, catalogRevision]
   );
 
   // Refresh due count on mount and when returning from a review
@@ -907,9 +890,7 @@ export function LearnView({
         >
           <Play size={28} className="shrink-0 text-blue-600 dark:text-blue-400" fill="currentColor" aria-hidden />
           <div>
-            <p className="text-blue-800 dark:text-blue-300 font-bold text-sm">
-              Continue where you left off
-            </p>
+            <p className="text-blue-800 dark:text-blue-300 font-bold text-sm"><I18nText source={"Continue where you left off"} /></p>
             <p className="text-blue-600 dark:text-blue-400 text-xs">
               {savedProgress.lessonTitle || t("learn.resume")}
             </p>
@@ -931,16 +912,10 @@ export function LearnView({
             <Brain size={20} className="text-purple-600 dark:text-purple-300" aria-hidden />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-purple-900 dark:text-purple-200 font-bold text-sm">
-              {dueCount} concept{dueCount > 1 ? "s" : ""} to review
-            </p>
-            <p className="text-purple-600 dark:text-purple-400 text-xs">
-              Quick quiz to keep your memory sharp
-            </p>
+            <p className="text-purple-900 dark:text-purple-200 font-bold text-sm"><I18nText source={"{value0} concepts to review"} values={[dueCount, dueCount > 1 ? "s" : ""]} one={"{value0} concept to review"} count={dueCount} /></p>
+            <p className="text-purple-600 dark:text-purple-400 text-xs"><I18nText source={"Quick quiz to keep your memory sharp"} /></p>
           </div>
-          <span className="shrink-0 text-xs font-bold text-white bg-purple-600 rounded-full px-2.5 py-1">
-            Start
-          </span>
+          <span className="shrink-0 text-xs font-bold text-white bg-purple-600 rounded-full px-2.5 py-1"><I18nText source={"Start"} /></span>
         </button>
       )}
 
@@ -961,13 +936,13 @@ export function LearnView({
                 <Target size={18} className="text-green-600 dark:text-green-400" aria-hidden />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-green-600 dark:text-green-500">Your goal</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-green-600 dark:text-green-500"><I18nText source={"Your goal"} /></p>
                 <p className="text-sm font-bold text-green-900 dark:text-green-200 leading-tight">
-                  {GOAL_OPTIONS.find((g) => g.id === userGoal)?.label ?? userGoal}
+                  <I18nText>{GOAL_OPTIONS.find((g) => g.id === userGoal)?.label ?? userGoal}</I18nText>
                 </p>
                 {goalDescription && (
                   <p className="mt-0.5 text-xs text-green-700 dark:text-green-400 opacity-80 break-words">
-                    {goalDescription}
+                    <I18nText>{goalDescription}</I18nText>
                   </p>
                 )}
               </div>
@@ -980,22 +955,18 @@ export function LearnView({
                 setShowGoalPicker(true);
               }}
               className="shrink-0 rounded-lg border border-green-300 bg-white px-3 py-1.5 text-xs font-bold text-green-700 hover:bg-green-100 dark:border-green-700 dark:bg-transparent dark:text-green-400 dark:hover:bg-green-900/40"
-            >
-              Edit
-            </button>
+            ><I18nText source={"Edit"} /></button>
           </div>
         </div>
       )}
 
-      <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 16 }}>
-        Your Learning Path
-      </h2>
+      <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 16 }}><I18nText source={"Your Learning Path"} /></h2>
 
       {!search.trim() && recommendedCourseIds.length > 0 && (
         <div className="mb-6">
           <div className="mb-3 flex items-center justify-between px-1">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white">Recommended for You</h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400">Based on your goal</span>
+            <h3 className="text-base font-bold text-gray-900 dark:text-white"><I18nText source={"Recommended for You"} /></h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400"><I18nText source={"Based on your goal"} /></span>
           </div>
           <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
             {recommendedCourseIds.map((courseId) => {
@@ -1012,7 +983,7 @@ export function LearnView({
                     <CourseIcon name={course.icon} size={40} />
                   </div>
                   <p className="text-sm font-bold leading-tight text-gray-900 dark:text-white">{localizeContent(locale, `course.${course.id}`, course.title)}</p>
-                  <p className="mt-1 text-xs font-medium text-green-600 dark:text-green-400">Start here →</p>
+                  <p className="mt-1 text-xs font-medium text-green-600 dark:text-green-400"><I18nText source={"Start here →"} /></p>
                 </button>
               );
             })}
@@ -1022,7 +993,7 @@ export function LearnView({
 
       {/* Search */}
       <div style={{ position: "relative", marginBottom: 24 }}>
-        <input
+        <I18nElement as="input"
           type="text"
           placeholder="Search courses in any language"
           value={search}
@@ -1044,9 +1015,7 @@ export function LearnView({
           <div className="mb-3 flex justify-center text-gray-400 dark:text-gray-500" aria-hidden>
             <Search size={40} strokeWidth={1.5} />
           </div>
-          <p className="text-gray-700 dark:text-gray-300 font-semibold">
-            No results for &quot;{search.trim()}&quot;
-          </p>
+          <p className="text-gray-700 dark:text-gray-300 font-semibold"><I18nText source={"No results for \"{value0}\""} values={[search.trim()]} /></p>
           {suggestion ? (
             <button
               type="button"
@@ -1054,12 +1023,10 @@ export function LearnView({
               className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 px-4 py-2 text-sm font-semibold text-green-700 dark:text-green-400 transition-colors hover:bg-green-100 dark:hover:bg-green-900/40"
             >
               <HelpCircle size={14} aria-hidden />
-              Did you mean &quot;{suggestion}&quot;?
+              <I18nText source={"Did you mean \""} /><I18nText>{suggestion}</I18nText>&quot;?
             </button>
           ) : (
-            <p className="text-gray-500 dark:text-gray-500 text-sm mt-1">
-              Try searching for a topic like &quot;budget&quot;, &quot;TFSA&quot;, or &quot;debt&quot;
-            </p>
+            <p className="text-gray-500 dark:text-gray-500 text-sm mt-1"><I18nText source={"Try searching for a topic like \"budget\", \"TFSA\", or \"debt\""} /></p>
           )}
         </div>
       )}
@@ -1143,19 +1110,16 @@ export function LearnView({
                   {/* One secondary line at most — the course description lives
                       on the course page, so it's dropped here. */}
                   {isLocked ? (
-                    <div className="course-card-note">
-                      {Math.max(0, (levelReq.level - 1) * 500 - userXP).toLocaleString("en-ZA")} XP to go
-                    </div>
+                    <div className="course-card-note"><I18nText source={"{value0} XP to go"} values={[Math.max(0, (levelReq.level - 1) * 500 - userXP).toLocaleString("en-ZA")]} preserveValues={[true]} /></div>
                   ) : recommendedCourseIds.includes(course.id) ? (
                     <div className="course-card-note" style={{ color: "#007A85" }}>
-                      <Target size={10} aria-hidden /> Recommended for your goal
-                    </div>
+                      <Target size={10} aria-hidden /> <I18nText source={" Recommended for your goal"} /></div>
                   ) : null}
                 </div>
 
                 {isLocked ? (
                   <div className="course-lock-chip">
-                    <Lock size={10} aria-hidden /> {levelReq.label}
+                    <Lock size={10} aria-hidden /> <I18nText>{levelReq.label}</I18nText>
                   </div>
                 ) : (
                   <>
@@ -1169,12 +1133,12 @@ export function LearnView({
                         <GradeBadge scorePct={score.scorePct} size="sm" showLabel={false} />
                       ) : null;
                     })()}
-                    <div className="course-percentage" style={{ color: colour.accent }}>{percentage}%</div>
+                    <div className="course-percentage" style={{ color: colour.accent }}><I18nText>{percentage}</I18nText>%</div>
                     {/* Pin toggle. Sits in the title row rather than absolutely
                         positioned so it can't collide with the percentage.
                         Hidden on locked courses — pinning one you can't open
                         yet just moves a dead card to the top. */}
-                    <button
+                    <I18nElement as="button"
                       type="button"
                       onClick={(e) => {
                         // The whole card is clickable, so the pin must not also
@@ -1202,7 +1166,7 @@ export function LearnView({
                       }}
                     >
                       {pinnedNow ? <PinOff size={14} aria-hidden /> : <Pin size={14} aria-hidden />}
-                    </button>
+                    </I18nElement>
                   </>
                 )}
               </div>
@@ -1214,11 +1178,11 @@ export function LearnView({
                   </div>
                   <div className="course-stats">
                     <span className="course-stat">
-                      <strong>{completedLessons}</strong> / {totalLessons} {totalLessons === 1 ? "lesson" : "lessons"}
+                      <I18nText source={"{value0} / {value1} lessons"} one={"{value0} / {value1} lesson"} count={totalLessons} values={[<strong key="completed">{completedLessons}</strong>, totalLessons]} />
                     </span>
                     <span className="course-stat" aria-hidden>·</span>
                     <span className="course-stat">
-                      <strong>{course.units.length}</strong> {course.units.length === 1 ? "unit" : "units"}
+                      <I18nText source={"{value0} units"} one={"{value0} unit"} count={course.units.length} values={[<strong key="units">{course.units.length}</strong>]} />
                     </span>
                   </div>
                 </>
@@ -1279,12 +1243,8 @@ export function LearnView({
           aria-labelledby="goal-picker-title"
         >
           <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 dark:bg-gray-800">
-            <h2 id="goal-picker-title" className="mb-1 text-lg font-bold text-gray-900 dark:text-white">
-              Your money goal
-            </h2>
-            <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-              We&apos;ll prioritise courses that match what you want to achieve.
-            </p>
+            <h2 id="goal-picker-title" className="mb-1 text-lg font-bold text-gray-900 dark:text-white"><I18nText source={"Your money goal"} /></h2>
+            <p className="mb-4 text-sm text-gray-500 dark:text-gray-400"><I18nText source={"We'll prioritise courses that match what you want to achieve."} /></p>
             <div className="mb-3 grid grid-cols-2 gap-2">
               {GOAL_OPTIONS.map((g) => (
                 <button
@@ -1301,7 +1261,7 @@ export function LearnView({
                   }`}
                 >
                   <g.Icon size={16} className="mr-1 inline align-text-bottom text-green-600 dark:text-green-400" aria-hidden />
-                  {g.label}
+                  <I18nText>{g.label}</I18nText>
                 </button>
               ))}
             </div>
@@ -1328,9 +1288,7 @@ export function LearnView({
                 type="button"
                 className="flex-1 rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200"
                 onClick={() => setShowGoalPicker(false)}
-              >
-                Cancel
-              </button>
+              ><I18nText source={"Cancel"} /></button>
               <button
                 type="button"
                 className="flex-1 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white disabled:opacity-40"
@@ -1343,9 +1301,7 @@ export function LearnView({
                   setGoalDescription(desc ?? "");
                   setShowGoalPicker(false);
                 }}
-              >
-                Save
-              </button>
+              ><I18nText source={"Save"} /></button>
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React from "react";
 import {
@@ -123,13 +124,13 @@ export function OnboardingFlow({
             <Flag size={64} strokeWidth={1.5} style={{ color: "var(--color-primary)" }} aria-hidden />
           </div>
         )}
-        {null}
+        <I18nText>{null}</I18nText>
 
         <h1 style={{ fontSize: 26, fontWeight: 900, marginBottom: 12, color: "var(--color-text-primary)" }}>
-          {current.title}
+          <I18nText>{current.title}</I18nText>
         </h1>
         <p style={{ fontSize: 15, color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: 28 }}>
-          {current.body}
+          <I18nText>{current.body}</I18nText>
         </p>
 
         {screen === 0 && (
@@ -143,7 +144,7 @@ export function OnboardingFlow({
                 border: `1.5px solid ${ageConfirmed ? "var(--color-primary)" : "var(--color-border)"}`,
               }}
             >
-              <input
+              <I18nElement as="input"
                 type="checkbox"
                 checked={ageConfirmed}
                 onChange={(e) => setAgeConfirmed(e.target.checked)}
@@ -151,8 +152,7 @@ export function OnboardingFlow({
                 style={{ marginTop: 2, accentColor: "var(--color-primary)", width: 18, height: 18, flexShrink: 0, cursor: "pointer" }}
               />
               <span style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.5, fontWeight: 500 }}>
-                I confirm that I am <strong>18 years of age or older</strong>. Notho is a financial education platform intended for adults.
-              </span>
+                <I18nText source={"I confirm that I am "} /><strong><I18nText source={"18 years of age or older"} /></strong><I18nText source={". Notho is a financial education platform intended for adults."} /></span>
             </label>
 
             <label
@@ -164,7 +164,7 @@ export function OnboardingFlow({
                 border: `1.5px solid ${consentPrivacy ? "var(--color-primary)" : "var(--color-border)"}`,
               }}
             >
-              <input
+              <I18nElement as="input"
                 type="checkbox"
                 checked={consentPrivacy}
                 onChange={(e) => setConsentPrivacy(e.target.checked)}
@@ -172,18 +172,15 @@ export function OnboardingFlow({
                 style={{ marginTop: 2, accentColor: "var(--color-primary)", width: 18, height: 18, flexShrink: 0, cursor: "pointer" }}
               />
               <span style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.5, fontWeight: 500 }}>
-                I have read and agree to the{" "}
+                <I18nText source={"I have read and agree to the"} /><I18nText>{" "}</I18nText>
                 <a
                   href="/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                   style={{ color: "var(--color-primary)", textDecoration: "underline" }}
-                >
-                  Privacy Policy
-                </a>
-                . I understand Notho processes my personal information under POPIA to provide my learning experience.
-              </span>
+                ><I18nText source={"Privacy Policy"} /></a>
+                <I18nText source={". I understand Notho processes my personal information under POPIA to provide my learning experience."} /></span>
             </label>
 
             <label
@@ -195,7 +192,7 @@ export function OnboardingFlow({
                 border: `1.5px solid ${consentTerms ? "var(--color-primary)" : "var(--color-border)"}`,
               }}
             >
-              <input
+              <I18nElement as="input"
                 type="checkbox"
                 checked={consentTerms}
                 onChange={(e) => setConsentTerms(e.target.checked)}
@@ -203,18 +200,15 @@ export function OnboardingFlow({
                 style={{ marginTop: 2, accentColor: "var(--color-primary)", width: 18, height: 18, flexShrink: 0, cursor: "pointer" }}
               />
               <span style={{ fontSize: 13, color: "var(--color-text-primary)", lineHeight: 1.5, fontWeight: 500 }}>
-                I agree to the Notho{" "}
+                <I18nText source={"I agree to the Notho"} /><I18nText>{" "}</I18nText>
                 <a
                   href="/terms"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                   style={{ color: "var(--color-primary)", textDecoration: "underline" }}
-                >
-                  Terms of Service
-                </a>
-                . I understand that lessons here are <strong>educational only</strong> and not personal financial advice.
-              </span>
+                ><I18nText source={"Terms of Service"} /></a>
+                <I18nText source={". I understand that lessons here are "} /><strong><I18nText source={"educational only"} /></strong> <I18nText source={" and not personal financial advice."} /></span>
             </label>
           </div>
         )}
@@ -246,7 +240,7 @@ export function OnboardingFlow({
                   }}
                 >
                   <g.Icon size={18} className="shrink-0" style={{ color: "var(--color-primary)" }} aria-hidden />
-                  {g.label}
+                  <I18nText>{g.label}</I18nText>
                 </button>
               ))}
             </div>
@@ -318,7 +312,7 @@ export function OnboardingFlow({
                 }}
               >
                 <a.Icon size={18} className="shrink-0" style={{ color: "var(--color-primary)" }} aria-hidden />
-                {a.label}
+                <I18nText>{a.label}</I18nText>
               </button>
             ))}
           </div>
@@ -333,7 +327,7 @@ export function OnboardingFlow({
             (screen === 1 && (!selectedGoal || (selectedGoal === "other" && !goalDescription.trim())))
           }
         >
-          {current.cta}
+          <I18nText>{current.cta}</I18nText>
         </button>
 
         {screen === 1 && (
@@ -349,9 +343,7 @@ export function OnboardingFlow({
               fontSize: 14,
               width: "100%",
             }}
-          >
-            Skip
-          </button>
+          ><I18nText source={"Skip"} /></button>
         )}
 
         {screen === 2 && (
@@ -367,9 +359,7 @@ export function OnboardingFlow({
               fontSize: 14,
               width: "100%",
             }}
-          >
-            Skip
-          </button>
+          ><I18nText source={"Skip"} /></button>
         )}
 
         {screen > 0 && (
@@ -384,9 +374,7 @@ export function OnboardingFlow({
               cursor: "pointer",
               fontSize: 14,
             }}
-          >
-            Back
-          </button>
+          ><I18nText source={"Back"} /></button>
         )}
       </div>
     </div>

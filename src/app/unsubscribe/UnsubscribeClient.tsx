@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * /unsubscribe - the public exit page, reached only from an email footer.
@@ -106,18 +107,16 @@ function Shell({ children }: { children: React.ReactNode }) {
       <div style={{ maxWidth: 520, margin: "0 auto" }}>
         <div style={{ background: "var(--u-brand)", borderRadius: "16px 16px 0 0", padding: "22px 26px", display: "flex", alignItems: "center", gap: 12 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/notho-icon-white.png" width={36} height={36} alt="" style={{ display: "block" }} />
+          <I18nElement as="img" src="/notho-icon-white.png" width={36} height={36} alt="" style={{ display: "block" }} />
           <div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: "var(--u-on-brand)", lineHeight: 1.2 }}>Notho</div>
-            <div style={{ fontSize: 11, color: "var(--u-brand-ink)", letterSpacing: "0.04em", paddingTop: 2 }}>Master Your Money</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "var(--u-on-brand)", lineHeight: 1.2 }}><I18nText source={"Notho"} /></div>
+            <div style={{ fontSize: 11, color: "var(--u-brand-ink)", letterSpacing: "0.04em", paddingTop: 2 }}><I18nText source={"Master Your Money"} /></div>
           </div>
         </div>
         <div style={{ background: "var(--u-card)", borderRadius: "0 0 16px 16px", padding: "28px 26px 30px", color: "var(--u-ink)", lineHeight: 1.6 }}>
-          {children}
+          <I18nText>{children}</I18nText>
         </div>
-        <p style={{ textAlign: "center", fontSize: 11, color: "var(--u-ink-4)", marginTop: 16 }}>
-          Notho · Educational content only, not financial advice.
-        </p>
+        <p style={{ textAlign: "center", fontSize: 11, color: "var(--u-ink-4)", marginTop: 16 }}><I18nText source={"Notho · Educational content only, not financial advice."} /></p>
       </div>
     </main>
   );
@@ -268,19 +267,14 @@ export default function UnsubscribeClient() {
     setBusy(false);
   };
 
-  if (loading) return <Shell><p style={{ color: "var(--u-ink-3)", margin: 0 }}>Loading…</p></Shell>;
+  if (loading) return <Shell><p style={{ color: "var(--u-ink-3)", margin: 0 }}><I18nText source={"Loading…"} /></p></Shell>;
 
   if (invalid) {
     return (
       <Shell>
-        <h1 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 10px" }}>This link isn&apos;t valid</h1>
-        <p style={{ color: "var(--u-ink-2)", margin: "0 0 18px" }}>
-          It may have been cut short by your email app. You can change email settings inside Notho under
-          Settings, or email us and we&apos;ll do it for you.
-        </p>
-        <a href="mailto:support@notho.co.za" style={{ ...primaryBtn, display: "block", textAlign: "center", textDecoration: "none", boxSizing: "border-box" }}>
-          Email support@notho.co.za
-        </a>
+        <h1 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 10px" }}><I18nText source={"This link isn't valid"} /></h1>
+        <p style={{ color: "var(--u-ink-2)", margin: "0 0 18px" }}><I18nText source={"It may have been cut short by your email app. You can change email settings inside Notho under Settings, or email us and we'll do it for you."} /></p>
+        <a href="mailto:support@notho.co.za" style={{ ...primaryBtn, display: "block", textAlign: "center", textDecoration: "none", boxSizing: "border-box" }}><I18nText source={"Email support@notho.co.za"} /></a>
       </Shell>
     );
   }
@@ -292,21 +286,16 @@ export default function UnsubscribeClient() {
     return (
       <Shell>
         <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>
-          {firstName ? `${firstName}, what happened?` : "What happened?"}
+          <I18nText>{firstName ? `${firstName}, what happened?` : "What happened?"}</I18nText>
         </h1>
-        <p style={{ color: "var(--u-ink-2)", margin: "0 0 20px" }}>
-          You stopped using Notho a few weeks ago. No pressure to come back — we just want to know what
-          got in the way, so it doesn&apos;t get in the next person&apos;s way too.
-        </p>
+        <p style={{ color: "var(--u-ink-2)", margin: "0 0 20px" }}><I18nText source={"You stopped using Notho a few weeks ago. No pressure to come back — we just want to know what got in the way, so it doesn't get in the next person's way too."} /></p>
         <ReasonPicker exitType="inactive_survey" value={reason} onChange={setReason} detail={detail} onDetailChange={setDetail} />
         <div style={{ marginTop: 20 }}>
           <button type="button" disabled={!reason || busy} onClick={() => sendReason(false)}
             style={{ ...primaryBtn, opacity: !reason || busy ? 0.5 : 1, marginBottom: 10 }}>
-            {busy ? "Sending…" : "Send"}
+            <I18nText>{busy ? "Sending…" : "Send"}</I18nText>
           </button>
-          <button type="button" disabled={busy} onClick={() => apply("all")} style={ghostBtn}>
-            Just stop emailing me
-          </button>
+          <button type="button" disabled={busy} onClick={() => apply("all")} style={ghostBtn}><I18nText source={"Just stop emailing me"} /></button>
         </div>
       </Shell>
     );
@@ -322,41 +311,35 @@ export default function UnsubscribeClient() {
     };
     return (
       <Shell>
-        <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>Done{firstName ? `, ${firstName}` : ""}.</h1>
-        <p style={{ color: "var(--u-ink-2)", margin: "0 0 22px" }}>{line[applied]}</p>
+        <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}><I18nText source={"Done{value0}."} values={[firstName ? `, ${firstName}` : ""]} /></h1>
+        <p style={{ color: "var(--u-ink-2)", margin: "0 0 22px" }}><I18nText>{line[applied]}</I18nText></p>
 
         {!reasonSent ? (
           <>
             <div style={{ borderTop: "1px solid var(--u-border)", paddingTop: 20 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 6px" }}>
-                Would you tell us why? <span style={{ fontWeight: 500, color: "var(--u-ink-3)" }}>Optional</span>
+                <I18nText source={"Would you tell us why? "} /><span style={{ fontWeight: 500, color: "var(--u-ink-3)" }}><I18nText source={"Optional"} /></span>
               </h2>
-              <p style={{ color: "var(--u-ink-3)", fontSize: 13.5, margin: "0 0 16px" }}>
-                Your setting is already saved. This is just so we know what to fix.
-              </p>
+              <p style={{ color: "var(--u-ink-3)", fontSize: 13.5, margin: "0 0 16px" }}><I18nText source={"Your setting is already saved. This is just so we know what to fix."} /></p>
               <ReasonPicker exitType="email_unsubscribe" value={reason} onChange={setReason} detail={detail} onDetailChange={setDetail} />
               <div style={{ marginTop: 18 }}>
                 <button type="button" disabled={!reason || busy} onClick={() => sendReason(false)}
                   style={{ ...primaryBtn, opacity: !reason || busy ? 0.5 : 1, marginBottom: 10 }}>
-                  {busy ? "Sending…" : "Send"}
+                  <I18nText>{busy ? "Sending…" : "Send"}</I18nText>
                 </button>
-                <button type="button" disabled={busy} onClick={() => sendReason(true)} style={ghostBtn}>
-                  No thanks
-                </button>
+                <button type="button" disabled={busy} onClick={() => sendReason(true)} style={ghostBtn}><I18nText source={"No thanks"} /></button>
               </div>
             </div>
           </>
         ) : (
-          <p style={{ color: "var(--u-ink-2)", margin: 0 }}>Thanks — that&apos;s genuinely useful.</p>
+          <p style={{ color: "var(--u-ink-2)", margin: 0 }}><I18nText source={"Thanks — that's genuinely useful."} /></p>
         )}
 
         {applied === "all" && (
-          <p style={{ fontSize: 12.5, color: "var(--u-ink-3)", marginTop: 22, borderTop: "1px solid var(--u-border)", paddingTop: 16 }}>
-            Changed your mind?{" "}
+          <p style={{ fontSize: 12.5, color: "var(--u-ink-3)", marginTop: 22, borderTop: "1px solid #e5e7eb", paddingTop: 16 }}>
+            <I18nText source={"Changed your mind?"} /><I18nText>{" "}</I18nText>
             <button type="button" onClick={() => apply("resubscribe" as Choice)}
-              style={{ background: "none", border: "none", padding: 0, color: "var(--u-brand)", fontWeight: 700, cursor: "pointer", fontSize: 12.5, textDecoration: "underline" }}>
-              Turn emails back on
-            </button>
+              style={{ background: "none", border: "none", padding: 0, color: "var(--u-brand)", fontWeight: 700, cursor: "pointer", fontSize: 12.5, textDecoration: "underline" }}><I18nText source={"Turn emails back on"} /></button>
           </p>
         )}
       </Shell>
@@ -369,35 +352,27 @@ export default function UnsubscribeClient() {
       <Shell>
         {offerTaken ? (
           <>
-            <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>Sorted.</h1>
-            <p style={{ color: "var(--u-ink-2)", margin: "0 0 22px" }}>
-              That&apos;s changed. Your account and progress are exactly where you left them.
-            </p>
-            <a href="https://www.notho.co.za" style={{ ...primaryBtn, display: "block", textAlign: "center", textDecoration: "none", boxSizing: "border-box" }}>
-              Open Notho
-            </a>
+            <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}><I18nText source={"Sorted."} /></h1>
+            <p style={{ color: "var(--u-ink-2)", margin: "0 0 22px" }}><I18nText source={"That's changed. Your account and progress are exactly where you left them."} /></p>
+            <a href="https://www.notho.co.za" style={{ ...primaryBtn, display: "block", textAlign: "center", textDecoration: "none", boxSizing: "border-box" }}><I18nText source={"Open Notho"} /></a>
           </>
         ) : (
           <>
-            <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>Thank you.</h1>
-            <p style={{ color: "var(--u-ink-2)", margin: "0 0 20px" }}>
-              That goes straight to the person who decides what we build next.
-            </p>
-            {error && <p style={{ color: "var(--u-danger)", fontSize: 13.5, margin: "0 0 14px" }}>{error}</p>}
+            <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}><I18nText source={"Thank you."} /></h1>
+            <p style={{ color: "var(--u-ink-2)", margin: "0 0 20px" }}><I18nText source={"That goes straight to the person who decides what we build next."} /></p>
+            {error && <p style={{ color: "var(--u-danger)", fontSize: 13.5, margin: "0 0 14px" }}><I18nText>{error}</I18nText></p>}
             {offer && (
-              <div style={{ background: "var(--u-selected-bg)", border: "1px solid var(--u-brand)", borderRadius: 14, padding: "16px 18px", marginBottom: 16 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--u-offer-title)", marginBottom: 6 }}>{offer.title}</div>
-                <div style={{ fontSize: 13.5, color: "var(--u-ink)", lineHeight: 1.55 }}>{offer.body}</div>
+              <div style={{ background: "var(--u-selected-bg)", border: "1px solid #007A85", borderRadius: 14, padding: "16px 18px", marginBottom: 16 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--u-offer-title)", marginBottom: 6 }}><I18nText>{offer.title}</I18nText></div>
+                <div style={{ fontSize: 13.5, color: "var(--u-ink)", lineHeight: 1.55 }}><I18nText>{offer.body}</I18nText></div>
               </div>
             )}
             {offer && (
               <button type="button" onClick={takeOffer} disabled={busy} style={{ ...primaryBtn, marginBottom: 10, opacity: busy ? 0.6 : 1 }}>
-                {busy ? "One moment…" : offer.cta}
+                <I18nText>{busy ? "One moment…" : offer.cta}</I18nText>
               </button>
             )}
-            <button type="button" onClick={() => apply("all")} disabled={busy} style={ghostBtn}>
-              Stop emailing me
-            </button>
+            <button type="button" onClick={() => apply("all")} disabled={busy} style={ghostBtn}><I18nText source={"Stop emailing me"} /></button>
           </>
         )}
       </Shell>
@@ -407,16 +382,12 @@ export default function UnsubscribeClient() {
   // ── Default: the unsubscribe choice ────────────────────────────────────────
   return (
     <Shell>
-      <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}>
-        {greeting}how often should we email you?
-      </h1>
-      <p style={{ color: "var(--u-ink-2)", margin: "0 0 20px" }}>
-        Pick whatever suits. You can change it again any time from this same link.
-      </p>
+      <h1 style={{ fontSize: 21, fontWeight: 800, margin: "0 0 10px" }}><I18nText source={"{value0}how often should we email you?"} values={[greeting]} /></h1>
+      <p style={{ color: "var(--u-ink-2)", margin: "0 0 20px" }}><I18nText source={"Pick whatever suits. You can change it again any time from this same link."} /></p>
 
-      {error && <p style={{ color: "var(--u-danger)", fontSize: 13.5, margin: "0 0 14px" }}>{error}</p>}
+      {error && <p style={{ color: "var(--u-danger)", fontSize: 13.5, margin: "0 0 14px" }}><I18nText>{error}</I18nText></p>}
 
-      <div role="radiogroup" aria-label="Email frequency" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+      <I18nElement as="div" role="radiogroup" aria-label="Email frequency" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
         {CHOICES.map((c) => {
           const on = choice === c.value;
           return (
@@ -435,16 +406,16 @@ export default function UnsubscribeClient() {
                 {on && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--u-brand)" }} />}
               </span>
               <span>
-                <span style={{ display: "block", fontSize: 14.5, fontWeight: 700 }}>{c.title}</span>
-                <span style={{ display: "block", fontSize: 13, color: "var(--u-ink-3)", marginTop: 2 }}>{c.body}</span>
+                <span style={{ display: "block", fontSize: 14.5, fontWeight: 700 }}><I18nText>{c.title}</I18nText></span>
+                <span style={{ display: "block", fontSize: 13, color: "var(--u-ink-3)", marginTop: 2 }}><I18nText>{c.body}</I18nText></span>
               </span>
             </button>
           );
         })}
-      </div>
+      </I18nElement>
 
       <button type="button" onClick={() => apply(choice)} disabled={busy} style={{ ...primaryBtn, opacity: busy ? 0.6 : 1 }}>
-        {busy ? "Saving…" : "Save my choice"}
+        <I18nText>{busy ? "Saving…" : "Save my choice"}</I18nText>
       </button>
     </Shell>
   );

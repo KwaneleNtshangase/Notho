@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useState } from "react";
 import { NothoProvider, useNotho } from "@/context/NothoContext";
@@ -143,7 +144,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {!isMockExam && <MobileTopBarWrapper />}
               <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>
                 {!isMockExam && <PersistentAppTabs visible={showTabs} />}
-                {!showTabs && children}
+                <I18nText>{!showTabs && children}</I18nText>
               </div>
             </div>
             {(pathname === "/learn" || pathname === "/") && (

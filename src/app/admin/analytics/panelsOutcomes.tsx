@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import React, { useState } from "react";
 import { fmt, fmtPct } from "./lib";
@@ -99,12 +100,8 @@ function OutcomesBody({
   return (
     <div className="nv-stack">
       <Card>
-        <h2 className="nv-card-title">Are the lessons showing up in the budget?</h2>
-        <p className="nv-card-sub">
-          {data.coverage.classifiedNote} {fmt(data.coverage.budgetUsers)} people have budget rows.{" "}
-          {fmt(data.coverage.lessonUsers)} have a recorded lesson. A person only counts as improved
-          when both windows have real spend. This is not proof the lesson caused the change.
-        </p>
+        <h2 className="nv-card-title"><I18nText source={"Are the lessons showing up in the budget?"} /></h2>
+        <p className="nv-card-sub"><I18nText source={"{value0} {value1} people have budget rows.{value2}{value3} have a recorded lesson. A person only counts as improved when both windows have real spend. This is not proof the lesson caused the change."} values={[data.coverage.classifiedNote, fmt(data.coverage.budgetUsers), " ", fmt(data.coverage.lessonUsers)]} preserveValues={[false,true,false,true]} /></p>
       </Card>
       <StatGrid>
         {blocks.map((b) => (
@@ -134,12 +131,10 @@ function OutcomesBody({
       {active && (
         <Card>
           <div className="nv-card-head">
-            <h2 className="nv-card-title">{active.label}</h2>
-            <span style={{ fontSize: 12, color: muted }}>
-              {fmt(active.improved)} improved \u00b7 {fmt(active.flat)} flat \u00b7 {fmt(active.worsened)} worsened \u00b7 {fmt(active.insufficient)} waiting on budget
-            </span>
+            <h2 className="nv-card-title"><I18nText>{active.label}</I18nText></h2>
+            <span style={{ fontSize: 12, color: muted }}><I18nText source={"{value0} improved · {value1} flat · {value2} worsened · {value3} waiting on budget"} values={[fmt(active.improved), fmt(active.flat), fmt(active.worsened), fmt(active.insufficient)]} /></span>
           </div>
-          <p className="nv-card-sub">{active.note}</p>
+          <p className="nv-card-sub"><I18nText>{active.note}</I18nText></p>
           {active.pairs.length === 0 ? (
             <Empty title="Nobody has finished this yet" detail="The card fills once a lesson result and a budget both exist." />
           ) : (
@@ -147,23 +142,23 @@ function OutcomesBody({
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, color: ink }}>
                 <thead>
                   <tr style={{ color: muted, textAlign: "left" }}>
-                    <th style={{ padding: "8px 6px" }}>Person</th>
-                    <th style={{ padding: "8px 6px" }}>Call</th>
-                    <th style={{ padding: "8px 6px" }}>Wants before</th>
-                    <th style={{ padding: "8px 6px" }}>Wants after</th>
-                    <th style={{ padding: "8px 6px" }}>Change</th>
-                    <th style={{ padding: "8px 6px" }}>Why</th>
+                    <th style={{ padding: "8px 6px" }}><I18nText source={"Person"} /></th>
+                    <th style={{ padding: "8px 6px" }}><I18nText source={"Call"} /></th>
+                    <th style={{ padding: "8px 6px" }}><I18nText source={"Wants before"} /></th>
+                    <th style={{ padding: "8px 6px" }}><I18nText source={"Wants after"} /></th>
+                    <th style={{ padding: "8px 6px" }}><I18nText source={"Change"} /></th>
+                    <th style={{ padding: "8px 6px" }}><I18nText source={"Why"} /></th>
                   </tr>
                 </thead>
                 <tbody>
                   {active.pairs.slice(0, 40).map((pair) => (
                     <tr key={pair.userId} style={{ borderTop: "1px solid var(--border, rgba(255,255,255,0.08))" }}>
                       <td style={{ padding: "8px 6px", fontWeight: 700 }}>{pair.username || "No username"}</td>
-                      <td style={{ padding: "8px 6px", color: tone(pair.call.verdict), fontWeight: 800 }}>{pair.call.verdict}</td>
-                      <td style={{ padding: "8px 6px" }}>{fmtPct(pair.call.before.wantSharePct)}</td>
-                      <td style={{ padding: "8px 6px" }}>{fmtPct(pair.call.after.wantSharePct)}</td>
-                      <td style={{ padding: "8px 6px" }}>{deltaLabel(pair.call.wantShareDeltaPp)}</td>
-                      <td style={{ padding: "8px 6px", color: muted, maxWidth: 360 }}>{pair.call.reason}</td>
+                      <td style={{ padding: "8px 6px", color: tone(pair.call.verdict), fontWeight: 800 }}><I18nText>{pair.call.verdict}</I18nText></td>
+                      <td style={{ padding: "8px 6px" }}><I18nText>{fmtPct(pair.call.before.wantSharePct)}</I18nText></td>
+                      <td style={{ padding: "8px 6px" }}><I18nText>{fmtPct(pair.call.after.wantSharePct)}</I18nText></td>
+                      <td style={{ padding: "8px 6px" }}><I18nText>{deltaLabel(pair.call.wantShareDeltaPp)}</I18nText></td>
+                      <td style={{ padding: "8px 6px", color: muted, maxWidth: 360 }}><I18nText>{pair.call.reason}</I18nText></td>
                     </tr>
                   ))}
                 </tbody>

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import { useEffect, useState } from "react";
 import {
@@ -27,12 +28,10 @@ export function TextSizeControl() {
       borderRadius: 12, padding: "14px 16px", marginBottom: 8,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-        <span style={{ color: "var(--color-primary)", fontWeight: 800, fontSize: 16, width: 18, textAlign: "center" }}>Aa</span>
+        <span style={{ color: "var(--color-primary)", fontWeight: 800, fontSize: 16, width: 18, textAlign: "center" }}><I18nText source={"Aa"} /></span>
         <div>
-          <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>Text size</div>
-          <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
-            Follows the phone, capped so buttons and tabs stay in place
-          </div>
+          <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}><I18nText source={"Text size"} /></div>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}><I18nText source={"Follows the phone, capped so buttons and tabs stay in place"} /></div>
         </div>
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -50,7 +49,7 @@ export function TextSizeControl() {
               color: textScale === scale ? "white" : "var(--color-text-secondary)",
               transition: "all 0.15s",
             }}
-          >{TEXT_SCALE_LABEL[scale]}</button>
+          ><I18nText>{TEXT_SCALE_LABEL[scale]}</I18nText></button>
         ))}
       </div>
     </div>

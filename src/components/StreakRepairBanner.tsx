@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * Streak repair offer: shows when the user's streak broke in the last 48h
@@ -100,7 +101,7 @@ export function StreakRepairBanner() {
   if (!offer) return null;
 
   return (
-    <div
+    <I18nElement as="div"
       role="dialog"
       aria-label="Restore your streak"
       style={{
@@ -119,17 +120,11 @@ export function StreakRepairBanner() {
       }}
     >
       {done ? (
-        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-primary)" }}>
-          Streak restored. Do a lesson today or it drops again.
-        </div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-primary)" }}><I18nText source={"Streak restored. Do a lesson today or it drops again."} /></div>
       ) : (
         <>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)" }}>
-            Your {offer.streak}-day streak broke.
-          </div>
-          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "4px 0 10px" }}>
-            Restore it for {COST} XP (you have {Math.floor(offer.xp)}). This offer expires soon.
-          </div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--color-text-primary)" }}><I18nText source={"Your {value0}-day streak broke."} values={[offer.streak]} /></div>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "4px 0 10px" }}><I18nText source={"Restore it for {value0} XP (you have {value1}). This offer expires soon."} values={[COST, Math.floor(offer.xp)]} /></div>
           <div style={{ display: "flex", gap: 8 }}>
             <button
               type="button"
@@ -141,7 +136,7 @@ export function StreakRepairBanner() {
                 cursor: "pointer", opacity: busy ? 0.6 : 1,
               }}
             >
-              {busy ? "Restoring…" : `Restore for ${COST} XP`}
+              <I18nText>{busy ? "Restoring…" : `Restore for ${COST} XP`}</I18nText>
             </button>
             <button
               type="button"
@@ -150,12 +145,10 @@ export function StreakRepairBanner() {
                 background: "none", border: "none", cursor: "pointer",
                 fontSize: 13, fontWeight: 700, color: "var(--color-text-secondary)",
               }}
-            >
-              Let it go
-            </button>
+            ><I18nText source={"Let it go"} /></button>
           </div>
         </>
       )}
-    </div>
+    </I18nElement>
   );
 }

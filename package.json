@@ -17,7 +17,13 @@
     "scan:answers": "node scripts/answer-pattern-scan.mjs",
     "scan:ratchet": "node scripts/answer-pattern-ratchet.mjs",
     "content:offenders": "node scripts/export-offenders.mjs",
-    "content:trims": "node scripts/propose-trims.mjs"
+    "content:trims": "node scripts/propose-trims.mjs",
+    "i18n:check": "node scripts/i18n.mjs check",
+    "i18n:export": "node scripts/i18n.mjs export",
+    "i18n:import": "node scripts/i18n.mjs import",
+    "i18n:inventory": "node scripts/i18n-inventory.mjs",
+    "i18n:compile": "node scripts/compile-i18n-drafts.mjs",
+    "i18n:plan": "node scripts/generate-i18n-gemini.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

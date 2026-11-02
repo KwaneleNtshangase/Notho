@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -137,7 +138,7 @@ export function ReportProblemSheet({
       style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}
       onClick={onClose}
     >
-      <div
+      <I18nElement as="div"
         role="dialog"
         aria-label="Report a Problem"
         onClick={(e) => e.stopPropagation()}
@@ -153,21 +154,21 @@ export function ReportProblemSheet({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-          <button type="button" aria-label="Close" onClick={onClose} style={iconBtn}>
+          <I18nElement as="button" type="button" aria-label="Close" onClick={onClose} style={iconBtn}>
             <X size={18} />
-          </button>
-          <div style={{ flex: 1, textAlign: "center", fontWeight: 750, fontSize: 17 }}>Report a Problem</div>
+          </I18nElement>
+          <div style={{ flex: 1, textAlign: "center", fontWeight: 750, fontSize: 17 }}><I18nText source={"Report a Problem"} /></div>
           <button type="button" onClick={submit} disabled={!canSubmit} style={{ ...pill, opacity: canSubmit ? 1 : 0.45 }}>
-            {sending ? "..." : "Submit"}
+            <I18nText>{sending ? "..." : "Submit"}</I18nText>
           </button>
         </div>
 
         {sent ? (
           <div style={{ textAlign: "center", padding: "36px 12px" }}>
             <CheckCircle2 size={42} style={{ color: "#3DDC97", margin: "0 auto 10px" }} />
-            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 6 }}>Sent</div>
-            <p style={{ color: "#a1a1aa", fontSize: 14, marginBottom: 18 }}>Thanks. We have the report from this screen.</p>
-            <button type="button" onClick={onClose} style={{ ...pill, width: "100%" }}>Close</button>
+            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 6 }}><I18nText source={"Sent"} /></div>
+            <p style={{ color: "#a1a1aa", fontSize: 14, marginBottom: 18 }}><I18nText source={"Thanks. We have the report from this screen."} /></p>
+            <button type="button" onClick={onClose} style={{ ...pill, width: "100%" }}><I18nText source={"Close"} /></button>
           </div>
         ) : (
           <>
@@ -175,10 +176,8 @@ export function ReportProblemSheet({
               <div style={{ display: "flex", gap: 10 }}>
                 <span style={{ fontSize: 18 }}>⌁</span>
                 <div>
-                  <div style={{ fontWeight: 750, fontSize: 15 }}>Shake to Report</div>
-                  <div style={{ fontSize: 13, color: "#a1a1aa", lineHeight: 1.4, marginTop: 2 }}>
-                    Shake your phone to report issues. You can turn it off in Settings.
-                  </div>
+                  <div style={{ fontWeight: 750, fontSize: 15 }}><I18nText source={"Shake to Report"} /></div>
+                  <div style={{ fontSize: 13, color: "#a1a1aa", lineHeight: 1.4, marginTop: 2 }}><I18nText source={"Shake your phone to report issues. You can turn it off in Settings."} /></div>
                 </div>
               </div>
             </div>
@@ -186,7 +185,7 @@ export function ReportProblemSheet({
             <label style={{ ...card, display: "flex", alignItems: "center", gap: 10, marginTop: 10 }}>
               <span style={{ color: "#a1a1aa" }}>◌</span>
               <select value={issueType} onChange={(e) => setIssueType(e.target.value)} style={selectStyle}>
-                {TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                {TYPES.map((t) => <I18nElement as="option" key={t.value} value={t.value}>{t.label}</I18nElement>)}
               </select>
             </label>
 
@@ -199,29 +198,29 @@ export function ReportProblemSheet({
             />
 
             <div style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
-              <span style={{ fontSize: 15 }}>Get a response from our support team</span>
+              <span style={{ fontSize: 15 }}><I18nText source={"Get a response from our support team"} /></span>
               <Toggle on={wantReply} onClick={() => setWantReply((v) => !v)} />
             </div>
 
-            <div style={{ marginTop: 16, color: "#a1a1aa", fontSize: 13 }}>Attachments</div>
+            <div style={{ marginTop: 16, color: "#a1a1aa", fontSize: 13 }}><I18nText source={"Attachments"} /></div>
             <div style={{ display: "flex", gap: 10, marginTop: 8, flexWrap: "wrap" }}>
-              <button type="button" onClick={() => fileRef.current?.click()} style={addBtn} aria-label="Add attachment">+</button>
+              <I18nElement as="button" type="button" onClick={() => fileRef.current?.click()} style={addBtn} aria-label="Add attachment">+</I18nElement>
               {files.map((f) => (
-                <div key={f.name} style={{ ...addBtn, fontSize: 11, padding: 8, overflow: "hidden" }}>{f.name}</div>
+                <div key={f.name} style={{ ...addBtn, fontSize: 11, padding: 8, overflow: "hidden" }}><I18nText>{f.name}</I18nText></div>
               ))}
               <input ref={fileRef} type="file" accept="image/*,.pdf" hidden multiple onChange={(e) => void addFiles(e.target.files)} />
             </div>
 
             <div style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16 }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}>⌖ Include screenshot</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}><I18nText source={"⌖ Include screenshot"} /></span>
               <Toggle on={includeShot} onClick={() => setIncludeShot((v) => !v)} active />
             </div>
             {includeShot && screenshot && (
-              <img src={screenshot} alt="Screenshot of the screen you shook from" style={{ width: "100%", borderRadius: 16, marginTop: 10, border: "1px solid #2a2a2e" }} />
+              <I18nElement as="img" src={screenshot} alt="Screenshot of the screen you shook from" style={{ width: "100%", borderRadius: 16, marginTop: 10, border: "1px solid #2a2a2e" }} />
             )}
           </>
         )}
-      </div>
+      </I18nElement>
     </div>
   );
 }
@@ -241,8 +240,8 @@ export function ShakeReportSetting() {
   return (
     <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 12, padding: "14px 16px", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
       <div>
-        <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>Shake to report</div>
-        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>Shake the phone to open Report a Problem</div>
+        <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}><I18nText source={"Shake to report"} /></div>
+        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={"Shake the phone to open Report a Problem"} /></div>
       </div>
       <button
         type="button"

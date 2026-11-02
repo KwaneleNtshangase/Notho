@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React from "react";
 import { Clock, GraduationCap, Target, TrendingUp } from "lucide-react";
@@ -75,9 +76,7 @@ export function ExamResultView({
             color: "var(--color-text-secondary)",
             marginBottom: 10,
           }}
-        >
-          {spec.label} · Result
-        </div>
+        ><I18nText source={"{value0} · Result"} values={[spec.label]} /></div>
 
         <div style={{ marginBottom: 14 }}>
           <PassPill
@@ -88,10 +87,10 @@ export function ExamResultView({
         </div>
 
         <div style={{ fontSize: 52, fontWeight: 900, lineHeight: 1, marginBottom: 4 }}>
-          {attempt.firstTryCorrect}
+          <I18nText>{attempt.firstTryCorrect}</I18nText>
           <span style={{ fontSize: 26, fontWeight: 700, opacity: 0.5 }}>
-            {" / "}
-            {attempt.totalQuestions}
+            <I18nText>{" / "}</I18nText>
+            <I18nText>{attempt.totalQuestions}</I18nText>
           </span>
         </div>
 
@@ -107,11 +106,11 @@ export function ExamResultView({
             margin: 0,
           }}
         >
-          Pass mark: <strong>{spec.passMarkCorrect} of {spec.totalQuestions}</strong>{" "}
-          ({spec.passMarkPct}%).{" "}
-          {attempt.passed
+          <I18nText source={"Pass mark: "} /><strong><I18nText source={"{value0} of {value1}"} values={[spec.passMarkCorrect, spec.totalQuestions]} /></strong><I18nText>{" "}</I18nText>
+          (<I18nText>{spec.passMarkPct}</I18nText>%).<I18nText>{" "}</I18nText>
+          <I18nText>{attempt.passed
             ? `You cleared it by ${attempt.firstTryCorrect - spec.passMarkCorrect}.`
-            : `You were ${spec.passMarkCorrect - attempt.firstTryCorrect} short.`}
+            : `You were ${spec.passMarkCorrect - attempt.firstTryCorrect} short.`}</I18nText>
         </p>
       </div>
 
@@ -177,8 +176,7 @@ export function ExamResultView({
           }}
         >
           <Target size={18} />
-          By knowledge area
-        </h3>
+          <I18nText source={"By knowledge area"} /></h3>
         <p
           style={{
             fontSize: 13,
@@ -186,15 +184,10 @@ export function ExamResultView({
             margin: "0 0 14px",
             lineHeight: 1.6,
           }}
-        >
-          Where the marks went. Anything under {spec.passMarkPct}% is worth
-          redoing before you re-sit.
-        </p>
+        ><I18nText source={"Where the marks went. Anything under {value0}% is worth redoing before you re-sit."} values={[spec.passMarkPct]} /></p>
 
         {attempt.areaBreakdown.length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}>
-            No breakdown available for this attempt.
-          </p>
+          <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}><I18nText source={"No breakdown available for this attempt."} /></p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[...attempt.areaBreakdown]
@@ -216,9 +209,7 @@ export function ExamResultView({
           marginBottom: 20,
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 6 }}>
-          How this was marked
-        </div>
+        <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 6 }}><I18nText source={"How this was marked"} /></div>
         <p
           style={{
             fontSize: 12.5,
@@ -227,18 +218,10 @@ export function ExamResultView({
             margin: 0,
           }}
         >
-          Your score counts each question <strong>once</strong>, as you answered
-          it the <strong>first</strong> time it appeared. Questions you missed
-          came back until you got them right — that is how the lessons are built
-          — but the repeats do not raise your mark, because the real RE5 gives
-          you one attempt per question.
-          {!attempt.saved && (
+          <I18nText source={"Your score counts each question "} /><strong><I18nText source={"once"} /></strong><I18nText source={", as you answered it the "} /><strong><I18nText source={"first"} /></strong> <I18nText source={" time it appeared. Questions you missed came back until you got them right — that is how the lessons are built — but the repeats do not raise your mark, because the real RE5 gives you one attempt per question."} />{!attempt.saved && (
             <>
-              {" "}
-              <span style={{ fontWeight: 700 }}>
-                This result could not be saved to your history — check your
-                connection and re-sit to record it.
-              </span>
+              <I18nText>{" "}</I18nText>
+              <span style={{ fontWeight: 700 }}><I18nText source={"This result could not be saved to your history — check your connection and re-sit to record it."} /></span>
             </>
           )}
         </p>
@@ -260,8 +243,7 @@ export function ExamResultView({
             }}
           >
             <GraduationCap size={18} />
-            See my RE5 readiness
-          </span>
+            <I18nText source={"See my RE5 readiness"} /></span>
         </button>
         {onRetake && (
           <button
@@ -274,9 +256,7 @@ export function ExamResultView({
               border: "1.5px solid var(--color-border)",
             }}
             onClick={onRetake}
-          >
-            Re-sit {spec.label}
-          </button>
+          ><I18nText source={"Re-sit {value0}"} values={[spec.label]} /></button>
         )}
         <button
           type="button"
@@ -288,9 +268,7 @@ export function ExamResultView({
             border: "1.5px solid var(--color-border)",
           }}
           onClick={onBackToCourse}
-        >
-          Back to course
-        </button>
+        ><I18nText source={"Back to course"} /></button>
       </div>
     </main>
   );
@@ -329,10 +307,10 @@ function StatCard({
           marginBottom: 6,
         }}
       >
-        {icon}
-        {label}
+        <I18nText>{icon}</I18nText>
+        <I18nText>{label}</I18nText>
       </div>
-      <div style={{ fontSize: 22, fontWeight: 900, lineHeight: 1.2 }}>{value}</div>
+      <div style={{ fontSize: 22, fontWeight: 900, lineHeight: 1.2 }}><I18nText>{value}</I18nText></div>
       <div
         style={{
           fontSize: 11.5,
@@ -341,7 +319,7 @@ function StatCard({
           color: noteTone === "warn" ? "#9A4B10" : "var(--color-text-secondary)",
         }}
       >
-        {note}
+        <I18nText>{note}</I18nText>
       </div>
     </div>
   );
@@ -371,7 +349,7 @@ export function AreaRow({
           marginBottom: 5,
         }}
       >
-        <span style={{ fontSize: 13.5, fontWeight: 700 }}>{area.areaLabel}</span>
+        <span style={{ fontSize: 13.5, fontWeight: 700 }}><I18nText>{area.areaLabel}</I18nText></span>
         <span
           style={{
             fontSize: 13,
@@ -380,11 +358,11 @@ export function AreaRow({
             whiteSpace: "nowrap",
           }}
         >
-          {area.correct}/{area.total}
-          <span style={{ opacity: 0.6, fontWeight: 600 }}> · {pct}%</span>
+          <I18nText>{area.correct}</I18nText>/<I18nText>{area.total}</I18nText>
+          <span style={{ opacity: 0.6, fontWeight: 600 }}> · <I18nText>{pct}</I18nText>%</span>
         </span>
       </div>
-      <div
+      <I18nElement as="div"
         role="img"
         aria-label={`${area.areaLabel}: ${area.correct} of ${area.total} correct`}
         style={{
@@ -402,7 +380,7 @@ export function AreaRow({
             background: weak ? "#DC2626" : "#0E7C85",
           }}
         />
-      </div>
+      </I18nElement>
       {unitHint && weak && unit && (
         <div
           style={{
@@ -411,9 +389,7 @@ export function AreaRow({
             marginTop: 4,
             fontWeight: 600,
           }}
-        >
-          Redo the teaching unit for this area before re-sitting.
-        </div>
+        ><I18nText source={"Redo the teaching unit for this area before re-sitting."} /></div>
       )}
     </div>
   );

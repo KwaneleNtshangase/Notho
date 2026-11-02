@@ -1,3 +1,4 @@
+import { resolveString } from "./localize";
 /** Exact English → isiZulu for lesson step copy. Missing key stays English. */
 export const stringZu: Record<string, string> = {
   "Money is More Than Cash": "Imali akuyona nje ukheshi",
@@ -131,6 +132,8 @@ export const stringZu: Record<string, string> = {
 
 export function localizeString(locale: string, text: string | undefined | null): string {
   if (!text) return text ?? "";
-  if (locale !== "zu") return text;
-  return stringZu[text] ?? text;
+  // The live lesson bank capitalises "Is"; retain the existing correction for
+  // this otherwise identical complete title rather than replace it with a draft.
+  const legacy = locale === "zu" ? stringZu[text] ?? (text === "Money Is More Than Cash" ? stringZu["Money is More Than Cash"] : undefined) : undefined;
+  return resolveString(locale, text, legacy);
 }

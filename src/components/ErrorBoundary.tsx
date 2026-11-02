@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import React from "react";
 import { AlertCircle } from "@/components/icons/NothoIcons";
@@ -154,9 +155,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             fontSize: 15,
             textAlign: "center",
           }}
-        >
-          Updating to the latest version&hellip;
-        </main>
+        ><I18nText source={"Updating to the latest version…"} /></main>
       );
     }
 
@@ -200,7 +199,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               margin: "0 0 8px",
             }}
           >
-            {isChunk ? "Notho needs a reload" : "Something went wrong"}
+            <I18nText>{isChunk ? "Notho needs a reload" : "Something went wrong"}</I18nText>
           </h1>
           <p
             style={{
@@ -212,15 +211,10 @@ export class ErrorBoundary extends React.Component<Props, State> {
           >
             {isChunk ? (
               <>
-                Your progress is safe. Part of the app didn't finish
-                downloading. Reload fetches the latest version.
-              </>
+                <I18nText source={"Your progress is safe. Part of the app didn't finish downloading. Reload fetches the latest version."} /></>
             ) : (
               <>
-                Your progress is safe. We have already been told. Reload fetches
-                a fresh copy. Try this screen again only redraws it, so the same
-                fault can come straight back.
-              </>
+                <I18nText source={"Your progress is safe. We have already been told. Reload fetches a fresh copy. Try this screen again only redraws it, so the same fault can come straight back."} /></>
             )}
           </p>
           <div style={{ display: "flex", gap: 10, flexDirection: "column" }}>
@@ -238,9 +232,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 fontSize: 15,
                 cursor: "pointer",
               }}
-            >
-              Reload Notho
-            </button>
+            ><I18nText source={"Reload Notho"} /></button>
             {!isChunk && (
               <button
                 type="button"
@@ -256,9 +248,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                   fontSize: 14,
                   cursor: "pointer",
                 }}
-              >
-                Try this screen again
-              </button>
+              ><I18nText source={"Try this screen again"} /></button>
             )}
           </div>
           {process.env.NODE_ENV !== "production" && this.state.error && (
