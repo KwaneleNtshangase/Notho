@@ -141,6 +141,7 @@ for (const filename of [...files(path.join(root, 'src/components')), ...files(pa
       const parent = node.parent;
       if (ts.isJsxAttribute(parent) && attrs.has(parent.name.getText(sourceFile))) source = node.text;
       else if (ts.isPropertyAssignment(parent) && labels.has(parent.name.getText(sourceFile).replace(/['"]/g, ''))) { source = node.text; candidate = true; }
+      else if (ts.isCallExpression(parent) && ((parent.expression.getText(sourceFile) === 'localizeString' && parent.arguments[1] === node) || (parent.expression.getText(sourceFile) === 'localizeClientString' && parent.arguments[0] === node))) source = node.text;
       else if (renderedLiteral(node, sourceFile)) source = node.text;
       else if (ts.isCallExpression(parent) && /^(alert|confirm|setError|setMessage|toast(?:\.\w+)?)$/.test(parent.expression.getText(sourceFile))) { source = node.text; candidate = true; }
       else if (!ts.isLiteralTypeNode(parent) && !ts.isImportDeclaration(parent) && !ts.isExportDeclaration(parent)

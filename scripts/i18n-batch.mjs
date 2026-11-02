@@ -60,6 +60,7 @@ if (command === 'plan') {
       return !issues.length && r.source !== value;
     }).map(r => r.source));
     let todo = sample ? sampleSources.map(source => sources.get(source)).filter(Boolean) : [...sources.values()].filter(r => !complete.has(r.source) && !preservedSourceReason(r.source));
+    if (process.argv.includes('--missing-only')) todo = todo.filter(row => !previousBySource.has(row.source));
     if (process.argv.includes('--repair-context')) todo = todo.map(row => {
       const previous = previousBySource.get(row.source);
       if (!previous) return row;

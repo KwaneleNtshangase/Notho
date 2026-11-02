@@ -10,7 +10,7 @@ import { formatWithSpaces, formatRand, formatZAR } from "@/lib/formatters";
 import { ShareResultButton } from "@/components/ShareCard";
 import {
   type CalcInputs,
-  assumptionLine,
+  assumptionParts,
   calcGrowth,
   formatDuration,
   projectGrowth,
@@ -234,7 +234,7 @@ export function CalculatorView() {
           {projectionA?.depletedYear != null && (
             <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 12, background: "rgba(224,60,49,0.08)", color: "#E03C31", fontWeight: 700, fontSize: 14 }}><I18nText source={"This withdrawal empties the pot in year {value0}."} values={[projectionA.depletedYear]} /></div>
           )}
-          <div style={{ marginBottom: 12, fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.45 }}><I18nText>{assumptionLine(calcA)}</I18nText></div>
+          <div style={{ marginBottom: 12, fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.45 }}>{assumptionParts(calcA).map((part, index) => <React.Fragment key={index}>{index > 0 ? " · " : ""}<I18nText>{part}</I18nText></React.Fragment>)}</div>
           {projectionA?.notes.filter((n) => !n.startsWith("The pot reaches")).map((n) => (
             <div key={n} style={{ marginBottom: 8, fontSize: 12, color: "var(--color-text-secondary)" }}><I18nText>{n}</I18nText></div>
           ))}

@@ -245,6 +245,8 @@ test('authenticated settings, navigation, course and lesson screens', async ({ p
   await page.locator('#mainContent').getByRole('button', { name: localizeString('af', ' Calculate').trim(), exact: true }).click();
   await expect(page.locator('.recharts-responsive-container')).toBeVisible();
   await expect(principal).toHaveValue('12000');
+  await expect(page.getByText('End-of-month deposits', { exact: false })).toHaveCount(0);
+  await expect(page.getByText(localizeString('af', 'End-of-month deposits'), { exact: false }).first()).toBeVisible();
   await noOverflow(page);
   await page.screenshot({ path: testInfo.outputPath('afrikaans-calculator.png'), fullPage: true });
   await page.goto('/budget', { waitUntil: 'domcontentloaded' });

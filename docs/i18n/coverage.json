@@ -1,157 +1,175 @@
 {
-  "coverage": [
+  "date": "2026-11-02",
+  "scope": "26,212 distinct source strings across 22 courses, 205 lessons and app UI candidates. Structural coverage is not linguistic validation.",
+  "bulk": {
+    "generatedAt": "2026-11-02T15:44:09.141Z",
+    "status": "incomplete",
+    "sourceRows": 26424,
+    "uniqueSources": 26212,
+    "validation": "Structural checks only. Generated drafts have not received human or cultural validation.",
+    "languages": [
+      {
+        "locale": "af",
+        "acceptedPublic": 24934,
+        "acceptedPrivate": 1270,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 8,
+        "unchangedRequiringClassification": 210
+      },
+      {
+        "locale": "nr",
+        "acceptedPublic": 24921,
+        "acceptedPrivate": 1270,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 21,
+        "unchangedRequiringClassification": 183
+      },
+      {
+        "locale": "xh",
+        "acceptedPublic": 24933,
+        "acceptedPrivate": 1270,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 9,
+        "unchangedRequiringClassification": 190
+      },
+      {
+        "locale": "zu",
+        "acceptedPublic": 24934,
+        "acceptedPrivate": 1270,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 8,
+        "unchangedRequiringClassification": 186
+      },
+      {
+        "locale": "nso",
+        "acceptedPublic": 24919,
+        "acceptedPrivate": 1270,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 23,
+        "unchangedRequiringClassification": 306
+      },
+      {
+        "locale": "st",
+        "acceptedPublic": 24932,
+        "acceptedPrivate": 1270,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 10,
+        "unchangedRequiringClassification": 264
+      },
+      {
+        "locale": "tn",
+        "acceptedPublic": 24922,
+        "acceptedPrivate": 1270,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 20,
+        "unchangedRequiringClassification": 306
+      },
+      {
+        "locale": "ss",
+        "acceptedPublic": 24836,
+        "acceptedPrivate": 1268,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 108,
+        "unchangedRequiringClassification": 265
+      },
+      {
+        "locale": "ve",
+        "acceptedPublic": 24890,
+        "acceptedPrivate": 1270,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 52,
+        "unchangedRequiringClassification": 368
+      },
+      {
+        "locale": "ts",
+        "acceptedPublic": 24882,
+        "acceptedPrivate": 1270,
+        "preservedSource": 195,
+        "missing": 0,
+        "rejected": 60,
+        "unchangedRequiringClassification": 347
+      }
+    ]
+  },
+  "effectivePublic": [
     {
       "locale": "af",
-      "messages": {
-        "total": 113,
-        "translated": 111
-      },
-      "content": {
-        "total": 274,
-        "translated": 22
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 8
-      }
+      "totalKeys": 25323,
+      "translated": 24854,
+      "preservedSource": 231,
+      "englishFallback": 238
     },
     {
       "locale": "nr",
-      "messages": {
-        "total": 113,
-        "translated": 111
-      },
-      "content": {
-        "total": 274,
-        "translated": 22
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 8
-      }
+      "totalKeys": 25323,
+      "translated": 24869,
+      "preservedSource": 231,
+      "englishFallback": 223
     },
     {
       "locale": "xh",
-      "messages": {
-        "total": 113,
-        "translated": 111
-      },
-      "content": {
-        "total": 274,
-        "translated": 22
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 8
-      }
+      "totalKeys": 25323,
+      "translated": 24874,
+      "preservedSource": 231,
+      "englishFallback": 218
     },
     {
       "locale": "zu",
-      "messages": {
-        "total": 113,
-        "translated": 112
-      },
-      "content": {
-        "total": 274,
-        "translated": 123
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 98
-      }
+      "totalKeys": 25323,
+      "translated": 24898,
+      "preservedSource": 230,
+      "englishFallback": 195
     },
     {
       "locale": "nso",
-      "messages": {
-        "total": 113,
-        "translated": 111
-      },
-      "content": {
-        "total": 274,
-        "translated": 22
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 8
-      }
+      "totalKeys": 25323,
+      "translated": 24742,
+      "preservedSource": 231,
+      "englishFallback": 350
     },
     {
       "locale": "st",
-      "messages": {
-        "total": 113,
-        "translated": 111
-      },
-      "content": {
-        "total": 274,
-        "translated": 22
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 8
-      }
+      "totalKeys": 25323,
+      "translated": 24799,
+      "preservedSource": 231,
+      "englishFallback": 293
     },
     {
       "locale": "tn",
-      "messages": {
-        "total": 113,
-        "translated": 111
-      },
-      "content": {
-        "total": 274,
-        "translated": 22
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 8
-      }
+      "totalKeys": 25323,
+      "translated": 24748,
+      "preservedSource": 231,
+      "englishFallback": 344
     },
     {
       "locale": "ss",
-      "messages": {
-        "total": 113,
-        "translated": 111
-      },
-      "content": {
-        "total": 274,
-        "translated": 22
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 8
-      }
+      "totalKeys": 25323,
+      "translated": 24706,
+      "preservedSource": 231,
+      "englishFallback": 386
     },
     {
       "locale": "ve",
-      "messages": {
-        "total": 113,
-        "translated": 111
-      },
-      "content": {
-        "total": 274,
-        "translated": 22
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 8
-      }
+      "totalKeys": 25323,
+      "translated": 24661,
+      "preservedSource": 231,
+      "englishFallback": 431
     },
     {
       "locale": "ts",
-      "messages": {
-        "total": 113,
-        "translated": 111
-      },
-      "content": {
-        "total": 274,
-        "translated": 21
-      },
-      "strings": {
-        "total": 20016,
-        "translated": 8
-      }
+      "totalKeys": 25323,
+      "translated": 24669,
+      "preservedSource": 231,
+      "englishFallback": 423
     }
-  ],
-  "failures": [],
-  "pluralNote": "No plural messages in the shared catalog. Existing count/number wording is preserved; unsupported ICU syntax is rejected, not approximated.",
-  "scope": "Shared message catalog and course title/lesson string hooks. Hardcoded UI outside these hooks remains English."
+  ]
 }
