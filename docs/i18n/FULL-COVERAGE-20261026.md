@@ -44,7 +44,7 @@ Own context-aware drafts and free Google/Gemini generated drafts are labelled in
 - All six mobile browser scenarios passed on the preceding 920-batch preview. Final release browser/build results are appended below.
 - Representative mobile lesson and calculator screenshots were inspected. Long headings fit without horizontal overflow. The inspection found and fixed concatenated calculator assumptions; final browser assertions verify translated assumptions.
 - All 1,270 exclusive server-only source passages are absent from every public language pack. Two streaming protocol tests passed. PDF tests verify preserved Tshivenda marks.
-- Existing equivalent-scope lint baseline: 88 errors and 604 warnings. The project is not lint-clean; lint is not an existing CI release gate.
+- Final curated lint scope: 195 files, 89 errors and 605 warnings. The additional error is in the newly included, existing PersistentAppTabs effect; counts in previously checked files are unchanged. The project is not lint-clean; lint is not an existing CI release gate.
 - The latest production loading skeletons and hidden-until-share card behaviour from `39afe20` were merged and preserved. Unrelated original workspace changes remain untouched.
 
 ## Release and rollback
@@ -58,3 +58,7 @@ npx vercel rollback https://notho-mwn5gcosr-notho.vercel.app --yes
 ```
 
 Then check the canonical alias and `/api/health`. For a durable source rollback, revert the release changes on main through the normal Git workflow, preserving later unrelated commits. Do not force-reset main. No schema migrations were added.
+
+## Final preview verification
+
+The complete release preview https://notho-b7mc06bkd-notho.vercel.app (`dpl_2JR2ofPHkbCvEhhSUdcuZ2ADaeo9`) built successfully and returned HTTP 200 from `/api/health`. All 18 browser scenarios passed on desktop, tablet and 320px mobile, including the calculator assumptions regression. The release worktree separately passed 876 unit tests, TypeScript and catalog integrity with zero failures. The source snapshot is committed on `codex/sa-language-release`; it incorporates current production `39afe20`.

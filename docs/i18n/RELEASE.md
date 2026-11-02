@@ -1,6 +1,6 @@
 # South African language beta release — 23 October 2026
 
-Latest production update: [language and read-aloud refinement, 24 October 2026](REFINEMENT-20261024.md). Use its rollback target for the current release.
+Historical release record. See [the full app and lesson release](FULL-COVERAGE-20261026.md) for current status and rollback instructions.
 
 ## Production deployment
 
