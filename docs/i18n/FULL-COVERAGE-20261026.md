@@ -1,6 +1,6 @@
 # South African language release, 2 November 2026
 
-Release candidate prepared for https://www.notho.co.za. Production publication and post-release verification are recorded below when complete.
+Deployed at https://www.notho.co.za on 2 November and verified on 3 November 2026. Production verification and rollback are recorded below.
 
 ## Scope
 
@@ -64,3 +64,9 @@ Then check the canonical alias and `/api/health`. For a durable source rollback,
 The complete release preview https://notho-b7mc06bkd-notho.vercel.app (`dpl_2JR2ofPHkbCvEhhSUdcuZ2ADaeo9`) built successfully and returned HTTP 200 from `/api/health`. All 18 browser scenarios passed on desktop, tablet and 320px mobile, including the calculator assumptions regression. The release worktree separately passed 876 unit tests, TypeScript and catalog integrity with zero failures. The source snapshot is committed on `codex/sa-language-release`; it incorporates current production `39afe20`.
 
 The final screenshot audit added 127 previously omitted custom-component helper texts (settings descriptions, calculator tooltips, public guide introductions and admin hints). All 1,270 additional language drafts were attempted. Browser checks now wait for translated settings copy before capturing screenshots.
+
+## Verified production release
+
+Published 2 November 2026 and verified on 3 November: https://www.notho.co.za. Immutable deployment: https://notho-baht8pcjq-notho.vercel.app (`dpl_44rbekmZ5EUHrrNk4wXgbXeCTp8z`), application commit `18ab900` on main. Vercel reports READY and the canonical domain resolves to this deployment. `/api/health` returned HTTP 200. All ten publicly served language files returned HTTP 200 and their SHA-256 hashes exactly matched the release files. All six production mobile browser scenarios passed, including fully loaded settings/helper text, lesson navigation, speech matching, Notto, English recovery, persistence and fallback. Screenshots are retained under `output/i18n-verification/browser-production-20261103/`.
+
+The release is deployed; the remaining English fallback and review gaps above are still present. No human/cultural validation is claimed. Rollback remains the pre-release `notho-mwn5gcosr` deployment documented above.
