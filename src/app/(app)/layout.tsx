@@ -29,6 +29,7 @@ import { OnboardingGate } from "@/components/OnboardingGate";
 import { NotificationOptIn } from "@/components/NotificationOptIn";
 import { StreakRepairBanner } from "@/components/StreakRepairBanner";
 import { UsageTracker } from "@/components/UsageTracker";
+import { SessionReplayGate } from "@/components/SessionReplayGate";
 import { AppGestures } from "@/components/AppGestures";
 import { ShakeToReport } from "@/components/ShakeToReport";
 import { NavProfileMark, ProfilePhotoBoot, warmProfileAvatar } from "@/components/navProfilePhoto";
@@ -155,6 +156,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {!isMockExam && <NotificationOptIn />}
           {!isMockExam && <StreakRepairBanner />}
           <UsageTracker />
+          <SessionReplayGate />
           <AppGestures />
           <ShakeToReport />
         </OnboardingGate>

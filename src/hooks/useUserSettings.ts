@@ -10,8 +10,14 @@
  * first render.  Supabase is the source of truth - on login its values win.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import {
+  choiceFromServer,
+  readLocalReplayChoice,
+  writeLocalReplayChoice,
+  type ReplayChoice,
+} from "@/lib/sessionReplay";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -144,6 +150,91 @@ export function useUserSettings(userId: string | null) {
   const setDailyGoal = useCallback((v: number) => persist({ dailyGoal: v }), [persist]);
   const setCalcSaved = useCallback((v: CalcSaved | null) => persist({ calcSaved: v }), [persist]);
 
+  // Session replay is stored on the same row but loaded on its own so a
+  // missing column cannot block sound, theme, or the daily goal.
+  // Local choice is applied in the render where the user id changes, so an
+  // opt-out is known before the server round-trip and before any recording.
+  const [replayFor, setReplayFor] = useState<string | null>(userId);
+  const [replayLocal, setReplayLocal] = useState<ReplayChoice | null>(() =>
+    userId && typeof window !== "undefined"
+      ? readLocalReplayChoice(window.localStorage, userId)
+      : null
+  );
+  const [replayServer, setReplayServer] = useState<ReplayChoice | null>(null);
+  const [replaySettled, setReplaySettled] = useState(false);
+  const [replayServerFailed, setReplayServerFailed] = useState(false);
+  const replayWriteSeq = useRef(0);
+
+  if (replayFor !== userId) {
+    setReplayFor(userId);
+    setReplayLocal(
+      userId && typeof window !== "undefined"
+        ? readLocalReplayChoice(window.localStorage, userId)
+        : null
+    );
+    setReplayServer(null);
+    setReplaySettled(false);
+    setReplayServerFailed(false);
+  }
+
+  useEffect(() => {
+    if (!userId) return;
+    const seqAtStart = replayWriteSeq.current;
+    let cancelled = false;
+
+    supabase
+      .from("user_settings")
+      .select("session_replay_enabled")
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled || replayWriteSeq.current !== seqAtStart) return;
+        if (error) {
+          setReplayServerFailed(true);
+          setReplaySettled(true);
+          return;
+        }
+        const choice = choiceFromServer(data?.session_replay_enabled);
+        writeLocalReplayChoice(window.localStorage, userId, choice);
+        setReplayLocal(choice);
+        setReplayServer(choice);
+        setReplayServerFailed(false);
+        setReplaySettled(true);
+      }, () => {
+        if (cancelled || replayWriteSeq.current !== seqAtStart) return;
+        setReplayServerFailed(true);
+        setReplaySettled(true);
+      });
+
+    return () => { cancelled = true; };
+  }, [userId]);
+
+  const setSessionReplayEnabled = useCallback((enabled: boolean) => {
+    const choice: ReplayChoice = enabled ? "on" : "off";
+    replayWriteSeq.current += 1;
+    setReplayLocal(choice);
+    setReplayServer(choice);
+    setReplayServerFailed(false);
+    setReplaySettled(true);
+    if (userId && typeof window !== "undefined") {
+      writeLocalReplayChoice(window.localStorage, userId, choice);
+      void supabase.from("user_settings").upsert(
+        {
+          user_id: userId,
+          session_replay_enabled: enabled,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
+      ).then(({ error }) => {
+        if (error) console.warn("Session replay preference was saved on this device only.");
+      }, () => {
+        console.warn("Session replay preference was saved on this device only.");
+      });
+    }
+  }, [userId]);
+
+  const sessionReplayEnabled = replayLocal !== "off" && replayServer !== "off";
+
   return {
     settings,
     loaded,
@@ -151,5 +242,11 @@ export function useUserSettings(userId: string | null) {
     setDarkMode,
     setDailyGoal,
     setCalcSaved,
+    sessionReplayEnabled,
+    replayLocalChoice: replayLocal,
+    replayServerChoice: replayServer,
+    replaySettled,
+    replayServerFailed,
+    setSessionReplayEnabled,
   } as const;
 }
