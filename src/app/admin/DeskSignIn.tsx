@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * Sign-in that lives on the desk itself.
@@ -89,13 +90,8 @@ export function DeskSignIn({
 
   return (
     <div className="nv-card" style={{ maxWidth: 460 }}>
-      <h2 className="nv-card-title" style={{ marginBottom: 8 }}>
-        Sign in to the desk
-      </h2>
-      <p className="nv-card-sub" style={{ marginBottom: 16 }}>
-        This is the operator console, not the learner app. Use the founder Gmail
-        or any mailbox listed in ADMIN_EMAILS.
-      </p>
+      <h2 className="nv-card-title" style={{ marginBottom: 8 }}><I18nText source={"Sign in to the desk"} /></h2>
+      <p className="nv-card-sub" style={{ marginBottom: 16 }}><I18nText source={"This is the operator console, not the learner app. Use the founder Gmail or any mailbox listed in ADMIN_EMAILS."} /></p>
 
       <button
         type="button"
@@ -104,7 +100,7 @@ export function DeskSignIn({
         disabled={busy !== null}
         style={{ width: "100%", justifyContent: "center", marginBottom: 14 }}
       >
-        {busy === "google" ? "Opening Google…" : "Continue with Google"}
+        <I18nText>{busy === "google" ? "Opening Google…" : "Continue with Google"}</I18nText>
       </button>
 
       <div
@@ -121,15 +117,12 @@ export function DeskSignIn({
         }}
       >
         <span style={{ flex: 1, height: 1, background: "var(--border)" }} />
-        or email
-        <span style={{ flex: 1, height: 1, background: "var(--border)" }} />
+        <I18nText source={"or email"} /><span style={{ flex: 1, height: 1, background: "var(--border)" }} />
       </div>
 
       <form onSubmit={signInPassword} style={{ display: "grid", gap: 10 }}>
         <label style={{ display: "grid", gap: 5 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 800, color: "var(--muted)" }}>
-            Email
-          </span>
+          <span style={{ fontSize: 11.5, fontWeight: 800, color: "var(--muted)" }}><I18nText source={"Email"} /></span>
           <input
             className="nv-input"
             type="email"
@@ -141,10 +134,8 @@ export function DeskSignIn({
           />
         </label>
         <label style={{ display: "grid", gap: 5 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 800, color: "var(--muted)" }}>
-            Password
-          </span>
-          <input
+          <span style={{ fontSize: 11.5, fontWeight: 800, color: "var(--muted)" }}><I18nText source={"Password"} /></span>
+          <I18nElement as="input"
             className="nv-input"
             type="password"
             autoComplete="current-password"
@@ -160,7 +151,7 @@ export function DeskSignIn({
             className="nv-btn primary"
             disabled={busy !== null || !password}
           >
-            {busy === "password" ? "Signing in…" : "Sign in"}
+            <I18nText>{busy === "password" ? "Signing in…" : "Sign in"}</I18nText>
           </button>
           <button
             type="button"
@@ -168,19 +159,19 @@ export function DeskSignIn({
             onClick={sendMagic}
             disabled={busy !== null || !email.trim()}
           >
-            {busy === "magic" ? "Sending…" : "Email me a link"}
+            <I18nText>{busy === "magic" ? "Sending…" : "Email me a link"}</I18nText>
           </button>
         </div>
       </form>
 
       {msg && (
         <p className="nv-note" style={{ marginTop: 14, marginBottom: 0 }}>
-          {msg}
+          <I18nText>{msg}</I18nText>
         </p>
       )}
       {err && (
         <p className="nv-error" style={{ marginTop: 14, marginBottom: 0 }}>
-          {err}
+          <I18nText>{err}</I18nText>
         </p>
       )}
     </div>

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /** Meta-style launch screen: static mark, no motion, no glow. */
 export function AppSplash() {
@@ -12,7 +13,7 @@ export function AppSplash() {
         background: "#ffffff",
       }}
     >
-      <img
+      <I18nElement as="img"
         src="/notho-icon.png"
         alt="Notho"
         width={88}

@@ -125,7 +125,8 @@ function tokenise(text: string): string[] {
 
 export function buildSearchIndex(
   courses: Course[],
-  concepts: readonly Concept[]
+  concepts: readonly Concept[],
+  locale = "en"
 ): IndexEntry[] {
   // Pre-compute concept → course mapping
   const courseConceptMap = new Map<string, string[]>();
@@ -146,7 +147,7 @@ export function buildSearchIndex(
     titleTokens: tokenise(course.title),
     tagTokens: [...new Set(courseConceptMap.get(course.id) ?? [])],
     descTokens: tokenise(course.description ?? ""),
-    localeTokens: [...new Set(tokenise(courseSearchText(course)))],
+    localeTokens: [...new Set(tokenise(courseSearchText(course, locale)))],
   }));
 }
 

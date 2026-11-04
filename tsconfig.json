@@ -31,6 +31,7 @@
     "**/*.mts"
   ],
   "exclude": [
+    "output",
     "node_modules",
     "supabase",
     "e2e",

@@ -20,6 +20,17 @@ import { parseNativeAuthCallback } from "@/lib/nativeAuthCallback";
 //
 // Renders nothing; it only exists to register the listener for the lifetime
 // of the app. Mount once, near the root layout.
+
+async function closeOAuthBrowser(browser: { close: () => Promise<void> }) {
+  try {
+    await browser.close();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (/no active window to close/i.test(message)) return;
+    console.error("Could not close the sign-in browser:", message);
+  }
+}
+
 export function NativeAuthDeepLink() {
   useEffect(() => {
     let removeListener: (() => void) | undefined;
@@ -62,9 +73,10 @@ export function NativeAuthDeepLink() {
             console.error("Native OAuth callback failed:", authError.message);
           }
 
-          // Closes the system browser tab/sheet that OAuth ran in, returning
-          // the user to the app.
-          await Browser.close();
+          // iOS dismisses SFSafariViewController itself when the custom scheme
+          // returns to the app. Browser.close() then rejects with
+          // "No active window to close!" — that is not a failed sign-in.
+          await closeOAuthBrowser(Browser);
         }
       );
 

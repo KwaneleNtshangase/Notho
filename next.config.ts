@@ -26,16 +26,23 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" },
   {
     key: "Permissions-Policy",
-    value: ["accelerometer=()", "camera=()", "microphone=()", "geolocation=()", "payment=()", "usb=()", "interest-cohort=()"].join(", "),
+    value: ["accelerometer=(self)", "camera=()", "microphone=()", "geolocation=()", "payment=()", "usb=()", "interest-cohort=()"].join(", "),
   },
   { key: "X-XSS-Protection", value: "1; mode=block" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
 
 const nextConfig: NextConfig = {
+  ...(process.env.NOTHO_LOW_MEMORY_BUILD === '1' ? {
+    experimental: { cpus: 1, webpackBuildWorker: true, webpackMemoryOptimizations: true },
+  } : {}),
   ...(process.env.VERCEL_DEPLOYMENT_ID && process.env.VERCEL_DEPLOYMENT_ID !== "undefined"
     ? { deploymentId: process.env.VERCEL_DEPLOYMENT_ID }
     : {}),
+  outputFileTracingIncludes: {
+    "/api/mock-attempts/**": ["./src/i18n/private/*.json", "./public/locales/*.json"],
+    "/api/budget/report": ["./public/locales/*.json", "./public/fonts/*.ttf"],
+  },
   serverExternalPackages: ["unpdf"],
   skipTrailingSlashRedirect: true,
   async headers() {

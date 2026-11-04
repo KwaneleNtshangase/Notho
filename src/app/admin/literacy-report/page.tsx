@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
@@ -91,11 +92,11 @@ export default function LiteracyReportPage() {
     };
   }, []);
 
-  if (gate === "checking") return <main className="sheet"><p>Preparing the measurement record…</p></main>;
+  if (gate === "checking") return <main className="sheet"><p><I18nText source={"Preparing the measurement record…"} /></p></main>;
   if (gate === "signed-out") {
     return <DeskSignIn onSignedIn={() => window.location.reload()} returnPath="/admin/literacy-report" />;
   }
-  if (gate === "denied") return <main className="sheet"><p>{error}</p></main>;
+  if (gate === "denied") return <main className="sheet"><p><I18nText>{error}</I18nText></p></main>;
 
   const when = new Date().toLocaleDateString("en-ZA", { day: "numeric", month: "long", year: "numeric" });
   const periodEnd = when;
@@ -108,135 +109,110 @@ export default function LiteracyReportPage() {
     <>
       <style>{css}</style>
       <div className="toolbar no-print">
-        <button type="button" onClick={() => window.print()}>Save PDF</button>
-        <Link href="/admin/analytics">Desk</Link>
-        <span>Send the PDF. Do not attach the People export.</span>
+        <button type="button" onClick={() => window.print()}><I18nText source={"Save PDF"} /></button>
+        <Link href="/admin/analytics"><I18nText source={"Desk"} /></Link>
+        <span><I18nText source={"Send the PDF. Do not attach the People export."} /></span>
       </div>
       <article className="sheet">
         <header className="mast">
-          <img src="/notho-icon-192.png" alt="" width={42} height={42} />
+          <I18nElement as="img" src="/notho-icon-192.png" alt="" width={42} height={42} />
           <div>
-            <p className="brand">Notho</p>
-            <p className="meta">{DOC} · Measurement record · Aggregates only</p>
+            <p className="brand"><I18nText source={"Notho"} /></p>
+            <p className="meta"><I18nText source={"{value0} · Measurement record · Aggregates only"} values={[DOC]} /></p>
           </div>
         </header>
 
-        <h1>Financial education measurement record</h1>
-        <p className="lede">
-          Prepared for the illustrative seat, Notho. Cohort {COHORT} is every Notho account until a
-          partner seat exists. Period: 90 days ending {periodEnd}. Prepared by The Solution Org (Pty)
-          Ltd, which operates Notho and is not an FSP.
-        </p>
+        <h1><I18nText source={"Financial education measurement record"} /></h1>
+        <p className="lede"><I18nText source={"Prepared for the illustrative seat, Notho. Cohort {value0} is every Notho account until a partner seat exists. Period: 90 days ending {value1}. Prepared by The Solution Org (Pty) Ltd, which operates Notho and is not an FSP."} values={[COHORT, periodEnd]} /></p>
 
         <div className="finding">
-          <p className="eyebrow">Finding</p>
-          <p>{finding}</p>
+          <p className="eyebrow"><I18nText source={"Finding"} /></p>
+          <p><I18nText>{finding}</I18nText></p>
         </div>
 
         <Section n="1" title="The initiative">
-          <p>
-            Name: Notho Money Basics and budget practice. Objective, matched to Conduct Standard 1 of
-            2025 section 4: help a person tell a need from a want, finish the basics course, and keep a
-            budget so they can manage money more sustainably.
-          </p>
-          <p>
-            Target group: natural persons using Notho. On a partner seat this line becomes that firm’s
-            named group. Delivery: the Notho app, lessons, review, calculator and budget. The platform
-            is appropriate for a phone-first audience. Content is objective instruction. It is not a
-            campaign for a specific financial product, and this record does not sell one.
-          </p>
+          <p><I18nText source={"Name: Notho Money Basics and budget practice. Objective, matched to Conduct Standard 1 of 2025 section 4: help a person tell a need from a want, finish the basics course, and keep a budget so they can manage money more sustainably."} /></p>
+          <p><I18nText source={"Target group: natural persons using Notho. On a partner seat this line becomes that firm’s named group. Delivery: the Notho app, lessons, review, calculator and budget. The platform is appropriate for a phone-first audience. Content is objective instruction. It is not a campaign for a specific financial product, and this record does not sell one."} /></p>
         </Section>
 
         <Section n="2" title="Governance">
-          <p>
-            The institution keeps responsibility for the initiative. Notho is the service provider: it
-            supplies the content, the platform, and this measurement. Oversight is the Notho Desk,
-            restricted to admins. This record is the pre- and post-implementation view a governing body
-            can read. The FSCA has not yet prescribed the reporting form under section 9, so this is
-            not a filing.
-          </p>
+          <p><I18nText source={"The institution keeps responsibility for the initiative. Notho is the service provider: it supplies the content, the platform, and this measurement. Oversight is the Notho Desk, restricted to admins. This record is the pre- and post-implementation view a governing body can read. The FSCA has not yet prescribed the reporting form under section 9, so this is not a filing."} /></p>
         </Section>
 
         <Section n="3" title="What is measured, and why">
-          <p>
-            Section 6 requires outcomes that can show effectiveness and, to the extent possible, impact.
-            Each measure below is tied to the objective. A blank is reported as a blank.
-          </p>
+          <p><I18nText source={"Section 6 requires outcomes that can show effectiveness and, to the extent possible, impact. Each measure below is tied to the objective. A blank is reported as a blank."} /></p>
           <table>
             <thead>
               <tr>
-                <th>Outcome</th>
-                <th>Measure</th>
-                <th>This period</th>
-                <th>Reading</th>
+                <th><I18nText source={"Outcome"} /></th>
+                <th><I18nText source={"Measure"} /></th>
+                <th><I18nText source={"This period"} /></th>
+                <th><I18nText source={"Reading"} /></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Reach</td>
-                <td>Accounts on the seat</td>
-                <td>{fmt(overview?.totalUsers)}</td>
-                <td>The people the initiative could reach.</td>
+                <td><I18nText source={"Reach"} /></td>
+                <td><I18nText source={"Accounts on the seat"} /></td>
+                <td><I18nText>{fmt(overview?.totalUsers)}</I18nText></td>
+                <td><I18nText source={"The people the initiative could reach."} /></td>
               </tr>
               <tr>
-                <td>Effectiveness</td>
-                <td>Finished at least one lesson</td>
-                <td>{fmt(overview?.activatedUsers)} · {fmtPct(overview?.activationRate)}</td>
-                <td>Instruction only counts once a lesson is finished.</td>
+                <td><I18nText source={"Effectiveness"} /></td>
+                <td><I18nText source={"Finished at least one lesson"} /></td>
+                <td><I18nText>{fmt(overview?.activatedUsers)}</I18nText> · <I18nText>{fmtPct(overview?.activationRate)}</I18nText></td>
+                <td><I18nText source={"Instruction only counts once a lesson is finished."} /></td>
               </tr>
               <tr>
-                <td>Knowledge</td>
-                <td>First-try accuracy, 90 days</td>
-                <td>{fmtPct(overview?.firstTryAccuracy)}</td>
-                <td>Retry accuracy is not used. It is inflated by practice.</td>
+                <td><I18nText source={"Knowledge"} /></td>
+                <td><I18nText source={"First-try accuracy, 90 days"} /></td>
+                <td><I18nText>{fmtPct(overview?.firstTryAccuracy)}</I18nText></td>
+                <td><I18nText source={"Retry accuracy is not used. It is inflated by practice."} /></td>
               </tr>
               <tr>
-                <td>Retention of the habit</td>
-                <td>Active on two or more days</td>
-                <td>{fmtPct(overview?.returningShare)}</td>
-                <td>One visit is a trial. Two is the start of a skill.</td>
+                <td><I18nText source={"Retention of the habit"} /></td>
+                <td><I18nText source={"Active on two or more days"} /></td>
+                <td><I18nText>{fmtPct(overview?.returningShare)}</I18nText></td>
+                <td><I18nText source={"One visit is a trial. Two is the start of a skill."} /></td>
               </tr>
               <tr>
-                <td>Impact</td>
-                <td>Want share of day-to-day spend, before and after</td>
-                <td>{comparable ? `${improved} of ${comparable} comparable improved` : "Not enough budget rows"}</td>
-                <td>Only where both windows have real classified spend. Not causal.</td>
+                <td><I18nText source={"Impact"} /></td>
+                <td><I18nText source={"Want share of day-to-day spend, before and after"} /></td>
+                <td><I18nText>{comparable ? `${improved} of ${comparable} comparable improved` : "Not enough budget rows"}</I18nText></td>
+                <td><I18nText source={"Only where both windows have real classified spend. Not causal."} /></td>
               </tr>
             </tbody>
           </table>
         </Section>
 
         <Section n="4" title="Effectiveness">
-          <p>
-            {fmt(overview?.activeUsers)} people were active in the 90 days. {fmt(overview?.lessonsInWindow)} lessons
-            were finished in the window. {fmt(overview?.answers)} answers were recorded.
-          </p>
+          <p><I18nText source={"{value0} people were active in the 90 days. {value1} lessons were finished in the window. {value2} answers were recorded."} values={[fmt(overview?.activeUsers), fmt(overview?.lessonsInWindow), fmt(overview?.answers)]} preserveValues={[true,false,false]} /></p>
           <table>
             <thead>
-              <tr><th>Step</th><th>People</th><th>Of accounts</th><th>Drop from previous</th></tr>
+              <tr><th><I18nText source={"Step"} /></th><th><I18nText source={"People"} /></th><th><I18nText source={"Of accounts"} /></th><th><I18nText source={"Drop from previous"} /></th></tr>
             </thead>
             <tbody>
               {funnel.map((s) => (
                 <tr key={s.step_key}>
-                  <td>{s.label}</td>
-                  <td>{fmt(s.users)}</td>
-                  <td>{fmtPct(s.pct)}</td>
-                  <td>{s.drop_pct == null ? "—" : fmtPct(s.drop_pct)}</td>
+                  <td><I18nText>{s.label}</I18nText></td>
+                  <td><I18nText>{fmt(s.users)}</I18nText></td>
+                  <td><I18nText>{fmtPct(s.pct)}</I18nText></td>
+                  <td><I18nText>{s.drop_pct == null ? "—" : fmtPct(s.drop_pct)}</I18nText></td>
                 </tr>
               ))}
             </tbody>
           </table>
           <table>
             <thead>
-              <tr><th>Course</th><th>Learners</th><th>Lessons</th><th>First-try</th></tr>
+              <tr><th><I18nText source={"Course"} /></th><th><I18nText source={"Learners"} /></th><th><I18nText source={"Lessons"} /></th><th><I18nText source={"First-try"} /></th></tr>
             </thead>
             <tbody>
               {courses.slice(0, 8).map((c) => (
                 <tr key={c.course_id}>
-                  <td>{c.course_id}</td>
-                  <td>{fmt(c.learners)}</td>
-                  <td>{fmt(c.lessons_taken)}</td>
-                  <td>{fmtPct(c.first_try_pct)}</td>
+                  <td><I18nText>{c.course_id}</I18nText></td>
+                  <td><I18nText>{fmt(c.learners)}</I18nText></td>
+                  <td><I18nText>{fmt(c.lessons_taken)}</I18nText></td>
+                  <td><I18nText>{fmtPct(c.first_try_pct)}</I18nText></td>
                 </tr>
               ))}
             </tbody>
@@ -244,31 +220,26 @@ export default function LiteracyReportPage() {
         </Section>
 
         <Section n="5" title="Impact, to the extent possible">
-          <p>
-            {outcomes?.coverage.classifiedNote} {fmt(outcomes?.coverage.budgetUsers)} people have budget rows.
-            A person counts only when both windows have 14 days, 4 expense rows and R200 of classified spend,
-            and the want share moves by at least 3 points. Transfers, debt and savings are excluded. Budget
-            rows are what the person entered, not a bank feed.
-          </p>
-          {outcomesError && <p>This line could not be loaded: {outcomesError}</p>}
+          <p><I18nText source={"{value0} {value1} people have budget rows. A person counts only when both windows have 14 days, 4 expense rows and R200 of classified spend, and the want share moves by at least 3 points. Transfers, debt and savings are excluded. Budget rows are what the person entered, not a bank feed."} values={[outcomes?.coverage.classifiedNote, fmt(outcomes?.coverage.budgetUsers)]} preserveValues={[false,true]} /></p>
+          {outcomesError && <p><I18nText source={"This line could not be loaded: {value0}"} values={[outcomesError]} /></p>}
           <table>
             <thead>
               <tr>
-                <th>Check</th><th>Finished</th><th>Comparable</th><th>Improved</th><th>Worsened</th><th>Median want share</th>
+                <th><I18nText source={"Check"} /></th><th><I18nText source={"Finished"} /></th><th><I18nText source={"Comparable"} /></th><th><I18nText source={"Improved"} /></th><th><I18nText source={"Worsened"} /></th><th><I18nText source={"Median want share"} /></th>
               </tr>
             </thead>
             <tbody>
               {spend.length === 0 ? (
-                <tr><td colSpan={6}>Waiting on the spending line.</td></tr>
+                <tr><td colSpan={6}><I18nText source={"Waiting on the spending line."} /></td></tr>
               ) : (
                 spend.map((c) => (
                   <tr key={c.id}>
-                    <td>{c.label}</td>
-                    <td>{fmt(c.finished)}</td>
-                    <td>{fmt(c.comparable)}</td>
-                    <td>{fmt(c.improved)}</td>
-                    <td>{fmt(c.worsened)}</td>
-                    <td>{c.medianWantShareDeltaPp == null ? "—" : `${c.medianWantShareDeltaPp} pp`}</td>
+                    <td><I18nText>{c.label}</I18nText></td>
+                    <td><I18nText>{fmt(c.finished)}</I18nText></td>
+                    <td><I18nText>{fmt(c.comparable)}</I18nText></td>
+                    <td><I18nText>{fmt(c.improved)}</I18nText></td>
+                    <td><I18nText>{fmt(c.worsened)}</I18nText></td>
+                    <td><I18nText>{c.medianWantShareDeltaPp == null ? "—" : `${c.medianWantShareDeltaPp} pp`}</I18nText></td>
                   </tr>
                 ))
               )}
@@ -277,49 +248,37 @@ export default function LiteracyReportPage() {
         </Section>
 
         <Section n="6" title="Evaluation, and the next run">
-          <p>
-            Section 7 asks for effectiveness, areas for improvement, and data the next programme can use.
-            The lessons below were started and finished least often. Rewrite those. Do not contact the people.
-          </p>
+          <p><I18nText source={"Section 7 asks for effectiveness, areas for improvement, and data the next programme can use. The lessons below were started and finished least often. Rewrite those. Do not contact the people."} /></p>
           <table>
             <thead>
-              <tr><th>Lesson</th><th>Starts</th><th>Finished</th><th>Completion</th></tr>
+              <tr><th><I18nText source={"Lesson"} /></th><th><I18nText source={"Starts"} /></th><th><I18nText source={"Finished"} /></th><th><I18nText source={"Completion"} /></th></tr>
             </thead>
             <tbody>
               {dropoff.length === 0 ? (
-                <tr><td colSpan={4}>No drop-off rows in this window.</td></tr>
+                <tr><td colSpan={4}><I18nText source={"No drop-off rows in this window."} /></td></tr>
               ) : (
                 dropoff.map((d) => (
                   <tr key={d.lesson_id}>
-                    <td>{d.lesson_id}</td>
-                    <td>{fmt(d.starts)}</td>
-                    <td>{fmt(d.completions)}</td>
-                    <td>{fmtPct(d.completion_pct)}</td>
+                    <td><I18nText>{d.lesson_id}</I18nText></td>
+                    <td><I18nText>{fmt(d.starts)}</I18nText></td>
+                    <td><I18nText>{fmt(d.completions)}</I18nText></td>
+                    <td><I18nText>{fmtPct(d.completion_pct)}</I18nText></td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
-          <p>
-            {fmt(overview?.atRiskUsers)} people who finished a lesson have been quiet for 7 to 30 days.
-            {fmt(overview?.dormantUsers)} have been quiet for 30 days or more. The retention move is one
-            resume of the last course, then stop.
-          </p>
+          <p><I18nText source={"{value0} people who finished a lesson have been quiet for 7 to 30 days.{value1} have been quiet for 30 days or more. The retention move is one resume of the last course, then stop."} values={[fmt(overview?.atRiskUsers), fmt(overview?.dormantUsers)]} preserveValues={[true,true]} /></p>
         </Section>
 
         <Section n="7" title="Limits">
-          <p>
-            No control group, so a change in spend is not proof the lesson caused it. No bank feed. No
-            names and no emails on this record. Cohort {COHORT} is every account, not a firm’s employees,
-            until a partner seat is cut. This document does not certify Conduct Standard 1 compliance.
-            The institution still owns the plan, the oversight, and any filing.
-          </p>
+          <p><I18nText source={"No control group, so a change in spend is not proof the lesson caused it. No bank feed. No names and no emails on this record. Cohort {value0} is every account, not a firm’s employees, until a partner seat is cut. This document does not certify Conduct Standard 1 compliance. The institution still owns the plan, the oversight, and any filing."} values={[COHORT]} /></p>
         </Section>
 
         <footer>
-          <span>{DOC}</span>
-          <span>Prepared {when}</span>
-          <span>Internal</span>
+          <span><I18nText>{DOC}</I18nText></span>
+          <span><I18nText source={"Prepared {value0}"} values={[when]} /></span>
+          <span><I18nText source={"Internal"} /></span>
         </footer>
       </article>
     </>
@@ -341,8 +300,8 @@ function findingLine(overview: Overview | null, comparable: number, improved: nu
 function Section({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2><span>{n}</span>{title}</h2>
-      {children}
+      <h2><span><I18nText>{n}</I18nText></span><I18nText>{title}</I18nText></h2>
+      <I18nText>{children}</I18nText>
     </section>
   );
 }

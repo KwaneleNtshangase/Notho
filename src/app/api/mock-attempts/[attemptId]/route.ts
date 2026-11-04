@@ -1,3 +1,4 @@
+import { localizedMockJson } from "@/server/localizeMock";
 import { NextRequest } from "next/server";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { createServiceSupabase } from "@/lib/supabaseServer";
@@ -9,7 +10,6 @@ import {
 import { validateMutationBody, validateUuid } from "@/lib/mockAttempts/validation";
 import {
   auditMockEvent,
-  mockJson,
   rejectRateLimited,
 } from "@/server/mockAttemptSecurity";
 
@@ -18,9 +18,9 @@ type RouteContext = { params: Promise<{ attemptId: string }> };
 
 export async function GET(req: NextRequest, context: RouteContext) {
   const user = await getUserFromRequest(req);
-  if (!user) return mockJson({ error: "Unauthorized" }, 401);
+  if (!user) return localizedMockJson(req, { error: "Unauthorized" }, 401);
   const { attemptId } = await context.params;
-  if (!validateUuid(attemptId)) return mockJson({ error: "Invalid attempt id" }, 400);
+  if (!validateUuid(attemptId)) return localizedMockJson(req, { error: "Invalid attempt id" }, 400);
 
   try {
     const admin = createServiceSupabase();
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
         action: "attempt_read",
         outcome: "denied",
       });
-      return mockJson({ error: "Attempt not found" }, 404);
+      return localizedMockJson(req, { error: "Attempt not found" }, 404);
     }
     await auditMockEvent(admin, req, {
       userId: user.id,
@@ -42,27 +42,27 @@ export async function GET(req: NextRequest, context: RouteContext) {
       outcome: "allowed",
       metadata: { status: attempt.status },
     });
-    return mockJson({ attempt });
+    return localizedMockJson(req, { attempt });
   } catch (error) {
     console.error("[mock-attempts/read]", error);
-    return mockJson({ error: "Attempt could not be loaded" }, 503);
+    return localizedMockJson(req, { error: "Attempt could not be loaded" }, 503);
   }
 }
 
 export async function PATCH(req: NextRequest, context: RouteContext) {
   const user = await getUserFromRequest(req);
-  if (!user) return mockJson({ error: "Unauthorized" }, 401);
+  if (!user) return localizedMockJson(req, { error: "Unauthorized" }, 401);
   const { attemptId } = await context.params;
-  if (!validateUuid(attemptId)) return mockJson({ error: "Invalid attempt id" }, 400);
+  if (!validateUuid(attemptId)) return localizedMockJson(req, { error: "Invalid attempt id" }, 400);
 
   let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return mockJson({ error: "Invalid JSON body" }, 400);
+    return localizedMockJson(req, { error: "Invalid JSON body" }, 400);
   }
   const valid = validateMutationBody(body);
-  if (!valid.ok) return mockJson({ error: valid.error }, 400);
+  if (!valid.ok) return localizedMockJson(req, { error: valid.error }, 400);
 
   const admin = createServiceSupabase();
   try {
@@ -70,7 +70,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     if (limited) return limited;
     const active = await mutateMockAttempt(admin, user.id, attemptId, valid.value);
     const attempt = await fetchOwnedMockAttempt(admin, user, attemptId);
-    if (!attempt) return mockJson({ error: "Attempt not found" }, 404);
+    if (!attempt) return localizedMockJson(req, { error: "Attempt not found" }, 404);
     await auditMockEvent(admin, req, {
       userId: user.id,
       attemptId,
@@ -79,12 +79,12 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       metadata: { action: valid.value.action, status: attempt.status },
     });
     if (!active) {
-      return mockJson(
+      return localizedMockJson(req,
         { error: "This attempt is no longer active", attempt },
         409
       );
     }
-    return mockJson({ attempt });
+    return localizedMockJson(req, { attempt });
   } catch (error) {
     const status = statusForMockAttemptError(error);
     const attempt =
@@ -92,7 +92,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         ? await fetchOwnedMockAttempt(admin, user, attemptId).catch(() => null)
         : null;
     if (status === 500) console.error("[mock-attempts/mutate]", error);
-    return mockJson(
+    return localizedMockJson(req,
       {
         error:
           status === 404

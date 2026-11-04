@@ -92,7 +92,9 @@ describe("Sign in with Apple configuration", () => {
 
     expect(authGate).toContain('handleOAuthSignIn("apple")');
     expect(authGate).toContain('data-testid="apple-oauth"');
-    expect(authGate).toContain("Continue with Apple");
+    expect(authGate).toContain('aria-label={t("auth.continueApple")}');
+    const { translate } = await import("@/i18n/messages");
+    expect(translate("en", "auth.continueApple")).toBe("Continue with Apple");
     expect(entitlements).toContain("com.apple.developer.applesignin");
     expect(entitlements).toContain("<string>Default</string>");
   });

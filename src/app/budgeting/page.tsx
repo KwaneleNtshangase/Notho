@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PublicGuide, guideStyles } from "@/components/PublicGuide";
@@ -46,30 +47,17 @@ export default function BudgetingPage() {
       lede="A budget is only useful if it uses your rand amounts. Notho keeps that planner in the same app as the lessons, so the vocabulary and the numbers stay together."
       faqs={faqs}
     >
-      <h2 style={h2}>How Notho budgeting works</h2>
+      <h2 style={h2}><I18nText source={"How Notho budgeting works"} /></h2>
+      <p style={p}><I18nText source={"Add income and expenses, sort them into categories, and see whether the month is on plan. You can import a statement to reconstruct recent spend. That import is lookback. Live cash is whatever you type — Notho does not scrape your bank."} /></p>
       <p style={p}>
-        Add income and expenses, sort them into categories, and see whether the
-        month is on plan. You can import a statement to reconstruct recent
-        spend. That import is lookback. Live cash is whatever you type — Notho
-        does not scrape your bank.
-      </p>
-      <p style={p}>
-        Open{" "}
-        <Link href="/budget" style={{ color: guideStyles.teal }}>
-          Budget
-        </Link>{" "}
-        in the app. If you are still learning why a category matters, start on{" "}
-        <Link href="/financial-literacy" style={{ color: guideStyles.teal }}>
-          Learn
-        </Link>
+        <I18nText source={"Open"} /><I18nText>{" "}</I18nText>
+        <Link href="/budget" style={{ color: guideStyles.teal }}><I18nText source={"Budget"} /></Link><I18nText>{" "}</I18nText>
+        <I18nText source={"in the app. If you are still learning why a category matters, start on"} /><I18nText>{" "}</I18nText>
+        <Link href="/financial-literacy" style={{ color: guideStyles.teal }}><I18nText source={"Learn"} /></Link>
         .
       </p>
-      <h2 style={h2}>What we will not claim</h2>
-      <p style={p}>
-        Notho is not a debt counsellor, not a bank, and not an FSP. A budget
-        that is honest about rent, taxis, airtime and school costs is more
-        useful than a template copied from another country.
-      </p>
+      <h2 style={h2}><I18nText source={"What we will not claim"} /></h2>
+      <p style={p}><I18nText source={"Notho is not a debt counsellor, not a bank, and not an FSP. A budget that is honest about rent, taxis, airtime and school costs is more useful than a template copied from another country."} /></p>
     </PublicGuide>
   );
 }

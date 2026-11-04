@@ -1,3 +1,4 @@
+import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -73,9 +74,7 @@ export default function SupportPage() {
               borderRadius: 20,
               marginBottom: 16,
             }}
-          >
-            Help
-          </div>
+          ><I18nText source={"Help"} /></div>
           <h1
             style={{
               fontSize: "clamp(28px, 5vw, 40px)",
@@ -84,37 +83,21 @@ export default function SupportPage() {
               margin: "0 0 12px",
               color: "#ffffff",
             }}
-          >
-            Support
-          </h1>
-          <p style={{ color: "#a0a0a0", fontSize: 15, margin: 0 }}>
-            We&apos;re here to help. Most questions are answered in the pages
-            below, but if not — email us and we&apos;ll get back to you.
-          </p>
+          ><I18nText source={"Support"} /></h1>
+          <p style={{ color: "#a0a0a0", fontSize: 15, margin: 0 }}><I18nText source={"We're here to help. Most questions are answered in the pages below, but if not — email us and we'll get back to you."} /></p>
         </div>
 
         {/* Contact card */}
         <div style={card}>
-          <h2 style={h2}>Contact us</h2>
-          <p style={p}>
-            Email{" "}
-            <a href="mailto:support@notho.co.za" style={link}>
-              support@notho.co.za
-            </a>{" "}
-            and we&apos;ll respond within 2&nbsp;business&nbsp;days.
-          </p>
-          <p style={{ ...p, marginBottom: 0 }}>
-            Please include the email address linked to your Notho account so we
-            can find you quickly.
-          </p>
+          <h2 style={h2}><I18nText source={"Contact us"} /></h2>
+          <p style={p}><I18nRich source={"Email  <a0>support@notho.co.za</a0>  and we'll respond within 2 business days."} elements={[<a key="inline-0" href="mailto:support@notho.co.za" style={link} />]} /></p>
+          <p style={{ ...p, marginBottom: 0 }}><I18nText source={"Please include the email address linked to your Notho account so we can find you quickly."} /></p>
         </div>
 
         {/* Quick links */}
         <div style={card}>
-          <h2 style={h2}>Before you email</h2>
-          <p style={p}>
-            These pages cover the most common questions:
-          </p>
+          <h2 style={h2}><I18nText source={"Before you email"} /></h2>
+          <p style={p}><I18nText source={"These pages cover the most common questions:"} /></p>
           <ul
             style={{
               paddingLeft: 20,
@@ -125,29 +108,17 @@ export default function SupportPage() {
             }}
           >
             <li>
-              <Link href="/privacy" style={link}>
-                Privacy Policy
-              </Link>{" "}
-              — what data we collect and how we use it
-            </li>
+              <Link href="/privacy" style={link}><I18nText source={"Privacy Policy"} /></Link><I18nText>{" "}</I18nText>
+              <I18nText source={"— what data we collect and how we use it"} /></li>
             <li>
-              <Link href="/terms" style={link}>
-                Terms of Service
-              </Link>{" "}
-              — rules of the road
-            </li>
+              <Link href="/terms" style={link}><I18nText source={"Terms of Service"} /></Link><I18nText>{" "}</I18nText>
+              <I18nText source={"— rules of the road"} /></li>
             <li>
-              <Link href="/security" style={link}>
-                Your Data &amp; Security
-              </Link>{" "}
-              — how we protect your information
-            </li>
+              <Link href="/security" style={link}><I18nText source={"Your Data & Security"} /></Link><I18nText>{" "}</I18nText>
+              <I18nText source={"— how we protect your information"} /></li>
             <li>
-              <Link href="/account-deletion" style={link}>
-                Delete Your Account
-              </Link>{" "}
-              — how to erase your data
-            </li>
+              <Link href="/account-deletion" style={link}><I18nText source={"Delete Your Account"} /></Link><I18nText>{" "}</I18nText>
+              <I18nText source={"— how to erase your data"} /></li>
           </ul>
         </div>
 
@@ -162,21 +133,14 @@ export default function SupportPage() {
           }}
         >
           <address style={{ fontStyle: "normal", lineHeight: 1.8 }}>
-            The Solution Org (Pty) Ltd
-            <br />
-            South Africa
-            <br />
+            <I18nText source={"The Solution Org (Pty) Ltd"} /><br />
+            <I18nText source={"South Africa"} /><br />
             <a
               href="mailto:support@notho.co.za"
               style={{ color: teal }}
-            >
-              support@notho.co.za
-            </a>
+            ><I18nText source={"support@notho.co.za"} /></a>
           </address>
-          <p style={{ marginTop: 16 }}>
-            &copy; {new Date().getFullYear()} The Solution Org (Pty) Ltd. All
-            rights reserved.
-          </p>
+          <p style={{ marginTop: 16 }}><I18nText source={"© {value0} The Solution Org (Pty) Ltd. All rights reserved."} values={[new Date().getFullYear()]} /></p>
         </div>
       </div>
     </main>

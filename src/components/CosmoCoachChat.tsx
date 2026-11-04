@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedRichText as I18nRich, LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * Cosmo AI chat (Tier 2 client).
@@ -238,14 +239,14 @@ export function CosmoCoachChat() {
       `}</style>
 
       {!open && (
-        <button
+        <I18nElement as="button"
           type="button"
           className="notho-chat-fab"
           aria-label="Ask Cosmo"
           onClick={() => setOpen(true)}
         >
           <MessageSquare size={24} style={{ color: "#fff" }} />
-        </button>
+        </I18nElement>
       )}
 
       {open && (
@@ -255,11 +256,9 @@ export function CosmoCoachChat() {
             aria-hidden
             onClick={() => setOpen(false)}
           />
-          <div className="notho-chat-panel" role="dialog" aria-modal="true" aria-label="Ask Cosmo, your money coach">
+          <I18nElement as="div" className="notho-chat-panel" role="dialog" aria-modal="true" aria-label="Ask Cosmo, your money coach">
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 800 }}>
-              Cosmo
-            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 800 }}><I18nText source={"Cosmo"} /></span>
             <span
               style={{
                 fontSize: 10,
@@ -270,13 +269,9 @@ export function CosmoCoachChat() {
                 borderRadius: 6,
                 padding: "1px 5px",
               }}
-            >
-              AI
-            </span>
+            ><I18nText source={"AI"} /></span>
             {state.kind === "chat" && remaining !== null && (
-              <span style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>
-                {remaining} left today
-              </span>
+              <span style={{ fontSize: 11, color: "var(--color-text-secondary)" }}><I18nText source={"{value0} left today"} values={[remaining]} /></span>
             )}
             <span style={{ marginLeft: "auto", display: "flex", gap: 12, alignItems: "center" }}>
               {state.kind === "chat" && (
@@ -288,11 +283,9 @@ export function CosmoCoachChat() {
                     fontSize: 11, fontWeight: 600, color: "var(--color-text-secondary)",
                     padding: 0,
                   }}
-                >
-                  Turn AI off
-                </button>
+                ><I18nText source={"Turn AI off"} /></button>
               )}
-              <button
+              <I18nElement as="button"
                 type="button"
                 aria-label="Close chat"
                 onClick={() => setOpen(false)}
@@ -303,34 +296,23 @@ export function CosmoCoachChat() {
                 }}
               >
                 ✕
-              </button>
+              </I18nElement>
             </span>
           </div>
 
           {state.kind === "loading" && (
-            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}>Loading…</p>
+            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}><I18nText source={"Loading…"} /></p>
           )}
 
           {state.kind === "consent" && (
             <div>
-              <p style={{ fontSize: 13, color: "var(--color-text-primary)", margin: "0 0 8px" }}>
-                Cosmo is an <strong>AI assistant</strong>, powered by Google
-                Gemini. Ask it questions about your month. Only anonymised
-                category totals are shared with the AI. Your name,
-                transactions, and account details are never shared.
-              </p>
-              <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "0 0 10px" }}>
-                AI can get things wrong. Cosmo explains, it does not advise, and
-                it is not a financial adviser.{" "}
-                <a
+              <p style={{ fontSize: 13, color: "var(--color-text-primary)", margin: "0 0 8px" }}><I18nText source={"Cosmo is an AI assistant. Ask him questions about your budget."} /></p>
+              <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "0 0 10px" }}><I18nRich source={"AI can get things wrong. Cosmo explains, it does not advise, and it is not a financial adviser.  <a0>How this works</a0>"} elements={[<a key="inline-0"
                   href="/privacy#ai-coach"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: "var(--color-primary)", fontWeight: 600 }}
-                >
-                  How this works
-                </a>
-              </p>
+                 />]} /></p>
               <button
                 type="button"
                 onClick={() => setConsent(true)}
@@ -339,12 +321,8 @@ export function CosmoCoachChat() {
                   borderRadius: 10, padding: "9px 16px", fontSize: 16, fontWeight: 700,
                   cursor: "pointer",
                 }}
-              >
-                Turn on AI coach
-              </button>
-              <p style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "8px 0 0" }}>
-                You can turn this off anytime.
-              </p>
+              ><I18nText source={"Turn on AI coach"} /></button>
+              <p style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "8px 0 0" }}><I18nText source={"You can turn this off anytime."} /></p>
             </div>
           )}
 
@@ -358,9 +336,7 @@ export function CosmoCoachChat() {
                 }}
               >
                 {messages.length === 0 && !sending && (
-                  <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}>
-                    Ask about a category on this month&apos;s budget.
-                  </p>
+                  <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}><I18nText source={"Ask about a category on this month's budget."} /></p>
                 )}
                 {messages.map((m, i) => (
                   <div
@@ -378,22 +354,20 @@ export function CosmoCoachChat() {
                   </div>
                 ))}
                 {sending && (
-                  <div
+                  <I18nElement as="div"
                     aria-label="Cosmo is typing"
                     style={{
                       alignSelf: "flex-start", background: "var(--color-border)",
                       borderRadius: 12, padding: "8px 12px", fontSize: 15,
                       color: "var(--color-text-secondary)",
                     }}
-                  >
-                    Cosmo is typing…
-                  </div>
+                  ><I18nText source={"Cosmo is typing…"} /></I18nElement>
                 )}
               </div>
 
               {notice && (
                 <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: "0 0 8px" }}>
-                  {notice}
+                  <I18nText>{notice}</I18nText>
                 </p>
               )}
 
@@ -401,7 +375,7 @@ export function CosmoCoachChat() {
                 onSubmit={(e) => { e.preventDefault(); send(); }}
                 className="notho-chat-form"
               >
-                <input
+                <I18nElement as="input"
                   value={input}
                   maxLength={INPUT_MAX}
                   onChange={(e) => setInput(e.target.value)}
@@ -412,7 +386,7 @@ export function CosmoCoachChat() {
                   autoCorrect="on"
                   enterKeyHint="send"
                 />
-                <button
+                <I18nElement as="button"
                   type="submit"
                   aria-label="Send"
                   disabled={sending || !input.trim() || remaining === 0}
@@ -428,16 +402,13 @@ export function CosmoCoachChat() {
                   <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden>
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                   </svg>
-                </button>
+                </I18nElement>
               </form>
 
-              <p style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "8px 0 0" }}>
-                AI-generated. Cosmo can make mistakes - check anything
-                important. Educational information, not financial advice.
-              </p>
+              <p style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "8px 0 0" }}><I18nText source={"AI-generated. Cosmo can make mistakes - check anything important. Educational information, not financial advice."} /></p>
             </div>
           )}
-          </div>
+          </I18nElement>
         </>
       )}
     </>

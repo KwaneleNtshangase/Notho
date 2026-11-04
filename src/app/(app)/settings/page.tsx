@@ -1,4 +1,6 @@
 "use client";
+import { localizeClientString } from "@/i18n/clientString";
+
 
 import { SettingsView } from "@/components/SettingsView";
 import { useNotho } from "@/context/NothoContext";
@@ -13,7 +15,7 @@ export default function SettingsPage() {
       userData={userData as any}
       setDailyGoal={setDailyGoal}
       resetProgress={() => {
-        const confirmReset = window.confirm("Are you sure you want to reset all progress?");
+        const confirmReset = window.confirm(localizeClientString("Are you sure you want to reset all progress?"));
         if (confirmReset) resetProgress();
       }}
       userSettings={userSettings}

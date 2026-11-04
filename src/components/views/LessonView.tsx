@@ -1,6 +1,8 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 import { useLocale } from "@/i18n/LocaleProvider";
 import { localizeString } from "@/i18n/stringZu";
+import { localizeLessonStep } from "@/i18n/lesson";
 /* eslint-disable @next/next/no-html-link-for-pages */
 import DOMPurify from 'dompurify';
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -120,6 +122,7 @@ import { StatsPanel } from "@/components/StatsPanel";
 import { AuthGate } from "@/components/AuthGate";
 import { ShareButton, ShareResultButton } from "@/components/ShareCard";
 import { CosmoCharacter } from "@/components/CosmoCharacter";
+import { SpeakButton } from "@/components/SpeakButton";
 import { NothoTopBar } from "@/components/NothoTopBar";
 import {
   OnboardingTooltips,
@@ -189,11 +192,14 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
 
   return (
     <>
-      <h2 className="step-title">{localizeString(locale, step.title || "Fill in the blank")}</h2>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+        <h2 className="step-title" style={{ margin: 0, flex: 1 }}>{localizeString(locale, step.title || "Fill in the blank")}</h2>
+        <SpeakButton text={localizeString(locale, step.title || "") + ". " + (step.prompt || "")} />
+      </div>
       <div className="step-content" style={{ fontSize: 16, lineHeight: 1.7, marginBottom: 20 }}>
-        {parts[0]}
+        <I18nText>{parts[0]}</I18nText>
         {!isAnswered ? (
-          <input
+          <I18nElement as="input"
             type="text"
             inputMode="decimal"
             value={val}
@@ -214,17 +220,15 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
             borderRadius: 8, fontWeight: 800, fontSize: 16,
             background: isCorrect ? "var(--color-success)" : "#E03C31", color: "white",
           }}>
-            {submittedAnswer}
+            <I18nText>{submittedAnswer}</I18nText>
           </span>
         )}
-        {parts[1]}
+        <I18nText>{parts[1]}</I18nText>
       </div>
 
       {!isAnswered && (
         <div className="lesson-actions">
-          <button className="btn btn-primary" onClick={handleSubmit} disabled={!val.trim()}>
-            Check
-          </button>
+          <button className="btn btn-primary" onClick={handleSubmit} disabled={!val.trim()}><I18nText source={"Check"} /></button>
         </div>
       )}
 
@@ -240,7 +244,7 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
               <div style={{ textAlign: "center", width: "100%" }}>
                 <Trophy size={48} style={{ color: "#EFB343", margin: "0 auto 8px" }} />
                 <CosmoCharacter expression="celebrating" size={100} style={{ margin: "0 auto 8px" }} />
-                <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Lesson Complete!</div>
+                <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}><I18nText source={"Lesson Complete!"} /></div>
                 {finalizeLesson ? (
                   <div className="flex flex-col gap-3 mt-2" style={{ width: "100%" }}>
                     {nextLessonTitle ? (
@@ -250,13 +254,12 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
                         style={{ width: "100%", padding: "14px 16px", fontSize: 17, fontWeight: 800 }}
                         onClick={() => finalizeLesson("next")}
                       >
-                        {t("lesson.nextLesson")}: {nextLessonTitle} →
+                        {t("lesson.nextLesson")}: <I18nText>{nextLessonTitle}</I18nText> →
                       </button>
                     ) : (
                       <div className="flex items-center justify-center gap-2" style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
                         <Sparkles size={22} className="text-[#EFB343]" aria-hidden />
-                        Course Complete!
-                      </div>
+                        <I18nText source={"Course Complete!"} /></div>
                     )}
                     <button
                       type="button"
@@ -271,9 +274,7 @@ function FillBlankStep({ step, isAnswered, isCorrect, submittedAnswer, onSubmit,
                         border: "1.5px solid var(--color-border)",
                       }}
                       onClick={() => finalizeLesson("course")}
-                    >
-                      ✓ Done - {t("lesson.backToCourse")}
-                    </button>
+                    ><I18nText source={"✓ Done - {value0}"} values={[t("lesson.backToCourse")]} /></button>
                     {lessonTitle ? (
                       <ShareResultButton
                         data={{ type: "lesson", lessonTitle, xpEarned: 50 + correctCount * 10, isPerfect: false, courseName: "Notho" }}
@@ -341,7 +342,9 @@ export function LessonView({
   totalQuestions?: number;
 }) {
   const { locale, t } = useLocale();
-  const step = lessonState.steps[lessonState.stepIndex];
+  const { catalogRevision } = useLocale();
+  const sourceStep = lessonState.steps[lessonState.stepIndex];
+  const step = useMemo(() => localizeLessonStep(sourceStep, locale), [sourceStep, locale, catalogRevision]);
   const progress =
     ((lessonState.stepIndex + 1) / lessonState.steps.length) * 100;
 
@@ -384,14 +387,10 @@ export function LessonView({
             border: "1px solid var(--color-border)",
           }}
         >
-          <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 10 }}>Leave?</div>
-          <p style={{ color: "var(--color-text-secondary)", fontSize: 14, marginBottom: 18, lineHeight: 1.5 }}>
-            If you leave now, you may lose your progress for this lesson.
-          </p>
+          <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 10 }}><I18nText source={"Leave?"} /></div>
+          <p style={{ color: "var(--color-text-secondary)", fontSize: 14, marginBottom: 18, lineHeight: 1.5 }}><I18nText source={"If you leave now, you may lose your progress for this lesson."} /></p>
           <div style={{ display: "flex", gap: 10 }}>
-            <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setShowExitConfirm(false)}>
-              Keep Going
-            </button>
+            <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setShowExitConfirm(false)}><I18nText source={"Keep Going"} /></button>
             <button
               className="btn btn-primary"
               style={{ flex: 1, background: "#E03C31", border: "none" }}
@@ -399,9 +398,7 @@ export function LessonView({
                 setShowExitConfirm(false);
                 goBack?.();
               }}
-            >
-              Leave
-            </button>
+            ><I18nText source={"Leave"} /></button>
           </div>
         </div>
       </div>
@@ -417,12 +414,12 @@ export function LessonView({
       return (
         <div style={{ textAlign: "center", padding: "24px 8px", animation: "fade-in 0.4s ease-out" }}>
           <Trophy size={48} style={{ color: "#EFB343", margin: "0 auto 8px" }} aria-hidden />
-          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 14 }}>Lesson Complete!</div>
+          <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 14 }}><I18nText source={"Lesson Complete!"} /></div>
           {finalizeLesson ? (
             <div className="flex flex-col gap-3" style={{ width: "100%" }}>
               {nextLessonTitle ? (
                 <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>
-                  {t("lesson.nextLesson")}: {nextLessonTitle} →
+                  {t("lesson.nextLesson")}: <I18nText>{nextLessonTitle}</I18nText> →
                 </button>
               ) : null}
               <button
@@ -430,7 +427,7 @@ export function LessonView({
                 style={{ width: "100%", background: "var(--color-bg)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }}
                 onClick={() => finalizeLesson("course")}
               >
-                <span className="inline-flex items-center justify-center gap-2"><CheckCircle2 size={18} aria-hidden /> Done - {t("lesson.backToCourse")}</span>
+                <span className="inline-flex items-center justify-center gap-2"><CheckCircle2 size={18} aria-hidden /> <I18nText source={" Done - "} />{t("lesson.backToCourse")}</span>
               </button>
             </div>
           ) : (
@@ -458,9 +455,7 @@ export function LessonView({
           }}
         >
           <HeartOff size={56} style={{ color: "#E03C31", margin: "0 auto 12px" }} />
-          <h2 className="step-title" style={{ marginBottom: 8 }}>
-            You&apos;re out of hearts
-          </h2>
+          <h2 className="step-title" style={{ marginBottom: 8 }}><I18nText source={"You're out of hearts"} /></h2>
           <p
             style={{
               color: "var(--color-text-secondary)",
@@ -468,25 +463,24 @@ export function LessonView({
               maxWidth: 360,
               marginInline: "auto",
             }}
-          >
-            Hearts refill over time. Your progress on this lesson is saved — come
-            back and pick up exactly where you left off.
-          </p>
+          ><I18nText source={"Hearts refill over time. Your progress on this lesson is saved — come back and pick up exactly where you left off."} /></p>
           <button
             className="btn btn-primary"
             style={{ width: "100%", maxWidth: 320 }}
             onClick={() => goBack?.()}
-          >
-            Save &amp; exit
-          </button>
+          ><I18nText source={"Save & exit"} /></button>
         </div>
       );
     }
 
     if (step.type === "info") {
+      const infoText = localizeString(locale, step.title) + ". " + (typeof step.content === "string" ? step.content : "");
       return (
         <>
-          <h2 className="step-title">{localizeString(locale, step.title)}</h2>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <h2 className="step-title" style={{ margin: 0, flex: 1 }}>{localizeString(locale, step.title)}</h2>
+            <SpeakButton text={infoText} />
+          </div>
           <div
             className="step-content"
             dangerouslySetInnerHTML={{ __html: typeof window !== 'undefined' ? DOMPurify.sanitize(localizeString(locale, step.content)) : localizeString(locale, step.content) }}
@@ -496,14 +490,14 @@ export function LessonView({
               finalizeLesson ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
                   {nextLessonTitle ? (
-                    <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>{t("lesson.nextLesson")}: {nextLessonTitle} →</button>
+                    <button className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>{t("lesson.nextLesson")}: <I18nText>{nextLessonTitle}</I18nText> →</button>
                   ) : null}
                   <button className="btn btn-secondary" style={{ width: "100%", background: "var(--color-bg)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }} onClick={() => finalizeLesson("course")}>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={18} /> Done - {t("lesson.backToCourse")}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={18} /> <I18nText source={" Done - "} />{t("lesson.backToCourse")}</span>
                   </button>
                 </div>
               ) : (
-                <button className="btn btn-primary" onClick={nextStep}>Finish</button>
+                <button className="btn btn-primary" onClick={nextStep}><I18nText source={"Finish"} /></button>
               )
             ) : (
               <button className="btn btn-primary" onClick={nextStep}>{t("lesson.continue")}</button>
@@ -519,18 +513,18 @@ export function LessonView({
           <div className="flex items-center gap-3 rounded-xl bg-green-600 px-5 py-4">
             <Zap className="h-8 w-8 shrink-0 text-white" strokeWidth={2} aria-hidden />
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-green-100">Do This Now</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-green-100"><I18nText source={"Do This Now"} /></p>
               <p className="text-lg font-bold leading-tight text-white">{localizeString(locale, step.title)}</p>
             </div>
           </div>
           <div className="rounded-xl border border-green-200 bg-green-50 p-5 dark:border-green-800 dark:bg-green-900/20">
-            <p className="text-base leading-relaxed text-gray-800 dark:text-gray-100">{step.instruction}</p>
+            <p className="text-base leading-relaxed text-gray-800 dark:text-gray-100"><I18nText>{step.instruction}</I18nText></p>
           </div>
           {step.tip ? (
             <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 dark:border-yellow-800 dark:bg-yellow-900/20">
               <p className="flex items-start gap-2 text-sm text-yellow-800 dark:text-yellow-300">
                 <Lightbulb size={16} className="mt-0.5 shrink-0" aria-hidden />
-                <span><span className="font-semibold">Tip:</span> {step.tip}</span>
+                <span><span className="font-semibold"><I18nText source={"Tip:"} /></span> <I18nText>{step.tip}</I18nText></span>
               </p>
             </div>
           ) : null}
@@ -539,14 +533,14 @@ export function LessonView({
               finalizeLesson ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
                   {nextLessonTitle ? (
-                    <button type="button" className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>{t("lesson.nextLesson")}: {nextLessonTitle} →</button>
+                    <button type="button" className="btn btn-primary" style={{ width: "100%" }} onClick={() => finalizeLesson("next")}>{t("lesson.nextLesson")}: <I18nText>{nextLessonTitle}</I18nText> →</button>
                   ) : null}
                   <button type="button" className="btn btn-secondary" style={{ width: "100%", background: "var(--color-bg)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }} onClick={() => finalizeLesson("course")}>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={18} /> Done - {t("lesson.backToCourse")}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={18} /> <I18nText source={" Done - "} />{t("lesson.backToCourse")}</span>
                   </button>
                 </div>
               ) : (
-                <button type="button" className="btn btn-primary" onClick={nextStep}>Finish</button>
+                <button type="button" className="btn btn-primary" onClick={nextStep}><I18nText source={"Finish"} /></button>
               )
             ) : (
               <button type="button" className="btn btn-primary" onClick={nextStep}>{t("lesson.continue")}</button>
@@ -569,17 +563,15 @@ export function LessonView({
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
               <Target size={24} className="shrink-0" />
-              <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.9 }}>
-                Take Action
-              </span>
+              <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.9 }}><I18nText source={"Take Action"} /></span>
             </div>
-            <h3 style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.3, marginBottom: 0 }}>{s.title}</h3>
+            <h3 style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.3, marginBottom: 0 }}><I18nText>{s.title}</I18nText></h3>
           </div>
           <div style={{
             background: "var(--color-surface)", border: "2px solid var(--color-primary)",
             borderRadius: 14, padding: "18px 16px",
           }}>
-            <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--color-text-primary)", fontWeight: 500 }}>{s.challenge}</p>
+            <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--color-text-primary)", fontWeight: 500 }}><I18nText>{s.challenge}</I18nText></p>
           </div>
           {didAction === undefined ? (
             <div style={{ display: "flex", gap: 10 }}>
@@ -603,8 +595,7 @@ export function LessonView({
               >
                 <span className="inline-flex items-center gap-2">
                   <CheckCircle2 size={18} aria-hidden />
-                  Done - I did it!
-                </span>
+                  <I18nText source={"Done - I did it!"} /></span>
               </button>
               <button
                 type="button"
@@ -627,7 +618,7 @@ export function LessonView({
                 fontSize: 14, lineHeight: 1.6, fontWeight: 600,
                 color: didAction === 1 ? "var(--color-primary)" : "#8B6914",
               }}>
-                {didAction === 1 ? s.successMessage : s.skipMessage}
+                <I18nText>{didAction === 1 ? s.successMessage : s.skipMessage}</I18nText>
               </p>
             </div>
           )}
@@ -637,18 +628,17 @@ export function LessonView({
                 <div style={{ textAlign: "center", width: "100%" }}>
                   <Trophy size={48} style={{ color: "#EFB343", margin: "0 auto 8px" }} />
                   <CosmoCharacter expression="celebrating" size={100} style={{ margin: "0 auto 8px" }} />
-                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Lesson Complete!</div>
+                  <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}><I18nText source={"Lesson Complete!"} /></div>
                   {finalizeLesson ? (
                     <div className="flex flex-col gap-3 mt-2" style={{ width: "100%" }}>
                       {nextLessonTitle ? (
                         <button type="button" className="btn btn-primary"
                           style={{ width: "100%", padding: "14px 16px", fontSize: 17, fontWeight: 800 }}
                           onClick={() => finalizeLesson("next")}
-                        >{t("lesson.nextLesson")}: {nextLessonTitle} →</button>
+                        >{t("lesson.nextLesson")}: <I18nText>{nextLessonTitle}</I18nText> →</button>
                       ) : (
                         <div className="flex items-center justify-center gap-2" style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
-                          <Sparkles size={22} className="text-[#EFB343]" aria-hidden /> Course Complete!
-                        </div>
+                          <Sparkles size={22} className="text-[#EFB343]" aria-hidden /> <I18nText source={" Course Complete!"} /></div>
                       )}
                       <button type="button" className="btn btn-secondary"
                         style={{
@@ -657,7 +647,7 @@ export function LessonView({
                         }}
                         onClick={() => finalizeLesson("course")}>
                         <span className="inline-flex items-center justify-center gap-2">
-                          <CheckCircle2 size={18} aria-hidden /> Done - {t("lesson.backToCourse")}
+                          <CheckCircle2 size={18} aria-hidden /> <I18nText source={" Done - "} />{t("lesson.backToCourse")}
                         </span>
                       </button>
                       {lessonTitle && (
@@ -703,7 +693,7 @@ export function LessonView({
             {step.options.map((option, index) => {
               return (
                 <button
-                  key={localizeString(locale, option)}
+                  key={index}
                   className={`option-button w-full text-left p-5 mb-3 rounded-2xl border-2 transition-all ${answered
                     ? index === step.correct
                       ? "correct font-bold"
@@ -754,9 +744,7 @@ export function LessonView({
                         fontWeight: 800,
                         marginBottom: 4,
                       }}
-                    >
-                      Lesson Complete!
-                    </div>
+                    ><I18nText source={"Lesson Complete!"} /></div>
                     {finalizeLesson ? (
                       <div className="flex flex-col gap-3 mt-2" style={{ width: "100%" }}>
                         {nextLessonTitle ? (
@@ -766,13 +754,12 @@ export function LessonView({
                             style={{ width: "100%", padding: "14px 16px", fontSize: 17, fontWeight: 800 }}
                             onClick={() => finalizeLesson("next")}
                           >
-                            {t("lesson.nextLesson")}: {nextLessonTitle} →
+                            {t("lesson.nextLesson")}: <I18nText>{nextLessonTitle}</I18nText> →
                           </button>
                         ) : (
                           <div className="flex items-center justify-center gap-2" style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
                             <Sparkles size={22} className="text-[#EFB343]" aria-hidden />
-                            Course Complete!
-                          </div>
+                            <I18nText source={"Course Complete!"} /></div>
                         )}
                         <button
                           type="button"
@@ -790,7 +777,7 @@ export function LessonView({
                         >
                           <span className="inline-flex items-center justify-center gap-2">
                             <CheckCircle2 size={18} aria-hidden />
-                            Done - {t("lesson.backToCourse")}
+                            <I18nText source={"Done - "} />{t("lesson.backToCourse")}
                           </span>
                         </button>
                         {lessonTitle ? (
@@ -805,7 +792,7 @@ export function LessonView({
                       <>
                         {nextLessonTitle && (
                           <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 14, opacity: 0.8 }}>
-                            Up next: <strong>{nextLessonTitle}</strong>
+                            <I18nText source={"Up next: "} /><strong><I18nText>{nextLessonTitle}</I18nText></strong>
                           </div>
                         )}
                         <button className="btn btn-primary" onClick={nextStep}>
@@ -815,9 +802,7 @@ export function LessonView({
                     )}
                   </div>
                 ) : (
-                  <button className="btn btn-primary" onClick={nextStep}>
-                    Continue
-                  </button>
+                  <button className="btn btn-primary" onClick={nextStep}><I18nText source={"Continue"} /></button>
                 )}
               </div>
             </>
@@ -881,9 +866,7 @@ export function LessonView({
                         fontWeight: 800,
                         marginBottom: 4,
                       }}
-                    >
-                      Lesson Complete!
-                    </div>
+                    ><I18nText source={"Lesson Complete!"} /></div>
                     {finalizeLesson ? (
                       <div className="flex flex-col gap-3 mt-2" style={{ width: "100%" }}>
                         {nextLessonTitle ? (
@@ -893,13 +876,12 @@ export function LessonView({
                             style={{ width: "100%", padding: "14px 16px", fontSize: 17, fontWeight: 800 }}
                             onClick={() => finalizeLesson("next")}
                           >
-                            {t("lesson.nextLesson")}: {nextLessonTitle} →
+                            {t("lesson.nextLesson")}: <I18nText>{nextLessonTitle}</I18nText> →
                           </button>
                         ) : (
                           <div className="flex items-center justify-center gap-2" style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
                             <Sparkles size={22} className="text-[#EFB343]" aria-hidden />
-                            Course Complete!
-                          </div>
+                            <I18nText source={"Course Complete!"} /></div>
                         )}
                         <button
                           type="button"
@@ -917,7 +899,7 @@ export function LessonView({
                         >
                           <span className="inline-flex items-center justify-center gap-2">
                             <CheckCircle2 size={18} aria-hidden />
-                            Done - {t("lesson.backToCourse")}
+                            <I18nText source={"Done - "} />{t("lesson.backToCourse")}
                           </span>
                         </button>
                         {lessonTitle ? (
@@ -929,15 +911,11 @@ export function LessonView({
                         ) : null}
                       </div>
                     ) : (
-                      <button className="btn btn-primary" onClick={nextStep}>
-                        Continue
-                      </button>
+                      <button className="btn btn-primary" onClick={nextStep}><I18nText source={"Continue"} /></button>
                     )}
                   </div>
                 ) : (
-                  <button className="btn btn-primary" onClick={nextStep}>
-                    Continue
-                  </button>
+                  <button className="btn btn-primary" onClick={nextStep}><I18nText source={"Continue"} /></button>
                 )}
               </div>
             </>
@@ -987,7 +965,7 @@ export function LessonView({
           {/* Back button + progress bar + exit (hearts only in NothoTopBar) */}
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, position: "sticky", top: 0, zIndex: 50, background: "var(--color-bg)", paddingTop: 8, paddingBottom: 8, marginTop: -8 }}>
             {goBack && (
-              <button
+              <I18nElement as="button"
                 onClick={() => setShowExitConfirm(true)}
                 style={{
                   background: "none",
@@ -1002,7 +980,7 @@ export function LessonView({
                 aria-label="Back to course"
               >
                 <ArrowLeft size={20} />
-              </button>
+              </I18nElement>
             )}
             <div className="lesson-progress-bar" style={{ flex: 1, margin: 0 }}>
               <div
@@ -1013,7 +991,7 @@ export function LessonView({
                 }}
               />
             </div>
-            <button
+            <I18nElement as="button"
               onClick={() => setShowExitConfirm(true)}
               style={{
                 background: "none",
@@ -1029,18 +1007,18 @@ export function LessonView({
               title="Exit lesson"
             >
               <X size={22} />
-            </button>
+            </I18nElement>
             {/* Hearts belong where you can lose them - inline in the lesson header */}
-            <div
+            <I18nElement as="div"
               style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0, fontWeight: 800, fontSize: 14, color: "#E03C31" }}
               aria-label={`${hearts} of ${maxHearts} hearts remaining`}
               title={`${hearts}/${maxHearts} hearts`}
             >
               {hearts > 0 ? <Heart size={18} fill="currentColor" /> : <HeartOff size={18} />}
-              {hearts}
-            </div>
+              <I18nText>{hearts}</I18nText>
+            </I18nElement>
           </div>
-          <div className="lesson-step">{renderStep()}</div>
+          <div className="lesson-step"><I18nText>{renderStep()}</I18nText></div>
           {/* Financial education disclaimer */}
           <div style={{
             textAlign: "center",
@@ -1050,9 +1028,7 @@ export function LessonView({
             opacity: 0.75,
             borderTop: "1px solid var(--color-border)",
             marginTop: 4,
-          }}>
-            Education only. Not financial advice.
-          </div>
+          }}><I18nText source={"Education only. Not financial advice."} /></div>
         </div>
       </main>
     </>
@@ -1087,12 +1063,10 @@ function CalculatorEmbedStep({ step, onNext }: { step: any; onNext: () => void }
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <Calculator size={22} className="shrink-0" />
-          <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.9 }}>
-            Interactive Calculator
-          </span>
+          <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.9 }}><I18nText source={"Interactive Calculator"} /></span>
         </div>
         <h3 style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.3, marginBottom: 6 }}>{localizeString(locale, step.title)}</h3>
-        <p style={{ fontSize: 13, opacity: 0.9, lineHeight: 1.5 }}>{step.description}</p>
+        <p style={{ fontSize: 13, opacity: 0.9, lineHeight: 1.5 }}><I18nText>{step.description}</I18nText></p>
       </div>
 
       {!embedCalcDone ? (
@@ -1102,8 +1076,7 @@ function CalculatorEmbedStep({ step, onNext }: { step: any; onNext: () => void }
           style={{ width: "100%", padding: "14px", fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
           onClick={() => setEmbedCalcDone(true)}
         >
-          <BarChart2 size={20} aria-hidden /> Calculate
-        </button>
+          <BarChart2 size={20} aria-hidden /> <I18nText source={" Calculate"} /></button>
       ) : (
         <>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -1111,22 +1084,22 @@ function CalculatorEmbedStep({ step, onNext }: { step: any; onNext: () => void }
               flex: 1, minWidth: 120, background: "var(--color-primary)", borderRadius: 12,
               padding: "14px 16px", textAlign: "center",
             }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.8)", textTransform: "uppercase", letterSpacing: 0.5 }}>Final Value</div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "white" }}>{formatRand(embedFinal.value)}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.8)", textTransform: "uppercase", letterSpacing: 0.5 }}><I18nText source={"Final Value"} /></div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: "white" }}><I18nText>{formatRand(embedFinal.value)}</I18nText></div>
             </div>
             <div style={{
               flex: 1, minWidth: 120, background: "var(--color-surface)", border: "1px solid var(--color-border)",
               borderRadius: 12, padding: "14px 16px", textAlign: "center",
             }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>You Put In</div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--color-text-primary)" }}>{formatRand(embedFinal.contributions)}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}><I18nText source={"You Put In"} /></div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--color-text-primary)" }}><I18nText>{formatRand(embedFinal.contributions)}</I18nText></div>
             </div>
             <div style={{
               flex: 1, minWidth: 120, background: "var(--color-surface)", border: "1px solid var(--color-border)",
               borderRadius: 12, padding: "14px 16px", textAlign: "center",
             }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Interest Earned</div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "#007A85" }}>{formatRand(embedFinal.interest)}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}><I18nText source={"Interest Earned"} /></div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: "#007A85" }}><I18nText>{formatRand(embedFinal.interest)}</I18nText></div>
             </div>
           </div>
 
@@ -1134,15 +1107,15 @@ function CalculatorEmbedStep({ step, onNext }: { step: any; onNext: () => void }
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={embedChart} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="year" tickFormatter={(v) => `Yr ${v}`} tick={{ fontSize: 10, fill: "var(--color-text-secondary)" }} />
+                <XAxis dataKey="year" tickFormatter={(v) => localizeString(locale, "Yr {value0}").replace("{value0}", String(v))} tick={{ fontSize: 10, fill: "var(--color-text-secondary)" }} />
                 <YAxis tickFormatter={(v: number) => `R${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 10, fill: "var(--color-text-secondary)" }} width={45} />
                 <Tooltip
                   formatter={(v: any) => formatRand(typeof v === "number" ? v : Number(v ?? 0))}
-                  labelFormatter={(l) => `Year ${l}`}
+                  labelFormatter={(l) => localizeString(locale, "Year {value0}").replace("{value0}", String(l))}
                   contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
                 />
-                <Line type="monotone" dataKey="Portfolio Value" stroke="var(--color-primary)" strokeWidth={2.5} dot={false} />
-                <Line type="monotone" dataKey="Total Contributions" stroke="#EFB343" strokeWidth={2} dot={false} strokeDasharray="5 5" />
+                <Line type="monotone" dataKey="Portfolio Value" name={localizeString(locale, "Portfolio Value")}  stroke="var(--color-primary)" strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="Total Contributions" name={localizeString(locale, "Total Contributions")}  stroke="#EFB343" strokeWidth={2} dot={false} strokeDasharray="5 5" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -1153,9 +1126,9 @@ function CalculatorEmbedStep({ step, onNext }: { step: any; onNext: () => void }
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
               <Lightbulb size={14} style={{ color: "var(--color-primary)" }} />
-              <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-primary)" }}>Key Insight</span>
+              <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-primary)" }}><I18nText source={"Key Insight"} /></span>
             </div>
-            <p style={{ fontSize: 13, lineHeight: 1.6, color: "var(--color-text-primary)" }}>{step.insight}</p>
+            <p style={{ fontSize: 13, lineHeight: 1.6, color: "var(--color-text-primary)" }}><I18nText>{step.insight}</I18nText></p>
           </div>
         </>
       )}

@@ -1,3 +1,4 @@
+import { resolveContent } from "./localize";
 /** isiZulu titles only. Lesson bodies stay English unless a key exists. */
 export const contentZu: Record<string, string> = {
   "course.money-basics": "Izisekelo Zemali",
@@ -144,6 +145,5 @@ export function localizeContent(
   key: string,
   fallback: string
 ): string {
-  if (locale !== "zu") return fallback;
-  return contentZu[key] ?? fallback;
+  return resolveContent(locale, key, fallback, locale === "zu" ? contentZu[key] : undefined);
 }

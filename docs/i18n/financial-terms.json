@@ -1,0 +1,375 @@
+{
+  "reference": "https://www.dsac.gov.za/sites/default/files/2023-11/Multilingual%20Financial%20Terminology%20list.pdf",
+  "verification": "Headwords checked against rendered PDF pages. This verifies term transcription only, not generated sentences or contextual inflections.",
+  "terms": [
+    {
+      "source": "credit account",
+      "pdfPage": 47,
+      "printedPage": 46,
+      "translations": {
+        "af": [
+          "kredietrekening"
+        ],
+        "zu": [
+          "i-akhawunti yesikweletu"
+        ],
+        "xh": [
+          "i-akhawunti yetyala",
+          "i-akhawunti yesikweliti",
+          "i-akhawunti yekhredithi"
+        ],
+        "ss": [
+          "i-akhawunti yekutsenga ngesikweleti"
+        ],
+        "nr": [
+          "i-akhawundi yesikolodo",
+          "i-akhawundi yesikwelede"
+        ],
+        "tn": [
+          "akhaontelato",
+          "akhaontekoloto"
+        ],
+        "nso": [
+          "akhaonte ya mokitlana",
+          "akhaonte ya sekoloto"
+        ],
+        "st": [
+          "akhaonte ya mokitlane",
+          "akhaonte ya sekoloto"
+        ],
+        "ve": [
+          "akhaunthu ya khredithi"
+        ],
+        "ts": [
+          "akhawunti ya xikweleti"
+        ]
+      }
+    },
+    {
+      "source": "investment fund",
+      "pdfPage": 103,
+      "printedPage": 102,
+      "translations": {
+        "af": [
+          "beleggingsfonds"
+        ],
+        "zu": [
+          "isikhwama sotshalomali"
+        ],
+        "xh": [
+          "ingxowa-mali yotyalo-mali"
+        ],
+        "ss": [
+          "sikhwamalusiso",
+          "sikhwama selusiso"
+        ],
+        "nr": [
+          "isikhwama sesisomali"
+        ],
+        "tn": [
+          "letlolepeeletso"
+        ],
+        "nso": [
+          "sekhwama sa dipeeletšo"
+        ],
+        "st": [
+          "letlole la letsete"
+        ],
+        "ve": [
+          "tshikwama tsha vhubindudzi"
+        ],
+        "ts": [
+          "nkwamavuvekisi"
+        ]
+      }
+    },
+    {
+      "source": "investment portfolio",
+      "pdfPage": 104,
+      "printedPage": 103,
+      "translations": {
+        "af": [
+          "beleggingsportefeulje"
+        ],
+        "zu": [
+          "iqoqotshalomali"
+        ],
+        "xh": [
+          "ipotifoliyo yotyalo-mali"
+        ],
+        "ss": [
+          "umlandvo welutjalomali",
+          "iphothifoliyo yelusiso"
+        ],
+        "nr": [
+          "iphothifoliyo yesisomali"
+        ],
+        "tn": [
+          "lokwalopeeletso",
+          "potfoliopeeletso"
+        ],
+        "nso": [
+          "photefolio ya dipeeletšo"
+        ],
+        "st": [
+          "potfoliyo ya matsete"
+        ],
+        "ve": [
+          "phothifoḽio ya vhubindudzi"
+        ],
+        "ts": [
+          "photifoliyovuvekisi"
+        ]
+      }
+    },
+    {
+      "source": "investment product",
+      "pdfPage": 104,
+      "printedPage": 103,
+      "translations": {
+        "af": [
+          "beleggingsproduk"
+        ],
+        "zu": [
+          "umkhiqizo wotshalomali"
+        ],
+        "xh": [
+          "isixhobo sotyalo-mali"
+        ],
+        "ss": [
+          "sisiswa",
+          "lokusisiwe",
+          "lokusiswako",
+          "umkhicitolusiso"
+        ],
+        "nr": [
+          "ivezopahla lamasiso"
+        ],
+        "tn": [
+          "sebeeletswa"
+        ],
+        "nso": [
+          "mohuta wa peeletšo"
+        ],
+        "st": [
+          "sehlahiswa sa letsete"
+        ],
+        "ve": [
+          "tshibveledzwa tsha vhubindudzi"
+        ],
+        "ts": [
+          "xivekisiwa",
+          "xibindzurisiwa"
+        ]
+      }
+    },
+    {
+      "source": "debt repayment",
+      "pdfPages": [
+        56,
+        57
+      ],
+      "printedPages": [
+        55,
+        56
+      ],
+      "translations": {
+        "af": [
+          "skuldterugbetaling",
+          "skuldafbetaling"
+        ],
+        "zu": [
+          "ukukhokha isikweletu"
+        ],
+        "xh": [
+          "ukuhlawulwa kwetyala"
+        ],
+        "ss": [
+          "kubhadala sikweleti"
+        ],
+        "nr": [
+          "ukubhadalwa kwesikolodo",
+          "ukubhadalwa kwesikwelede"
+        ],
+        "tn": [
+          "tuelolato",
+          "tuelokoloto"
+        ],
+        "nso": [
+          "tefelo ya mekitlana",
+          "tefelo ya dikoloto"
+        ],
+        "st": [
+          "tefo ya sekoloto"
+        ],
+        "ve": [
+          "ndifho ya tshikolodo"
+        ],
+        "ts": [
+          "hakelo wa swikweleti"
+        ]
+      }
+    },
+    {
+      "source": "retirement annuity",
+      "pdfPage": 159,
+      "printedPage": 158,
+      "translations": {
+        "af": [
+          "aftreeannuïteit"
+        ],
+        "zu": [
+          "umhlomulozikhathi womhlalaphansi"
+        ],
+        "xh": [
+          "utyalo-mali lomhlala-phantsi"
+        ],
+        "ss": [
+          "inzuzolusisomali yemhlalaphasi"
+        ],
+        "nr": [
+          "imbadalo yesisomali yomhlalaphasi",
+          "imbadelo ye-anyuwithi"
+        ],
+        "tn": [
+          "katsotshireletsotholotiro",
+          "anyuithitholotiro",
+          "tshiamelotholotiro"
+        ],
+        "nso": [
+          "anyuithi ya tholomodiro",
+          "anyuithi ya phentšhene"
+        ],
+        "st": [
+          "tjhelete ya peho ya meja"
+        ],
+        "ve": [
+          "anyuwithi ya nyawelo"
+        ],
+        "ts": [
+          "malimbekiso ya phenxeni",
+          "malimbekiso ya nchipiso"
+        ]
+      }
+    },
+    {
+      "source": "accrued interest {investment}",
+      "pdfPage": 17,
+      "printedPage": 16,
+      "translations": {
+        "af": [
+          "opgelope rente"
+        ],
+        "zu": [
+          "inzalomali eqongelelwe"
+        ],
+        "xh": [
+          "inzala engekahlawulwa",
+          "inzala engekabhatalwa"
+        ],
+        "ss": [
+          "intalo lelindzelekile"
+        ],
+        "nr": [
+          "inzalo elindelweko",
+          "amakonyana alindelweko"
+        ],
+        "tn": [
+          "morokotsokokoantsweng"
+        ],
+        "nso": [
+          "tswala yeo e kokotletšego",
+          "tswala yeo e oketšegilego"
+        ],
+        "st": [
+          "tswala e lebeletsweng"
+        ],
+        "ve": [
+          "nzwalelondavhelelwa"
+        ],
+        "ts": [
+          "ntswalo lowu languteriweke"
+        ]
+      }
+    },
+    {
+      "source": "fixed interest rate",
+      "pdfPage": 80,
+      "printedPage": 79,
+      "translations": {
+        "af": [
+          "vaste rentekoers"
+        ],
+        "zu": [
+          "izinga elingaguquki lenzalo"
+        ],
+        "xh": [
+          "izinga lenzala elingatshintshiyo",
+          "izinga lenzala elingaguqukiyo"
+        ],
+        "ss": [
+          "silinganisontalo lesingagucuki"
+        ],
+        "nr": [
+          "isilinganisonzalo esingatjhugulukiko"
+        ],
+        "tn": [
+          "kelotsalotlhomameng"
+        ],
+        "nso": [
+          "kelotswala ya go se fetoge"
+        ],
+        "st": [
+          "sekgahla sa tswala se tsitsitseng"
+        ],
+        "ve": [
+          "phimo ya mbuelotiwa"
+        ],
+        "ts": [
+          "mpimo wa ntswalonkancinco"
+        ]
+      }
+    },
+    {
+      "source": "principal {a loan}",
+      "pdfPage": 148,
+      "printedPage": 147,
+      "translations": {
+        "af": [
+          "hoofsom"
+        ],
+        "zu": [
+          "uninasikweletu"
+        ],
+        "xh": [
+          "inkunzi kwimali-mboleko"
+        ],
+        "ss": [
+          "samba lesingenantalo",
+          "imali yesisekelontalo",
+          "imali yelubolekontalo"
+        ],
+        "nr": [
+          "imalisisekelo ebolekiweko"
+        ],
+        "tn": [
+          "molato",
+          "sekoloto"
+        ],
+        "nso": [
+          "tšhelete ya mathomo ya kadimo"
+        ],
+        "st": [
+          "tjhelete ya motheo ya lounu",
+          "tjhelete ya motheo ya kadimo"
+        ],
+        "ve": [
+          "tshikolodo tshihulwane"
+        ],
+        "ts": [
+          "malixidzi"
+        ]
+      }
+    }
+  ]
+}

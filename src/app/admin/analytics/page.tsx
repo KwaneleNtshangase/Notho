@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * /admin/analytics - Notho Desk.
@@ -205,24 +206,20 @@ function Dashboard() {
       <header className="nv-head">
         <div className="nv-title">
           <div className="nv-mark">
-            <img src="/notho-icon-192.png" alt="Notho" />
+            <I18nElement as="img" src="/notho-icon-192.png" alt="Notho" />
           </div>
           <div>
-            <h1 className="nv-h1">Notho Desk</h1>
-            <p className="nv-lockup">Learn · Grow · Build wealth</p>
-            <p className="nv-sub">Live from the database. Updates on its own.</p>
+            <h1 className="nv-h1"><I18nText source={"Notho Desk"} /></h1>
+            <p className="nv-lockup"><I18nText source={"Learn · Grow · Build wealth"} /></p>
+            <p className="nv-sub"><I18nText source={"Live from the database. Updates on its own."} /></p>
           </div>
         </div>
 
         <div className="nv-actions">
-          <Link href="/admin" className="nv-btn" style={{ textDecoration: "none" }}>
-            Backend
-          </Link>
+          <Link href="/admin" className="nv-btn" style={{ textDecoration: "none" }}><I18nText source={"Backend"} /></Link>
           {gate === "ok" && (
             <>
-              <Link href="/admin/bugs" className="nv-btn" style={{ textDecoration: "none" }}>
-                Bugs
-              </Link>
+              <Link href="/admin/bugs" className="nv-btn" style={{ textDecoration: "none" }}><I18nText source={"Bugs"} /></Link>
               <label className="nv-live">
                 <input
                   type="checkbox"
@@ -231,27 +228,25 @@ function Dashboard() {
                   style={{ accentColor: "var(--teal)" }}
                 />
                 <span className={`nv-pulse ${auto ? "" : "off"}`} />
-                {auto ? "Live" : "Paused"}
+                <I18nText>{auto ? "Live" : "Paused"}</I18nText>
                 {lastRefresh && (
                   <span>
-                    {" · "}
-                    {lastRefresh.toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}
+                    <I18nText>{" · "}</I18nText>
+                    <I18nText>{lastRefresh.toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}</I18nText>
                   </span>
                 )}
               </label>
-              <Btn onClick={refresh}>Refresh</Btn>
+              <Btn onClick={refresh}><I18nText source={"Refresh"} /></Btn>
             </>
           )}
           <Btn
             onClick={toggle}
             title="Dark is the working console. Light is the export theme for screenshots and decks."
           >
-            {mode === "dark" ? "Export theme" : "Console theme"}
+            <I18nText>{mode === "dark" ? "Export theme" : "Console theme"}</I18nText>
           </Btn>
           {gate === "ok" && (
-            <Btn onClick={signOut} title={who ?? "Sign out"}>
-              Sign out
-            </Btn>
+            <Btn onClick={signOut} title={who ?? "Sign out"}><I18nText source={"Sign out"} /></Btn>
           )}
         </div>
       </header>
@@ -271,7 +266,7 @@ function Dashboard() {
             }
           />
           <div style={{ marginTop: 14, display: "flex", gap: 8 }}>
-            <Btn onClick={signOut}>Use a different account</Btn>
+            <Btn onClick={signOut}><I18nText source={"Use a different account"} /></Btn>
           </div>
         </Card>
       )}
@@ -288,7 +283,7 @@ function Dashboard() {
               marginBottom: 14,
             }}
           >
-            <nav className="nv-nav" role="tablist" aria-label="Dashboard sections">
+            <I18nElement as="nav" className="nv-nav" role="tablist" aria-label="Dashboard sections">
               {TABS.map((t) => (
                 <button
                   key={t.value}
@@ -297,19 +292,19 @@ function Dashboard() {
                   className="nv-tab"
                   onClick={() => setTab(t.value)}
                 >
-                  {t.label}
+                  <I18nText>{t.label}</I18nText>
                 </button>
               ))}
-            </nav>
+            </I18nElement>
 
             {tab !== "people" && tab !== "outcomes" && (
               <Segmented options={WINDOWS} value={days} onChange={setDays} label="Time window" />
             )}
           </div>
 
-          <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 18px" }}>{active.blurb}</p>
+          <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 18px" }}><I18nText>{active.blurb}</I18nText></p>
 
-          <div role="tabpanel" aria-label={active.label}>
+          <I18nElement as="div" role="tabpanel" aria-label={active.label}>
             {tab === "pulse" && <PulsePanel days={numDays} nonce={nonce} onJump={jump} />}
             {tab === "growth" && <GrowthPanel days={numDays} nonce={nonce} />}
             {tab === "engagement" && <EngagementPanel days={numDays} nonce={nonce} />}
@@ -322,15 +317,9 @@ function Dashboard() {
             {tab === "people" && (
               <PeoplePanel nonce={nonce} openUser={openUser} onOpenUser={setOpenUser} />
             )}
-          </div>
+          </I18nElement>
 
-          <p className="nv-foot">
-            This page shows personal data and is restricted to admins. Under POPIA, only view what
-            you need for a legitimate product purpose, and prefer the aggregate tabs over the
-            per-user drill-down when preparing anything you will share outside the team. Time
-            buckets are South African time; &ldquo;active&rdquo; means a tracked session, a question
-            answered, or any recorded feature event.
-          </p>
+          <p className="nv-foot"><I18nText source={"This page shows personal data and is restricted to admins. Under POPIA, only view what you need for a legitimate product purpose, and prefer the aggregate tabs over the per-user drill-down when preparing anything you will share outside the team. Time buckets are South African time; “active” means a tracked session, a question answered, or any recorded feature event."} /></p>
         </>
       )}
     </div>

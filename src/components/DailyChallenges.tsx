@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useRef, useState } from "react";
 import { CheckCircle2 } from "@/components/icons/NothoIcons";
@@ -100,29 +101,26 @@ export function DailyChallenges() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, flex: 1 }}>{meta?.title ?? row.challenge_code}</div>
-          <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--color-text-secondary)" }}>{row.difficulty}</span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)" }}>+{row.xp_reward} XP</span>
+          <div style={{ fontSize: 13, fontWeight: 700, flex: 1 }}><I18nText>{meta?.title ?? row.challenge_code}</I18nText></div>
+          <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--color-text-secondary)" }}><I18nText>{row.difficulty}</I18nText></span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-primary)" }}><I18nText source={"+{value0} XP"} values={[row.xp_reward]} /></span>
         </div>
-        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 8 }}>{meta?.description ?? "Challenge in progress"}</div>
+        <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText>{meta?.description ?? "Challenge in progress"}</I18nText></div>
         <div style={{ height: 6, background: "var(--color-border)", borderRadius: 999, overflow: "hidden" }}>
           <div style={{ width: `${pct}%`, height: "100%", background: "var(--color-primary)", transition: "width 250ms ease" }} />
         </div>
         <div style={{ marginTop: 6, fontSize: 11, color: "var(--color-text-secondary)" }}>
-          {Math.min(p.current, p.target)}/{p.target}
+          <I18nText>{Math.min(p.current, p.target)}</I18nText>/<I18nText>{p.target}</I18nText>
         </div>
         {done && (
           <div style={{ position: "absolute", right: 10, bottom: 8, fontSize: 12, color: "#007A85", fontWeight: 800, display: "flex", alignItems: "center", gap: 4 }}>
-            <CheckCircle2 size={14} /> Done
-          </div>
+            <CheckCircle2 size={14} /> <I18nText source={" Done"} /></div>
         )}
         {xpPop?.id === row.id && (
-          <div style={{ position: "absolute", right: 12, top: -10, background: "#007A85", color: "#fff", borderRadius: 999, fontSize: 11, fontWeight: 800, padding: "4px 8px" }}>
-            +{xpPop.xp} XP
-          </div>
+          <div style={{ position: "absolute", right: 12, top: -10, background: "#007A85", color: "#fff", borderRadius: 999, fontSize: 11, fontWeight: 800, padding: "4px 8px" }}><I18nText source={"+{value0} XP"} values={[xpPop.xp]} /></div>
         )}
         {row.period_type === "daily" && (
-          <button
+          <I18nElement as="button"
             type="button"
             disabled={rerollUsed}
             title="1 reroll per day"
@@ -144,9 +142,7 @@ export function DailyChallenges() {
               padding: "4px 8px",
               cursor: rerollUsed ? "not-allowed" : "pointer",
             }}
-          >
-            Reroll
-          </button>
+          ><I18nText source={"Reroll"} /></I18nElement>
         )}
       </div>
     );
@@ -154,9 +150,9 @@ export function DailyChallenges() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>
-      <div style={{ fontSize: 13, fontWeight: 800 }}>Daily Challenges</div>
+      <div style={{ fontSize: 13, fontWeight: 800 }}><I18nText source={"Daily Challenges"} /></div>
       {daily.map(renderCard)}
-      <div style={{ fontSize: 13, fontWeight: 800, marginTop: 4 }}>Weekly Challenges</div>
+      <div style={{ fontSize: 13, fontWeight: 800, marginTop: 4 }}><I18nText source={"Weekly Challenges"} /></div>
       {weekly.map(renderCard)}
     </div>
   );

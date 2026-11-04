@@ -1,3 +1,4 @@
+import { localizedMockJson } from "@/server/localizeMock";
 import { NextRequest } from "next/server";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { createServiceSupabase } from "@/lib/supabaseServer";
@@ -9,7 +10,6 @@ import {
 import { validateUuid } from "@/lib/mockAttempts/validation";
 import {
   auditMockEvent,
-  mockJson,
   rejectRateLimited,
 } from "@/server/mockAttemptSecurity";
 
@@ -18,9 +18,9 @@ type RouteContext = { params: Promise<{ attemptId: string }> };
 
 export async function POST(req: NextRequest, context: RouteContext) {
   const user = await getUserFromRequest(req);
-  if (!user) return mockJson({ error: "Unauthorized" }, 401);
+  if (!user) return localizedMockJson(req, { error: "Unauthorized" }, 401);
   const { attemptId } = await context.params;
-  if (!validateUuid(attemptId)) return mockJson({ error: "Invalid attempt id" }, 400);
+  if (!validateUuid(attemptId)) return localizedMockJson(req, { error: "Invalid attempt id" }, 400);
 
   const admin = createServiceSupabase();
   try {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     if (limited) return limited;
     await submitMockAttempt(admin, user.id, attemptId);
     const attempt = await fetchOwnedMockAttempt(admin, user, attemptId);
-    if (!attempt) return mockJson({ error: "Attempt not found" }, 404);
+    if (!attempt) return localizedMockJson(req, { error: "Attempt not found" }, 404);
     await auditMockEvent(admin, req, {
       userId: user.id,
       attemptId,
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
       outcome: "allowed",
       metadata: { reason: attempt.result?.submissionReason ?? null },
     });
-    return mockJson({ attempt });
+    return localizedMockJson(req, { attempt });
   } catch (error) {
     const status = statusForMockAttemptError(error);
     const attempt =
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
         ? await fetchOwnedMockAttempt(admin, user, attemptId).catch(() => null)
         : null;
     if (status === 500) console.error("[mock-attempts/submit]", error);
-    return mockJson(
+    return localizedMockJson(req,
       {
         error:
           status === 409

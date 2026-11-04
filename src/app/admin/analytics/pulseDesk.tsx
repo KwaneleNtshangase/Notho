@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useMemo } from "react";
 import {
@@ -107,10 +108,10 @@ export function PulsePanel({
         <ScoreCard title="Product health" score={health.score} label="out of 100" caption={healthCaption(health.score)} parts={health.parts} />
         <Card>
           <div className="nv-card-head">
-            <h2 className="nv-card-title">What to do next</h2>
-            <span style={{ fontSize: 11.5, color: p.muted }}>{insights.length} findings, most urgent first</span>
+            <h2 className="nv-card-title"><I18nText source={"What to do next"} /></h2>
+            <span style={{ fontSize: 11.5, color: p.muted }}><I18nText source={"{value0} findings, most urgent first"} values={[insights.length]} /></span>
           </div>
-          <p className="nv-card-sub">Generated from the same queries the other tabs draw. Each card names the number that triggered it.</p>
+          <p className="nv-card-sub"><I18nText source={"Generated from the same queries the other tabs draw. Each card names the number that triggered it."} /></p>
           <InsightList insights={insights} onJump={onJump} />
         </Card>
       </div>
@@ -118,10 +119,10 @@ export function PulsePanel({
         <ScoreCard title="Store readiness" score={store.score} label="launch floor" caption={store.score >= 70 ? "Ready to put in front of strangers." : "Fix the red bars before store review."} parts={store.parts} />
         <Card>
           <div className="nv-card-head">
-            <h2 className="nv-card-title">Questions that look broken</h2>
-            <Btn onClick={() => onJump("content")}>Open Content</Btn>
+            <h2 className="nv-card-title"><I18nText source={"Questions that look broken"} /></h2>
+            <Btn onClick={() => onJump("content")}><I18nText source={"Open Content"} /></Btn>
           </div>
-          <p className="nv-card-sub">Under 25% first-try with real volume. Rewrite the stem or un-key the answer before a store reviewer meets them.</p>
+          <p className="nv-card-sub"><I18nText source={"Under 25% first-try with real volume. Rewrite the stem or un-key the answer before a store reviewer meets them."} /></p>
           {questions.loading && !questions.data ? (
             <div className="nv-skel" style={{ height: 160 }} />
           ) : brokenQuestions.length === 0 ? (
@@ -130,10 +131,10 @@ export function PulsePanel({
             brokenQuestions.map((q) => (
               <div key={`${q.course_id}-${q.lesson_id}-${q.slot_id}-${q.variant_id}`} className="nv-kv">
                 <div>
-                  <div className="nv-kv-l">{q.course_id} / {q.lesson_id}</div>
-                  <div className="nv-kv-d">{q.slot_id} \u00b7 {q.attempts} attempts \u00b7 {q.learners} learners</div>
+                  <div className="nv-kv-l"><I18nText>{q.course_id}</I18nText> / <I18nText>{q.lesson_id}</I18nText></div>
+                  <div className="nv-kv-d"><I18nText source={"{value0} · {value1} attempts · {value2} learners"} values={[q.slot_id, q.attempts, q.learners]} /></div>
                 </div>
-                <div className="nv-kv-v" style={{ color: p.red }}>{q.first_try_pct}%</div>
+                <div className="nv-kv-v" style={{ color: p.red }}><I18nText>{q.first_try_pct}</I18nText>%</div>
               </div>
             ))
           )}
@@ -163,7 +164,7 @@ export function PulsePanel({
       </Panel>
       <div className="nv-grid two">
         <Card>
-          <div className="nv-card-head"><h2 className="nv-card-title">Reach right now</h2></div>
+          <div className="nv-card-head"><h2 className="nv-card-title"><I18nText source={"Reach right now"} /></h2></div>
           <KV label="Today" detail="people who did anything at all" value={fmt(s.dau)} accent={p.teal} />
           <KV label="This week" detail="unique people in 7 days" value={fmt(s.wau)} accent={p.teal} />
           <KV label="This month" detail="unique people in 30 days" value={fmt(s.mau)} accent={p.teal} />
@@ -173,10 +174,10 @@ export function PulsePanel({
         </Card>
         <Card>
           <div className="nv-card-head">
-            <h2 className="nv-card-title">Where everyone stands</h2>
-            <Btn onClick={() => onJump("people")}>Open People</Btn>
+            <h2 className="nv-card-title"><I18nText source={"Where everyone stands"} /></h2>
+            <Btn onClick={() => onJump("people")}><I18nText source={"Open People"} /></Btn>
           </div>
-          <p className="nv-card-sub">Every account, bucketed by how recently and how deeply they use Notho. Each bucket takes a different move.</p>
+          <p className="nv-card-sub"><I18nText source={"Every account, bucketed by how recently and how deeply they use Notho. Each bucket takes a different move."} /></p>
           <Gate loading={segments.loading && !segments.data} error={segments.error} empty={(segments.data ?? []).length === 0} emptyTitle="No accounts yet" skeleton={180}>
             <SegmentBar segments={segments.data ?? []} />
             <div style={{ marginTop: 14 }}>
@@ -184,11 +185,11 @@ export function PulsePanel({
                 <div key={x.segment} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: `1px solid ${p.border}` }}>
                   <i style={{ width: 9, height: 9, borderRadius: 3, background: p.series[i % p.series.length], flex: "none" }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: p.ink }}>{x.label}</div>
-                    <div style={{ fontSize: 11.5, color: p.muted, lineHeight: 1.45 }}>{x.action}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: p.ink }}><I18nText>{x.label}</I18nText></div>
+                    <div style={{ fontSize: 11.5, color: p.muted, lineHeight: 1.45 }}><I18nText>{x.action}</I18nText></div>
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: p.ink, fontVariantNumeric: "tabular-nums" }}>
-                    {fmt(x.users)}<span style={{ fontSize: 11, color: p.muted, fontWeight: 700 }}> \u00b7 {fmtPct(x.pct)}</span>
+                    <I18nText>{fmt(x.users)}</I18nText><span style={{ fontSize: 11, color: p.muted, fontWeight: 700 }}><I18nText source={" · {value0}"} values={[fmtPct(x.pct)]} /></span>
                   </div>
                 </div>
               ))}
@@ -197,9 +198,7 @@ export function PulsePanel({
         </Card>
       </div>
       <Card className="pad-sm">
-        <div style={{ fontSize: 11.5, color: p.muted, lineHeight: 1.6 }}>
-          Numbers generated {ago(s.generatedAt)} \u00b7 window {s.windowDays} days \u00b7 answers {fmt(s.answers)} \u00b7 lessons {fmt(s.lessonsInWindow)} \u00b7 first-try {fmtPct(s.firstTryAccuracy)} \u00b7 installed {fmtPct(s.pwaShare)} \u00b7 {s.dau} today / {s.mau} this month. Percent deltas stay hidden until a window has 30 people so one extra friend cannot look like growth.
-        </div>
+        <div style={{ fontSize: 11.5, color: p.muted, lineHeight: 1.6 }}><I18nText source={"Numbers generated {value0} · window {value1} days · answers {value2} · lessons {value3} · first-try {value4} · installed {value5} · {value6} today / {value7} this month. Percent deltas stay hidden until a window has 30 people so one extra friend cannot look like growth."} values={[ago(s.generatedAt), s.windowDays, fmt(s.answers), fmt(s.lessonsInWindow), fmtPct(s.firstTryAccuracy), fmtPct(s.pwaShare), s.dau, s.mau]} /></div>
       </Card>
     </div>
   );
@@ -217,9 +216,9 @@ function ScoreCard({
   const p = usePalette();
   return (
     <Card>
-      <div className="nv-card-head"><h2 className="nv-card-title">{title}</h2></div>
+      <div className="nv-card-head"><h2 className="nv-card-title"><I18nText>{title}</I18nText></h2></div>
       {title === "Store readiness" && (
-        <p className="nv-card-sub">Launch gates for the App Store and Play listing. Red means do not spend on acquisition yet.</p>
+        <p className="nv-card-sub"><I18nText source={"Launch gates for the App Store and Play listing. Red means do not spend on acquisition yet."} /></p>
       )}
       <div style={{ display: "grid", placeItems: "center", padding: "6px 0 14px" }}>
         <Ring value={score} label={label} color={toneColor(scoreTone(score), p)} caption={caption} />
@@ -227,11 +226,11 @@ function ScoreCard({
       {parts.map((part) => (
         <div key={part.key} style={{ marginBottom: 13 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 6, fontSize: 12.5, fontWeight: 700, color: p.ink }}>
-            <span>{part.label}</span>
-            <span style={{ color: partColor(part.score, p), fontVariantNumeric: "tabular-nums" }}>{part.score}</span>
+            <span><I18nText>{part.label}</I18nText></span>
+            <span style={{ color: partColor(part.score, p), fontVariantNumeric: "tabular-nums" }}><I18nText>{part.score}</I18nText></span>
           </div>
           <Meter pct={part.score} color={partColor(part.score, p)} />
-          <div style={{ fontSize: 11, color: p.muted, marginTop: 5, lineHeight: 1.45 }}>{part.detail}</div>
+          <div style={{ fontSize: 11, color: p.muted, marginTop: 5, lineHeight: 1.45 }}><I18nText>{part.detail}</I18nText></div>
         </div>
       ))}
     </Card>
@@ -255,7 +254,7 @@ function SegmentBar({ segments }: { segments: SegmentRow[] }) {
   return (
     <div style={{ display: "flex", height: 16, borderRadius: 999, overflow: "hidden", gap: 2 }}>
       {segments.filter((s) => s.users > 0).map((s, i) => (
-        <div key={s.segment} title={`${s.label}: ${s.users} (${s.pct}%)`} style={{ width: `${(s.users / total) * 100}%`, background: p.series[i % p.series.length], transition: "width .6s cubic-bezier(.22,1,.36,1)" }} />
+        <I18nElement as="div" key={s.segment} title={`${s.label}: ${s.users} (${s.pct}%)`} style={{ width: `${(s.users / total) * 100}%`, background: p.series[i % p.series.length], transition: "width .6s cubic-bezier(.22,1,.36,1)" }} />
       ))}
     </div>
   );

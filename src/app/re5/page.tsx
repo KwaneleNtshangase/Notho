@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PublicGuide, guideStyles } from "@/components/PublicGuide";
@@ -37,15 +38,11 @@ export default function Re5Page() {
       lede="RE5 is a regulatory exam. Notho gives you a place to practise the material. It does not sit the exam for you and it does not make you an authorised representative."
       faqs={faqs}
     >
-      <h2 style={h2}>How to use it</h2>
+      <h2 style={h2}><I18nText source={"How to use it"} /></h2>
       <p style={p}>
-        Open the RE5 course from{" "}
-        <Link href="/learn" style={{ color: guideStyles.teal }}>
-          Learn
-        </Link>{" "}
-        or the readiness screen in the app. Everyday literacy review stays
-        separate so a money lesson does not turn into an RE5 prompt.
-      </p>
+        <I18nText source={"Open the RE5 course from"} /><I18nText>{" "}</I18nText>
+        <Link href="/learn" style={{ color: guideStyles.teal }}><I18nText source={"Learn"} /></Link><I18nText>{" "}</I18nText>
+        <I18nText source={"or the readiness screen in the app. Everyday literacy review stays separate so a money lesson does not turn into an RE5 prompt."} /></p>
     </PublicGuide>
   );
 }

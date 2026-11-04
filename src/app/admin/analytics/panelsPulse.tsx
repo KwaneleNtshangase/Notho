@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 /**
  * PULSE - the tab that opens first.
@@ -159,7 +160,7 @@ export function PulsePanel({
       <div className="nv-grid" style={{ gridTemplateColumns: "minmax(280px, 340px) 1fr" }}>
         <Card>
           <div className="nv-card-head">
-            <h2 className="nv-card-title">Product health</h2>
+            <h2 className="nv-card-title"><I18nText source={"Product health"} /></h2>
           </div>
           <div style={{ display: "grid", placeItems: "center", padding: "6px 0 14px" }}>
             <Ring
@@ -182,14 +183,14 @@ export function PulsePanel({
                   color: p.ink,
                 }}
               >
-                <span>{part.label}</span>
+                <span><I18nText>{part.label}</I18nText></span>
                 <span style={{ color: partColor(part.score, p), fontVariantNumeric: "tabular-nums" }}>
-                  {part.score}
+                  <I18nText>{part.score}</I18nText>
                 </span>
               </div>
               <Meter pct={part.score} color={partColor(part.score, p)} />
               <div style={{ fontSize: 11, color: p.muted, marginTop: 5, lineHeight: 1.45 }}>
-                {part.detail}
+                <I18nText>{part.detail}</I18nText>
               </div>
             </div>
           ))}
@@ -200,15 +201,10 @@ export function PulsePanel({
 
         <Card>
           <div className="nv-card-head">
-            <h2 className="nv-card-title">What to do next</h2>
-            <span style={{ fontSize: 11.5, color: p.muted }}>
-              {insights.length} finding{insights.length === 1 ? "" : "s"}, most urgent first
-            </span>
+            <h2 className="nv-card-title"><I18nText source={"What to do next"} /></h2>
+            <span style={{ fontSize: 11.5, color: p.muted }}><I18nText source={"{value0} findings, most urgent first"} values={[insights.length, insights.length === 1 ? "" : "s"]} one={"{value0} finding, most urgent first"} count={insights.length} /></span>
           </div>
-          <p className="nv-card-sub">
-            Generated from the same queries the other tabs draw. Each card names the number that
-            triggered it, so you can disagree with it on the evidence rather than on the vibe.
-          </p>
+          <p className="nv-card-sub"><I18nText source={"Generated from the same queries the other tabs draw. Each card names the number that triggered it, so you can disagree with it on the evidence rather than on the vibe."} /></p>
           <InsightList insights={insights} onJump={onJump} />
         </Card>
       </div>
@@ -262,7 +258,7 @@ export function PulsePanel({
       <div className="nv-grid two">
         <Card>
           <div className="nv-card-head">
-            <h2 className="nv-card-title">Reach right now</h2>
+            <h2 className="nv-card-title"><I18nText source={"Reach right now"} /></h2>
           </div>
           <KV label="Today" detail="people who did anything at all" value={fmt(s.dau)} accent={p.teal} />
           <KV label="This week" detail="unique people in 7 days" value={fmt(s.wau)} accent={p.teal} />
@@ -279,13 +275,10 @@ export function PulsePanel({
 
         <Card>
           <div className="nv-card-head">
-            <h2 className="nv-card-title">Where everyone stands</h2>
-            <Btn onClick={() => onJump("people")}>Open People</Btn>
+            <h2 className="nv-card-title"><I18nText source={"Where everyone stands"} /></h2>
+            <Btn onClick={() => onJump("people")}><I18nText source={"Open People"} /></Btn>
           </div>
-          <p className="nv-card-sub">
-            Every account, bucketed by how recently and how deeply they use Notho. Each bucket takes a
-            different move.
-          </p>
+          <p className="nv-card-sub"><I18nText source={"Every account, bucketed by how recently and how deeply they use Notho. Each bucket takes a different move."} /></p>
           <Gate
             loading={segments.loading && !segments.data}
             error={segments.error}
@@ -318,8 +311,8 @@ export function PulsePanel({
                       }}
                     />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: p.ink }}>{x.label}</div>
-                      <div style={{ fontSize: 11.5, color: p.muted, lineHeight: 1.45 }}>{x.action}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: p.ink }}><I18nText>{x.label}</I18nText></div>
+                      <div style={{ fontSize: 11.5, color: p.muted, lineHeight: 1.45 }}><I18nText>{x.action}</I18nText></div>
                     </div>
                     <div
                       style={{
@@ -329,8 +322,8 @@ export function PulsePanel({
                         fontVariantNumeric: "tabular-nums",
                       }}
                     >
-                      {fmt(x.users)}
-                      <span style={{ fontSize: 11, color: p.muted, fontWeight: 700 }}> · {fmtPct(x.pct)}</span>
+                      <I18nText>{fmt(x.users)}</I18nText>
+                      <span style={{ fontSize: 11, color: p.muted, fontWeight: 700 }}> · <I18nText>{fmtPct(x.pct)}</I18nText></span>
                     </div>
                   </div>
                 ))}
@@ -340,11 +333,7 @@ export function PulsePanel({
       </div>
 
       <Card className="pad-sm">
-        <div style={{ fontSize: 11.5, color: p.muted, lineHeight: 1.6 }}>
-          Numbers generated {ago(s.generatedAt)} · window {s.windowDays} days · answers in window{" "}
-          {fmt(s.answers)} · first-try accuracy {fmtPct(s.firstTryAccuracy)} · installed-app share{" "}
-          {fmtPct(s.pwaShare)}
-        </div>
+        <div style={{ fontSize: 11.5, color: p.muted, lineHeight: 1.6 }}><I18nText source={"Numbers generated {value0} · window {value1} days · answers in window{value2}{value3} · first-try accuracy {value4} · installed-app share{value5}{value6}"} values={[ago(s.generatedAt), s.windowDays, " ", fmt(s.answers), fmtPct(s.firstTryAccuracy), " ", fmtPct(s.pwaShare)]} /></div>
       </Card>
     </div>
   );
@@ -381,17 +370,15 @@ export function InsightList({
           <div className="nv-insight-rail" />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 6, flexWrap: "wrap" }}>
-              <span className={`nv-tag ${toneClass(i.severity)}`}>{SEVERITY_LABEL[i.severity]}</span>
+              <span className={`nv-tag ${toneClass(i.severity)}`}><I18nText>{SEVERITY_LABEL[i.severity]}</I18nText></span>
             </div>
-            <h3 className="nv-insight-title">{i.title}</h3>
-            <p className="nv-insight-body">{i.evidence}</p>
+            <h3 className="nv-insight-title"><I18nText>{i.title}</I18nText></h3>
+            <p className="nv-insight-body"><I18nText>{i.evidence}</I18nText></p>
             <p className="nv-insight-do">
-              <b>Do this:</b> {i.action}
+              <b><I18nText source={"Do this:"} /></b> <I18nText>{i.action}</I18nText>
             </p>
             {i.tab && (
-              <button type="button" className="nv-insight-jump" onClick={() => onJump(i.tab!)}>
-                See the evidence →
-              </button>
+              <button type="button" className="nv-insight-jump" onClick={() => onJump(i.tab!)}><I18nText source={"See the evidence →"} /></button>
             )}
           </div>
         </div>
@@ -403,7 +390,7 @@ export function InsightList({
           style={{ alignSelf: "flex-start" }}
           onClick={() => setExpanded((e) => !e)}
         >
-          {expanded ? "Show fewer" : `Show ${insights.length - limit} more`}
+          <I18nText>{expanded ? "Show fewer" : `Show ${insights.length - limit} more`}</I18nText>
         </button>
       )}
     </div>
@@ -446,7 +433,7 @@ function SegmentBar({ segments }: { segments: SegmentRow[] }) {
       {segments
         .filter((s) => s.users > 0)
         .map((s, i) => (
-          <div
+          <I18nElement as="div"
             key={s.segment}
             title={`${s.label}: ${s.users} (${s.pct}%)`}
             style={{

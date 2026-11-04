@@ -1,5 +1,11 @@
 "use client";
+import { localizeClientString } from "@/i18n/clientString";
+
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useLocale } from "@/i18n/LocaleProvider";
+import { localizeString } from "@/i18n/stringZu";
+import { localizedDate } from "@/i18n/date";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
@@ -246,14 +252,14 @@ function SwipeableRow({
   const REVEAL = 76;
   return (
     <div style={{ position: "relative", overflow: "hidden", borderBottom: "1px solid var(--color-border)" }}>
-      <button
+      <I18nElement as="button"
         type="button"
         aria-label="Delete transaction"
         onClick={onDelete}
         style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: REVEAL, border: "none", background: "#E03C31", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
       >
         <Trash2 size={18} />
-      </button>
+      </I18nElement>
       <div
         role="button"
         tabIndex={0}
@@ -269,7 +275,7 @@ function SwipeableRow({
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } }}
         style={{ transform: `translateX(${dx}px)`, transition: drag.current ? "none" : "transform .2s ease", background: "var(--color-surface)", cursor: "pointer" }}
       >
-        {children}
+        <I18nText>{children}</I18nText>
       </div>
     </div>
   );
@@ -312,6 +318,9 @@ async function postBudgetReport(body: Record<string, unknown>): Promise<Response
 }
 
 export function BudgetView() {
+  const { locale } = useLocale();
+  const categoryText = (category: { label: string; tag?: string }) =>
+    category.tag === 'custom' || category.tag === 'historical' ? category.label : localizeString(locale, category.label);
   const now = new Date();
   const [viewMode, setViewMode] = useState<"month" | "year">("month");
   const [monthOffset, setMonthOffset] = useState(0);
@@ -451,7 +460,7 @@ export function BudgetView() {
   const targetDate = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
   const year = targetDate.getFullYear();
   const month = targetDate.getMonth();
-  const monthLabel = targetDate.toLocaleString("en-ZA", { month: "long", year: "numeric" });
+  const monthLabel = localizedDate(targetDate, locale, { month: "long", year: "numeric" });
 
   const startDate = `${year}-${String(month + 1).padStart(2, "0")}-01`;
   const lastDay = new Date(year, month + 1, 0).getDate();
@@ -661,7 +670,7 @@ export function BudgetView() {
   };
 
   const handleDeleteCustomCat = async (id: string) => {
-    if (!window.confirm("Delete this category? Transactions in it move to Other.")) return;
+    if (!window.confirm(localizeClientString("Delete this category? Transactions in it move to Other."))) return;
     await supabase.from("custom_budget_categories").delete().eq("id", id);
     setCustomCats((prev) => prev.filter((c) => c.id !== id));
     if (editingCatId === id) resetCustomCatForm();
@@ -902,7 +911,7 @@ export function BudgetView() {
 
   // Swipe-to-delete a single row.
   const swipeDelete = async (id: string) => {
-    if (!window.confirm("Delete this transaction?")) return;
+    if (!window.confirm(localizeClientString("Delete this transaction?"))) return;
     await supabase.from("budget_entries").delete().eq("id", id);
     setEntries((prev) => prev.filter((e) => e.id !== id));
   };
@@ -919,7 +928,7 @@ export function BudgetView() {
 
   const bulkDelete = async () => {
     if (selectedIds.size === 0) return;
-    if (!window.confirm(`Delete ${selectedIds.size} transaction${selectedIds.size > 1 ? "s" : ""}?`)) return;
+    if (!window.confirm(localizeClientString(selectedIds.size === 1 ? 'Delete 1 transaction?' : `Delete ${selectedIds.size} transactions?`))) return;
     const ids = [...selectedIds];
     await supabase.from("budget_entries").delete().in("id", ids);
     setEntries((prev) => prev.filter((e) => !selectedIds.has(e.id)));
@@ -1205,7 +1214,7 @@ export function BudgetView() {
   const getCatColor = (cat: string) => allExpCats.find((c) => c.id === cat)?.color ?? "#9E9E9E";
   const formatEntry = (date: string) => {
     const d = new Date(date + "T00:00:00");
-    return d.toLocaleDateString("en-ZA", { day: "numeric", month: "short" });
+    return localizedDate(d, locale, { day: "numeric", month: "short" });
   };
 
   const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -1224,7 +1233,7 @@ export function BudgetView() {
       <div style={{ maxWidth: 760, margin: "0 auto", width: "100%" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: userGoalLabel ? 8 : 16 }}>
-        <h2 style={{ fontSize: 28, fontWeight: 900 }}>Budget</h2>
+        <h2 style={{ fontSize: 28, fontWeight: 900 }}><I18nText source={"Budget"} /></h2>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
           <BudgetImportPanel onImported={loadEntries} />
           <button
@@ -1240,8 +1249,7 @@ export function BudgetView() {
               borderRadius: 10, padding: "8px 12px", fontWeight: 700, fontSize: 13, cursor: "pointer",
             }}
           >
-            <BarChart2 size={15} aria-hidden /> View report
-          </button>
+            <BarChart2 size={15} aria-hidden /> <I18nText source={" View report"} /></button>
           <button
             type="button"
             onClick={openExportModal}
@@ -1259,21 +1267,19 @@ export function BudgetView() {
               cursor: "pointer",
             }}
           >
-            <FileText size={15} aria-hidden /> Export PDF
-          </button>
+            <FileText size={15} aria-hidden /> <I18nText source={" Export PDF"} /></button>
           <div style={{ display: "flex", borderRadius: 10, border: "1px solid var(--color-border)", overflow: "hidden" }}>
             {(["month", "year"] as const).map((v) => (
               <button key={v} type="button" onClick={() => setViewMode(v)}
                 style={{ padding: "7px 14px", fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer", background: viewMode === v ? "var(--color-primary)" : "var(--color-surface)", color: viewMode === v ? "white" : "var(--color-text-secondary)" }}>
-                {v.charAt(0).toUpperCase() + v.slice(1)}
+                <I18nText>{v === "month" ? "Month" : "Year"}</I18nText>
               </button>
             ))}
           </div>
           <button type="button"
             onClick={() => { setAddType("expense"); setAddCategory(""); setAddAmount(""); setAddDesc(""); setAddDate(now.toISOString().slice(0, 10)); setShowAdd(true); }}
             style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--color-primary)", color: "white", border: "none", borderRadius: 10, padding: "8px 14px", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
-            <Plus size={16} aria-hidden /> Add
-          </button>
+            <Plus size={16} aria-hidden /> <I18nText source={" Add"} /></button>
         </div>
       </div>
 
@@ -1286,9 +1292,7 @@ export function BudgetView() {
           borderRadius: 8, border: "none",
         }}>
           <Target size={13} style={{ color: "var(--color-primary)", flexShrink: 0 }} aria-hidden />
-          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-primary)" }}>
-            Your budget plan, {userGoalLabel}
-          </span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-primary)" }}><I18nText source={"Your budget plan, {value0}"} values={[userGoalLabel]} preserveValues={[true]} /></span>
         </div>
       )}
 
@@ -1312,28 +1316,28 @@ export function BudgetView() {
       {/* YEAR VIEW */}
       {viewMode === "year" && (
         <div>
-          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}>{now.getFullYear()} Overview</div>
+          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}><I18nText source={"{value0} Overview"} values={[now.getFullYear()]} /></div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
             {yearMonthData.map((m) => (
               <div key={m.name} style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 12, padding: 14 }}>
-                <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 10, color: "var(--color-text-primary)" }}>{m.name}</div>
+                <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 10, color: "var(--color-text-primary)" }}><I18nText>{m.name}</I18nText></div>
                 {m.income === 0 && m.expenses === 0 ? (
-                  <div style={{ fontSize: 11, color: "var(--color-text-secondary)", fontStyle: "italic" }}>No entries</div>
+                  <div style={{ fontSize: 11, color: "var(--color-text-secondary)", fontStyle: "italic" }}><I18nText source={"No entries"} /></div>
                 ) : (
                   <>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-                      <span style={{ color: "var(--color-text-secondary)" }}>Income</span>
-                      <span style={{ fontWeight: 700, color: "#007A85" }}>{formatRand(m.income)}</span>
+                      <span style={{ color: "var(--color-text-secondary)" }}><I18nText source={"Income"} /></span>
+                      <span style={{ fontWeight: 700, color: "#007A85" }}><I18nText>{formatRand(m.income)}</I18nText></span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 6 }}>
-                      <span style={{ color: "var(--color-text-secondary)" }}>Expenses</span>
-                      <span style={{ fontWeight: 700, color: "#E03C31" }}>{formatRand(m.expenses)}</span>
+                      <span style={{ color: "var(--color-text-secondary)" }}><I18nText source={"Expenses"} /></span>
+                      <span style={{ fontWeight: 700, color: "#E03C31" }}><I18nText>{formatRand(m.expenses)}</I18nText></span>
                     </div>
                     <div style={{ height: 3, borderRadius: 2, background: "var(--color-border)", overflow: "hidden", marginBottom: 4 }}>
                       <div style={{ height: "100%", background: m.surplus >= 0 ? "#007A85" : "#E03C31", width: `${m.income > 0 ? Math.min(100, (m.expenses / m.income) * 100) : 100}%` }} />
                     </div>
                     <div style={{ fontSize: 12, fontWeight: 800, color: m.surplus >= 0 ? "#007A85" : "#E03C31", textAlign: "right" }}>
-                      {m.surplus >= 0 ? "+" : ""}{formatRand(m.surplus)}
+                      <I18nText>{m.surplus >= 0 ? "+" : ""}</I18nText><I18nText>{formatRand(m.surplus)}</I18nText>
                     </div>
                   </>
                 )}
@@ -1348,17 +1352,17 @@ export function BudgetView() {
               <>
                 {yearMonthData.some(m => m.income > 0 || m.expenses > 0) && (
                   <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
-                    <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 14 }}>Income vs Expenses - {now.getFullYear()}</div>
+                    <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 14 }}><I18nText source={"Income vs Expenses - {value0}"} values={[now.getFullYear()]} /></div>
                     <ResponsiveContainer width="100%" height={200}>
                       <LineChart data={yearMonthData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--color-text-secondary)" }} axisLine={false} tickLine={false} />
+                        <XAxis dataKey="name" tickFormatter={v => localizeString(locale, String(v))} tick={{ fontSize: 11, fill: "var(--color-text-secondary)" }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 10, fill: "var(--color-text-secondary)" }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `R${(v/1000).toFixed(0)}k`} />
                         <Tooltip
-                          formatter={((value: unknown, name: unknown) => [formatRand(Number(value)), name === "income" ? "Income" : name === "expenses" ? "Expenses" : "Surplus"]) as never}
+                          formatter={((value: unknown, name: unknown) => [formatRand(Number(value)), localizeString(locale, name === "income" ? "Income" : name === "expenses" ? "Expenses" : "Surplus")]) as never}
                           contentStyle={{ borderRadius: 10, fontSize: 12, border: "1px solid var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-primary)" }}
                         />
-                        <Legend iconType="circle" iconSize={8} formatter={(v: string) => v === "income" ? "Income" : v === "expenses" ? "Expenses" : "Surplus"} wrapperStyle={{ fontSize: 12 }} />
+                        <Legend iconType="circle" iconSize={8} formatter={(v: string) => localizeString(locale, v === "income" ? "Income" : v === "expenses" ? "Expenses" : "Surplus")} wrapperStyle={{ fontSize: 12 }} />
                         <Line type="monotone" dataKey="income" stroke="#007A85" strokeWidth={2.5} dot={{ r: 3, fill: "#007A85" }} activeDot={{ r: 5 }} />
                         <Line type="monotone" dataKey="expenses" stroke="#E03C31" strokeWidth={2.5} dot={{ r: 3, fill: "#E03C31" }} activeDot={{ r: 5 }} />
                         <Line type="monotone" dataKey="surplus" stroke="#EFB343" strokeWidth={2} dot={{ r: 2, fill: "#EFB343" }} strokeDasharray="4 3" />
@@ -1367,7 +1371,7 @@ export function BudgetView() {
                   </div>
                 )}
                 <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16 }}>
-                  <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 12 }}>Year Totals</div>
+                  <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 12 }}><I18nText source={"Year Totals"} /></div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
                     {[
                       { label: "Total Income", value: totInc, color: "#007A85" },
@@ -1375,8 +1379,8 @@ export function BudgetView() {
                       { label: totSur >= 0 ? "Net Surplus" : "Net Deficit", value: Math.abs(totSur), color: totSur >= 0 ? "#007A85" : "#E03C31" },
                     ].map((c) => (
                       <div key={c.label} style={{ textAlign: "center" }}>
-                        <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", marginBottom: 4 }}>{c.label}</div>
-                        <div style={{ fontSize: 16, fontWeight: 900, color: c.color }}>{formatRand(c.value)}</div>
+                        <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", marginBottom: 4 }}>{categoryText(c)}</div>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: c.color }}><I18nText>{formatRand(c.value)}</I18nText></div>
                       </div>
                     ))}
                   </div>
@@ -1392,15 +1396,15 @@ export function BudgetView() {
 
       {/* Month selector */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
-        <button type="button" onClick={() => setMonthOffset((o) => o - 1)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", padding: 4 }} aria-label="Previous month">
+        <I18nElement as="button" type="button" onClick={() => setMonthOffset((o) => o - 1)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", padding: 4 }} aria-label="Previous month">
           <ChevronLeft size={20} />
-        </button>
-        <span style={{ fontWeight: 700, fontSize: 15 }}>{monthLabel}</span>
+        </I18nElement>
+        <span style={{ fontWeight: 700, fontSize: 15 }}><I18nText>{monthLabel}</I18nText></span>
         {/* Allow planning up to 3 months ahead (was capped at the current month) */}
-        <button type="button" onClick={() => setMonthOffset((o) => Math.min(o + 1, 3))} disabled={monthOffset >= 3}
+        <I18nElement as="button" type="button" onClick={() => setMonthOffset((o) => Math.min(o + 1, 3))} disabled={monthOffset >= 3}
           style={{ background: "none", border: "none", cursor: monthOffset >= 3 ? "default" : "pointer", color: monthOffset >= 3 ? "var(--color-border)" : "var(--color-text-secondary)", padding: 4 }} aria-label="Next month">
           <ChevronRight size={20} />
-        </button>
+        </I18nElement>
       </div>
 
       {Object.keys(budgetTargets).length > 0 && (
@@ -1408,27 +1412,23 @@ export function BudgetView() {
           {monthIsCustomised ? (
             <>
               <Target size={14} style={{ color: "#B8860B", flexShrink: 0 }} />
-              <span style={{ fontWeight: 600, color: "var(--color-text-primary)", flex: 1 }}>Budget targets customised for {monthLabel}</span>
+              <span style={{ fontWeight: 600, color: "var(--color-text-primary)", flex: 1 }}><I18nText source={"Budget targets customised for {value0}"} values={[monthLabel]} /></span>
               <button type="button" onClick={resetMonthToDefault}
-                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-primary)", fontWeight: 700, fontSize: 12.5, padding: 0 }}>
-                Reset to default
-              </button>
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-primary)", fontWeight: 700, fontSize: 12.5, padding: 0 }}><I18nText source={"Reset to default"} /></button>
             </>
           ) : (
             <>
               <Copy size={14} style={{ color: "var(--color-text-secondary)", flexShrink: 0 }} />
-              <span style={{ fontWeight: 600, color: "var(--color-text-secondary)", flex: 1 }}>Following your default budget</span>
+              <span style={{ fontWeight: 600, color: "var(--color-text-secondary)", flex: 1 }}><I18nText source={"Following your default budget"} /></span>
               <button type="button" onClick={() => openSetBudget("month")}
-                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-primary)", fontWeight: 700, fontSize: 12.5, padding: 0 }}>
-                Customise this month
-              </button>
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-primary)", fontWeight: 700, fontSize: 12.5, padding: 0 }}><I18nText source={"Customise this month"} /></button>
             </>
           )}
         </div>
       )}
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: 40, color: "var(--color-text-secondary)" }}>Loading...</div>
+        <div style={{ textAlign: "center", padding: 40, color: "var(--color-text-secondary)" }}><I18nText source={"Loading..."} /></div>
       ) : (
         <>
           {/* Summary cards */}
@@ -1439,8 +1439,8 @@ export function BudgetView() {
               { label: surplus >= 0 ? "Surplus" : "Deficit", value: Math.abs(surplus), color: surplus >= 0 ? "#007A85" : "#E03C31" },
             ].map((c) => (
               <div key={c.label} style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
-                <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>{c.label}</div>
-                <div style={{ fontSize: 15, fontWeight: 900, color: c.color, lineHeight: 1.2 }}>{formatRand(c.value)}</div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>{categoryText(c)}</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: c.color, lineHeight: 1.2 }}><I18nText>{formatRand(c.value)}</I18nText></div>
               </div>
             ))}
           </div>
@@ -1448,37 +1448,34 @@ export function BudgetView() {
           {entries.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--color-text-secondary)" }}>
               <Wallet size={48} strokeWidth={1.2} style={{ color: "var(--color-border)", margin: "0 auto 12px" }} />
-              <p style={{ fontWeight: 700, fontSize: 16, marginBottom: 8, color: "var(--color-text-primary)" }}>No entries yet</p>
-              <p style={{ fontSize: 14, marginBottom: 20 }}>Start by adding your income and expenses for {monthLabel}.</p>
-              <button type="button" onClick={() => { setAddType("income"); setShowAdd(true); }} className="btn btn-primary" style={{ padding: "12px 28px" }}>
-                Add your first entry
-              </button>
+              <p style={{ fontWeight: 700, fontSize: 16, marginBottom: 8, color: "var(--color-text-primary)" }}><I18nText source={"No entries yet"} /></p>
+              <p style={{ fontSize: 14, marginBottom: 20 }}><I18nText source={"Start by adding your income and expenses for {value0}."} values={[monthLabel]} /></p>
+              <button type="button" onClick={() => { setAddType("income"); setShowAdd(true); }} className="btn btn-primary" style={{ padding: "12px 28px" }}><I18nText source={"Add your first entry"} /></button>
             </div>
           ) : (
             <>
               {income > 0 && (
                 <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 20 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 14, marginBottom: 12 }}>
-                    <Lightbulb size={16} style={{ color: "var(--color-primary)" }} /> Spending Insights
-                  </div>
+                    <Lightbulb size={16} style={{ color: "var(--color-primary)" }} /> <I18nText source={" Spending Insights"} /></div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13 }}>
-                      <span style={{ color: "var(--color-text-secondary)" }}>Savings rate (Net)</span>
+                      <span style={{ color: "var(--color-text-secondary)" }}><I18nText source={"Savings rate (Net)"} /></span>
                       <span style={{ fontWeight: 700, color: mathSavingsRate >= 10 ? "#007A85" : "#E03C31" }}>
-                        {mathSavingsRate}% {mathSavingsRate >= 10 ? "Great job!" : "Aim for 10%+"}
+                        <I18nText>{mathSavingsRate}</I18nText>% <I18nText>{mathSavingsRate >= 10 ? "Great job!" : "Aim for 10%+"}</I18nText>
                       </span>
                     </div>
 
                     {catTotals.length > 0 && (
                       <div>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>Top Expenses</div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"Top Expenses"} /></div>
                         {catTotals.slice(0, 3).map((c) => (
                           <div key={c.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, marginBottom: 4 }}>
                             <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                               <div style={{ width: 8, height: 8, borderRadius: "50%", background: c.color }} />
-                              {c.label}
+                              {categoryText(c)}
                             </span>
-                            <span style={{ fontWeight: 600 }}>{formatRand(c.total)} <span style={{ color: "var(--color-text-secondary)", fontSize: 11, fontWeight: 500 }}>({expenses > 0 ? Math.round((c.total / expenses) * 100) : 0}%)</span></span>
+                            <span style={{ fontWeight: 600 }}><I18nText>{formatRand(c.total)}</I18nText> <span style={{ color: "var(--color-text-secondary)", fontSize: 11, fontWeight: 500 }}>(<I18nText>{expenses > 0 ? Math.round((c.total / expenses) * 100) : 0}</I18nText>%)</span></span>
                           </div>
                         ))}
                       </div>
@@ -1487,20 +1484,18 @@ export function BudgetView() {
                     {needsWants.dayToDay > 0 && (
                       <button type="button" onClick={() => setShowSpendRoles(true)}
                         style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, gap: 12, background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left", width: "100%" }}>
-                        <span style={{ color: "var(--color-text-secondary)" }}>Needs vs Wants</span>
+                        <span style={{ color: "var(--color-text-secondary)" }}><I18nText source={"Needs vs Wants"} /></span>
                         <span style={{ fontWeight: 600, textAlign: "right", color: "var(--color-text-primary)" }}>
-                          Needs {needsWants.needsPct}% · Wants {needsWants.wantsPct}%
-                          <span style={{ display: "block", color: "var(--color-text-secondary)", fontSize: 11, fontWeight: 500 }}>
-                            of day-to-day spend{needsWants.excluded > 0 ? ` · ${formatRand(needsWants.excluded)} left out` : ""}
-                          </span>
+                          <I18nText source={"Needs "} /><I18nText>{needsWants.needsPct}</I18nText><I18nText source={"% · Wants "} /><I18nText>{needsWants.wantsPct}</I18nText>%
+                          <span style={{ display: "block", color: "var(--color-text-secondary)", fontSize: 11, fontWeight: 500 }}><I18nText source={"of day-to-day spend{value0}"} values={[needsWants.excluded > 0 ? ` · ${formatRand(needsWants.excluded)} left out` : ""]} /></span>
                         </span>
                       </button>
                     )}
 
                     <Link href="/learn?course=saving-investing" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "rgba(0,122,133,0.06)", borderRadius: 10, textDecoration: "none" }}>
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: 13, color: "var(--color-primary)" }}>{mathSavingsRate < 10 ? "Boost your savings" : "Grow your wealth"}</div>
-                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>{mathSavingsRate < 10 ? "Learn how to build an emergency fund." : "Level up your investing skills."}</div>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: "var(--color-primary)" }}><I18nText>{mathSavingsRate < 10 ? "Boost your savings" : "Grow your wealth"}</I18nText></div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText>{mathSavingsRate < 10 ? "Learn how to build an emergency fund." : "Level up your investing skills."}</I18nText></div>
                       </div>
                       <ChevronRight size={16} style={{ color: "var(--color-primary)" }} />
                     </Link>
@@ -1519,10 +1514,8 @@ export function BudgetView() {
                       <Target size={22} style={{ color: isOver ? "#E03C31" : "#007A85" }} />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 800, fontSize: 15, color: isOver ? "#E03C31" : "#007A85" }}>{isOver ? "Over Budget" : "Under Budget"}</div>
-                      <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginTop: 2 }}>
-                        {isOver ? `${formatRand(Math.abs(delta))} over` : `${formatRand(delta)} remaining`} of {formatRand(totalBudget)} budgeted
-                      </div>
+                      <div style={{ fontWeight: 800, fontSize: 15, color: isOver ? "#E03C31" : "#007A85" }}><I18nText>{isOver ? "Over Budget" : "Under Budget"}</I18nText></div>
+                      <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={"{value0} of {value1} budgeted"} values={[isOver ? `${formatRand(Math.abs(delta))} over` : `${formatRand(delta)} remaining`, formatRand(totalBudget)]} /></div>
                     </div>
                   </div>
                 );
@@ -1531,10 +1524,9 @@ export function BudgetView() {
               {catTotals.length > 0 && (
                 <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 20 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                    <div style={{ fontWeight: 800, fontSize: 14 }}>Expense breakdown</div>
+                    <div style={{ fontWeight: 800, fontSize: 14 }}><I18nText source={"Expense breakdown"} /></div>
                     <button type="button" onClick={() => openSetBudget()} style={{ background: "rgba(0,122,133,0.1)", border: "none", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#007A85", display: "flex", alignItems: "center", gap: 4 }}>
-                      <Target size={13} /> Set Budget
-                    </button>
+                      <Target size={13} /> <I18nText source={" Set Budget"} /></button>
                   </div>
                   <div style={{ position: "relative", width: "100%", maxWidth: 260, margin: "0 auto 20px" }}>
                     <ResponsiveContainer width="100%" height={220}>
@@ -1552,8 +1544,8 @@ export function BudgetView() {
                       </PieChart>
                     </ResponsiveContainer>
                     <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", textAlign: "center", pointerEvents: "none" }}>
-                      <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 2 }}>Total</div>
-                      <div style={{ fontSize: 18, fontWeight: 900, color: "var(--color-text-primary)" }}>{formatRand(expenses)}</div>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 2 }}><I18nText source={"Total"} /></div>
+                      <div style={{ fontSize: 18, fontWeight: 900, color: "var(--color-text-primary)" }}><I18nText>{formatRand(expenses)}</I18nText></div>
                     </div>
                   </div>
 
@@ -1580,14 +1572,14 @@ export function BudgetView() {
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                             <ChevronDown size={14} style={{ transform: expanded ? "rotate(0deg)" : "rotate(-90deg)", transition: "transform 0.15s", color: "var(--color-text-secondary)", flexShrink: 0 }} />
                             <div style={{ width: 10, height: 10, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
-                            <span style={{ fontWeight: 600 }}>{c.label}</span>
-                            {isOver && <span style={{ fontSize: 10, fontWeight: 800, background: OVER_RED_SOFT, color: OVER_RED, borderRadius: 4, padding: "1px 5px" }}>OVER</span>}
-                            {isOnBudget && <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(0,122,133,0.12)", color: "#007A85", borderRadius: 4, padding: "1px 5px" }}>ON BUDGET</span>}
+                            <span style={{ fontWeight: 600 }}>{categoryText(c)}</span>
+                            {isOver && <span style={{ fontSize: 10, fontWeight: 800, background: OVER_RED_SOFT, color: OVER_RED, borderRadius: 4, padding: "1px 5px" }}><I18nText source={"OVER"} /></span>}
+                            {isOnBudget && <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(0,122,133,0.12)", color: "#007A85", borderRadius: 4, padding: "1px 5px" }}><I18nText source={"ON BUDGET"} /></span>}
                             {isAmber && !isOver && <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(245,124,0,0.13)", color: "#F57C00", borderRadius: 4, padding: "1px 5px" }}>80%+</span>}
                           </div>
                           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, background: "var(--color-bg)", borderRadius: 6, padding: "2px 6px", color: "var(--color-text-secondary)" }}>{pct.toFixed(1)}%</span>
-                            <span style={{ fontWeight: 800, color: isOver ? OVER_RED : "var(--color-text-primary)" }}>{formatRand(c.total)}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, background: "var(--color-bg)", borderRadius: 6, padding: "2px 6px", color: "var(--color-text-secondary)" }}><I18nText>{pct.toFixed(1)}</I18nText>%</span>
+                            <span style={{ fontWeight: 800, color: isOver ? OVER_RED : "var(--color-text-primary)" }}><I18nText>{formatRand(c.total)}</I18nText></span>
                           </div>
                         </button>
                         {limit ? (
@@ -1606,9 +1598,9 @@ export function BudgetView() {
                               )}
                             </div>
                             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3, fontSize: 11, color: "var(--color-text-secondary)" }}>
-                              <span>{formatRand(c.total)} of {formatRand(limit)}</span>
+                              <span><I18nText source={"{value0} of {value1}"} values={[formatRand(c.total), formatRand(limit)]} /></span>
                               <span style={{ color: isOver ? OVER_RED : isAmber ? "#F57C00" : "#007A85", fontWeight: 700 }}>
-                                {isOver ? `${formatRand(c.total - limit)} over` : isOnBudget ? "On budget" : `${formatRand(limit - c.total)} left`}
+                                <I18nText>{isOver ? `${formatRand(c.total - limit)} over` : isOnBudget ? "On budget" : `${formatRand(limit - c.total)} left`}</I18nText>
                               </span>
                             </div>
                           </div>
@@ -1620,7 +1612,7 @@ export function BudgetView() {
                         {expanded && (
                           <div style={{ marginTop: 8, border: "1px solid var(--color-border)", borderRadius: 10, overflow: "hidden" }}>
                             {catEntries.length === 0 ? (
-                              <div style={{ padding: "10px 12px", fontSize: 12, color: "var(--color-text-secondary)" }}>No transactions in this category.</div>
+                              <div style={{ padding: "10px 12px", fontSize: 12, color: "var(--color-text-secondary)" }}><I18nText source={"No transactions in this category."} /></div>
                             ) : catEntries.map((e) => (
                               <button
                                 key={e.id}
@@ -1630,13 +1622,13 @@ export function BudgetView() {
                               >
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                   <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                    {e.description || "No description"}
+                                    {e.description || <I18nText source="No description" />}
                                   </div>
                                   <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 2 }}>
-                                    {e.entry_date}
+                                    <I18nText>{e.entry_date}</I18nText>
                                   </div>
                                 </div>
-                                <div style={{ fontWeight: 800, fontSize: 12, flexShrink: 0 }}>-{formatRand(e.amount)}</div>
+                                <div style={{ fontWeight: 800, fontSize: 12, flexShrink: 0 }}>-<I18nText>{formatRand(e.amount)}</I18nText></div>
                                 <ChevronRight size={14} style={{ color: "var(--color-text-secondary)", flexShrink: 0 }} />
                               </button>
                             ))}
@@ -1652,8 +1644,8 @@ export function BudgetView() {
                 <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 20 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                     <BarChart2 size={15} style={{ color: "var(--color-primary)", flexShrink: 0 }} />
-                    <div style={{ fontWeight: 800, fontSize: 14 }}>How you compare</div>
-                    <span style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", marginLeft: "auto", background: "rgba(0,122,133,0.08)", padding: "2px 8px", borderRadius: 20 }}>Community avg</span>
+                    <div style={{ fontWeight: 800, fontSize: 14 }}><I18nText source={"How you compare"} /></div>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)", marginLeft: "auto", background: "rgba(0,122,133,0.08)", padding: "2px 8px", borderRadius: 20 }}><I18nText source={"Community avg"} /></span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {catTotals.filter((c) => benchmarks[c.id] !== undefined).slice(0, 5).map((c) => {
@@ -1667,13 +1659,11 @@ export function BudgetView() {
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                               <div style={{ width: 8, height: 8, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
-                              <span style={{ fontSize: 12, fontWeight: 600 }}>{c.label}</span>
+                              <span style={{ fontSize: 12, fontWeight: 600 }}>{categoryText(c)}</span>
                             </div>
                             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                              <span style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>avg {avgPct}%</span>
-                              <span style={{ fontSize: 13, fontWeight: 800, color: isOver ? "#E03C31" : isUnder ? "#007A85" : "var(--color-text-primary)" }}>
-                                you {userPct}%{isOver ? " ▲" : isUnder ? " ▼" : ""}
-                              </span>
+                              <span style={{ fontSize: 11, color: "var(--color-text-secondary)" }}><I18nText source={"avg {value0}%"} values={[avgPct]} /></span>
+                              <span style={{ fontSize: 13, fontWeight: 800, color: isOver ? "#E03C31" : isUnder ? "#007A85" : "var(--color-text-primary)" }}><I18nText source={"you {value0}%{value1}"} values={[userPct, isOver ? " ▲" : isUnder ? " ▼" : ""]} preserveValues={[true,false]} /></span>
                             </div>
                           </div>
                           <div style={{ height: 6, borderRadius: 3, background: "var(--color-border)", overflow: "visible", position: "relative" }}>
@@ -1684,17 +1674,17 @@ export function BudgetView() {
                       );
                     })}
                   </div>
-                  <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 12, textAlign: "center" }}>Anonymized community data, updated daily</div>
+                  <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 12, textAlign: "center" }}><I18nText source={"Anonymized community data, updated daily"} /></div>
                 </div>
               )}
 
               <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, overflow: "hidden", marginBottom: selectMode ? 80 : 24 }}>
                 <div style={{ fontWeight: 800, fontSize: 14, padding: "14px 16px", borderBottom: "1px solid var(--color-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>{selectMode ? `${selectedIds.size} selected` : "Transactions"}</span>
+                  <span><I18nText>{selectMode ? `${selectedIds.size} selected` : "Transactions"}</I18nText></span>
                   {selectMode ? (
-                    <button type="button" onClick={exitSelectMode} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", fontWeight: 700, fontSize: 12.5, padding: 0 }}>Cancel</button>
+                    <button type="button" onClick={exitSelectMode} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", fontWeight: 700, fontSize: 12.5, padding: 0 }}><I18nText source={"Cancel"} /></button>
                   ) : (
-                    <button type="button" onClick={() => setSelectMode(true)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-primary)", fontWeight: 700, fontSize: 12.5, padding: 0 }}>Select</button>
+                    <button type="button" onClick={() => setSelectMode(true)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-primary)", fontWeight: 700, fontSize: 12.5, padding: 0 }}><I18nText source={"Select"} /></button>
                   )}
                 </div>
                 {(() => {
@@ -1716,16 +1706,16 @@ export function BudgetView() {
                         {e.is_transfer ? <ArrowLeftRight size={15} style={{ color: "var(--color-text-secondary)" }} /> : e.type === "income" ? <TrendingUp size={16} style={{ color: "#007A85" }} /> : <div style={{ width: 8, height: 8, borderRadius: "50%", background: getCatColor(e.category) }} />}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, fontSize: 13, color: "var(--color-text-primary)" }}>{e.is_transfer ? "Transfer" : getCatLabel(e.type, e.category)}</div>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: "var(--color-text-primary)" }}><I18nText>{e.is_transfer ? "Transfer" : getCatLabel(e.type, e.category)}</I18nText></div>
                         <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {formatEntry(e.entry_date)}{e.description ? ` · ${e.description}` : ""}
+                          <I18nText>{formatEntry(e.entry_date)}</I18nText>{e.description ? ` · ${e.description}` : ""}
                         </div>
                         <div style={{ fontSize: 10, color: "var(--color-text-secondary)", opacity: 0.8, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {getAccountName(e)} • {(e.entry_method === "imported" || e.source === "import") ? "Imported" : "Manual"}
+                          <I18nText>{getAccountName(e)}</I18nText> • <I18nText>{(e.entry_method === "imported" || e.source === "import") ? "Imported" : "Manual"}</I18nText>
                         </div>
                       </div>
                       <div style={{ fontWeight: 800, fontSize: 14, color: e.is_transfer ? "var(--color-text-secondary)" : e.type === "income" ? "#007A85" : "var(--color-text-primary)", flexShrink: 0 }}>
-                        {e.is_transfer ? "⇄ " : e.type === "income" ? "+" : "-"}{formatRand(e.amount)}
+                        <I18nText>{e.is_transfer ? "⇄ " : e.type === "income" ? "+" : "-"}</I18nText><I18nText>{formatRand(e.amount)}</I18nText>
                       </div>
                     </>
                   );
@@ -1738,14 +1728,14 @@ export function BudgetView() {
                           <div style={{ width: 20, height: 20, borderRadius: 6, flexShrink: 0, border: `2px solid ${sel ? "var(--color-primary)" : "var(--color-border)"}`, background: sel ? "var(--color-primary)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             {sel && <Check size={13} style={{ color: "white" }} />}
                           </div>
-                          {rowInner(e)}
+                          <I18nText>{rowInner(e)}</I18nText>
                         </div>
                       );
                     }
                     return (
                       <SwipeableRow key={e.id} onOpen={() => openEdit(e)} onDelete={() => swipeDelete(e.id)}>
                         <div style={{ display: "flex", alignItems: "center", padding: "12px 16px", gap: 12, width: "100%" }}>
-                          {rowInner(e)}
+                          <I18nText>{rowInner(e)}</I18nText>
                           <ChevronRight size={14} style={{ color: "var(--color-text-secondary)", flexShrink: 0 }} />
                         </div>
                       </SwipeableRow>
@@ -1764,8 +1754,7 @@ export function BudgetView() {
         <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 350, padding: "12px 16px calc(14px + env(safe-area-inset-bottom))", background: "var(--color-surface)", borderTop: "1px solid var(--color-border)", display: "flex", justifyContent: "center", boxShadow: "0 -4px 16px rgba(0,0,0,0.08)" }}>
           <button type="button" onClick={bulkDelete}
             style={{ width: "100%", maxWidth: 420, padding: 14, borderRadius: 12, border: "none", background: "#E03C31", color: "#fff", fontWeight: 800, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-            <Trash2 size={17} /> Delete {selectedIds.size} selected
-          </button>
+            <Trash2 size={17} /> <I18nText source={" Delete "} /><I18nText>{selectedIds.size}</I18nText> <I18nText source={" selected"} /></button>
         </div>
       )}
 
@@ -1774,16 +1763,14 @@ export function BudgetView() {
         <div className="fixed inset-0 z-[400] flex items-end justify-center bg-black/60" role="dialog" aria-modal="true" onClick={() => setShowExportModal(false)}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", padding: "24px 20px 36px", width: "100%", maxWidth: 500 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-              <h3 style={{ fontWeight: 900, fontSize: 18 }}>Export Budget Report</h3>
+              <h3 style={{ fontWeight: 900, fontSize: 18 }}><I18nText source={"Export Budget Report"} /></h3>
               <button type="button" onClick={() => setShowExportModal(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
                 <X size={20} style={{ color: "var(--color-text-secondary)" }} />
               </button>
             </div>
-            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 16 }}>
-              Download a PDF summary of your budget vs actual spending for a chosen period.
-            </p>
+            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 16 }}><I18nText source={"Download a PDF summary of your budget vs actual spending for a chosen period."} /></p>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Period</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"Period"} /></div>
               <select
                 value={exportPreset}
                 onChange={(e) => setExportPreset(e.target.value as PeriodPreset)}
@@ -1798,17 +1785,17 @@ export function BudgetView() {
                   color: "var(--color-text-primary)",
                 }}
               >
-                <option value="this_month">This month (to date)</option>
-                <option value="last_month">Last month</option>
-                <option value="quarter">This quarter (to date)</option>
-                <option value="year">This year (to date)</option>
-                <option value="custom">Custom range</option>
+                <I18nElement as="option" value="this_month">This month (to date)</I18nElement>
+                <I18nElement as="option" value="last_month">Last month</I18nElement>
+                <I18nElement as="option" value="quarter">This quarter (to date)</I18nElement>
+                <I18nElement as="option" value="year">This year (to date)</I18nElement>
+                <I18nElement as="option" value="custom">Custom range</I18nElement>
               </select>
             </div>
             {exportPreset === "custom" && (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>From</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"From"} /></div>
                   <input
                     type="date"
                     value={exportCustomStart}
@@ -1817,7 +1804,7 @@ export function BudgetView() {
                   />
                 </div>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>To</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"To"} /></div>
                   <input
                     type="date"
                     value={exportCustomEnd}
@@ -1829,7 +1816,7 @@ export function BudgetView() {
             )}
             {exportError && (
               <div style={{ marginBottom: 12, padding: "10px 12px", borderRadius: 10, background: "rgba(224,60,49,0.1)", color: "#E03C31", fontSize: 13, fontWeight: 600 }}>
-                {exportError}
+                <I18nText>{exportError}</I18nText>
               </div>
             )}
             <button
@@ -1840,7 +1827,7 @@ export function BudgetView() {
               onClick={handleExportReport}
             >
               <FileText size={16} aria-hidden />
-              {exportLoading ? "Generating PDF…" : "Preview PDF"}
+              <I18nText>{exportLoading ? "Generating PDF…" : "Preview PDF"}</I18nText>
             </button>
           </div>
         </div>
@@ -1854,8 +1841,8 @@ export function BudgetView() {
               padding: "max(12px, env(safe-area-inset-top)) 16px 12px",
               borderBottom: "1px solid var(--color-border)", flexShrink: 0, zIndex: 2,
             }}>
-              <h3 style={{ fontWeight: 900, fontSize: 16 }}>Budget report</h3>
-              <button type="button" onClick={() => {
+              <h3 style={{ fontWeight: 900, fontSize: 16 }}><I18nText source={"Budget report"} /></h3>
+              <I18nElement as="button" type="button" onClick={() => {
                 if (pdfPreview.url.startsWith("blob:")) URL.revokeObjectURL(pdfPreview.url);
                 setPdfPreview(null);
               }} aria-label="Close preview" style={{
@@ -1864,7 +1851,7 @@ export function BudgetView() {
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
                 <X size={20} />
-              </button>
+              </I18nElement>
             </div>
             <div style={{ flex: 1, position: "relative", minHeight: 240, background: "var(--color-bg)", overflow: "auto" }}>
               {typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches ? (
@@ -1872,10 +1859,8 @@ export function BudgetView() {
                   minHeight: "100%", display: "flex", flexDirection: "column",
                   alignItems: "center", justifyContent: "center", gap: 10, padding: 28, textAlign: "center",
                 }}>
-                  <div style={{ fontWeight: 800, fontSize: 18 }}>Your report is ready</div>
-                  <p style={{ margin: 0, fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.45, maxWidth: 320 }}>
-                    Phones cannot paint the PDF pages in this sheet. Use Share or Save PDF to open, send, or keep the file.
-                  </p>
+                  <div style={{ fontWeight: 800, fontSize: 18 }}><I18nText source={"Your report is ready"} /></div>
+                  <p style={{ margin: 0, fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.45, maxWidth: 320 }}><I18nText source={"Phones cannot paint the PDF pages in this sheet. Use Share or Save PDF to open, send, or keep the file."} /></p>
                 </div>
               ) : (
                 <>
@@ -1884,11 +1869,9 @@ export function BudgetView() {
                       position: "absolute", inset: 0, display: "flex", flexDirection: "column",
                       alignItems: "center", justifyContent: "center", gap: 8, padding: 24, textAlign: "center",
                       color: "var(--color-text-secondary)", fontSize: 14, fontWeight: 600, zIndex: 1,
-                    }}>
-                      Preparing your report…
-                    </div>
+                    }}><I18nText source={"Preparing your report…"} /></div>
                   )}
-                  <iframe
+                  <I18nElement as="iframe"
                     title="Budget report preview"
                     src={pdfPreview.url}
                     sandbox="allow-same-origin"
@@ -1907,9 +1890,7 @@ export function BudgetView() {
                   if (pdfPreview.url.startsWith("blob:")) URL.revokeObjectURL(pdfPreview.url);
                   setPdfPreview(null);
                 }}
-              >
-                Done
-              </button>
+              ><I18nText source={"Done"} /></button>
               <button
                 type="button"
                 className="btn btn-secondary"
@@ -1939,9 +1920,7 @@ export function BudgetView() {
                   a.click();
                   a.remove();
                 }}
-              >
-                Share
-              </button>
+              ><I18nText source={"Share"} /></button>
               <button
                 type="button"
                 className="btn btn-primary"
@@ -1963,9 +1942,7 @@ export function BudgetView() {
                   a.click();
                   a.remove();
                 }}
-              >
-                Save PDF
-              </button>
+              ><I18nText source={"Save PDF"} /></button>
             </div>
           </div>
         </div>
@@ -1979,10 +1956,10 @@ export function BudgetView() {
             style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", width: "100%", maxWidth: 500, maxHeight: "92vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
             {/* Sticky header - X always reachable on mobile */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px 12px", borderBottom: "1px solid var(--color-border)", flexShrink: 0 }}>
-              <h3 style={{ fontWeight: 900, fontSize: 18 }}>{budgetScope === "default" ? "Set Default Budget" : `Budget for ${monthLabel}`}</h3>
-              <button type="button" onClick={() => setShowSetBudget(false)} aria-label="Close" style={{ background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 999, cursor: "pointer", padding: 6, display: "flex" }}>
+              <h3 style={{ fontWeight: 900, fontSize: 18 }}><I18nText>{budgetScope === "default" ? "Set Default Budget" : `Budget for ${monthLabel}`}</I18nText></h3>
+              <I18nElement as="button" type="button" onClick={() => setShowSetBudget(false)} aria-label="Close" style={{ background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 999, cursor: "pointer", padding: 6, display: "flex" }}>
                 <X size={18} style={{ color: "var(--color-text-secondary)" }} />
-              </button>
+              </I18nElement>
             </div>
 
             {/* Scrollable body */}
@@ -2004,8 +1981,8 @@ export function BudgetView() {
                       if (opt.key === "month") setBudgetApplyAll(false);
                     }}
                       style={{ padding: "9px 10px", borderRadius: 10, cursor: "pointer", border: `2px solid ${active ? "var(--color-primary)" : "var(--color-border)"}`, background: active ? "rgba(0,122,133,0.08)" : "var(--color-bg)", textAlign: "center" }}>
-                      <div style={{ fontWeight: 800, fontSize: 13.5, color: "var(--color-text-primary)" }}>{opt.label}</div>
-                      <div style={{ fontSize: 10.5, color: "var(--color-text-secondary)", marginTop: 1 }}>{opt.sub}</div>
+                      <div style={{ fontWeight: 800, fontSize: 13.5, color: "var(--color-text-primary)" }}><I18nText>{opt.label}</I18nText></div>
+                      <div style={{ fontSize: 10.5, color: "var(--color-text-secondary)", marginTop: 1 }}><I18nText>{opt.sub}</I18nText></div>
                     </button>
                   );
                 })}
@@ -2022,8 +1999,8 @@ export function BudgetView() {
                     return (
                       <button key={String(opt.all)} type="button" onClick={() => setBudgetApplyAll(opt.all)}
                         style={{ padding: "8px 10px", borderRadius: 10, cursor: "pointer", border: `1.5px solid ${active ? "var(--color-primary)" : "var(--color-border)"}`, background: active ? "rgba(0,122,133,0.06)" : "var(--color-bg)", textAlign: "center" }}>
-                        <div style={{ fontWeight: 700, fontSize: 12.5, color: "var(--color-text-primary)" }}>{opt.label}</div>
-                        <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 1 }}>{opt.sub}</div>
+                        <div style={{ fontWeight: 700, fontSize: 12.5, color: "var(--color-text-primary)" }}><I18nText>{opt.label}</I18nText></div>
+                        <div style={{ fontSize: 10, color: "var(--color-text-secondary)", marginTop: 1 }}><I18nText>{opt.sub}</I18nText></div>
                       </button>
                     );
                   })}
@@ -2031,11 +2008,11 @@ export function BudgetView() {
               )}
 
               <p style={{ fontSize: 12.5, color: "var(--color-text-secondary)", marginBottom: 16 }}>
-                {budgetScope !== "default"
+                <I18nText>{budgetScope !== "default"
                   ? `Set limits for ${monthLabel} only. These override your default budget for this month. Leave blank to follow the default.`
                   : budgetApplyAll
                     ? "Applies to every month - past and future - and replaces any month-specific budgets you've set. Use this to reset your whole budget."
-                    : `Your default budget from ${monthLabel} onward. Earlier months keep the budget they already had, so this won't rewrite your history. You can still override individual months. Leave blank for no limit.`}
+                    : `Your default budget from ${monthLabel} onward. Earlier months keep the budget they already had, so this won't rewrite your history. You can still override individual months. Leave blank for no limit.`}</I18nText>
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {/* "Other" is the uncategorised bucket, not a spending envelope -
@@ -2043,10 +2020,10 @@ export function BudgetView() {
                 {allExpCats.filter((c) => c.id !== "other").map((c) => (
                   <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ width: 10, height: 10, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
-                    <span style={{ fontWeight: 600, fontSize: 13, flex: 1, minWidth: 0 }}>{c.label}</span>
+                    <span style={{ fontWeight: 600, fontSize: 13, flex: 1, minWidth: 0 }}>{categoryText(c)}</span>
                     <div style={{ position: "relative", width: 120 }}>
-                      <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, fontWeight: 700, color: "var(--color-text-secondary)" }}>R</span>
-                      <input type="number" inputMode="decimal"
+                      <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 13, fontWeight: 700, color: "var(--color-text-secondary)" }}><I18nText source={"R"} /></span>
+                      <I18nElement as="input" type="number" inputMode="decimal"
                         placeholder={budgetScope === "month" && defaultTargets[c.id] ? String(defaultTargets[c.id]) : "0"}
                         value={budgetDraft[c.id] ?? ""}
                         onChange={(e) => setBudgetDraft((prev) => ({ ...prev, [c.id]: e.target.value }))}
@@ -2056,8 +2033,7 @@ export function BudgetView() {
                 ))}
                 <button type="button" onClick={() => { resetCustomCatForm(); setNewCatType("expense"); setShowAddCustomCat(true); }}
                   style={{ marginTop: 2, padding: "11px 12px", borderRadius: 10, cursor: "pointer", border: "2px dashed var(--color-border)", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontWeight: 700, fontSize: 13, color: "var(--color-text-secondary)" }}>
-                  <Plus size={15} aria-hidden /> Add a category
-                </button>
+                  <Plus size={15} aria-hidden /> <I18nText source={" Add a category"} /></button>
               </div>
             </div>
 
@@ -2066,10 +2042,10 @@ export function BudgetView() {
               <button type="button" className="btn btn-primary" style={{ width: "100%", padding: 14, fontSize: 15 }} disabled={budgetSaving}
                 onClick={() => {
                   if (budgetScope === "default" && budgetApplyAll &&
-                    !window.confirm("Apply this budget to every month (past and future) and replace any month-specific budgets?")) return;
+                    !window.confirm(localizeClientString("Apply this budget to every month (past and future) and replace any month-specific budgets?"))) return;
                   handleSaveBudgetTargets();
                 }}>
-                {budgetSaving ? "Saving..." : budgetScope !== "default" ? `Save budget for ${monthLabel}` : budgetApplyAll ? "Apply to all months" : "Save default budget"}
+                <I18nText>{budgetSaving ? "Saving..." : budgetScope !== "default" ? `Save budget for ${monthLabel}` : budgetApplyAll ? "Apply to all months" : "Save default budget"}</I18nText>
               </button>
             </div>
           </div>
@@ -2081,14 +2057,14 @@ export function BudgetView() {
         <div className="fixed inset-0 z-[400] flex items-end justify-center bg-black/60" role="dialog" aria-modal="true" onClick={() => setEditEntry(null)}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", padding: "24px 20px 36px", width: "100%", maxWidth: 500, maxHeight: "90vh", overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, position: "sticky", top: -24, background: "var(--color-surface)", paddingTop: 8, marginTop: -8, zIndex: 2 }}>
-              <h3 style={{ fontWeight: 900, fontSize: 18 }}>Edit Entry</h3>
+              <h3 style={{ fontWeight: 900, fontSize: 18 }}><I18nText source={"Edit Entry"} /></h3>
               <button type="button" onClick={() => setEditEntry(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)" }}><X size={20} /></button>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
               {(["expense", "income"] as const).map((t) => (
                 <button key={t} type="button" onClick={() => { setEditType(t); setEditCategory(""); }}
                   style={{ padding: "10px", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", border: `2px solid ${editType === t ? "var(--color-primary)" : "var(--color-border)"}`, background: editType === t ? "rgba(0,122,133,0.1)" : "var(--color-bg)", color: "var(--color-text-primary)", textTransform: "capitalize" }}>
-                  {t === "income" ? "Income +" : "Expense -"}
+                  <I18nText>{t === "income" ? "Income +" : "Expense -"}</I18nText>
                 </button>
               ))}
             </div>
@@ -2099,18 +2075,16 @@ export function BudgetView() {
                 {editIsTransfer && <Check size={12} style={{ color: "white" }} />}
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 13.5 }}>This is a transfer</div>
-                <div style={{ fontSize: 11.5, color: "var(--color-text-secondary)" }}>Money moved between accounts - kept out of income &amp; expenses</div>
+                <div style={{ fontWeight: 700, fontSize: 13.5 }}><I18nText source={"This is a transfer"} /></div>
+                <div style={{ fontSize: 11.5, color: "var(--color-text-secondary)" }}><I18nText source={"Money moved between accounts - kept out of income & expenses"} /></div>
               </div>
             </button>
             {/* Funding Source Selector */}
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Funding Source</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Funding Source"} /></div>
               <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, scrollbarWidth: "none" }}>
                 <button type="button" onClick={() => setEditAccountId(null)}
-                  style={{ padding: "8px 14px", borderRadius: 20, whiteSpace: "nowrap", cursor: "pointer", border: `2px solid ${editAccountId === null ? "var(--color-primary)" : "var(--color-border)"}`, background: editAccountId === null ? "rgba(0,122,133,0.08)" : "var(--color-bg)", fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)" }}>
-                  Cash
-                </button>
+                  style={{ padding: "8px 14px", borderRadius: 20, whiteSpace: "nowrap", cursor: "pointer", border: `2px solid ${editAccountId === null ? "var(--color-primary)" : "var(--color-border)"}`, background: editAccountId === null ? "rgba(0,122,133,0.08)" : "var(--color-bg)", fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)" }}><I18nText source={"Cash"} /></button>
                 {bankAccounts.map((b) => (
                   <button key={b.id} type="button" onClick={() => setEditAccountId(b.id)}
                     style={{ padding: "8px 14px", borderRadius: 20, whiteSpace: "nowrap", cursor: "pointer", border: `2px solid ${editAccountId === b.id ? "var(--color-primary)" : "var(--color-border)"}`, background: editAccountId === b.id ? "rgba(0,122,133,0.08)" : "var(--color-bg)", fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)" }}>
@@ -2120,7 +2094,7 @@ export function BudgetView() {
               </div>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Category</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Category"} /></div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 {(editType === "expense" ? allExpCats : allIncCats).map((c) => {
                   const color = c.color;
@@ -2129,38 +2103,36 @@ export function BudgetView() {
                   <button key={c.id} type="button" onClick={() => setEditCategory(c.id)}
                     style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${selected ? color : "var(--color-border)"}`, background: selected ? `${color}22` : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
                     <c.Icon size={14} style={{ color, flexShrink: 0 }} aria-hidden />
-                    <span>{c.label}</span>
+                    <span>{categoryText(c)}</span>
                   </button>
                   );
                 })}
                 <button type="button" onClick={() => { resetCustomCatForm(); setNewCatType(editType === "income" ? "income" : "expense"); setShowAddCustomCat(true); }}
                   style={{ marginTop: 2, padding: "11px 12px", borderRadius: 10, cursor: "pointer", border: "2px dashed var(--color-border)", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontWeight: 700, fontSize: 13, color: "var(--color-text-secondary)" }}>
-                  <Plus size={15} aria-hidden /> Add a category
-                </button>
+                  <Plus size={15} aria-hidden /> <I18nText source={" Add a category"} /></button>
               </div>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Amount (R)</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"Amount (R)"} /></div>
               <input type="number" inputMode="decimal" value={editAmount} onChange={(e) => setEditAmount(e.target.value)} min="0.01" step="0.01"
                 style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 16, fontWeight: 700, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
             </div>
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Description</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"Description"} /></div>
               <input type="text" value={editDesc} onChange={(e) => setEditDesc(e.target.value)}
                 style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 14, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
             </div>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Date</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"Date"} /></div>
               <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
                 style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 14, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <button type="button" onClick={handleEditDelete} disabled={editSaving}
                 style={{ padding: "13px 16px", borderRadius: 12, border: "1.5px solid #E03C31", background: "transparent", color: "#E03C31", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-                <Trash2 size={15} /> Delete
-              </button>
+                <Trash2 size={15} /> <I18nText source={" Delete"} /></button>
               <button type="button" className="btn btn-primary" style={{ flex: 1, padding: 14, fontSize: 15 }} disabled={editSaving || !editCategory || !editAmount || Number(editAmount) <= 0} onClick={handleEditSave}>
-                {editSaving ? "Saving..." : "Save Changes"}
+                <I18nText>{editSaving ? "Saving..." : "Save Changes"}</I18nText>
               </button>
             </div>
           </div>
@@ -2171,8 +2143,9 @@ export function BudgetView() {
           transactions from the same merchant exist. */}
       {similarPrompt && (() => {
         const catList = similarPrompt.type === "expense" ? allExpCats : allIncCats;
-        const catLabel = catList.find((c) => c.id === similarPrompt.newCategory)?.label ?? similarPrompt.newCategory;
-        const oldCatLabel = (id: string) => catList.find((c) => c.id === id)?.label ?? id;
+        const selectedCategory = catList.find((c) => c.id === similarPrompt.newCategory);
+        const catLabel = selectedCategory ? categoryText(selectedCategory) : similarPrompt.newCategory;
+        const oldCatLabel = (id: string) => { const category = catList.find((c) => c.id === id); return category ? categoryText(category) : id; };
         const n = similarSelected.size;
         const none = similarPrompt.candidates.length === 0;
         return (
@@ -2180,35 +2153,29 @@ export function BudgetView() {
             <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", padding: "24px 20px 0", width: "100%", maxWidth: 500, maxHeight: "85vh", display: "flex", flexDirection: "column" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                 <h3 style={{ fontWeight: 900, fontSize: 17 }}>
-                  {none
-                    ? "Remember this merchant?"
-                    : `Found ${similarPrompt.candidates.length} similar transaction${similarPrompt.candidates.length === 1 ? "" : "s"}`}
+                  {none ? <I18nText source="Remember this merchant?" /> : <I18nText
+                    source="Found {value0} similar transactions" one="Found {value0} similar transaction"
+                    count={similarPrompt.candidates.length} values={[similarPrompt.candidates.length]} />}
                 </h3>
-                <button type="button" onClick={() => setSimilarPrompt(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)" }} aria-label="Close"><X size={20} /></button>
+                <I18nElement as="button" type="button" onClick={() => setSimilarPrompt(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)" }} aria-label="Close"><X size={20} /></I18nElement>
               </div>
               <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 12 }}>
                 {none ? (
                   <>
-                    No other <strong style={{ color: "var(--color-text-primary)" }}>{similarPrompt.merchantLabel}</strong> transactions found right now - but Notho can remember this, so every future import from them lands in{" "}
-                    <strong style={{ color: "var(--color-primary)" }}>{catLabel}</strong> automatically.
-                  </>
+                    <I18nText source="No other {value0} transactions found right now, but Notho can remember this, so every future import from them lands in {value1} automatically."
+                      values={[<strong key="merchant" style={{ color: "var(--color-text-primary)" }}>{similarPrompt.merchantLabel}</strong>, <strong key="category" style={{ color: "var(--color-primary)" }}>{catLabel}</strong>]} /></>
                 ) : (
                   <>
-                    Other transactions from <strong style={{ color: "var(--color-text-primary)" }}>{similarPrompt.merchantLabel}</strong> can also move to{" "}
-                    <strong style={{ color: "var(--color-primary)" }}>{catLabel}</strong>. Untick any that should stay as they are.
-                  </>
+                    <I18nText source="Other transactions from {value0} can also move to {value1}. Untick any that should stay as they are."
+                      values={[<strong key="merchant" style={{ color: "var(--color-text-primary)" }}>{similarPrompt.merchantLabel}</strong>, <strong key="category" style={{ color: "var(--color-primary)" }}>{catLabel}</strong>]} /></>
                 )}
               </p>
               {!none && (
               <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                 <button type="button" onClick={() => setSimilarSelected(new Set(similarPrompt.candidates.map((c) => c.id)))}
-                  style={{ padding: "6px 12px", borderRadius: 16, border: "1.5px solid var(--color-border)", background: "var(--color-bg)", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "var(--color-text-primary)" }}>
-                  Select all
-                </button>
+                  style={{ padding: "6px 12px", borderRadius: 16, border: "1.5px solid var(--color-border)", background: "var(--color-bg)", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "var(--color-text-primary)" }}><I18nText source={"Select all"} /></button>
                 <button type="button" onClick={() => setSimilarSelected(new Set())}
-                  style={{ padding: "6px 12px", borderRadius: 16, border: "1.5px solid var(--color-border)", background: "var(--color-bg)", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "var(--color-text-primary)" }}>
-                  Select none
-                </button>
+                  style={{ padding: "6px 12px", borderRadius: 16, border: "1.5px solid var(--color-border)", background: "var(--color-bg)", fontSize: 12, fontWeight: 700, cursor: "pointer", color: "var(--color-text-primary)" }}><I18nText source={"Select none"} /></button>
               </div>
               )}
               <div style={{ overflowY: "auto", flex: 1, minHeight: 0, border: none ? "none" : "1px solid var(--color-border)", borderRadius: 12 }}>
@@ -2222,10 +2189,10 @@ export function BudgetView() {
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.description}</div>
-                        <div style={{ fontSize: 11.5, color: "var(--color-text-secondary)" }}>{c.entry_date} · currently {oldCatLabel(c.category)}</div>
+                        <div style={{ fontSize: 11.5, color: "var(--color-text-secondary)" }}><I18nText source={"{value0} · currently {value1}"} values={[c.entry_date, oldCatLabel(c.category)]} /></div>
                       </div>
                       <div style={{ fontWeight: 800, fontSize: 13, flexShrink: 0, color: c.type === "income" ? "var(--color-primary)" : "var(--color-text-primary)" }}>
-                        {c.type === "income" ? "+" : "-"}{formatRand(c.amount)}
+                        <I18nText>{c.type === "income" ? "+" : "-"}</I18nText><I18nText>{formatRand(c.amount)}</I18nText>
                       </div>
                     </button>
                   );
@@ -2237,17 +2204,15 @@ export function BudgetView() {
                   {similarRemember && <Check size={12} style={{ color: "white" }} />}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 13.5 }}>Remember for future imports</div>
-                  <div style={{ fontSize: 11.5, color: "var(--color-text-secondary)" }}>New {similarPrompt.merchantLabel} transactions will land in {catLabel} automatically</div>
+                  <div style={{ fontWeight: 700, fontSize: 13.5 }}><I18nText source={"Remember for future imports"} /></div>
+                  <div style={{ fontSize: 11.5, color: "var(--color-text-secondary)" }}><I18nText source={"New {value0} transactions will land in {value1} automatically"} values={[similarPrompt.merchantLabel, catLabel]} preserveValues={[true,true]} /></div>
                 </div>
               </button>
               <div style={{ display: "flex", gap: 10, padding: "12px 0 calc(16px + env(safe-area-inset-bottom))" }}>
                 <button type="button" onClick={() => setSimilarPrompt(null)} disabled={similarSaving}
-                  style={{ padding: "13px 16px", borderRadius: 12, border: "1.5px solid var(--color-border)", background: "transparent", color: "var(--color-text-secondary)", fontWeight: 700, cursor: "pointer" }}>
-                  Skip
-                </button>
+                  style={{ padding: "13px 16px", borderRadius: 12, border: "1.5px solid var(--color-border)", background: "transparent", color: "var(--color-text-secondary)", fontWeight: 700, cursor: "pointer" }}><I18nText source={"Skip"} /></button>
                 <button type="button" className="btn btn-primary" style={{ flex: 1, padding: 14, fontSize: 15 }} disabled={similarSaving || (n === 0 && !similarRemember)} onClick={applySimilar}>
-                  {similarSaving ? "Applying..." : n > 0 ? `Move ${n} to ${catLabel}` : "Just remember the rule"}
+                  <I18nText>{similarSaving ? "Applying..." : n > 0 ? `Move ${n} to ${catLabel}` : "Just remember the rule"}</I18nText>
                 </button>
               </div>
             </div>
@@ -2260,31 +2225,29 @@ export function BudgetView() {
         <div className="fixed inset-0 z-[400] flex items-end justify-center bg-black/60" role="dialog" aria-modal="true" onClick={() => setShowAdd(false)}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", padding: "24px 20px 36px", width: "100%", maxWidth: 500, maxHeight: "90vh", overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, position: "sticky", top: -24, background: "var(--color-surface)", paddingTop: 8, marginTop: -8, zIndex: 2 }}>
-              <h3 style={{ fontWeight: 900, fontSize: 18 }}>Add Entry</h3>
+              <h3 style={{ fontWeight: 900, fontSize: 18 }}><I18nText source={"Add Entry"} /></h3>
               <button type="button" onClick={() => setShowAdd(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)" }}><X size={20} /></button>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 20 }}>
               {(["expense", "income", "transfer"] as const).map((t) => (
                 <button key={t} type="button" onClick={() => { setAddType(t); setAddCategory(""); }}
                   style={{ padding: "10px 6px", borderRadius: 10, fontWeight: 700, fontSize: 13.5, cursor: "pointer", border: `2px solid ${addType === t ? "var(--color-primary)" : "var(--color-border)"}`, background: addType === t ? "rgba(0,122,133,0.1)" : "var(--color-bg)", color: "var(--color-text-primary)" }}>
-                  {t === "income" ? "Income +" : t === "expense" ? "Expense -" : "Transfer ⇄"}
+                  <I18nText>{t === "income" ? "Income +" : t === "expense" ? "Expense -" : "Transfer ⇄"}</I18nText>
                 </button>
               ))}
             </div>
             {addType === "transfer" ? (
               <>
-                <p style={{ fontSize: 12.5, color: "var(--color-text-secondary)", marginBottom: 14 }}>
-                  Moving money between your own accounts (or to savings). Transfers are kept out of your income and expenses so they don&apos;t distort your budget.
-                </p>
+                <p style={{ fontSize: 12.5, color: "var(--color-text-secondary)", marginBottom: 14 }}><I18nText source={"Moving money between your own accounts (or to savings). Transfers are kept out of your income and expenses so they don't distort your budget."} /></p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>From</div>
-                    <input type="text" placeholder="e.g. Cheque" value={addFrom} onChange={(e) => setAddFrom(e.target.value)}
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"From"} /></div>
+                    <I18nElement as="input" type="text" placeholder="e.g. Cheque" value={addFrom} onChange={(e) => setAddFrom(e.target.value)}
                       style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 14, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
                   </div>
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>To</div>
-                    <input type="text" placeholder="e.g. Savings" value={addTo} onChange={(e) => setAddTo(e.target.value)}
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"To"} /></div>
+                    <I18nElement as="input" type="text" placeholder="e.g. Savings" value={addTo} onChange={(e) => setAddTo(e.target.value)}
                       style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 14, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
                   </div>
                 </div>
@@ -2293,12 +2256,10 @@ export function BudgetView() {
               <>
                 {/* Funding Source Selector */}
                 <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Funding Source</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Funding Source"} /></div>
                   <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, scrollbarWidth: "none" }}>
                     <button type="button" onClick={() => setAddAccountId(null)}
-                      style={{ padding: "8px 14px", borderRadius: 20, whiteSpace: "nowrap", cursor: "pointer", border: `2px solid ${addAccountId === null ? "var(--color-primary)" : "var(--color-border)"}`, background: addAccountId === null ? "rgba(0,122,133,0.08)" : "var(--color-bg)", fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)" }}>
-                      Cash
-                    </button>
+                      style={{ padding: "8px 14px", borderRadius: 20, whiteSpace: "nowrap", cursor: "pointer", border: `2px solid ${addAccountId === null ? "var(--color-primary)" : "var(--color-border)"}`, background: addAccountId === null ? "rgba(0,122,133,0.08)" : "var(--color-bg)", fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)" }}><I18nText source={"Cash"} /></button>
                     {bankAccounts.map((b) => (
                       <button key={b.id} type="button" onClick={() => setAddAccountId(b.id)}
                         style={{ padding: "8px 14px", borderRadius: 20, whiteSpace: "nowrap", cursor: "pointer", border: `2px solid ${addAccountId === b.id ? "var(--color-primary)" : "var(--color-border)"}`, background: addAccountId === b.id ? "rgba(0,122,133,0.08)" : "var(--color-bg)", fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)" }}>
@@ -2308,7 +2269,7 @@ export function BudgetView() {
                   </div>
                 </div>
                 <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Category</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Category"} /></div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     {(addType === "expense" ? allExpCats : allIncCats).map((c) => {
                       const color = c.color;
@@ -2317,36 +2278,36 @@ export function BudgetView() {
                       <button key={c.id} type="button" onClick={() => setAddCategory(c.id)}
                         style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${selected ? color : "var(--color-border)"}`, background: selected ? `${color}22` : "var(--color-bg)", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)", textAlign: "left" }}>
                         <c.Icon size={14} style={{ color, flexShrink: 0 }} aria-hidden />
-                        <span>{c.label}</span>
+                        <span>{categoryText(c)}</span>
                       </button>
                       );
                     })}
                     <button type="button" onClick={() => { resetCustomCatForm(); setNewCatType(addType === "income" ? "income" : "expense"); setShowAddCustomCat(true); }}
                       style={{ padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: "2px dashed var(--color-border)", background: "transparent", display: "flex", alignItems: "center", gap: 8, fontWeight: 600, fontSize: 13, color: "var(--color-text-secondary)", textAlign: "left" }}>
-                      <Plus size={14} style={{ flexShrink: 0 }} aria-hidden /> <span>Add category</span>
+                      <Plus size={14} style={{ flexShrink: 0 }} aria-hidden /> <span><I18nText source={"Add category"} /></span>
                     </button>
                   </div>
                 </div>
               </>
             )}
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Amount (R)</div>
-              <input type="number" inputMode="decimal" placeholder="0.00" value={addAmount} onChange={(e) => setAddAmount(e.target.value)} min="0.01" step="0.01"
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"Amount (R)"} /></div>
+              <I18nElement as="input" type="number" inputMode="decimal" placeholder="0.00" value={addAmount} onChange={(e) => setAddAmount(e.target.value)} min="0.01" step="0.01"
                 style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 16, fontWeight: 700, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
             </div>
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Description (optional)</div>
-              <input type="text" placeholder="e.g. Woolworths, Uber" value={addDesc} onChange={(e) => setAddDesc(e.target.value)}
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"Description (optional)"} /></div>
+              <I18nElement as="input" type="text" placeholder="e.g. Woolworths, Uber" value={addDesc} onChange={(e) => setAddDesc(e.target.value)}
                 style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 14, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
             </div>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Date</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"Date"} /></div>
               <input type="date" value={addDate} onChange={(e) => setAddDate(e.target.value)}
                 style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 14, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
             </div>
             <button type="button" className="btn btn-primary" style={{ width: "100%", padding: 14, fontSize: 16 }}
               disabled={saving || !addAmount || Number(addAmount) <= 0 || (addType === "transfer" ? (!addFrom.trim() || !addTo.trim()) : !addCategory)} onClick={handleAdd}>
-              {saving ? "Saving..." : addType === "transfer" ? "Save Transfer" : "Save Entry"}
+              <I18nText>{saving ? "Saving..." : addType === "transfer" ? "Save Transfer" : "Save Entry"}</I18nText>
             </button>
           </div>
         </div>
@@ -2358,20 +2319,20 @@ export function BudgetView() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 80, display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={() => setShowSpendRoles(false)}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: "min(560px, 100%)", maxHeight: "80vh", overflow: "auto", background: "var(--color-surface)", borderRadius: "16px 16px 0 0", padding: 20 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-              <h3 style={{ fontWeight: 900, fontSize: 18, margin: 0 }}>What counts</h3>
+              <h3 style={{ fontWeight: 900, fontSize: 18, margin: 0 }}><I18nText source={"What counts"} /></h3>
               <button type="button" onClick={() => setShowSpendRoles(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)" }}><X size={18} /></button>
             </div>
-            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: "0 0 14px" }}>Need and Want make the percentage. Leave out keeps savings, business, transfers and anything else off that line. This does not move the money.</p>
+            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: "0 0 14px" }}><I18nText source={"Need and Want make the percentage. Leave out keeps savings, business, transfers and anything else off that line. This does not move the money."} /></p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {allExpCats.map((c) => {
                 const role = spendRoles[c.id] ?? defaultSpendRole(c.id, c.label);
                 return (
                   <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ flex: 1, minWidth: 0, fontWeight: 650, fontSize: 13 }}>{c.label}</span>
+                    <span style={{ flex: 1, minWidth: 0, fontWeight: 650, fontSize: 13 }}>{categoryText(c)}</span>
                     {SPEND_ROLES.map((option) => (
                       <button key={option.id} type="button" onClick={() => saveSpendRole(c.id, option.id)}
                         style={{ borderRadius: 8, padding: "6px 8px", fontSize: 12, fontWeight: 700, cursor: "pointer", border: `1px solid ${role === option.id ? "var(--color-primary)" : "var(--color-border)"}`, background: role === option.id ? "rgba(0,122,133,0.12)" : "transparent", color: "var(--color-text-primary)" }}>
-                        {option.label}
+                        <I18nText>{option.label}</I18nText>
                       </button>
                     ))}
                   </div>
@@ -2385,20 +2346,20 @@ export function BudgetView() {
         <div className="fixed inset-0 z-[500] flex items-end justify-center bg-black/70" role="dialog" aria-modal="true" onClick={() => { setShowAddCustomCat(false); resetCustomCatForm(); }}>
           <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--color-surface)", borderRadius: "20px 20px 0 0", padding: "24px 20px 40px", width: "100%", maxWidth: 500, maxHeight: "92vh", overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, position: "sticky", top: -24, background: "var(--color-surface)", paddingTop: 8, marginTop: -8, zIndex: 2 }}>
-              <h3 style={{ fontWeight: 900, fontSize: 18 }}>{editingCatId ? "Edit Category" : "New Category"}</h3>
+              <h3 style={{ fontWeight: 900, fontSize: 18 }}><I18nText>{editingCatId ? "Edit Category" : "New Category"}</I18nText></h3>
               <button type="button" onClick={() => { setShowAddCustomCat(false); resetCustomCatForm(); }} style={{ background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 999, cursor: "pointer", padding: 6, display: "flex", color: "var(--color-text-secondary)" }}><X size={18} /></button>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20, opacity: editingCatId ? 0.5 : 1, pointerEvents: editingCatId ? "none" : "auto" }}>
               {(["expense", "income"] as const).map((t) => (
                 <button key={t} type="button" onClick={() => setNewCatType(t)}
                   style={{ padding: 10, borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", border: `2px solid ${newCatType === t ? "var(--color-primary)" : "var(--color-border)"}`, background: newCatType === t ? "rgba(0,122,133,0.1)" : "var(--color-bg)", color: "var(--color-text-primary)", textTransform: "capitalize" }}>
-                  {t === "income" ? "Income" : "Expense"}
+                  <I18nText>{t === "income" ? "Income" : "Expense"}</I18nText>
                 </button>
               ))}
             </div>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>Category Name</div>
-              <input type="text" placeholder="e.g. Gym, Pets, Clothing" value={newCatName} onChange={(e) => {
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"Category Name"} /></div>
+              <I18nElement as="input" type="text" placeholder="e.g. Gym, Pets, Clothing" value={newCatName} onChange={(e) => {
                 const value = e.target.value;
                 setNewCatName(value);
                 if (!roleTouched && newCatType === "expense") setNewCatRole(defaultSpendRole("custom", value));
@@ -2406,16 +2367,16 @@ export function BudgetView() {
                 style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid var(--color-border)", fontSize: 15, fontWeight: 700, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" as const }} />
             </div>
             <div style={{ marginBottom: 18 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Colour</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Colour"} /></div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
                 {CAT_COLOR_SWATCHES.map((col) => (
-                  <button key={col} type="button" onClick={() => setNewCatColor(col)}
+                  <I18nElement as="button" key={col} type="button" onClick={() => setNewCatColor(col)}
                     style={{ width: 30, height: 30, borderRadius: "50%", background: col, border: `3px solid ${newCatColor.toLowerCase() === col.toLowerCase() ? "white" : "transparent"}`, outline: newCatColor.toLowerCase() === col.toLowerCase() ? `2px solid ${col}` : "none", cursor: "pointer", flexShrink: 0 }}
                     aria-label={col} />
                 ))}
                 {/* Custom colour: native picker, styled as a "＋" swatch. The
                     current custom pick shows a ring when it isn't a preset. */}
-                <label
+                <I18nElement as="label"
                   title="Pick a custom colour"
                   style={{
                     position: "relative", width: 30, height: 30, borderRadius: "50%", cursor: "pointer", flexShrink: 0,
@@ -2426,64 +2387,62 @@ export function BudgetView() {
                   }}
                 >
                   <Plus size={15} style={{ color: CAT_COLOR_SWATCHES.some((s) => s.toLowerCase() === newCatColor.toLowerCase()) ? "var(--color-text-secondary)" : "white" }} />
-                  <input
+                  <I18nElement as="input"
                     type="color"
                     value={/^#[0-9a-fA-F]{6}$/.test(newCatColor) ? newCatColor : "#007A85"}
                     onChange={(e) => setNewCatColor(e.target.value)}
                     style={{ position: "absolute", inset: 0, opacity: 0, width: "100%", height: "100%", cursor: "pointer" }}
                     aria-label="Custom colour"
                   />
-                </label>
+                </I18nElement>
               </div>
             </div>
             <div style={{ marginBottom: 24 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Icon</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Icon"} /></div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8 }}>
                 {ICON_PICKER_OPTIONS.map((opt) => (
-                  <button key={opt.name} type="button" onClick={() => setNewCatIcon(opt.name)}
+                  <I18nElement as="button" key={opt.name} type="button" onClick={() => setNewCatIcon(opt.name)}
                     style={{ padding: 10, borderRadius: 10, cursor: "pointer", border: `2px solid ${newCatIcon === opt.name ? newCatColor : "var(--color-border)"}`, background: newCatIcon === opt.name ? `${newCatColor}18` : "var(--color-bg)", display: "flex", alignItems: "center", justifyContent: "center" }}
                     aria-label={opt.name}>
                     <opt.Icon size={18} style={{ color: newCatIcon === opt.name ? newCatColor : "var(--color-text-secondary)" }} />
-                  </button>
+                  </I18nElement>
                 ))}
               </div>
             </div>
 
             {newCatType === "expense" && (
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 8 }}>Counts as</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Counts as"} /></div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                   {SPEND_ROLES.map((role) => (
                     <button key={role.id} type="button" onClick={() => { setRoleTouched(true); setNewCatRole(role.id); }}
                       style={{ padding: 10, borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: "pointer", border: `2px solid ${newCatRole === role.id ? "var(--color-primary)" : "var(--color-border)"}`, background: newCatRole === role.id ? "rgba(0,122,133,0.1)" : "var(--color-bg)", color: "var(--color-text-primary)" }}>
-                      {role.label}
+                      <I18nText>{role.label}</I18nText>
                     </button>
                   ))}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 6 }}>Suggested from the name. Change it if that is not how you use this money.</div>
+                <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 6 }}><I18nText source={"Suggested from the name. Change it if that is not how you use this money."} /></div>
               </div>
             )}
             <div style={{ marginBottom: 20, padding: "12px 14px", borderRadius: 12, border: "1px solid var(--color-border)", background: "var(--color-bg)", display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${newCatColor}20`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {(() => { const Ic = getIconByName(newCatIcon); return <Ic size={18} style={{ color: newCatColor }} />; })()}
               </div>
-              <span style={{ fontWeight: 700, fontSize: 14, color: "var(--color-text-primary)" }}>{newCatName.trim() || "Category name"}</span>
-              <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "capitalize" }}>{newCatType}</span>
+              <span style={{ fontWeight: 700, fontSize: 14, color: "var(--color-text-primary)" }}>{newCatName.trim() || <I18nText source="Category name" />}</span>
+              <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 600, color: "var(--color-text-secondary)", textTransform: "capitalize" }}><I18nText>{newCatType}</I18nText></span>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               {editingCatId && (
                 <button type="button" onClick={resetCustomCatForm}
-                  style={{ padding: "13px 18px", borderRadius: 12, border: "1.5px solid var(--color-border)", background: "transparent", color: "var(--color-text-secondary)", fontWeight: 700, cursor: "pointer" }}>
-                  Cancel
-                </button>
+                  style={{ padding: "13px 18px", borderRadius: 12, border: "1.5px solid var(--color-border)", background: "transparent", color: "var(--color-text-secondary)", fontWeight: 700, cursor: "pointer" }}><I18nText source={"Cancel"} /></button>
               )}
               <button type="button" className="btn btn-primary" style={{ flex: 1, padding: 14, fontSize: 15 }} disabled={savingCustomCat || !newCatName.trim()} onClick={handleSaveCustomCat}>
-                {savingCustomCat ? "Saving..." : editingCatId ? "Save changes" : "Create Category"}
+                <I18nText>{savingCustomCat ? "Saving..." : editingCatId ? "Save changes" : "Create Category"}</I18nText>
               </button>
             </div>
             {customCats.filter(c => c.type === newCatType).length > 0 && (
               <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--color-border)" }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 10 }}>Your custom {newCatType} categories · tap to edit</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 10 }}><I18nText source={"Your custom {value0} categories · tap to edit"} values={[newCatType]} /></div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {customCats.filter(c => c.type === newCatType).map((c) => {
                     const CatIcon = getIconByName(c.icon_name);
@@ -2496,10 +2455,10 @@ export function BudgetView() {
                           <span style={{ fontWeight: 600, fontSize: 13, flex: 1, color: "var(--color-text-primary)" }}>{c.name}</span>
                           <Pencil size={13} style={{ color: "var(--color-text-secondary)", flexShrink: 0 }} />
                         </button>
-                        <button type="button" onClick={() => handleDeleteCustomCat(c.id)}
+                        <I18nElement as="button" type="button" onClick={() => handleDeleteCustomCat(c.id)}
                           style={{ background: "none", border: "none", cursor: "pointer", color: "#E03C31", padding: 4, display: "flex", alignItems: "center" }} aria-label="Delete category">
                           <Trash2 size={14} />
-                        </button>
+                        </I18nElement>
                       </div>
                     );
                   })}

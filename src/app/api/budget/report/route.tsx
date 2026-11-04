@@ -9,6 +9,8 @@ import {
   sumDbEntriesCents,
 } from "@/lib/budget/report/aggregate";
 import { BudgetReportDocument } from "@/lib/budget/report/pdf";
+import { publicTranslator } from '@/server/publicTranslations';
+import { parseLocale } from '@/i18n/locales';
 import { countRedacted, redactReportModel } from "@/lib/budget/report/redact";
 import { precedingPeriod, previousCalendarMonthPeriod } from "@/lib/budget/report/period";
 import { snapshotFingerprint, snapshotMetricsOf } from "@/lib/budget/report/snapshot";
@@ -309,11 +311,13 @@ export async function POST(req: NextRequest) {
   const redactNames = body.redactNames !== false;
   const redactedCount = redactNames ? countRedacted(model) : 0;
   const pdfModel = redactNames ? redactReportModel(model) : model;
+  const locale = parseLocale(req.cookies.get('notho_locale')?.value);
+  const translate = await publicTranslator(locale);
 
   // Server-side @react-pdf render: element is constructed here, outside the
   // try, because renderToBuffer rejects on failure - no error boundary exists.
   const reportDoc = (
-    <BudgetReportDocument model={pdfModel} logoDataUri={logoDataUri} redactedCount={redactedCount} />
+    <BudgetReportDocument model={pdfModel} logoDataUri={logoDataUri} redactedCount={redactedCount} locale={locale} translate={translate} />
   );
   try {
     const buffer = await renderToBuffer(reportDoc);

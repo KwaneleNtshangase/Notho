@@ -1,9 +1,11 @@
+import { personalCategoryNames } from "@/i18n/budget";
 import React from "react";
+import path from 'node:path';
 import {
   Document,
   Page,
   View,
-  Text,
+  Text as PdfText,
   Image,
   Link,
   StyleSheet,
@@ -12,9 +14,13 @@ import {
   Circle,
   Line,
   G,
+  Font,
+  type TextProps,
 } from "@react-pdf/renderer";
 import { formatZarCurrency } from "@/lib/currency";
 import { formatPeriodLabel } from "./period";
+import type { Locale } from '@/i18n/locales';
+import { localeTag } from '@/i18n/locales';
 import type {
   CategoryGroup,
   ExpenseCategoryRow,
@@ -22,6 +28,39 @@ import type {
   MonthlySpend,
   ReportModel,
 } from "./types";
+
+Font.register({ family: 'Noto Sans', fonts: [
+  { src: path.join(process.cwd(), 'public/fonts/NotoSans-Regular.ttf'), fontWeight: 400 },
+  { src: path.join(process.cwd(), 'public/fonts/NotoSans-Bold.ttf'), fontWeight: 700 },
+] });
+/** Translate rendered presentation, keeping React links and styling intact. */
+function Text({ children, render, translate = source => source, ...props }: React.ComponentProps<typeof PdfText> & { children?: React.ReactNode; render?: TextProps['render']; translate?: (source: string) => string }) {
+  // Explicit combining marks keep fontkit's PDF character map searchable.
+  // Its default decomposition can otherwise give the mark an empty Unicode map.
+  const displayText = (source: string) => translate(source).normalize('NFD');
+  const parts = React.Children.toArray(children);
+  const content = parts.every(part => typeof part === 'string' || typeof part === 'number')
+    ? displayText(parts.join(''))
+    : React.Children.map(children, child => typeof child === 'string' ? displayText(child) : child);
+  const renderProps = render ? { render: (context: Parameters<NonNullable<TextProps['render']>>[0]) => {
+    const value = render(context);
+    return typeof value === 'string' ? displayText(value) : value;
+  } } : {};
+  return <PdfText {...props} {...renderProps}>{content}</PdfText>;
+}
+
+/** These report-only components are pure render functions. Expand them into
+ * PDF primitives with a translator bound to this document. Next's server React
+ * has no context hooks, and a global translator could mix concurrent exports. */
+function localizePdfTree(node: React.ReactNode, translate: (source: string) => string): React.ReactNode {
+  if (Array.isArray(node)) return node.map(child => localizePdfTree(child, translate));
+  if (!React.isValidElement<{ children?: React.ReactNode }>(node)) return node;
+  if (typeof node.type === 'function') {
+    const render = node.type as (props: unknown) => React.ReactNode;
+    return localizePdfTree(render(node.type === Text ? { ...node.props, translate } : node.props), translate);
+  }
+  return React.cloneElement(node, {}, React.Children.map(node.props.children, child => localizePdfTree(child, translate)));
+}
 
 // Brand palette - from the Notho pitch deck (navy / gold / teal).
 const C = {
@@ -63,9 +102,8 @@ function lessonHref(lesson: { courseId: string; lessonId: string }): string {
 }
 
 /**
- * Cover contents strip. Page numbers are structural - the document below is a
- * fixed sequence of five <Page> blocks - so keep this in step if a page is
- * added or removed.
+ * Cover contents strip. Links use destinations rather than fixed page numbers:
+ * translated text may legitimately flow onto additional pages.
  *
  * `anchor` is the named PDF destination the entry jumps to. Each one must match
  * an `id` on a <SectionAnchor> at the top of the corresponding page; react-pdf
@@ -109,12 +147,12 @@ const styles = StyleSheet.create({
     paddingTop: 78,
     paddingBottom: 56,
     paddingHorizontal: 40,
-    fontFamily: "Helvetica",
+    fontFamily: "Noto Sans",
     fontSize: 10,
     color: C.text,
   },
   // Cover (navy)
-  cover: { fontFamily: "Helvetica", color: C.white, backgroundColor: C.navy, padding: 0 },
+  cover: { fontFamily: "Noto Sans", color: C.white, backgroundColor: C.navy, padding: 0 },
   sectionTitle: { fontSize: 13, fontWeight: 700, marginBottom: 8, color: C.navy },
   sectionSub: { fontSize: 8, color: C.textMuted, marginBottom: 6 },
 
@@ -865,6 +903,8 @@ export function BudgetReportDocument({
   model,
   logoDataUri,
   redactedCount = 0,
+  locale = 'en',
+  translate = source => source,
 }: {
   model: ReportModel;
   logoDataUri?: string;
@@ -873,9 +913,22 @@ export function BudgetReportDocument({
    *  "Housing · person A" should be told that is a deliberate mask, not a
    *  parsing failure. Zero means nothing was hidden and no note is shown. */
   redactedCount?: number;
+  locale?: Locale;
+  translate?: (source: string) => string;
 }) {
-  const periodLabel = formatPeriodLabel(model.periodStart, model.periodEnd);
-  const generated = new Date(model.generatedAt).toLocaleString("en-ZA", {
+  const periodLabel = formatPeriodLabel(model.periodStart, model.periodEnd, translate);
+  const plurals = new Intl.PluralRules(locale);
+  const protectedNames = personalCategoryNames([...model.expenseCategories, ...model.incomeCategories]);
+  protectedNames.add(model.displayName);
+  const protect = (value: unknown): void => {
+    if (Array.isArray(value)) value.forEach(protect);
+    else if (value && typeof value === 'object') for (const [key, item] of Object.entries(value)) {
+      if (['description', 'displayName', 'account_label'].includes(key) && typeof item === 'string') protectedNames.add(item);
+      else protect(item);
+    }
+  };
+  protect(model);
+  const generated = new Date(model.generatedAt).toLocaleString(localeTag(locale), {
     timeZone: "Africa/Johannesburg",
     dateStyle: "medium",
     timeStyle: "short",
@@ -1015,8 +1068,8 @@ export function BudgetReportDocument({
   const recurringNames = new Set(model.recurringCommitments.map((r) => r.description));
   const totalRecurringMonthly = model.recurringCommitments.reduce((s, r) => s + r.typicalCents, 0);
 
-  return (
-    <Document title="Notho - Budget Report" author="Notho">
+  return localizePdfTree((
+    <Document title={translate("Notho - Budget Report")} author="Notho">
       {/* ── Page 1 - Cover: verdict first ─────────────────────────────── */}
       <Page size="A4" style={styles.cover}>
         {logoDataUri && (
@@ -1037,9 +1090,8 @@ export function BudgetReportDocument({
           />
         )}
         <View style={{ height: 6, backgroundColor: C.gold }} />
-        {/* flexGrow so this column owns the full remaining page height - that's
-            what gives the contents strip below something to push against. */}
-        <View style={{ flexGrow: 1, paddingHorizontal: 48, paddingTop: 38, paddingBottom: 30 }}>
+        {/* Natural height avoids a blank overflow page when translated text grows. */}
+        <View style={{ paddingHorizontal: 48, paddingTop: 24 }}>
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 26 }}>
             <Logo uri={logoDataUri} size={40} />
             <View style={{ marginLeft: 11 }}>
@@ -1125,14 +1177,10 @@ export function BudgetReportDocument({
             </View>
           )}
 
-          {/* Contents strip. `marginTop: auto` pushes it to the foot of the
-              cover, which both closes the empty third the cover used to end on
-              and gives the reader a map of a multi-page document. Auto margin
-              (not absolute positioning) so a taller "At a glance" simply
-              squeezes the gap instead of printing underneath this. */}
+          {/* Contents follow the cover text and remain clickable after pagination. */}
           <View
             style={{
-              marginTop: "auto",
+              marginTop: 14,
               paddingTop: 14,
               borderTop: `1px solid ${C.card}`,
             }}
@@ -1145,23 +1193,20 @@ export function BudgetReportDocument({
             </Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               {COVER_CONTENTS.map((c) => (
-                // The Link wraps the whole row, so the page number, title and
-                // blurb are all part of one generous tap target - fiddly
-                // text-sized hotspots are the usual reason PDF contents links
-                // go unused on a phone.
-                <Link
+                <View
                   key={c.title}
-                  src={`#${c.anchor}`}
-                  style={{ width: "50%", textDecoration: "none", marginBottom: 6, paddingRight: 12 }}
+                  style={{ width: "50%", marginBottom: 6, paddingRight: 12 }}
                 >
                   <View style={{ flexDirection: "row" }}>
-                    <Text style={{ fontSize: 8, color: C.teal, fontWeight: 700, width: 16 }}>{c.page}</Text>
+                    <Text style={{ fontSize: 8, color: C.teal, fontWeight: 700, width: 16 }}>{'>'}</Text>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 8.5, color: C.white, fontWeight: 700 }}>{c.title}</Text>
+                      <Link src={`#${c.anchor}`} style={{ textDecoration: 'none' }}>
+                        <Text style={{ fontSize: 8.5, color: C.white, fontWeight: 700 }}>{c.title}</Text>
+                      </Link>
                       <Text style={{ fontSize: 7, color: C.onNavyMuted }}>{c.blurb}</Text>
                     </View>
                   </View>
-                </Link>
+                </View>
               ))}
             </View>
           </View>
@@ -1534,7 +1579,9 @@ export function BudgetReportDocument({
           <Text style={{ fontSize: 8, color: C.textMuted, marginBottom: 10 }}>
             {model.incomeCategories[0].sharePct >= 80
               ? `${model.incomeCategories[0].sharePct}% of income comes from one source - a second stream, even a small one, softens the risk of a bad month.`
-              : `Income is spread across ${model.incomeCategories.length} source${model.incomeCategories.length === 1 ? "" : "s"}.`}
+              : plurals.select(model.incomeCategories.length) === 'one'
+                ? `Income is spread across ${model.incomeCategories.length} source.`
+                : `Income is spread across ${model.incomeCategories.length} sources.`}
           </Text>
         )}
 
@@ -1606,8 +1653,9 @@ export function BudgetReportDocument({
                       <Text style={{ fontSize: 8.5, fontWeight: 700 }}>{zar(m.totalCents)}</Text>
                     </View>
                     <Text style={{ fontSize: 7, color: C.textMuted, marginLeft: 10 }}>
-                      {m.count} transaction{m.count === 1 ? "" : "s"}
-                      {recurringNames.has(m.description) ? " · recurring monthly" : ""}
+                      {recurringNames.has(m.description)
+                        ? plurals.select(m.count) === 'one' ? `${m.count} transaction · recurring monthly` : `${m.count} transactions · recurring monthly`
+                        : plurals.select(m.count) === 'one' ? `${m.count} transaction` : `${m.count} transactions`}
                     </Text>
                   </View>
                 ))
@@ -1678,5 +1726,5 @@ export function BudgetReportDocument({
         <Footer />
       </Page>
     </Document>
-  );
+  ), source => protectedNames.has(source) ? source : translate(source));
 }

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 /**
  * The dashboard's own design system.
@@ -74,7 +75,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     <ThemeCtx.Provider value={{ mode, toggle }}>
       <div className="nv-root" data-mode={mode}>
         <style dangerouslySetInnerHTML={{ __html: CSS }} />
-        {children}
+        <I18nText>{children}</I18nText>
       </div>
     </ThemeCtx.Provider>
   );

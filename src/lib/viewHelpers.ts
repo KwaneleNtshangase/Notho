@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 
+import { localizeClientString } from "@/i18n/clientString";
 import React from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
@@ -165,15 +166,15 @@ export function generateShareText(
   if (type === "lesson") {
     const t = data.lessonTitle ?? "a lesson";
     const xpPart = data.xp ? ` (+${data.xp} XP)` : "";
-    return `I just completed "${t}"${xpPart} on Notho 🎓\n\nShort, South Africa–focused money lessons that actually make sense. Join me 👇\nnotho.co.za`;
+    return localizeClientString(`I just completed "${t}"${xpPart} on Notho 🎓\n\nShort, South Africa–focused money lessons that actually make sense. Join me 👇\nnotho.co.za`);
   }
   if (type === "badge") {
     const n = data.badgeName ?? "a";
-    return `I just earned the "${n}" badge on Notho 🏅\n\nBuilding real financial knowledge, one lesson at a time.\nnotho.co.za`;
+    return localizeClientString(`I just earned the "${n}" badge on Notho 🏅\n\nBuilding real financial knowledge, one lesson at a time.\nnotho.co.za`);
   }
   if (type === "streak") {
     const d = data.streakDays ?? 0;
-    return `${d}-day learning streak on Notho 🔥\n\nShowing up for my money goals every single day.\nnotho.co.za`;
+    return localizeClientString(`${d}-day learning streak on Notho 🔥\n\nShowing up for my money goals every single day.\nnotho.co.za`);
   }
   return "";
 }

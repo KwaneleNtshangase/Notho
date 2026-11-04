@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedRichText as I18nRich, LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ArrowLeftRight, CheckCircle2, FileUp, Plus, Shield, Upload, X } from "@/components/icons/NothoIcons";
@@ -765,8 +766,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
           padding: "8px 14px", fontWeight: 700, fontSize: 14, cursor: "pointer",
         }}
       >
-        <Upload size={16} aria-hidden /> Import statement
-      </button>
+        <Upload size={16} aria-hidden /> <I18nText source={" Import statement"} /></button>
     );
   }
 
@@ -785,7 +785,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
       }}>
         <div style={{ flexShrink: 0, padding: rows.length > 0 ? "20px 20px 0" : "24px 20px 0" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: rows.length > 0 ? 12 : 16 }}>
-            <h3 style={{ fontWeight: 900, fontSize: 18 }}>Import bank statement(s)</h3>
+            <h3 style={{ fontWeight: 900, fontSize: 18 }}><I18nText source={"Import bank statement(s)"} /></h3>
             <button type="button" onClick={() => { setOpen(false); reset(); }} style={{ background: "none", border: "none", cursor: "pointer" }}>
               <X size={20} />
             </button>
@@ -797,15 +797,12 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
         <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 16, fontSize: 13, color: "var(--color-text-secondary)" }}>
           <Shield size={16} style={{ flexShrink: 0, marginTop: 2 }} />
           <span>
-            Files are processed <strong>in memory only</strong> - raw PDFs, CSVs, and passwords are never stored.
-            Only categorised transactions and account labels are saved.
-          </span>
+            <I18nText source={"Files are processed "} /><strong><I18nText source={"in memory only"} /></strong> <I18nText source={" - raw PDFs, CSVs, and passwords are never stored. Only categorised transactions and account labels are saved."} /></span>
         </div>
 
         <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 13 }}>
           <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-          I consent to processing these statement(s) for budget tracking (POPIA), including PDF and multi-file uploads.
-        </label>
+          <I18nText source={"I consent to processing these statement(s) for budget tracking (POPIA), including PDF and multi-file uploads."} /></label>
 
             <div
               role="button"
@@ -848,14 +845,12 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                 <FileUp size={32} style={{ color: dragActive ? "var(--color-primary)" : "var(--color-text-secondary)" }} />
                 <span style={{ fontWeight: 600 }}>
                   {dragActive
-                    ? "Drop files here"
+                    ? <I18nText source="Drop files here" />
                     : files.length > 0
-                      ? `${files.length} file${files.length > 1 ? "s" : ""} selected`
-                      : "Choose or drop CSV, OFX, or PDF files"}
+                      ? <I18nText source="{value0} files selected" one="{value0} file selected" count={files.length} values={[files.length]} />
+                      : <I18nText source="Choose or drop CSV, OFX, or PDF files" />}
                 </span>
-                <span style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
-                  Multiple files OK · Max 5 MB each
-                </span>
+                <span style={{ fontSize: 12, color: "var(--color-text-secondary)" }}><I18nText source={"Multiple files OK · Max 5 MB each"} /></span>
               </label>
               <input
                 id="budget-import-file-input"
@@ -895,9 +890,9 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                         maxWidth: 220,
                       }}
                     >
-                      {f.name}
+                      <I18nText>{f.name}</I18nText>
                     </span>
-                    <button
+                    <I18nElement as="button"
                       type="button"
                       aria-label={`Remove ${f.name}`}
                       onClick={() => removeFile(f.name, f.size)}
@@ -911,7 +906,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                       }}
                     >
                       <X size={14} />
-                    </button>
+                    </I18nElement>
                   </div>
                 ))}
               </div>
@@ -919,10 +914,8 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
 
             {needsPasswordFile && (
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}>
-                  PDF password for {needsPasswordFile}
-                </div>
-                <input
+                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"PDF password for {value0}"} values={[needsPasswordFile]} /></div>
+                <I18nElement as="input"
                   type="password"
                   value={pdfPassword}
                   onChange={(e) => setPdfPassword(e.target.value)}
@@ -936,7 +929,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               </div>
             )}
 
-            {error && <p style={{ color: "#E03C31", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+            {error && <p style={{ color: "#E03C31", fontSize: 13, marginBottom: 12 }}><I18nText>{error}</I18nText></p>}
             <button
               type="button"
               className="btn btn-primary"
@@ -944,7 +937,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               disabled={files.length === 0 || !consent || loading}
               onClick={() => handleParse(needsPasswordFile ? pdfPassword : undefined)}
             >
-              {loading ? "Parsing…" : "Preview transactions"}
+              <I18nText>{loading ? "Parsing…" : "Preview transactions"}</I18nText>
             </button>
           </div>
         ) : (
@@ -954,15 +947,13 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                 meta.reconciliation?.ok ? (
                   <div key={`${meta.fileName}-ok`} style={{ background: "rgba(0,122,133,0.08)", border: "1px solid rgba(0,122,133,0.25)", borderRadius: 10, padding: 12, marginBottom: 8, fontSize: 13 }}>
                     <div style={{ display: "flex", gap: 8, fontWeight: 700, color: "var(--color-primary)" }}>
-                      <CheckCircle2 size={16} /> {meta.fileName} - Balance reconciles ✓
-                    </div>
+                      <CheckCircle2 size={16} /> <I18nText>{meta.fileName}</I18nText> <I18nText source={" - Balance reconciles ✓"} /></div>
                   </div>
                 ) : meta.reconciliation ? (
                   <div key={meta.fileName} style={{ background: "rgba(255,152,0,0.1)", border: "1px solid rgba(255,152,0,0.3)", borderRadius: 10, padding: 12, marginBottom: 8, fontSize: 13 }}>
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 4 }}>
                       <div style={{ display: "flex", gap: 8, fontWeight: 700, color: "#F57C00", flex: 1 }}>
-                        <AlertTriangle size={16} /> {meta.fileName} - reconciliation warning
-                      </div>
+                        <AlertTriangle size={16} /> <I18nText>{meta.fileName}</I18nText> <I18nText source={" - reconciliation warning"} /></div>
                       <button
                         type="button"
                         onClick={() => excludeFile(meta.fileName)}
@@ -971,20 +962,14 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                           cursor: "pointer", color: "#F57C00", fontSize: 11, fontWeight: 700,
                           padding: "3px 8px", whiteSpace: "nowrap", flexShrink: 0,
                         }}
-                      >
-                        Skip this file
-                      </button>
+                      ><I18nText source={"Skip this file"} /></button>
                     </div>
-                    {meta.reconciliation.warnings.map((w) => <div key={w}>{w}</div>)}
-                    <div style={{ marginTop: 6, color: "var(--color-text-secondary)" }}>
-                      Often means this file overlaps a different account than the others below. You can still import everything else - use &ldquo;Skip this file&rdquo; to leave it out, or fix and re-upload just this statement.
-                    </div>
+                    {meta.reconciliation.warnings.map((w) => <div key={w}><I18nText>{w}</I18nText></div>)}
+                    <div style={{ marginTop: 6, color: "var(--color-text-secondary)" }}><I18nText source={"Often means this file overlaps a different account than the others below. You can still import everything else - use “Skip this file” to leave it out, or fix and re-upload just this statement."} /></div>
                   </div>
                 ) : null
               ))}
-              <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 0, lineHeight: 1.5 }}>
-                Edit a category below and tick <strong>Remember</strong> to apply it to matching rows in this import and teach future imports.
-              </p>
+              <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 0, lineHeight: 1.5 }}><I18nRich source={"Edit a category below and tick <strong0>Remember</strong0>  to apply it to matching rows in this import and teach future imports."} elements={[<strong key="inline-0" />]} /></p>
             </div>
 
             <div style={{ flexShrink: 0, padding: "8px 20px 0" }}>
@@ -993,8 +978,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               <div style={{ background: "rgba(0,122,133,0.06)", border: "1px solid rgba(0,122,133,0.25)", borderRadius: 10, padding: 14, marginBottom: 16 }}>
                 <div style={{ display: "flex", gap: 8, fontWeight: 700, color: "var(--color-primary)", marginBottom: 10, fontSize: 13 }}>
                   <ArrowLeftRight size={16} />
-                  These look like transfers between your own accounts - exclude from spending?
-                </div>
+                  <I18nText source={"These look like transfers between your own accounts - exclude from spending?"} /></div>
                 {transferPairs.map((pair: TransferPair) => {
                   const debit = rowsWithTransfers.find((r) => r.id === pair.debitId);
                   const credit = rowsWithTransfers.find((r) => r.id === pair.creditId);
@@ -1009,9 +993,9 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                         style={{ marginTop: 3 }}
                       />
                       <span>
-                        <strong>{formatRand(pair.amountCents / 100)}</strong> - {pair.debitAccount} → {pair.creditAccount}
+                        <strong><I18nText>{formatRand(pair.amountCents / 100)}</I18nText></strong> - <I18nText>{pair.debitAccount}</I18nText> → <I18nText>{pair.creditAccount}</I18nText>
                         <span style={{ display: "block", color: "var(--color-text-secondary)", marginTop: 2 }}>
-                          {debit.date}: {debit.description.slice(0, 40)} ↔ {credit.description.slice(0, 40)}
+                          <I18nText>{debit.date}</I18nText>: {debit.description.slice(0, 40)} ↔ {credit.description.slice(0, 40)}
                         </span>
                       </span>
                     </label>
@@ -1038,9 +1022,9 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               }}
             >
               {(["Date", "Description", "Amount", "Category", "Remember"] as const).map((label) => (
-                <div key={label} title={label === "Remember" ? "Save this merchant's category for next time." : undefined}>
-                  {label}
-                </div>
+                <I18nElement as="div" key={label} title={label === "Remember" ? "Save this merchant's category for next time." : undefined}>
+                  <I18nText>{label}</I18nText>
+                </I18nElement>
               ))}
             </div>
             )}
@@ -1052,11 +1036,11 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               return (
                 <div key={fileName} style={{ marginBottom: 20 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0 6px", flexWrap: "wrap" }}>
-                    <span style={{ fontWeight: 800, fontSize: 13 }}>{fileName}</span>
+                    <span style={{ fontWeight: 800, fontSize: 13 }}><I18nText>{fileName}</I18nText></span>
                     {meta?.bankHint && (
-                      <span style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>({meta.bankHint})</span>
+                      <span style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>(<I18nText>{meta.bankHint}</I18nText>)</span>
                     )}
-                    <input
+                    <I18nElement as="input"
                       type="text"
                       value={meta?.accountLabel ?? ""}
                       onChange={(e) => updateAccountLabel(fileName, e.target.value)}
@@ -1081,24 +1065,23 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                             <>
                               {r.possibleDuplicate ? (
                                 <span style={{ display: "block", fontSize: 11, color: "#F57C00", marginTop: 4 }}>
-                                  Possible duplicate{r.duplicateOfDescription ? ` of "${r.duplicateOfDescription}"` : ""}
+                                  <I18nText source={"Possible duplicate"} /><I18nText>{r.duplicateOfDescription ? ` of "${r.duplicateOfDescription}"` : ""}</I18nText>
                                   <label style={{ display: "inline-flex", alignItems: "center", gap: 4, marginLeft: 6, color: "var(--color-text-secondary)", cursor: "pointer" }}>
                                     <input
                                       type="checkbox"
                                       checked={!r.skipReason}
                                       onChange={(e) => updateRow(r.id, { skipReason: e.target.checked ? undefined : "existing_import" })}
                                     />
-                                    Import anyway
-                                  </label>
+                                    <I18nText source={"Import anyway"} /></label>
                                 </span>
                               ) : r.skipReason === "existing_import" ? (
-                                <span style={{ display: "block", fontSize: 11, color: "#9E9E9E", marginTop: 4 }}>Already imported</span>
+                                <span style={{ display: "block", fontSize: 11, color: "#9E9E9E", marginTop: 4 }}><I18nText source={"Already imported"} /></span>
                               ) : null}
                               {r.isTransfer && (
-                                <span style={{ display: "block", fontSize: 11, color: "var(--color-primary)", marginTop: 4 }}>Transfer - excluded</span>
+                                <span style={{ display: "block", fontSize: 11, color: "var(--color-primary)", marginTop: 4 }}><I18nText source={"Transfer - excluded"} /></span>
                               )}
                               {selectiveNeedsReview(r, meta) && !r.skipReason && !r.possibleDuplicate && (
-                                <span style={{ display: "block", fontSize: 11, color: "#F57C00", marginTop: 4 }}>Needs review</span>
+                                <span style={{ display: "block", fontSize: 11, color: "#F57C00", marginTop: 4 }}><I18nText source={"Needs review"} /></span>
                               )}
                             </>
                           );
@@ -1117,13 +1100,13 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                                 }}
                               >
                                 {categoriesForRow(r).map((c) => (
-                                  <option key={c.id} value={c.id}>{c.label}</option>
+                                  <I18nElement as="option" key={c.id} value={c.id}>{c.label}</I18nElement>
                                 ))}
-                                <option value={ADD_CATEGORY_VALUE}>+ Add category</option>
+                                <I18nElement as="option" value={ADD_CATEGORY_VALUE}>+ Add category</I18nElement>
                               </select>
                               {addingCategoryFor === r.id && (
                                 <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-                                  <input
+                                  <I18nElement as="input"
                                     type="text"
                                     value={newCategoryName}
                                     onChange={(e) => setNewCategoryName(e.target.value)}
@@ -1162,8 +1145,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                                   }
                                 }}
                               />
-                              Remember
-                            </label>
+                              <I18nText source={"Remember"} /></label>
                           ) : null;
                           if (narrow) {
                             return (
@@ -1176,15 +1158,15 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                                 marginBottom: 8,
                               }}>
                                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline" }}>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}>{r.date}</div>
-                                  <div style={{ fontWeight: 800, whiteSpace: "nowrap", color: amountColor }}>{amountLabel}</div>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)" }}><I18nText>{r.date}</I18nText></div>
+                                  <div style={{ fontWeight: 800, whiteSpace: "nowrap", color: amountColor }}><I18nText>{amountLabel}</I18nText></div>
                                 </div>
                                 <div style={{ marginTop: 6, fontSize: 14, fontWeight: 600, lineHeight: 1.35, wordBreak: "break-word" }}>
                                   {r.description}
                                 </div>
-                                {notes}
-                                <div style={{ marginTop: 10 }}>{categoryBlock}</div>
-                                {rememberBox && <div style={{ marginTop: 8 }}>{rememberBox}</div>}
+                                <I18nText>{notes}</I18nText>
+                                <div style={{ marginTop: 10 }}><I18nText>{categoryBlock}</I18nText></div>
+                                {rememberBox && <div style={{ marginTop: 8 }}><I18nText>{rememberBox}</I18nText></div>}
                               </div>
                             );
                           }
@@ -1196,14 +1178,14 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                             opacity: r.skipReason || r.isTransfer ? 0.45 : 1,
                             borderBottom: "1px solid var(--color-border)",
                           }}>
-                            <div style={{ padding: 8 }}>{r.date}</div>
+                            <div style={{ padding: 8 }}><I18nText>{r.date}</I18nText></div>
                             <div style={{ padding: 8, minWidth: 0 }}>
                               <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.description}</div>
-                              {notes}
+                              <I18nText>{notes}</I18nText>
                             </div>
-                            <div style={{ padding: 8, fontWeight: 700, whiteSpace: "nowrap", color: amountColor }}>{amountLabel}</div>
-                            <div style={{ padding: 8 }}>{categoryBlock}</div>
-                            <div style={{ padding: 8, textAlign: "center" }}>{rememberBox}</div>
+                            <div style={{ padding: 8, fontWeight: 700, whiteSpace: "nowrap", color: amountColor }}><I18nText>{amountLabel}</I18nText></div>
+                            <div style={{ padding: 8 }}><I18nText>{categoryBlock}</I18nText></div>
+                            <div style={{ padding: 8, textAlign: "center" }}><I18nText>{rememberBox}</I18nText></div>
                           </div>
                           );
                         })}
@@ -1214,7 +1196,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               );
             })}
 
-            {error && <p style={{ color: "#E03C31", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+            {error && <p style={{ color: "#E03C31", fontSize: 13, marginBottom: 12 }}><I18nText>{error}</I18nText></p>}
             </div>
 
             <div style={{
@@ -1227,12 +1209,10 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               gap: 10,
             }}>
               {possibleDuplicateCount > 0 && (
-                <div style={{ fontSize: 12, color: "#F57C00", background: "rgba(245,124,0,0.08)", border: "1px solid rgba(245,124,0,0.3)", borderRadius: 8, padding: "8px 10px" }}>
-                  ⚠ {possibleDuplicateCount} possible duplicate{possibleDuplicateCount !== 1 ? "s" : ""} found (same date &amp; amount as existing transactions). Skipped by default - tick &ldquo;Import anyway&rdquo; on any that are genuinely new.
-                </div>
+                <div style={{ fontSize: 12, color: "#F57C00", background: "rgba(245,124,0,0.08)", border: "1px solid rgba(245,124,0,0.3)", borderRadius: 8, padding: "8px 10px" }}><I18nText source={"⚠ {value0} possible duplicates found (same date & amount as existing transactions). Skipped by default - tick “Import anyway” on any that are genuinely new."} values={[possibleDuplicateCount, possibleDuplicateCount !== 1 ? "s" : ""]} one={"⚠ {value0} possible duplicate found (same date & amount as existing transactions). Skipped by default - tick “Import anyway” on any that are genuinely new."} count={possibleDuplicateCount} /></div>
               )}
               <div style={{ display: "flex", gap: 10 }}>
-              <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={reset}>Back</button>
+              <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={reset}><I18nText source={"Back"} /></button>
               <button
                 type="button"
                 className="btn btn-primary"
@@ -1248,8 +1228,8 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
                 {committing ? "Importing…" : (
                   <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                     <CheckCircle2 size={16} />
-                    Import {importableCount} transaction{importableCount !== 1 ? "s" : ""}
-                    {transferCount > 0 ? ` (+ ${transferCount} transfers)` : ""}
+                    <I18nText source={"Import {value0} transactions"} one={"Import {value0} transaction"} count={importableCount} values={[importableCount]} />
+                    <I18nText>{transferCount > 0 ? ` (+ ${transferCount} transfers)` : ""}</I18nText>
                   </span>
                 )}
               </button>

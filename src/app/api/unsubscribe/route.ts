@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceSupabase } from "@/lib/supabaseServer";
 import { verifyUnsubscribeToken } from "@/lib/churn/unsubscribeToken";
+import { isReasonCode } from "@/lib/churn/reasons";
+import {
+  sendUnsubscribeAlert,
+  sendUnsubscribeReasonAlert,
+  type UnsubscribeChoice,
+} from "@/lib/emails/unsubscribeAlert";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,8 +15,10 @@ export const dynamic = "force-dynamic";
  * The public unsubscribe endpoint. No session: identity comes from the HMAC in
  * the link, which is the only thing an email client can carry.
  *
- * GET  - what is this person currently signed up for, and what is their name.
- * POST - apply their choice.
+ * GET   - what is this person currently signed up for, and what is their name.
+ * POST  - apply their choice.
+ * PATCH - they went on to answer the optional "why" survey (a separate,
+ *         later request from the client); tell the founder what they said.
  *
  * Deliberately NOT a one-click GET that unsubscribes on load. Mail scanners,
  * link previewers and corporate security gateways fetch every URL in an email;
@@ -62,6 +70,52 @@ export async function GET(req: NextRequest) {
     firstName: firstName.length >= 2 ? firstName : "",
     prefs: (prefs as Prefs | null) ?? DEFAULTS,
   });
+}
+
+/**
+ * Best-effort "someone changed their email preference" alert to the founder.
+ * Reads a first name and a cheap activity snapshot so the alert is a moment,
+ * not just a fact - but every read is best-effort and the whole thing is
+ * fire-and-forget from the caller, so a slow or failing lookup here can never
+ * delay or fail the unsubscribe response itself. Same POPIA standard as the
+ * GET handler above: first name only, never the email address, because we
+ * have another way to tell one person's alerts apart (their name, or nothing).
+ */
+async function notifyFounderOfChoice(
+  admin: ReturnType<typeof createServiceSupabase>,
+  userId: string,
+  choice: UnsubscribeChoice,
+): Promise<void> {
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) return;
+
+  try {
+    const [{ data: profile }, { data: progress }, authResult] = await Promise.all([
+      admin.from("profiles").select("full_name, username").eq("user_id", userId).maybeSingle(),
+      admin.from("user_progress").select("xp, streak, completed_lessons").eq("user_id", userId).maybeSingle(),
+      admin.auth.admin.getUserById(userId).catch(() => null),
+    ]);
+
+    const full = (profile?.full_name as string | null) ?? "";
+    const firstName =
+      full.trim().split(/\s+/)[0] || ((profile?.username as string | null) ?? "").trim() || null;
+
+    const created = authResult?.data?.user?.created_at;
+    const daysSinceSignup = created
+      ? Math.max(0, Math.floor((Date.now() - new Date(created).getTime()) / 86_400_000))
+      : null;
+
+    await sendUnsubscribeAlert(resendKey, {
+      choice,
+      firstName,
+      daysSinceSignup,
+      lessonsCompleted: Array.isArray(progress?.completed_lessons) ? progress.completed_lessons.length : null,
+      streak: typeof progress?.streak === "number" ? progress.streak : null,
+      xp: typeof progress?.xp === "number" ? progress.xp : null,
+    });
+  } catch {
+    /* best effort - a founder alert must never surface to the caller */
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -122,6 +176,59 @@ export async function POST(req: NextRequest) {
       { error: "We couldn't save that. Please try again, or email support@notho.co.za." },
       { status: 500 },
     );
+  }
+
+  // Tell the founder. Deliberately not awaited: the person's change is already
+  // saved and confirmed above, and nothing about telling a human should be
+  // able to slow down or fail the response to the person who just clicked.
+  void notifyFounderOfChoice(admin, userId, choice as UnsubscribeChoice);
+
+  return NextResponse.json({ ok: true });
+}
+
+/**
+ * The optional "why" survey is a separate, later request from the client to
+ * /api/exit-feedback (which owns writing exit_feedback - this route does not
+ * duplicate that write). This endpoint exists only so the founder also hears
+ * the reason, when one was given: the client calls it right after a
+ * successful, non-skipped exit-feedback submission.
+ */
+export async function PATCH(req: NextRequest) {
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+  }
+
+  const userId = verifyUnsubscribeToken(typeof body.token === "string" ? body.token : null);
+  if (!userId) return NextResponse.json({ error: "Invalid or expired link" }, { status: 401 });
+
+  const reason = body.reason;
+  if (!isReasonCode(reason)) {
+    // Nothing to notify - skipped or malformed. Still fine, this is best-effort.
+    return NextResponse.json({ ok: true });
+  }
+  const detail = typeof body.detail === "string" ? body.detail : null;
+
+  const resendKey = process.env.RESEND_API_KEY;
+  if (resendKey) {
+    const admin = createServiceSupabase();
+    void (async () => {
+      try {
+        const { data: profile } = await admin
+          .from("profiles")
+          .select("full_name, username")
+          .eq("user_id", userId)
+          .maybeSingle();
+        const full = (profile?.full_name as string | null) ?? "";
+        const firstName =
+          full.trim().split(/\s+/)[0] || ((profile?.username as string | null) ?? "").trim() || null;
+        await sendUnsubscribeReasonAlert(resendKey, { firstName, reason, detail });
+      } catch {
+        /* best effort */
+      }
+    })();
   }
 
   return NextResponse.json({ ok: true });

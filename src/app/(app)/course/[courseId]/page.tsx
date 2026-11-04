@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import React, { use } from "react";
 import { CourseView } from "@/components/views/CourseView";
@@ -13,7 +14,7 @@ export default function CoursePage({ params }: { params: Promise<{ courseId: str
   const course = CONTENT_DATA.courses.find(c => c.id === courseId);
 
   if (!course) {
-    return <div className="p-4">Course not found.</div>;
+    return <div className="p-4"><I18nText source={"Course not found."} /></div>;
   }
 
   return (

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import posthog from "posthog-js";
 import { useEffect } from "react";
@@ -25,5 +26,5 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       },
     });
   }, []);
-  return <>{children}</>;
+  return <><I18nText>{children}</I18nText></>;
 }

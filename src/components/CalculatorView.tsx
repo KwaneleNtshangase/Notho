@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -9,7 +10,7 @@ import { formatWithSpaces, formatRand, formatZAR } from "@/lib/formatters";
 import { ShareResultButton } from "@/components/ShareCard";
 import {
   type CalcInputs,
-  assumptionLine,
+  assumptionParts,
   calcGrowth,
   formatDuration,
   projectGrowth,
@@ -165,17 +166,17 @@ export function CalculatorView() {
 
   return (
     <main id="mainContent">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, gap: 10 }}>
-        <h2 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}>Investment Calculator</h2>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", marginBottom: 16, gap: 10 }}>
+        <h2 style={{ fontSize: "clamp(20px, 5.5vw, 28px)", fontWeight: 900, margin: 0, maxWidth: "100%", overflowWrap: "anywhere", textWrap: "balance" }}><I18nText source={"Investment Calculator"} /></h2>
         {solveMode === "goal" && (
-          <div style={{ display: "flex", gap: 8 }}>
-            <button className={mode === "single" ? "btn btn-primary" : "btn btn-secondary"} style={{ padding: "8px 12px", fontSize: 13 }} onClick={() => setMode("single")}>Single</button>
-            <button className={mode === "compare" ? "btn btn-primary" : "btn btn-secondary"} style={{ padding: "8px 12px", fontSize: 13 }} onClick={() => setMode("compare")}>Compare</button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", maxWidth: "100%" }}>
+            <button className={mode === "single" ? "btn btn-primary" : "btn btn-secondary"} style={{ padding: "8px 12px", fontSize: 13 }} onClick={() => setMode("single")}><I18nText source={"Single"} /></button>
+            <button className={mode === "compare" ? "btn btn-primary" : "btn btn-secondary"} style={{ padding: "8px 12px", fontSize: 13 }} onClick={() => setMode("compare")}><I18nText source={"Compare"} /></button>
           </div>
         )}
       </div>
       <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 12 }}>What are you solving for?</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 12 }}><I18nText source={"What are you solving for?"} /></div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 8 }}>
           {SOLVE_OPTIONS.map((opt) => (
             <button
@@ -184,14 +185,14 @@ export function CalculatorView() {
               style={{ padding: "10px 8px", borderRadius: 10, border: `2px solid ${solveMode === opt.id ? "var(--color-primary)" : "var(--color-border)"}`, background: solveMode === opt.id ? "rgba(0,122,133,0.08)" : "var(--color-bg)", cursor: "pointer", textAlign: "center" }}
             >
               <div style={{ display: "flex", justifyContent: "center", marginBottom: 4, color: solveMode === opt.id ? "var(--color-primary)" : "var(--color-text-secondary)" }}><opt.Icon size={18} /></div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: solveMode === opt.id ? "var(--color-primary)" : "var(--color-text-primary)" }}>{opt.label}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: solveMode === opt.id ? "var(--color-primary)" : "var(--color-text-primary)" }}><I18nText>{opt.label}</I18nText></div>
             </button>
           ))}
         </div>
         {solveMode !== "goal" && (
           <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--color-border)" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>{SOLVE_OPTIONS.find((o) => o.id === solveMode)?.desc} - Target Goal Amount (R)</div>
-            <input type="number" inputMode="decimal" placeholder="e.g. 1000000" value={goalTarget} onChange={(e) => setGoalTarget(e.target.value)} style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1.5px solid var(--color-primary)", fontSize: 16, fontWeight: 700, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" }} />
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}><I18nText source={"{value0} - Target Goal Amount (R)"} values={[SOLVE_OPTIONS.find((o) => o.id === solveMode)?.desc]} /></div>
+            <I18nElement as="input" type="number" inputMode="decimal" placeholder="e.g. 1000000" value={goalTarget} onChange={(e) => setGoalTarget(e.target.value)} style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1.5px solid var(--color-primary)", fontSize: 16, fontWeight: 700, background: "var(--color-bg)", color: "var(--color-text-primary)", boxSizing: "border-box" }} />
           </div>
         )}
       </div>
@@ -207,15 +208,14 @@ export function CalculatorView() {
         )}
       </div>
       <button className="btn btn-primary" style={{ width: "100%", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }} onClick={handleCalculate}>
-        <BarChart2 size={20} aria-hidden /> Calculate
-      </button>
-      {!hasCalculated && <div style={{ textAlign: "center", padding: "18px 0", color: "var(--color-text-secondary)" }}>{solveMode === "goal" ? "Set your values above, then tap Calculate" : "Set your inputs above and enter a target goal, then tap Calculate"}</div>}
+        <BarChart2 size={20} aria-hidden /> <I18nText source={" Calculate"} /></button>
+      {!hasCalculated && <div style={{ textAlign: "center", padding: "18px 0", color: "var(--color-text-secondary)" }}><I18nText>{solveMode === "goal" ? "Set your values above, then tap Calculate" : "Set your inputs above and enter a target goal, then tap Calculate"}</I18nText></div>}
       {hasCalculated && solveResult && (
         <>
           <div style={{ background: "linear-gradient(135deg, var(--color-primary) 0%, #005F68 100%)", borderRadius: 16, padding: "20px 24px", marginBottom: 12, color: "white", textAlign: "center" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, opacity: 0.8, marginBottom: 8 }}>{solveResult.label}</div>
-            <div style={{ fontSize: 32, fontWeight: 900, marginBottom: 4 }}>{solveResult.value}</div>
-            {solveResult.sub && <div style={{ fontSize: 13, opacity: 0.85 }}>{solveResult.sub}</div>}
+            <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, opacity: 0.8, marginBottom: 8 }}><I18nText>{solveResult.label}</I18nText></div>
+            <div style={{ fontSize: 32, fontWeight: 900, marginBottom: 4 }}><I18nText>{solveResult.value}</I18nText></div>
+            {solveResult.sub && <div style={{ fontSize: 13, opacity: 0.85 }}><I18nText>{solveResult.sub}</I18nText></div>}
           </div>
           <div style={{ marginBottom: 20 }}>
             <ShareResultButton data={{ type: "calculator", headline: `${solveResult.value} - ${solveResult.label.toLowerCase()}`, sub: solveResult.sub ?? `Saving R${formatWithSpaces(inputsA.monthly)}/month at ${inputsA.rate}% p.a. - calculated on Notho` }} label="Share this result" />
@@ -232,13 +232,11 @@ export function CalculatorView() {
             {showReal && <ResultCard label="In today's rands" value={formatRand(finalA.realValue)} />}
           </div>
           {projectionA?.depletedYear != null && (
-            <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 12, background: "rgba(224,60,49,0.08)", color: "#E03C31", fontWeight: 700, fontSize: 14 }}>
-              This withdrawal empties the pot in year {projectionA.depletedYear}.
-            </div>
+            <div style={{ marginBottom: 12, padding: "12px 16px", borderRadius: 12, background: "rgba(224,60,49,0.08)", color: "#E03C31", fontWeight: 700, fontSize: 14 }}><I18nText source={"This withdrawal empties the pot in year {value0}."} values={[projectionA.depletedYear]} /></div>
           )}
-          <div style={{ marginBottom: 12, fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.45 }}>{assumptionLine(calcA)}</div>
+          <div style={{ marginBottom: 12, fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.45 }}>{assumptionParts(calcA).map((part, index) => <React.Fragment key={index}>{index > 0 ? " · " : ""}<I18nText>{part}</I18nText></React.Fragment>)}</div>
           {projectionA?.notes.filter((n) => !n.startsWith("The pot reaches")).map((n) => (
-            <div key={n} style={{ marginBottom: 8, fontSize: 12, color: "var(--color-text-secondary)" }}>{n}</div>
+            <div key={n} style={{ marginBottom: 8, fontSize: 12, color: "var(--color-text-secondary)" }}><I18nText>{n}</I18nText></div>
           ))}
           <div style={{ marginBottom: 20 }}>
             <ShareResultButton data={{ type: "calculator", headline: `My R${formatWithSpaces(inputsA.monthly)}/month investment could be worth ${formatRand(finalA.value)} in ${inputsA.years} years`, sub: `At ${inputsA.rate}% p.a. · R${formatWithSpaces(finalA.interest)} in interest earned · Calculated on Notho` }} label="Share this calculation" />
@@ -263,13 +261,12 @@ export function CalculatorView() {
           }}
           style={{ width: "100%", marginBottom: 12, padding: "11px 16px", borderRadius: 12, border: "1.5px solid var(--color-primary)", background: "transparent", color: "var(--color-primary)", fontWeight: 700, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
         >
-          <TrendingUp size={16} aria-hidden /> Save this projection to my Profile
-        </button>
+          <TrendingUp size={16} aria-hidden /> <I18nText source={" Save this projection to my Profile"} /></button>
       )}
       {projectionSaved && (
         <div className="mb-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 dark:border-green-700 dark:bg-green-900/20 dark:text-green-300">
           <CheckCircle2 size={16} className="shrink-0" aria-hidden />
-          <span>Projection pinned to your Profile - tap Profile to view it.</span>
+          <span><I18nText source={"Projection pinned to your Profile - tap Profile to view it."} /></span>
         </div>
       )}
     </main>

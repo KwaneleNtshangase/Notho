@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useState } from "react";
 import { Info } from "@/components/icons/NothoIcons";
@@ -17,7 +18,7 @@ export function FieldTip({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
   return (
     <span className="relative inline-flex align-middle">
-      <button
+      <I18nElement as="button"
         type="button"
         className="rounded-full p-0.5 text-gray-400 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 dark:text-gray-500 dark:hover:text-gray-300"
         aria-label="More info"
@@ -27,13 +28,13 @@ export function FieldTip({ text }: { text: string }) {
         onBlur={() => setOpen(false)}
       >
         <Info size={14} strokeWidth={2.5} aria-hidden />
-      </button>
+      </I18nElement>
       {open ? (
         <span
           role="tooltip"
           className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1 w-max max-w-[220px] -translate-x-1/2 rounded-lg bg-gray-900 px-2.5 py-2 text-left text-xs font-medium leading-snug text-white shadow-lg dark:bg-gray-700"
         >
-          {text}
+          <I18nText>{text}</I18nText>
         </span>
       ) : null}
     </span>
@@ -61,10 +62,10 @@ export function CalcNumberRow({
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)" }}>{label}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)" }}><I18nText>{label}</I18nText></span>
         <FieldTip text={tooltip} />
       </div>
-      <input
+      <I18nElement as="input"
         type="number"
         step={step}
         value={str}
@@ -118,11 +119,11 @@ export function InputPanel({
     <div style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 16, padding: 20, flex: 1 }}>
       {label && (
         <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-primary)", marginBottom: 16, textTransform: "uppercase", letterSpacing: 1 }}>
-          {label}
+          <I18nText>{label}</I18nText>
         </div>
       )}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Account type</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Account type"} /></div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {WRAPPERS.map((w) => (
             <button
@@ -151,7 +152,7 @@ export function InputPanel({
                 color: (inputs.wrapper ?? "none") === w.id ? "var(--color-primary)" : "var(--color-text-secondary)",
               }}
             >
-              {w.label}
+              <I18nText>{w.label}</I18nText>
             </button>
           ))}
         </div>
@@ -198,7 +199,7 @@ export function InputPanel({
                   cursor: "pointer",
                 }}
               >
-                {r}%
+                <I18nText>{r}</I18nText>%
               </button>
             ))}
           </div>
@@ -238,7 +239,7 @@ export function InputPanel({
       )}
       {!living && (
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}>Investment Frequency</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Investment Frequency"} /></div>
           <div style={{ display: "flex", gap: 8 }}>
             {(["monthly", "annually", "once-off"] as const).map((f) => (
               <button
@@ -258,7 +259,7 @@ export function InputPanel({
                   color: inputs.frequency === f ? "var(--color-primary)" : "var(--color-text-secondary)",
                 }}
               >
-                {f === "once-off" ? "Once-off" : f.charAt(0).toUpperCase() + f.slice(1)}
+                <I18nText>{f === "monthly" ? "Monthly" : f === "annually" ? "Annually" : "Once-off"}</I18nText>
               </button>
             ))}
           </div>
@@ -271,7 +272,7 @@ export function InputPanel({
             onClick={() => setShowMore((s) => !s)}
             style={{ background: "none", border: "none", color: "var(--color-primary)", fontWeight: 700, fontSize: 13, cursor: "pointer", padding: 0, marginBottom: showMore ? 16 : 0 }}
           >
-            {showMore ? "Hide fees, inflation and withdrawals" : "Fees, inflation and withdrawals"}
+            <I18nText>{showMore ? "Hide fees, inflation and withdrawals" : "Fees, inflation and withdrawals"}</I18nText>
           </button>
           {showMore && (
             <div>
@@ -291,7 +292,7 @@ export function InputPanel({
               />
               <div style={{ marginBottom: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)" }}>Withdrawal</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-secondary)" }}><I18nText source={"Withdrawal"} /></span>
                   <div style={{ display: "flex", gap: 6 }}>
                     {(["rand", "percent"] as const).map((mode) => (
                       <button
@@ -309,7 +310,7 @@ export function InputPanel({
                           color: "var(--color-text-secondary)",
                         }}
                       >
-                        {mode === "rand" ? "R / month" : "% of pot / year"}
+                        <I18nText>{mode === "rand" ? "R / month" : "% of pot / year"}</I18nText>
                       </button>
                     ))}
                   </div>
@@ -331,9 +332,7 @@ export function InputPanel({
                       }
                     />
                     {(inputs.withdrawalPercent ?? 0) > 0 && (
-                      <div style={{ marginTop: -12, marginBottom: 16, fontSize: 12, color: "var(--color-text-secondary)" }}>
-                        Year 1 ≈ R{Math.round(((inputs.principal || 0) * (inputs.withdrawalPercent || 0)) / 100 / 12).toLocaleString("en-ZA")} / month
-                      </div>
+                      <div style={{ marginTop: -12, marginBottom: 16, fontSize: 12, color: "var(--color-text-secondary)" }}><I18nText source={"Year 1 ≈ R{value0} / month"} values={[Math.round(((inputs.principal || 0) * (inputs.withdrawalPercent || 0)) / 100 / 12).toLocaleString("en-ZA")]} preserveValues={[true]} /></div>
                     )}
                   </>
                 ) : (

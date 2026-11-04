@@ -62,6 +62,12 @@ export function warmHeavyShell() {
   prefetchHref("/re5-readiness");
 }
 
+
+export function warmBudget() {
+  prefetchHref("/budget");
+  void import("@/components/BudgetPlanner");
+}
+
 export function whenIdle(fn: () => void, timeoutMs = 1400): () => void {
   if (typeof window === "undefined") return () => {};
   const ric = window.requestIdleCallback?.bind(window);

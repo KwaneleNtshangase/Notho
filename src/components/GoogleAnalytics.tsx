@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import Script from "next/script";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
@@ -12,7 +13,7 @@ export function GoogleAnalytics() {
         strategy="afterInteractive"
       />
       <Script id="notho-ga4" strategy="afterInteractive">
-        {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}',{anonymize_ip:true});`}
+        <I18nText>{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}',{anonymize_ip:true});`}</I18nText>
       </Script>
     </>
   );

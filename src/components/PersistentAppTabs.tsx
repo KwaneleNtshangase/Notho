@@ -10,11 +10,14 @@ import {
   normalizeTabPath,
   type AppTabHref,
 } from "@/lib/appTabs";
-import { warmHeavyShell, whenIdle } from "@/lib/speculativeWarm";
+import { warmHeavyShell, warmBudget, whenIdle } from "@/lib/speculativeWarm";
+import { CourseCardSkeleton, TransactionListSkeleton } from "@/components/Skeleton";
+
+import { LocalizedText } from "@/i18n/LocalizedText";
 
 const LearnPage = dynamic(() => import("@/app/(app)/learn/page"), {
   ssr: false,
-  loading: () => <TabSkeleton />,
+  loading: () => <TabSkeleton href="/learn" />,
 });
 const CalculatorPage = dynamic(() => import("@/app/(app)/calculator/page"), {
   ssr: false,
@@ -22,7 +25,7 @@ const CalculatorPage = dynamic(() => import("@/app/(app)/calculator/page"), {
 });
 const BudgetPage = dynamic(() => import("@/app/(app)/budget/page"), {
   ssr: false,
-  loading: () => <TabSkeleton />,
+  loading: () => <TabSkeleton href="/budget" />,
 });
 const QuestsPage = dynamic(() => import("@/app/(app)/quests/page"), {
   ssr: false,
@@ -33,22 +36,48 @@ const ProfilePage = dynamic(() => import("@/app/(app)/profile/page"), {
   loading: () => <TabSkeleton />,
 });
 
-function TabSkeleton() {
+function LearnTabSkeleton() {
   return (
-    <div
-      aria-hidden
-      style={{
-        padding: 20,
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-      }}
-    >
-      <div style={{ height: 18, width: "40%", borderRadius: 8, background: "var(--color-border)", opacity: 0.5 }} />
-      <div style={{ height: 120, borderRadius: 16, background: "var(--color-border)", opacity: 0.35 }} />
-      <div style={{ height: 80, borderRadius: 16, background: "var(--color-border)", opacity: 0.25 }} />
+    <div aria-busy="true" style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+      <span className="sr-only"><LocalizedText>Loading</LocalizedText></span>
+      <div className="skeleton" style={{ height: 18, width: "36%", borderRadius: 6 }} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <CourseCardSkeleton key={i} />
+        ))}
+      </div>
     </div>
   );
+}
+
+function BudgetTabSkeleton() {
+  return (
+    <div aria-busy="true" style={{ padding: "16px 0" }}>
+      <span className="sr-only"><LocalizedText>Loading</LocalizedText></span>
+      <div style={{ padding: "0 16px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="skeleton" style={{ height: 18, width: 120, borderRadius: 6 }} />
+        <div className="skeleton" style={{ height: 28, width: 64, borderRadius: 8 }} />
+      </div>
+      <TransactionListSkeleton rows={6} />
+    </div>
+  );
+}
+
+function GenericTabSkeleton() {
+  return (
+    <div aria-busy="true" style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+      <span className="sr-only"><LocalizedText>Loading</LocalizedText></span>
+      <div className="skeleton" style={{ height: 18, width: "40%", borderRadius: 8 }} />
+      <div className="skeleton" style={{ height: 96, borderRadius: 16 }} />
+      <div className="skeleton" style={{ height: 64, borderRadius: 16 }} />
+    </div>
+  );
+}
+
+function TabSkeleton({ href }: { href?: string }) {
+  if (href === "/learn") return <LearnTabSkeleton />;
+  if (href === "/budget") return <BudgetTabSkeleton />;
+  return <GenericTabSkeleton />;
 }
 
 const PAGES: Record<AppTabHref, React.ComponentType> = {
@@ -107,6 +136,7 @@ export function PersistentAppTabs({ visible }: { visible: boolean }) {
       void import("@/app/(app)/quests/page");
       void import("@/app/(app)/profile/page");
       warmHeavyShell();
+      warmBudget();
     };
     return whenIdle(warm, 900);
   }, []);

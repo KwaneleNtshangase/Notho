@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React from "react";
 import type { Grade } from "@/lib/results/types";
@@ -43,7 +44,7 @@ export function GradeBadge({
   const small = size === "sm";
 
   return (
-    <span
+    <I18nElement as="span"
       title={title ?? `${grade.label} — ${Math.round(scorePct)}% first-try accuracy`}
       style={{
         display: "inline-flex",
@@ -60,13 +61,13 @@ export function GradeBadge({
         whiteSpace: "nowrap",
       }}
     >
-      <span>{grade.letter}</span>
+      <span><I18nText>{grade.letter}</I18nText></span>
       <span style={{ opacity: 0.55 }}>·</span>
-      <span>{Math.round(scorePct)}%</span>
+      <span><I18nText>{Math.round(scorePct)}</I18nText>%</span>
       {showLabel && !small && (
-        <span style={{ fontWeight: 600, opacity: 0.85 }}>{grade.label}</span>
+        <span style={{ fontWeight: 600, opacity: 0.85 }}><I18nText>{grade.label}</I18nText></span>
       )}
-    </span>
+    </I18nElement>
   );
 }
 
@@ -85,7 +86,7 @@ export function PassPill({
   const tone = passed ? TONE.excellent : TONE.poor;
   const small = size === "sm";
   return (
-    <span
+    <I18nElement as="span"
       title={`Pass mark: ${passMarkCorrect} of ${totalQuestions}`}
       style={{
         display: "inline-flex",
@@ -102,7 +103,7 @@ export function PassPill({
         whiteSpace: "nowrap",
       }}
     >
-      {passed ? "PASS" : "FAIL"}
-    </span>
+      <I18nText>{passed ? "PASS" : "FAIL"}</I18nText>
+    </I18nElement>
   );
 }

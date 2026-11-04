@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,5 +12,5 @@ export default function SecurityLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <><I18nText>{children}</I18nText></>;
 }

@@ -1,6 +1,8 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import { useLocale } from "@/i18n/LocaleProvider";
 import { localizeContent } from "@/i18n/contentZu";
+import { localizeString } from "@/i18n/stringZu";
 /* eslint-disable @next/next/no-html-link-for-pages */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -282,8 +284,7 @@ export function CourseView({
         <button className="back-button" onClick={goBack}>
           <span className="inline-flex items-center gap-2">
             <ArrowLeft size={20} className="text-current" />
-            Back to Courses
-          </span>
+            <I18nText source={"Back to Courses"} /></span>
         </button>
 
         <div className="course-map-header" style={{ background: colour.bg, borderRadius: 16, padding: "20px 16px", marginBottom: 8 }}>
@@ -291,7 +292,7 @@ export function CourseView({
             <CourseIcon name={course.icon} size={56} />
           </div>
           <h2 className="course-map-title" style={{ color: colour.accent }}>{localizeContent(locale, `course.${course.id}`, course.title)}</h2>
-          <p className="course-map-description">{course.description}</p>
+          <p className="course-map-description">{localizeString(locale, course.description)}</p>
         </div>
 
         {overall && (
@@ -317,10 +318,9 @@ export function CourseView({
                 color: "var(--color-text-secondary)",
               }}
             >
-              Course score
-              <span style={{ opacity: 0.7, fontWeight: 600 }}>
-                {" · "}
-                {overall.lessonsScored}/{playableLessonCount}
+              <I18nText source={"Course score"} /><span style={{ opacity: 0.7, fontWeight: 600 }}>
+                <I18nText>{" · "}</I18nText>
+                <I18nText>{overall.lessonsScored}</I18nText>/<I18nText>{playableLessonCount}</I18nText>
               </span>
             </span>
             <GradeBadge scorePct={overall.scorePct} showLabel={false} />
@@ -336,8 +336,7 @@ export function CourseView({
           >
             <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
               <GraduationCap size={18} />
-              My RE5 readiness
-            </span>
+              <I18nText source={"My RE5 readiness"} /></span>
           </button>
         )}
 
@@ -345,7 +344,7 @@ export function CourseView({
           <div className="unit" key={unit.id}>
             <div className="unit-header">
               <div className="unit-title">{localizeContent(locale, `unit.${course.id}.${unit.id}`, unit.title)}</div>
-              <div className="unit-description">{unit.description}</div>
+              <div className="unit-description">{localizeString(locale, unit.description)}</div>
             </div>
 
             <div className="lessons-path">
@@ -406,11 +405,11 @@ export function CourseView({
                         animation: state === "playable" ? "node-pulse 2s ease-in-out infinite" : undefined,
                       }}
                     >
-                      {icon}
+                      <I18nText>{icon}</I18nText>
                     </div>
                     <div className="lesson-label">
                       {localizeContent(locale, `lesson.${course.id}.${lesson.id}`, lesson.title)}
-                      {lessonGrade(lesson.id)}
+                      <I18nText>{lessonGrade(lesson.id)}</I18nText>
                       {state === "coming_soon" && (
                         <span
                           style={{
@@ -419,9 +418,7 @@ export function CourseView({
                             color: "var(--color-text-secondary)",
                             marginTop: 2,
                           }}
-                        >
-                          Coming soon
-                        </span>
+                        ><I18nText source={"Coming soon"} /></span>
                       )}
                     </div>
                   </div>
@@ -437,13 +434,9 @@ export function CourseView({
             className="btn btn-primary"
             style={{ width: "100%", marginTop: 24 }}
             onClick={onGoToNextCourse}
-          >
-            Next Course: {localizeContent(locale, `course.${nextCourse.id}`, nextCourse.title)}
-          </button>
+          ><I18nText source={"Next Course: {value0}"} values={[localizeContent(locale, `course.${nextCourse.id}`, nextCourse.title)]} /></button>
         ) : (
-          <p style={{ textAlign: "center", marginTop: 24, color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 600 }}>
-            You've completed all courses!
-          </p>
+          <p style={{ textAlign: "center", marginTop: 24, color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 600 }}><I18nText source={"You've completed all courses!"} /></p>
         )}
 
         {lockedModal && (
@@ -487,7 +480,7 @@ export function CourseView({
                   marginBottom: 8,
                 }}
               >
-                {lockedModal.lessonTitle}
+                <I18nText>{lockedModal.lessonTitle}</I18nText>
               </div>
               <p
                 style={{
@@ -497,14 +490,12 @@ export function CourseView({
                   fontSize: 14,
                 }}
               >
-                {lockedModal.reason}
+                <I18nText>{lockedModal.reason}</I18nText>
               </p>
               <button
                 className="btn btn-primary"
                 onClick={() => setLockedModal(null)}
-              >
-                Got it
-              </button>
+              ><I18nText source={"Got it"} /></button>
             </div>
           </div>
         )}

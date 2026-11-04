@@ -58,7 +58,7 @@ const CANVAS_BOOT_SCRIPT = `(() => {
     }
     var loc = '';
     try { loc = localStorage.getItem('notho-locale') || ''; } catch (e) {}
-    if (loc === 'zu') root.lang = 'zu-ZA';
+    if (['en','af','nr','xh','zu','nso','st','tn','ss','ve','ts'].includes(loc)) root.lang = loc + '-ZA';
   } catch (e) {}
 })();`;
 

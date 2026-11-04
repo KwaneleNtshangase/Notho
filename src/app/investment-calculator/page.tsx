@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PublicGuide, guideStyles } from "@/components/PublicGuide";
@@ -47,34 +48,17 @@ export default function InvestmentCalculatorPage() {
       lede="If you want an investment calculator that speaks rand and South African wrappers, use Notho Calculate. It is a planning sketch, not a product quote."
       faqs={faqs}
     >
-      <h2 style={h2}>What the calculator does</h2>
+      <h2 style={h2}><I18nText source={"What the calculator does"} /></h2>
+      <p style={p}><I18nText source={"Notho compounds a nominal rate monthly across contribution frequencies. You can withdraw a rand amount or a percent of the pot, layer fees, and look at inflation so the ending number is not only nominal."} /></p>
+      <p style={p}><I18nText source={"Time-to-goal searches for the period that reaches a target. That is useful when the question is \"how long at this contribution?\" rather than \"what is the balance in 20 years?\""} /></p>
+      <h2 style={h2}><I18nText source={"Wrappers, not product picks"} /></h2>
+      <p style={p}><I18nText source={"TFSA, retirement annuity and living-annuity modes exist so learners can see how contribution limits and drawdown rules change the picture. Notho does not choose a fund, an adviser, or a platform for you."} /></p>
       <p style={p}>
-        Notho compounds a nominal rate monthly across contribution frequencies.
-        You can withdraw a rand amount or a percent of the pot, layer fees, and
-        look at inflation so the ending number is not only nominal.
-      </p>
-      <p style={p}>
-        Time-to-goal searches for the period that reaches a target. That is
-        useful when the question is "how long at this contribution?" rather than
-        "what is the balance in 20 years?"
-      </p>
-      <h2 style={h2}>Wrappers, not product picks</h2>
-      <p style={p}>
-        TFSA, retirement annuity and living-annuity modes exist so learners can
-        see how contribution limits and drawdown rules change the picture. Notho
-        does not choose a fund, an adviser, or a platform for you.
-      </p>
-      <p style={p}>
-        Open the live tool on the{" "}
-        <Link href="/calculator" style={{ color: guideStyles.teal }}>
-          Calculate
-        </Link>{" "}
-        tab after you sign in. Pair it with{" "}
-        <Link href="/financial-literacy" style={{ color: guideStyles.teal }}>
-          lessons
-        </Link>{" "}
-        if a term is new.
-      </p>
+        <I18nText source={"Open the live tool on the"} /><I18nText>{" "}</I18nText>
+        <Link href="/calculator" style={{ color: guideStyles.teal }}><I18nText source={"Calculate"} /></Link><I18nText>{" "}</I18nText>
+        <I18nText source={"tab after you sign in. Pair it with"} /><I18nText>{" "}</I18nText>
+        <Link href="/financial-literacy" style={{ color: guideStyles.teal }}><I18nText source={"lessons"} /></Link><I18nText>{" "}</I18nText>
+        <I18nText source={"if a term is new."} /></p>
     </PublicGuide>
   );
 }

@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PublicGuide, guideStyles } from "@/components/PublicGuide";
@@ -46,39 +47,22 @@ export default function PersonalFinancePage() {
       lede="Personal finance in South Africa is not a US 401(k) tutorial with a rand symbol stuck on. The useful order is: see the money, name the trade-offs, then practise the numbers."
       faqs={faqs}
     >
-      <h2 style={h2}>A working order</h2>
+      <h2 style={h2}><I18nText source={"A working order"} /></h2>
       <p style={p}>
-        First, know what comes in and what leaves. Notho's{" "}
-        <Link href="/budgeting" style={{ color: guideStyles.teal }}>
-          budget
-        </Link>{" "}
-        is for that. Statements are lookback only — they do not become live bank
-        access.
-      </p>
+        <I18nText source={"First, know what comes in and what leaves. Notho's"} /><I18nText>{" "}</I18nText>
+        <Link href="/budgeting" style={{ color: guideStyles.teal }}><I18nText source={"budget"} /></Link><I18nText>{" "}</I18nText>
+        <I18nText source={"is for that. Statements are lookback only — they do not become live bank access."} /></p>
       <p style={p}>
-        Second, learn the local vocabulary: emergency savings, debt cost, TFSA
-        annual and lifetime caps, retirement annuity tax treatment, and living
-        annuities as a drawdown wrapper. Those ideas live in{" "}
-        <Link href="/financial-literacy" style={{ color: guideStyles.teal }}>
-          short lessons
-        </Link>
+        <I18nText source={"Second, learn the local vocabulary: emergency savings, debt cost, TFSA annual and lifetime caps, retirement annuity tax treatment, and living annuities as a drawdown wrapper. Those ideas live in"} /><I18nText>{" "}</I18nText>
+        <Link href="/financial-literacy" style={{ color: guideStyles.teal }}><I18nText source={"short lessons"} /></Link>
         .
       </p>
       <p style={p}>
-        Third, run scenarios in the{" "}
-        <Link href="/investment-calculator" style={{ color: guideStyles.teal }}>
-          investment calculator
-        </Link>{" "}
-        so compounding, fees and inflation stop being abstract. The output is
-        illustrative, not a recommendation.
-      </p>
-      <h2 style={h2}>Why Notho exists</h2>
-      <p style={p}>
-        Most South African money pages are either a bank product page or a
-        generic calculator that ignores local wrappers. Notho puts learning,
-        calculators and a budget in one app so the same person can practise the
-        same ideas in rand.
-      </p>
+        <I18nText source={"Third, run scenarios in the"} /><I18nText>{" "}</I18nText>
+        <Link href="/investment-calculator" style={{ color: guideStyles.teal }}><I18nText source={"investment calculator"} /></Link><I18nText>{" "}</I18nText>
+        <I18nText source={"so compounding, fees and inflation stop being abstract. The output is illustrative, not a recommendation."} /></p>
+      <h2 style={h2}><I18nText source={"Why Notho exists"} /></h2>
+      <p style={p}><I18nText source={"Most South African money pages are either a bank product page or a generic calculator that ignores local wrappers. Notho puts learning, calculators and a budget in one app so the same person can practise the same ideas in rand."} /></p>
     </PublicGuide>
   );
 }

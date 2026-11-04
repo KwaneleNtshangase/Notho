@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -297,7 +298,7 @@ export function AppGestures() {
         }}
       >
         <span className="ptr-spinner" />
-        <span className="ptr-label">{refreshing ? "Refreshing" : "Release to refresh"}</span>
+        <span className="ptr-label"><I18nText>{refreshing ? "Refreshing" : "Release to refresh"}</I18nText></span>
       </div>
       <div
         className="app-swipe-back"

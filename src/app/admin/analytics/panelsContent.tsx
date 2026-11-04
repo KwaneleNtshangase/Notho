@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 /**
  * CONTENT - which lessons and which individual questions to change.
@@ -69,8 +70,8 @@ export function ContentPanel({ days, nonce }: { days: number; nonce: number }) {
     }));
 
   const lessonColumns: Column<ContentRow>[] = [
-    { key: "lesson", label: "Lesson", render: (r) => <span className="nv-strong">{r.lesson_id}</span> },
-    { key: "course", label: "Course", render: (r) => <span style={{ color: p.muted }}>{r.course_id}</span> },
+    { key: "lesson", label: "Lesson", render: (r) => <span className="nv-strong"><I18nText>{r.lesson_id}</I18nText></span> },
+    { key: "course", label: "Course", render: (r) => <span style={{ color: p.muted }}><I18nText>{r.course_id}</I18nText></span> },
     { key: "learners", label: "Learners", numeric: true, render: (r) => fmt(r.learners) },
     { key: "attempts", label: "Answers", numeric: true, render: (r) => fmt(r.attempts) },
     {
@@ -79,7 +80,7 @@ export function ContentPanel({ days, nonce }: { days: number; nonce: number }) {
       numeric: true,
       render: (r) => (
         <span style={{ fontWeight: 700, color: bandColor(r.first_try_pct, p) }}>
-          {fmtPct(r.first_try_pct)}
+          <I18nText>{fmtPct(r.first_try_pct)}</I18nText>
         </span>
       ),
     },
@@ -87,7 +88,7 @@ export function ContentPanel({ days, nonce }: { days: number; nonce: number }) {
     {
       key: "verdict",
       label: "Verdict",
-      render: (r) => <Tag tone={verdictTone(r.verdict)}>{r.verdict}</Tag>,
+      render: (r) => <Tag tone={verdictTone(r.verdict)}><I18nText>{r.verdict}</I18nText></Tag>,
     },
   ];
 
@@ -98,12 +99,9 @@ export function ContentPanel({ days, nonce }: { days: number; nonce: number }) {
       render: (r) => (
         <div>
           <div className="nv-strong">
-            {r.lesson_id} · {r.slot_id}
+            <I18nText>{r.lesson_id}</I18nText> · <I18nText>{r.slot_id}</I18nText>
           </div>
-          <div style={{ fontSize: 11.5, color: p.muted }}>
-            {r.course_id} · variant {r.variant_id}
-            {r.concept_id ? ` · ${r.concept_id}` : ""}
-          </div>
+          <div style={{ fontSize: 11.5, color: p.muted }}><I18nText source={"{value0} · variant {value1}{value2}"} values={[r.course_id, r.variant_id, r.concept_id ? ` · ${r.concept_id}` : ""]} /></div>
         </div>
       ),
     },
@@ -115,13 +113,13 @@ export function ContentPanel({ days, nonce }: { days: number; nonce: number }) {
       numeric: true,
       render: (r) => (
         <span style={{ fontWeight: 700, color: bandColor(r.first_try_pct, p) }}>
-          {fmtPct(r.first_try_pct)}
+          <I18nText>{fmtPct(r.first_try_pct)}</I18nText>
         </span>
       ),
     },
     { key: "overall", label: "Eventually right", numeric: true, render: (r) => fmtPct(r.overall_pct) },
     { key: "tries", label: "Avg tries", numeric: true, render: (r) => r.avg_attempts },
-    { key: "verdict", label: "Verdict", render: (r) => <Tag tone={verdictTone(r.verdict)}>{r.verdict}</Tag> },
+    { key: "verdict", label: "Verdict", render: (r) => <Tag tone={verdictTone(r.verdict)}><I18nText>{r.verdict}</I18nText></Tag> },
   ];
 
   return (
@@ -239,11 +237,7 @@ export function ContentPanel({ days, nonce }: { days: number; nonce: number }) {
         >
           <DataTable columns={questionColumns} rows={questions} maxHeight={520} />
           <Note>
-            <strong>Work order:</strong> start at the top, open the question, and read it as a
-            learner who has just been taught the concept. Fix the wording, then re-check this table
-            in a week - the same question should climb into the green band without the lesson
-            changing at all.
-          </Note>
+            <strong><I18nText source={"Work order:"} /></strong> <I18nText source={" start at the top, open the question, and read it as a learner who has just been taught the concept. Fix the wording, then re-check this table in a week - the same question should climb into the green band without the lesson changing at all."} /></Note>
         </Gate>
       </Panel>
 

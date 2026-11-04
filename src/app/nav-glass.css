@@ -111,3 +111,13 @@ html.dark .nav-pill-btn[data-active="true"] {
     transition: none !important;
   }
 }
+
+/* Full native labels remain readable at narrow widths and larger text sizes. */
+html:not([lang="en-ZA"]) .nav-pill-btn .nav-lbl {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.15;
+}

@@ -1,3 +1,4 @@
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 import type { SVGProps } from "react";
 
 /**
@@ -27,7 +28,7 @@ function Icon({
   ...rest
 }: NothoIconProps & { children: React.ReactNode }) {
   return (
-    <svg
+    <I18nElement as="svg"
       width={size}
       height={size}
       viewBox="0 0 24 24"
@@ -42,8 +43,8 @@ function Icon({
       focusable="false"
       {...rest}
     >
-      {children}
-    </svg>
+      <I18nText>{children}</I18nText>
+    </I18nElement>
   );
 }
 

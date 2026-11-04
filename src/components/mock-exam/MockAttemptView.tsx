@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React from "react";
 import {
@@ -172,15 +173,11 @@ export function MockAttemptView({
       >
         <section className="mock-state-screen" role="alert">
           <AlertCircle size={36} aria-hidden />
-          <h1>This mock has no available questions</h1>
-          <p>Refresh the authoritative attempt before continuing.</p>
+          <h1><I18nText source={"This mock has no available questions"} /></h1>
+          <p><I18nText source={"Refresh the authoritative attempt before continuing."} /></p>
           <div className="mock-state-actions">
-            <button type="button" className="btn btn-primary" onClick={onRetrySave}>
-              Retry
-            </button>
-            <button type="button" className="btn btn-secondary" onClick={onExit}>
-              Back to course
-            </button>
+            <button type="button" className="btn btn-primary" onClick={onRetrySave}><I18nText source={"Retry"} /></button>
+            <button type="button" className="btn btn-secondary" onClick={onExit}><I18nText source={"Back to course"} /></button>
           </div>
         </section>
       </ProtectedMockSurface>
@@ -195,40 +192,35 @@ export function MockAttemptView({
       <header className="mock-exam-header">
         <div className="mock-exam-heading">
           <button type="button" className="mock-exit-button" onClick={onExit}>
-            <ArrowLeft size={18} aria-hidden /> Exit mock
-          </button>
+            <ArrowLeft size={18} aria-hidden /> <I18nText source={" Exit mock"} /></button>
           <div>
-            <span className="mock-eyebrow">RE5 practice</span>
-            <h1>Mock examination</h1>
+            <span className="mock-eyebrow"><I18nText source={"RE5 practice"} /></span>
+            <h1><I18nText source={"Mock examination"} /></h1>
           </div>
         </div>
-        <div
+        <I18nElement as="div"
           className={`mock-timer ${remainingSeconds <= 600 ? "mock-timer-warning" : ""}`}
           role="timer"
           aria-label={`${formatMockTimer(remainingSeconds)} remaining`}
         >
           <Clock3 size={19} aria-hidden />
-          <span>{formatMockTimer(remainingSeconds)}</span>
-        </div>
+          <span><I18nText>{formatMockTimer(remainingSeconds)}</I18nText></span>
+        </I18nElement>
       </header>
 
       {saveError && (
         <div className="mock-submit-error" role="alert">
           <AlertCircle size={18} aria-hidden />
-          <span>{saveError}</span>
-          <button type="button" onClick={onRetrySave}>
-            Retry save
-          </button>
+          <span><I18nText>{saveError}</I18nText></span>
+          <button type="button" onClick={onRetrySave}><I18nText source={"Retry save"} /></button>
         </div>
       )}
 
-      <div className="mock-mobile-progress" aria-label="Mock progress">
-        <span>
-          {attempt.viewedCount} of {attempt.totalQuestions} visited
-        </span>
-        <span>{answeredCount} answered</span>
-        <span>{flaggedCount} flagged</span>
-      </div>
+      <I18nElement as="div" className="mock-mobile-progress" aria-label="Mock progress">
+        <span><I18nText source={"{value0} of {value1} visited"} values={[attempt.viewedCount, attempt.totalQuestions]} /></span>
+        <span><I18nText source={"{value0} answered"} values={[answeredCount]} /></span>
+        <span><I18nText source={"{value0} flagged"} values={[flaggedCount]} /></span>
+      </I18nElement>
 
       <button
         type="button"
@@ -238,16 +230,14 @@ export function MockAttemptView({
         onClick={() => setNavigatorOpen((open) => !open)}
       >
         <ListChecks size={18} aria-hidden />
-        Questions {currentPosition + 1}/{attempt.totalQuestions}
+        <I18nText source={"Questions "} /><I18nText>{currentPosition + 1}</I18nText>/<I18nText>{attempt.totalQuestions}</I18nText>
         <ChevronDown size={18} aria-hidden />
       </button>
 
       <div className="mock-exam-layout">
         <section className="mock-question-card" aria-labelledby="mock-question-title">
           <div className="mock-question-meta">
-            <span>
-              Question {current.questionIndex + 1} of {attempt.totalQuestions}
-            </span>
+            <span><I18nText source={"Question {value0} of {value1}"} values={[current.questionIndex + 1, attempt.totalQuestions]} /></span>
             <button
               type="button"
               className={`mock-flag-button ${current.flagged ? "is-flagged" : ""}`}
@@ -260,17 +250,17 @@ export function MockAttemptView({
                 fill={current.flagged ? "currentColor" : "none"}
                 aria-hidden
               />
-              {current.flagged ? "Flagged" : "Flag question"}
+              <I18nText>{current.flagged ? "Flagged" : "Flag question"}</I18nText>
             </button>
           </div>
 
-          {current.content && <p className="mock-question-context">{current.content}</p>}
+          {current.content && <p className="mock-question-context"><I18nText>{current.content}</I18nText></p>}
           <h2 id="mock-question-title" ref={questionHeadingRef} tabIndex={-1}>
-            {current.prompt}
+            <I18nText>{current.prompt}</I18nText>
           </h2>
 
           <fieldset className="mock-options" disabled={interactionsBlocked}>
-            <legend className="sr-only">Choose one answer</legend>
+            <legend className="sr-only"><I18nText source={"Choose one answer"} /></legend>
             {current.options.map((option) => {
               const selected = current.answeredOptionId === option.id;
               return (
@@ -286,9 +276,9 @@ export function MockAttemptView({
                     onChange={() => onAnswer(current.questionIndex, option.id)}
                   />
                   <span className="mock-option-label" aria-hidden>
-                    {option.label}
+                    <I18nText>{option.label}</I18nText>
                   </span>
-                  <span>{option.text}</span>
+                  <span><I18nText>{option.text}</I18nText></span>
                 </label>
               );
             })}
@@ -301,13 +291,11 @@ export function MockAttemptView({
               disabled={current.answeredOptionId === null || interactionsBlocked}
               onClick={() => onAnswer(current.questionIndex, null)}
             >
-              <X size={16} aria-hidden /> Clear selected answer
-            </button>
+              <X size={16} aria-hidden /> <I18nText source={" Clear selected answer"} /></button>
             <span className="mock-save-state" aria-live="polite">
               {pendingSaves > 0 ? (
                 <>
-                  <LoaderCircle className="mock-spinner" size={14} aria-hidden /> Saving…
-                </>
+                  <LoaderCircle className="mock-spinner" size={14} aria-hidden /> <I18nText source={" Saving…"} /></>
               ) : saveError ? (
                 "Save needs attention"
               ) : (
@@ -323,8 +311,7 @@ export function MockAttemptView({
               disabled={currentPosition === 0 || interactionsBlocked}
               onClick={() => goToPosition(currentPosition - 1)}
             >
-              <ArrowLeft size={18} aria-hidden /> Back
-            </button>
+              <ArrowLeft size={18} aria-hidden /> <I18nText source={" Back"} /></button>
             <button
               type="button"
               className="btn btn-primary"
@@ -334,7 +321,7 @@ export function MockAttemptView({
               }
               onClick={() => goToPosition(currentPosition + 1)}
             >
-              Next <ArrowRight size={18} aria-hidden />
+              <I18nText source={"Next "} /><ArrowRight size={18} aria-hidden />
             </button>
           </div>
         </section>
@@ -346,22 +333,22 @@ export function MockAttemptView({
         >
           <div className="mock-navigator-heading">
             <div>
-              <h2>Questions</h2>
-              <p>Jump to any question</p>
+              <h2><I18nText source={"Questions"} /></h2>
+              <p><I18nText source={"Jump to any question"} /></p>
             </div>
             <span>
-              {answeredCount}/{attempt.totalQuestions}
+              <I18nText>{answeredCount}</I18nText>/<I18nText>{attempt.totalQuestions}</I18nText>
             </span>
           </div>
 
-          <nav aria-label="Question navigator">
+          <I18nElement as="nav" aria-label="Question navigator">
             <ol className="mock-question-grid">
               {attempt.questions.map((question, position) => {
                 const status = mockQuestionStatus(question);
                 const isCurrent = position === currentPosition;
                 return (
                   <li key={question.id}>
-                    <button
+                    <I18nElement as="button"
                       ref={(node) => {
                         navigatorButtonRefs.current[position] = node;
                       }}
@@ -380,7 +367,7 @@ export function MockAttemptView({
                       onKeyDown={(event) => handleNavigatorKeyDown(event, position)}
                       onClick={() => goToPosition(position)}
                     >
-                      <span>{question.questionIndex + 1}</span>
+                      <span><I18nText>{question.questionIndex + 1}</I18nText></span>
                       {status === "answered" && <Check size={12} aria-hidden />}
                       {status === "unanswered" && <Circle size={9} aria-hidden />}
                       {question.flagged && (
@@ -391,45 +378,37 @@ export function MockAttemptView({
                           aria-hidden
                         />
                       )}
-                    </button>
+                    </I18nElement>
                   </li>
                 );
               })}
             </ol>
-          </nav>
+          </I18nElement>
 
-          <div className="mock-status-legend" aria-label="Question status key">
+          <I18nElement as="div" className="mock-status-legend" aria-label="Question status key">
             <span>
-              <i className="legend-unseen" /> Unseen
-            </span>
+              <i className="legend-unseen" /> <I18nText source={" Unseen"} /></span>
             <span>
-              <i className="legend-unanswered" /> Unanswered
-            </span>
+              <i className="legend-unanswered" /> <I18nText source={" Unanswered"} /></span>
             <span>
-              <i className="legend-answered" /> Answered
-            </span>
+              <i className="legend-answered" /> <I18nText source={" Answered"} /></span>
             <span>
-              <Flag size={11} fill="currentColor" aria-hidden /> Flagged
-            </span>
-          </div>
+              <Flag size={11} fill="currentColor" aria-hidden /> <I18nText source={" Flagged"} /></span>
+          </I18nElement>
         </aside>
       </div>
 
       <div className="mock-content-deterrent" role="note">
         <ShieldCheck size={16} aria-hidden />
-        This protected practice paper is watermarked. Copy and print controls are
-        deterrents; screenshots and camera capture cannot be prevented.
-      </div>
+        <I18nText source={"This protected practice paper is watermarked. Copy and print controls are deterrents; screenshots and camera capture cannot be prevented."} /></div>
 
       <div className="mock-submit-dock">
         <div className="mock-submit-dock-inner">
           {attempt.allViewed ? (
             <>
               <div>
-                <strong>All questions visited</strong>
-                <span>
-                  {attempt.unansweredCount} unanswered · {flaggedCount} flagged
-                </span>
+                <strong><I18nText source={"All questions visited"} /></strong>
+                <span><I18nText source={"{value0} unanswered · {value1} flagged"} values={[attempt.unansweredCount, flaggedCount]} /></span>
               </div>
               <button
                 type="button"
@@ -442,17 +421,13 @@ export function MockAttemptView({
                 ) : (
                   <ShieldCheck size={18} aria-hidden />
                 )}
-                {submitting ? "Submitting…" : "Submit mock"}
+                <I18nText>{submitting ? "Submitting…" : "Submit mock"}</I18nText>
               </button>
             </>
           ) : (
             <div className="mock-submit-locked" role="status">
               <ListChecks size={19} aria-hidden />
-              <span>
-                Visit {attempt.totalQuestions - attempt.viewedCount} more question
-                {attempt.totalQuestions - attempt.viewedCount === 1 ? "" : "s"} to
-                unlock Submit
-              </span>
+              <span><I18nText source={"Visit {value0} more questions to unlock Submit"} values={[attempt.totalQuestions - attempt.viewedCount, attempt.totalQuestions - attempt.viewedCount === 1 ? "" : "s"]} one={"Visit {value0} more question to unlock Submit"} count={attempt.totalQuestions - attempt.viewedCount} /></span>
             </div>
           )}
         </div>
@@ -531,62 +506,60 @@ export function MockAttemptReport({
     >
       <header className="mock-result-header">
         <div>
-          <span className="mock-eyebrow">RE5 mock · Authoritative result</span>
-          <h1>{result.passed ? "Practice pass" : "Not yet at the threshold"}</h1>
+          <span className="mock-eyebrow"><I18nText source={"RE5 mock · Authoritative result"} /></span>
+          <h1><I18nText>{result.passed ? "Practice pass" : "Not yet at the threshold"}</I18nText></h1>
           <p>
-            {result.passed
+            <I18nText>{result.passed
               ? `You met this practice paper’s configured threshold of ${result.passMarkCorrect}/${result.totalQuestions}.`
               : `You needed ${Math.max(
                   0,
                   result.passMarkCorrect - result.correctAnswers
                 )} more correct answer${
                   result.passMarkCorrect - result.correctAnswers === 1 ? "" : "s"
-                }.`}
+                }.`}</I18nText>
           </p>
         </div>
         <div className={`mock-result-score ${result.passed ? "is-pass" : "is-fail"}`}>
           <strong>
-            {result.correctAnswers}
-            <span>/{result.totalQuestions}</span>
+            <I18nText>{result.correctAnswers}</I18nText>
+            <span>/<I18nText>{result.totalQuestions}</I18nText></span>
           </strong>
-          <span>{result.scorePct}%</span>
+          <span><I18nText>{result.scorePct}</I18nText>%</span>
         </div>
       </header>
 
-      <section className="mock-result-summary" aria-label="Result summary">
+      <I18nElement as="section" className="mock-result-summary" aria-label="Result summary">
         <div>
-          <span>Outcome</span>
-          <strong>{result.passed ? "Pass" : "Fail"}</strong>
+          <span><I18nText source={"Outcome"} /></span>
+          <strong><I18nText>{result.passed ? "Pass" : "Fail"}</I18nText></strong>
         </div>
         <div>
-          <span>Pass mark</span>
+          <span><I18nText source={"Pass mark"} /></span>
           <strong>
-            {result.passMarkCorrect}/{result.totalQuestions}
+            <I18nText>{result.passMarkCorrect}</I18nText>/<I18nText>{result.totalQuestions}</I18nText>
           </strong>
         </div>
         <div>
-          <span>Time used</span>
-          <strong>{formatMockTimer(result.durationSeconds)}</strong>
+          <span><I18nText source={"Time used"} /></span>
+          <strong><I18nText>{formatMockTimer(result.durationSeconds)}</I18nText></strong>
         </div>
         <div>
-          <span>Unanswered</span>
-          <strong>{result.unansweredCount}</strong>
+          <span><I18nText source={"Unanswered"} /></span>
+          <strong><I18nText>{result.unansweredCount}</I18nText></strong>
         </div>
-      </section>
+      </I18nElement>
 
       {result.submissionReason === "time_expired" && (
         <div className="mock-result-warning" role="status">
           <Clock3 size={18} aria-hidden />
-          The fixed deadline elapsed, so the server submitted this attempt with
-          unanswered questions marked blank.
-        </div>
+          <I18nText source={"The fixed deadline elapsed, so the server submitted this attempt with unanswered questions marked blank."} /></div>
       )}
 
       {result.areaBreakdown.length > 0 && (
         <section className="mock-area-breakdown" aria-labelledby="mock-area-title">
           <div>
-            <h2 id="mock-area-title">Knowledge-area breakdown</h2>
-            <p>Use these server-graded results to choose what to revise next.</p>
+            <h2 id="mock-area-title"><I18nText source={"Knowledge-area breakdown"} /></h2>
+            <p><I18nText source={"Use these server-graded results to choose what to revise next."} /></p>
           </div>
           <ul>
             {result.areaBreakdown.map((area) => {
@@ -594,13 +567,13 @@ export function MockAttemptReport({
                 area.total > 0 ? Math.round((area.correct / area.total) * 100) : 0;
               return (
                 <li key={area.areaId}>
-                  <span>{area.areaLabel}</span>
+                  <span><I18nText>{area.areaLabel}</I18nText></span>
                   <strong>
-                    {area.correct}/{area.total}
+                    <I18nText>{area.correct}</I18nText>/<I18nText>{area.total}</I18nText>
                   </strong>
-                  <div aria-label={`${percentage}% correct`}>
+                  <I18nElement as="div" aria-label={`${percentage}% correct`}>
                     <i style={{ width: `${percentage}%` }} />
-                  </div>
+                  </I18nElement>
                 </li>
               );
             })}
@@ -611,10 +584,10 @@ export function MockAttemptReport({
       <section className="mock-review-section" aria-labelledby="mock-review-title">
         <div className="mock-review-heading">
           <div>
-            <h2 id="mock-review-title">Answer review</h2>
-            <p>Explanations are requested securely and stay closed until you ask.</p>
+            <h2 id="mock-review-title"><I18nText source={"Answer review"} /></h2>
+            <p><I18nText source={"Explanations are requested securely and stay closed until you ask."} /></p>
           </div>
-          <span>Completed paper</span>
+          <span><I18nText source={"Completed paper"} /></span>
         </div>
 
         <ol className="mock-review-list">
@@ -640,15 +613,15 @@ export function MockAttemptReport({
                   ) : (
                     <XCircle className="is-incorrect" size={21} aria-label="Incorrect" />
                   )}
-                  <span>{question.questionIndex + 1}</span>
-                  <h3>{question.prompt}</h3>
+                  <span><I18nText>{question.questionIndex + 1}</I18nText></span>
+                  <h3><I18nText>{question.prompt}</I18nText></h3>
                 </div>
 
                 {question.content && (
-                  <p className="mock-review-context">{question.content}</p>
+                  <p className="mock-review-context"><I18nText>{question.content}</I18nText></p>
                 )}
 
-                <div className="mock-reviewed-options" aria-label="Reviewed answers">
+                <I18nElement as="div" className="mock-reviewed-options" aria-label="Reviewed answers">
                   {question.options.map((option) => {
                     const selected = option.id === question.answeredOptionId;
                     const correct = option.id === question.correctOptionId;
@@ -659,24 +632,22 @@ export function MockAttemptReport({
                           selected && !correct ? "is-incorrect" : ""
                         }`}
                       >
-                        <strong>{option.label}.</strong> {option.text}
+                        <strong><I18nText>{option.label}</I18nText>.</strong> <I18nText>{option.text}</I18nText>
                         {correct ? (
-                          <span>Correct answer</span>
+                          <span><I18nText source={"Correct answer"} /></span>
                         ) : selected ? (
-                          <span>Your answer</span>
+                          <span><I18nText source={"Your answer"} /></span>
                         ) : null}
                       </div>
                     );
                   })}
-                </div>
+                </I18nElement>
 
                 {!selectedOption && (
-                  <p className="mock-unanswered-review">No answer selected.</p>
+                  <p className="mock-unanswered-review"><I18nText source={"No answer selected."} /></p>
                 )}
                 {!correctOption && (
-                  <p className="mock-explanation-error" role="alert">
-                    The marked answer is unavailable in this report.
-                  </p>
+                  <p className="mock-explanation-error" role="alert"><I18nText source={"The marked answer is unavailable in this report."} /></p>
                 )}
 
                 <button
@@ -690,8 +661,7 @@ export function MockAttemptReport({
                   {explanation.status === "loading" ? (
                     <>
                       <LoaderCircle className="mock-spinner" size={16} aria-hidden />
-                      Loading explanation…
-                    </>
+                      <I18nText source={"Loading explanation…"} /></>
                   ) : expanded ? (
                     "Hide explanation"
                   ) : explanation.status === "error" ? (
@@ -707,13 +677,13 @@ export function MockAttemptReport({
                     className="mock-explanation-error"
                     role="alert"
                   >
-                    {explanation.message}
+                    <I18nText>{explanation.message}</I18nText>
                   </p>
                 )}
                 {explanation.status === "loaded" && explanation.expanded && (
                   <div id={explanationId} className="mock-explanation-panel">
-                    <strong>Why</strong>
-                    <p>{explanation.text}</p>
+                    <strong><I18nText source={"Why"} /></strong>
+                    <p><I18nText>{explanation.text}</I18nText></p>
                   </div>
                 )}
               </li>
@@ -724,19 +694,12 @@ export function MockAttemptReport({
 
       <div className="mock-content-deterrent" role="note">
         <ShieldCheck size={16} aria-hidden />
-        This completed paper remains watermarked and protected from casual copying.
-      </div>
+        <I18nText source={"This completed paper remains watermarked and protected from casual copying."} /></div>
 
       <div className="mock-result-actions">
-        <button type="button" className="btn btn-primary" onClick={onViewReadiness}>
-          View RE5 readiness
-        </button>
-        <button type="button" className="btn btn-secondary" onClick={onRetake}>
-          Retake mock
-        </button>
-        <button type="button" className="btn btn-secondary" onClick={onExit}>
-          Back to course
-        </button>
+        <button type="button" className="btn btn-primary" onClick={onViewReadiness}><I18nText source={"View RE5 readiness"} /></button>
+        <button type="button" className="btn btn-secondary" onClick={onRetake}><I18nText source={"Retake mock"} /></button>
+        <button type="button" className="btn btn-secondary" onClick={onExit}><I18nText source={"Back to course"} /></button>
       </div>
     </ProtectedMockSurface>
   );
@@ -774,13 +737,11 @@ function ProtectedMockSurface({
     >
       <div className="mock-watermark-layer" aria-hidden>
         {Array.from({ length: 18 }, (_, index) => (
-          <span key={index}>{watermark}</span>
+          <span key={index}><I18nText>{watermark}</I18nText></span>
         ))}
       </div>
-      <div className="mock-print-message">
-        Printing protected mock-exam content is disabled.
-      </div>
-      <div className="mock-protected-content">{children}</div>
+      <div className="mock-print-message"><I18nText source={"Printing protected mock-exam content is disabled."} /></div>
+      <div className="mock-protected-content"><I18nText>{children}</I18nText></div>
     </main>
   );
 }

@@ -16,3 +16,13 @@ export async function isNativePlatform(): Promise<boolean> {
     return false;
   }
 }
+
+/** True only in the iPhone/iPad app. Android, Huawei, web, and desktop stay false. */
+export async function isIosNative(): Promise<boolean> {
+  try {
+    const { Capacitor } = await import("@capacitor/core");
+    return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "ios";
+  } catch {
+    return false;
+  }
+}

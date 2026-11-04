@@ -1,3 +1,4 @@
+import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -39,9 +40,7 @@ export default function TermsPage() {
               borderRadius: "6px",
               marginBottom: "16px",
             }}
-          >
-            Legal
-          </div>
+          ><I18nText source={"Legal"} /></div>
           <h1
             style={{
               fontSize: "clamp(28px, 5vw, 40px)",
@@ -50,12 +49,8 @@ export default function TermsPage() {
               margin: "0 0 12px",
               color: "#ffffff",
             }}
-          >
-            Terms of Service
-          </h1>
-          <p style={{ color: "#a0a0a0", fontSize: "15px", margin: 0 }}>
-            Last updated: July 2026 &nbsp;&middot;&nbsp; The Solution Org (Pty) Ltd
-          </p>
+          ><I18nText source={"Terms of Service"} /></h1>
+          <p style={{ color: "#a0a0a0", fontSize: "15px", margin: 0 }}><I18nText source={"Last updated: July 2026  ·  The Solution Org (Pty) Ltd"} /></p>
         </div>
 
         {/* Important Notice */}
@@ -77,9 +72,7 @@ export default function TermsPage() {
               color: "#EFB343",
               marginBottom: "10px",
             }}
-          >
-            Important Notice
-          </div>
+          ><I18nText source={"Important Notice"} /></div>
           <p
             style={{
               fontSize: "15px",
@@ -87,19 +80,7 @@ export default function TermsPage() {
               color: "#d0d0d0",
               margin: 0,
             }}
-          >
-            Notho is a{" "}
-            <strong style={{ color: "#ffffff" }}>
-              financial-literacy education
-            </strong>{" "}
-            platform. It is{" "}
-            <strong style={{ color: "#ffffff" }}>
-              not a licensed financial services provider (FSP)
-            </strong>{" "}
-            under the South African Financial Advisory and Intermediary Services
-            Act (FAIS Act, 2002) and it does not render financial, investment,
-            tax, or legal advice as defined in that Act.
-          </p>
+          ><I18nRich source={"Notho is a  <strong0>financial-literacy education</strong0>  platform. It is  <strong1>not a licensed financial services provider (FSP)</strong1>  under the South African Financial Advisory and Intermediary Services Act (FAIS Act, 2002) and it does not render financial, investment, tax, or legal advice as defined in that Act."} elements={[<strong key="inline-0" style={{ color: "#ffffff" }} />, <strong key="inline-1" style={{ color: "#ffffff" }} />]} /></p>
           <p
             style={{
               fontSize: "14px",
@@ -107,21 +88,12 @@ export default function TermsPage() {
               color: "#a0a0a0",
               margin: "12px 0 0",
             }}
-          >
-            Lessons, calculators, budgets, and projections are illustrative and
-            generic. For advice specific to your personal circumstances, consult
-            an FSCA-registered financial adviser. You can verify any adviser&apos;s
-            licence at{" "}
-            <a
+          ><I18nRich source={"Lessons, calculators, budgets, and projections are illustrative and generic. For advice specific to your personal circumstances, consult an FSCA-registered financial adviser. You can verify any adviser's licence at  <a0>fsca.co.za</a0> ."} elements={[<a key="inline-0"
               href="https://fsca.co.za"
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: "#007A85" }}
-            >
-              fsca.co.za
-            </a>
-            .
-          </p>
+             />]} /></p>
         </div>
 
         {/* Sections */}
@@ -139,7 +111,7 @@ export default function TermsPage() {
           { title: "10. Contact", body: "For any questions about these Terms, contact us at legal@notho.co.za." },
         ].map((s) => (
           <Section key={s.title} title={s.title}>
-            <p>{s.body}</p>
+            <p><I18nText>{s.body}</I18nText></p>
           </Section>
         ))}
 
@@ -151,10 +123,7 @@ export default function TermsPage() {
             color: "#505050",
             fontSize: "13px",
           }}
-        >
-          &copy; {new Date().getFullYear()} The Solution Org (Pty) Ltd. All rights
-          reserved.
-        </div>
+        ><I18nText source={"© {value0} The Solution Org (Pty) Ltd. All rights reserved."} values={[new Date().getFullYear()]} /></div>
       </div>
     </main>
   );
@@ -177,7 +146,7 @@ function Section({
           margin: "0 0 12px",
         }}
       >
-        {title}
+        <I18nText>{title}</I18nText>
       </h2>
       <div
         style={{
@@ -186,7 +155,7 @@ function Section({
           color: "#c0c0c0",
         }}
       >
-        {children}
+        <I18nText>{children}</I18nText>
       </div>
     </section>
   );

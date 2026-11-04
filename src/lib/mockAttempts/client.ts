@@ -1,9 +1,11 @@
 "use client";
 
 import { supabase } from "@/lib/supabaseClient";
+import { parseLocale } from '@/i18n/locales';
 import type { MockAttemptMutation, MockAttemptSnapshot } from "@/lib/mockAttempts/types";
 
 type AttemptResponse = { attempt: MockAttemptSnapshot };
+const presentationLocale = () => typeof document === 'undefined' ? 'en' : parseLocale(document.documentElement.lang.split('-')[0]);
 
 export class MockAttemptApiError extends Error {
   constructor(
@@ -23,10 +25,13 @@ async function bearerToken(): Promise<string> {
 }
 
 async function requestAttempt(path: string, init: RequestInit): Promise<MockAttemptSnapshot> {
+  const token = await bearerToken();
+  const locale = presentationLocale();
   const response = await fetch(path, {
     ...init,
     headers: {
-      Authorization: `Bearer ${await bearerToken()}`,
+      Authorization: `Bearer ${token}`,
+      'X-Notho-Locale': locale,
       ...(init.body ? { "Content-Type": "application/json" } : {}),
       ...init.headers,
     },
@@ -35,14 +40,19 @@ async function requestAttempt(path: string, init: RequestInit): Promise<MockAtte
   const payload = (await response.json().catch(() => ({}))) as Partial<
     AttemptResponse & { error: string }
   >;
+  // A language change must never replay an answer or submission. Re-read the
+  // same attempt to refresh presentation after the original mutation finishes.
+  const changedLanguage = locale !== presentationLocale();
+  const snapshot = changedLanguage && payload.attempt
+    ? await getMockAttempt(payload.attempt.id) : payload.attempt;
   if (!response.ok || !payload.attempt) {
     throw new MockAttemptApiError(
-      payload.error ?? "The mock attempt request failed",
+      changedLanguage ? "The mock attempt request failed" : payload.error ?? "The mock attempt request failed",
       response.status,
-      payload.attempt ?? null
+      snapshot ?? null
     );
   }
-  return payload.attempt;
+  return snapshot!;
 }
 
 export function startMockAttempt(
@@ -71,11 +81,13 @@ export function submitMockAttempt(attemptId: string) {
   return requestAttempt(`/api/mock-attempts/${attemptId}/submit`, { method: "POST" });
 }
 
-export async function getMockExplanation(attemptId: string, questionId: string) {
+export async function getMockExplanation(attemptId: string, questionId: string): Promise<string> {
+  const token = await bearerToken();
+  const locale = presentationLocale();
   const response = await fetch(
     `/api/mock-attempts/${attemptId}/explanations/${questionId}`,
     {
-      headers: { Authorization: `Bearer ${await bearerToken()}` },
+      headers: { Authorization: `Bearer ${token}`, 'X-Notho-Locale': locale },
       cache: "no-store",
     }
   );
@@ -86,6 +98,7 @@ export async function getMockExplanation(attemptId: string, questionId: string) 
   if (!response.ok || !payload.explanation) {
     throw new MockAttemptApiError(payload.error ?? "Explanation unavailable", response.status);
   }
+  if (locale !== presentationLocale()) return getMockExplanation(attemptId, questionId);
   return payload.explanation;
 }
 

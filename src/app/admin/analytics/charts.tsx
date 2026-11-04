@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 /**
  * Thin theming layer over recharts.
@@ -54,7 +55,7 @@ export function labelFormatter(fn: (s: string) => string): RcLabelFormatter {
 export function Frame({ height, children }: { height: number; children: React.ReactElement }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      {children}
+      <I18nText>{children}</I18nText>
     </ResponsiveContainer>
   );
 }

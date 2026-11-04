@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import { useState } from "react";
 import { NothoStreak, NothoXP } from "@/components/icons/NothoIcons";
@@ -150,7 +151,7 @@ export function OnboardingTooltips({ onDone }: { onDone: () => void }) {
         />
 
         {/* Icon */}
-        {current.icon}
+        <I18nText>{current.icon}</I18nText>
 
         {/* Title */}
         <h2
@@ -162,7 +163,7 @@ export function OnboardingTooltips({ onDone }: { onDone: () => void }) {
             marginBottom: 12,
           }}
         >
-          {current.title}
+          <I18nText>{current.title}</I18nText>
         </h2>
 
         {/* Body */}
@@ -175,7 +176,7 @@ export function OnboardingTooltips({ onDone }: { onDone: () => void }) {
             marginBottom: 16,
           }}
         >
-          {current.body}
+          <I18nText>{current.body}</I18nText>
         </p>
 
         {/* Tip chip */}
@@ -192,7 +193,7 @@ export function OnboardingTooltips({ onDone }: { onDone: () => void }) {
             fontStyle: "italic",
           }}
         >
-          {current.tip}
+          <I18nText>{current.tip}</I18nText>
         </div>
 
         {/* Dot pagination */}
@@ -228,7 +229,7 @@ export function OnboardingTooltips({ onDone }: { onDone: () => void }) {
           className="btn btn-primary"
           style={{ width: "100%", fontSize: 16, padding: "14px 0", borderRadius: 12 }}
         >
-          {isLast ? "Got it, let's go" : "Next"}
+          <I18nText>{isLast ? "Got it, let's go" : "Next"}</I18nText>
         </button>
 
         {/* Skip link */}
@@ -247,9 +248,7 @@ export function OnboardingTooltips({ onDone }: { onDone: () => void }) {
               cursor: "pointer",
               textAlign: "center",
             }}
-          >
-            Skip intro
-          </button>
+          ><I18nText source={"Skip intro"} /></button>
         )}
       </div>
     </div>

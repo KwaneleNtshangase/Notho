@@ -19,9 +19,11 @@ export async function POST(req: NextRequest) {
     issueType?: string;
     userEmail?: string;
     feedbackId?: string;
+    screenshot?: string | null;
   };
 
-  const { subject, description, issueType, userEmail, feedbackId } = body;
+  const { subject, description, issueType, userEmail, feedbackId, screenshot } = body;
+  const shot = typeof screenshot === "string" && screenshot.startsWith("data:image/") && screenshot.length < 900_000 ? screenshot : null;
 
   // Helper: write diagnostic info back to the feedback row so we can query it
   const logStatus = async (status: Record<string, unknown>) => {
@@ -69,6 +71,7 @@ export async function POST(req: NextRequest) {
         html: `
           <div style="font-family:Arial,sans-serif;line-height:1.6;color:#1f2937;max-width:600px">
             <h2 style="color:#007A85">New Feedback from Notho</h2>
+            ${shot ? `<img src="${shot}" alt="Screen" style="width:100%;max-width:420px;border-radius:12px;margin:8px 0" />` : ""}
             <table style="width:100%;border-collapse:collapse">
               <tr>
                 <td style="padding:8px 0;font-weight:700;width:140px;color:#6b7280">Type</td>

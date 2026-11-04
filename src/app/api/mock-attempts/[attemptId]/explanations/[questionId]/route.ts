@@ -1,3 +1,4 @@
+import { localizedMockJson } from "@/server/localizeMock";
 import { NextRequest } from "next/server";
 import { getUserFromRequest } from "@/lib/apiAuth";
 import { createServiceSupabase } from "@/lib/supabaseServer";
@@ -5,7 +6,6 @@ import { fetchOwnedMockExplanation } from "@/lib/mockAttempts/server";
 import { validateUuid } from "@/lib/mockAttempts/validation";
 import {
   auditMockEvent,
-  mockJson,
   rejectRateLimited,
 } from "@/server/mockAttemptSecurity";
 
@@ -16,10 +16,10 @@ type RouteContext = {
 
 export async function GET(req: NextRequest, context: RouteContext) {
   const user = await getUserFromRequest(req);
-  if (!user) return mockJson({ error: "Unauthorized" }, 401);
+  if (!user) return localizedMockJson(req, { error: "Unauthorized" }, 401);
   const { attemptId, questionId } = await context.params;
   if (!validateUuid(attemptId) || !validateUuid(questionId)) {
-    return mockJson({ error: "Invalid explanation id" }, 400);
+    return localizedMockJson(req, { error: "Invalid explanation id" }, 400);
   }
 
   try {
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
         action: "explanation_read",
         outcome: "denied",
       });
-      return mockJson({ error: "Explanation not found" }, 404);
+      return localizedMockJson(req, { error: "Explanation not found" }, 404);
     }
     await auditMockEvent(admin, req, {
       userId: user.id,
@@ -52,9 +52,9 @@ export async function GET(req: NextRequest, context: RouteContext) {
       outcome: "allowed",
       metadata: { questionId },
     });
-    return mockJson({ questionId, explanation });
+    return localizedMockJson(req, { questionId, explanation });
   } catch (error) {
     console.error("[mock-attempts/explanation]", error);
-    return mockJson({ error: "Explanation unavailable" }, 503);
+    return localizedMockJson(req, { error: "Explanation unavailable" }, 503);
   }
 }

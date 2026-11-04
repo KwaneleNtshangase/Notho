@@ -17,7 +17,13 @@
     "scan:answers": "node scripts/answer-pattern-scan.mjs",
     "scan:ratchet": "node scripts/answer-pattern-ratchet.mjs",
     "content:offenders": "node scripts/export-offenders.mjs",
-    "content:trims": "node scripts/propose-trims.mjs"
+    "content:trims": "node scripts/propose-trims.mjs",
+    "i18n:check": "node scripts/i18n.mjs check",
+    "i18n:export": "node scripts/i18n.mjs export",
+    "i18n:import": "node scripts/i18n.mjs import",
+    "i18n:inventory": "node scripts/i18n-inventory.mjs",
+    "i18n:compile": "node scripts/compile-i18n-drafts.mjs",
+    "i18n:plan": "node scripts/generate-i18n-gemini.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
@@ -33,11 +39,13 @@
     "@capacitor/share": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.2",
     "@capgo/capacitor-native-biometric": "^8.6.2",
+    "@capgo/capacitor-shake": "^8.0.46",
     "@react-pdf/renderer": "^4.5.1",
     "@sentry/nextjs": "^10.75.3",
     "@supabase/supabase-js": "^2.99.2",
     "canvas-confetti": "^1.9.4",
     "dompurify": "^3.4.11",
+    "html-to-image": "^1.11.13",
     "lucide-react": "^0.577.0",
     "next": "^16.2.10",
     "papaparse": "^5.5.4",

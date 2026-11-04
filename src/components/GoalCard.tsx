@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useState } from "react";
 import { Target } from "lucide-react";
@@ -63,11 +64,11 @@ export function GoalCard() {
               <div className="min-w-0">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-green-600 dark:text-green-500">{t("goals.yourGoal")}</p>
                 <p className="text-sm font-bold text-green-900 dark:text-green-200 leading-tight">
-                  {GOAL_OPTIONS.find((g) => g.id === userGoal)?.label ?? userGoal}
+                  <I18nText>{GOAL_OPTIONS.find((g) => g.id === userGoal)?.label ?? userGoal}</I18nText>
                 </p>
                 {goalDescription && (
                   <p className="mt-0.5 text-xs text-green-700 dark:text-green-400 opacity-80 break-words">
-                    {goalDescription}
+                    <I18nText>{goalDescription}</I18nText>
                   </p>
                 )}
               </div>
@@ -96,9 +97,7 @@ export function GoalCard() {
             <p className="text-sm font-bold text-green-900 dark:text-green-200 leading-tight">
               {t("goals.setMoney")}
             </p>
-            <p className="mt-0.5 text-xs text-green-700 dark:text-green-400 opacity-80">
-              We&apos;ll prioritise courses that match it.
-            </p>
+            <p className="mt-0.5 text-xs text-green-700 dark:text-green-400 opacity-80"><I18nText source={"We'll prioritise courses that match it."} /></p>
           </div>
         </button>
       )}
@@ -118,9 +117,7 @@ export function GoalCard() {
             <h2 id="goalcard-picker-title" className="mb-1 text-lg font-bold text-gray-900 dark:text-white">
               {t("goals.pickerTitle")}
             </h2>
-            <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-              We&apos;ll prioritise courses that match what you want to achieve.
-            </p>
+            <p className="mb-4 text-sm text-gray-500 dark:text-gray-400"><I18nText source={"We'll prioritise courses that match what you want to achieve."} /></p>
             <div className="mb-3 grid grid-cols-2 gap-2">
               {GOAL_OPTIONS.map((g) => (
                 <button

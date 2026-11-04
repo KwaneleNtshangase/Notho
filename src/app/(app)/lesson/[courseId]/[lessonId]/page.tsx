@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 import { isScorableStep } from "@/lib/lessonScoring";
 import React, { use } from "react";
@@ -189,7 +190,7 @@ function StandardLessonPage({
   }, [hasLessonState, userId, courseId, lessonId]);
 
   if (!hasLessonState || !currentLessonState) {
-    return <div className="p-4">Loading lesson...</div>;
+    return <div className="p-4"><I18nText source={"Loading lesson..."} /></div>;
   }
 
   const finalizeCurrentLesson = (choice: "next" | "course") => {

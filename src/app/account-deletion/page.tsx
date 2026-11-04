@@ -1,3 +1,4 @@
+import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -73,9 +74,7 @@ export default function AccountDeletionPage() {
               borderRadius: 20,
               marginBottom: 16,
             }}
-          >
-            Account
-          </div>
+          ><I18nText source={"Account"} /></div>
           <h1
             style={{
               fontSize: "clamp(28px, 5vw, 40px)",
@@ -84,18 +83,13 @@ export default function AccountDeletionPage() {
               margin: "0 0 12px",
               color: "#ffffff",
             }}
-          >
-            Delete Your Account
-          </h1>
-          <p style={{ color: "#a0a0a0", fontSize: 15, margin: 0 }}>
-            You can delete your Notho account and all associated data at any
-            time. Here&apos;s how.
-          </p>
+          ><I18nText source={"Delete Your Account"} /></h1>
+          <p style={{ color: "#a0a0a0", fontSize: 15, margin: 0 }}><I18nText source={"You can delete your Notho account and all associated data at any time. Here's how."} /></p>
         </div>
 
         {/* Self-service deletion */}
         <div style={card}>
-          <h2 style={h2}>Option 1 — Delete it yourself, instantly</h2>
+          <h2 style={h2}><I18nText source={"Option 1 — Delete it yourself, instantly"} /></h2>
           <ol
             style={{
               paddingLeft: 20,
@@ -105,41 +99,22 @@ export default function AccountDeletionPage() {
               lineHeight: 1.9,
             }}
           >
-            <li>
-              Open <strong>Settings</strong> in the app.
-            </li>
-            <li>
-              Tap <strong>Delete My Data</strong>. We&apos;ll ask why
-              you&apos;re leaving — this is <strong>optional</strong>; there is
-              a <strong>Skip</strong> button, and skipping does not delay or
-              affect your deletion in any way.
-            </li>
-            <li>
-              Confirm. Your account and all data attached to it are erased
-              immediately. <strong>This cannot be undone.</strong>
-            </li>
+            <li><I18nRich source={"Open <strong0>Settings</strong0>  in the app."} elements={[<strong key="inline-0" />]} /></li>
+            <li><I18nRich source={"Tap <strong0>Delete My Data</strong0>. We'll ask why you're leaving — this is <strong1>optional</strong1>; there is a <strong2>Skip</strong2>  button, and skipping does not delay or affect your deletion in any way."} elements={[<strong key="inline-0" />, <strong key="inline-1" />, <strong key="inline-2" />]} /></li>
+            <li><I18nRich source={"Confirm. Your account and all data attached to it are erased immediately. <strong0>This cannot be undone.</strong0>"} elements={[<strong key="inline-0" />]} /></li>
           </ol>
         </div>
 
         {/* Export first */}
         <div style={card}>
-          <h2 style={h2}>Export your data first</h2>
-          <p style={p}>
-            Before you delete, you can download everything we hold on you.
-            Go to <strong>Settings</strong> and tap{" "}
-            <strong>Download my data</strong>. You&apos;ll receive a JSON file
-            with your learning progress, budget entries, imported transactions,
-            and coach conversations.
-          </p>
+          <h2 style={h2}><I18nText source={"Export your data first"} /></h2>
+          <p style={p}><I18nRich source={"Before you delete, you can download everything we hold on you. Go to <strong0>Settings</strong0>  and tap  <strong1>Download my data</strong1>. You'll receive a JSON file with your learning progress, budget entries, imported transactions, and coach conversations."} elements={[<strong key="inline-0" />, <strong key="inline-1" />]} /></p>
         </div>
 
         {/* What gets deleted */}
         <div style={card}>
-          <h2 style={h2}>What gets deleted</h2>
-          <p style={p}>
-            When you delete your account, <strong>all</strong> of the following
-            are permanently removed:
-          </p>
+          <h2 style={h2}><I18nText source={"What gets deleted"} /></h2>
+          <p style={p}><I18nRich source={"When you delete your account, <strong0>all</strong0>  of the following are permanently removed:"} elements={[<strong key="inline-0" />]} /></p>
           <ul
             style={{
               paddingLeft: 20,
@@ -149,30 +124,22 @@ export default function AccountDeletionPage() {
               lineHeight: 1.9,
             }}
           >
-            <li>Your account information (name, email, profile photo)</li>
-            <li>Learning progress, XP, streaks, and quiz results</li>
-            <li>Budget entries and financial goals</li>
-            <li>
-              Imported transactions (the categorised data extracted from your
-              bank statements — raw statement files are never stored)
-            </li>
-            <li>Cosmo coach conversations</li>
-            <li>Push notification subscriptions</li>
+            <li><I18nText source={"Your account information (name, email, profile photo)"} /></li>
+            <li><I18nText source={"Learning progress, XP, streaks, and quiz results"} /></li>
+            <li><I18nText source={"Budget entries and financial goals"} /></li>
+            <li><I18nText source={"Imported transactions (the categorised data extracted from your bank statements — raw statement files are never stored)"} /></li>
+            <li><I18nText source={"Cosmo coach conversations"} /></li>
+            <li><I18nText source={"Push notification subscriptions"} /></li>
           </ul>
           <p style={{ ...p, marginBottom: 0 }}>
-            The only thing that is <strong>not</strong> erased is anonymous exit
-            feedback, if you chose to give any. It carries no name, email, or
-            account identifier and cannot be traced back to you. See{" "}
-            <Link href="/privacy#data-deletion" style={link}>
-              Section 8 of the Privacy Policy
-            </Link>{" "}
-            for full details.
-          </p>
+            <I18nText source={"The only thing that is "} /><strong><I18nText source={"not"} /></strong> <I18nText source={" erased is anonymous exit feedback, if you chose to give any. It carries no name, email, or account identifier and cannot be traced back to you. See"} /><I18nText>{" "}</I18nText>
+            <Link href="/privacy#data-deletion" style={link}><I18nText source={"Section 8 of the Privacy Policy"} /></Link><I18nText>{" "}</I18nText>
+            <I18nText source={"for full details."} /></p>
         </div>
 
         {/* Email fallback */}
         <div style={card}>
-          <h2 style={h2}>Option 2 — Request deletion by email</h2>
+          <h2 style={h2}><I18nText source={"Option 2 — Request deletion by email"} /></h2>
           <ol
             style={{
               paddingLeft: 20,
@@ -182,58 +149,22 @@ export default function AccountDeletionPage() {
               lineHeight: 1.9,
             }}
           >
-            <li>
-              Email{" "}
-              <a href="mailto:support@notho.co.za" style={link}>
-                support@notho.co.za
-              </a>{" "}
-              with the subject line{" "}
-              <em>&ldquo;Data Deletion Request&rdquo;</em> and the email address
-              associated with your account.
-            </li>
-            <li>
-              We&apos;ll verify your identity and confirm receipt within
-              5&nbsp;business&nbsp;days.
-            </li>
-            <li>
-              Your account and all personal data will be permanently deleted
-              within 30&nbsp;days of verification.
-            </li>
+            <li><I18nRich source={"Email  <a0>support@notho.co.za</a0>  with the subject line  <em1>“Data Deletion Request”</em1>  and the email address associated with your account."} elements={[<a key="inline-0" href="mailto:support@notho.co.za" style={link} />, <em key="inline-1" />]} /></li>
+            <li><I18nText source={"We'll verify your identity and confirm receipt within 5 business days."} /></li>
+            <li><I18nText source={"Your account and all personal data will be permanently deleted within 30 days of verification."} /></li>
           </ol>
         </div>
 
         {/* Facebook */}
         <div style={card}>
-          <h2 style={h2}>Signed in with Facebook?</h2>
-          <p style={{ ...p, marginBottom: 0 }}>
-            You can also revoke access from{" "}
-            <strong>
-              Facebook Settings &rarr; Apps and Websites &rarr; Notho &rarr;
-              Remove
-            </strong>
-            . While our rename is completing, this may still appear as{" "}
-            <strong>Fundi Finance</strong>; both refer to the same app. To
-            ensure full deletion from our servers, please also send the
-            deletion email above.
-          </p>
+          <h2 style={h2}><I18nText source={"Signed in with Facebook?"} /></h2>
+          <p style={{ ...p, marginBottom: 0 }}><I18nRich source={"You can also revoke access from  <strong0>Facebook Settings → Apps and Websites → Notho → Remove</strong0> . While our rename is completing, this may still appear as  <strong1>Fundi Finance</strong1>; both refer to the same app. To ensure full deletion from our servers, please also send the deletion email above."} elements={[<strong key="inline-0" />, <strong key="inline-1" />]} /></p>
         </div>
 
         {/* Apple */}
         <div style={card}>
-          <h2 style={h2}>Signed in with Apple?</h2>
-          <p style={{ ...p, marginBottom: 0 }}>
-            Deleting your account in Notho removes your Notho account and data.
-            You can also disconnect Notho from your Apple Account under{" "}
-            <strong>
-              Sign-In &amp; Security &rarr; Sign in with Apple &rarr; Notho &rarr;
-              Stop Using Sign in with Apple
-            </strong>{" "}
-            at{" "}
-            <a href="https://account.apple.com" style={link}>
-              account.apple.com
-            </a>
-            .
-          </p>
+          <h2 style={h2}><I18nText source={"Signed in with Apple?"} /></h2>
+          <p style={{ ...p, marginBottom: 0 }}><I18nRich source={"Deleting your account in Notho removes your Notho account and data. You can also disconnect Notho from your Apple Account under  <strong0>Sign-In & Security → Sign in with Apple → Notho → Stop Using Sign in with Apple</strong0>  at  <a1>account.apple.com</a1> ."} elements={[<strong key="inline-0" />, <a key="inline-1" href="https://account.apple.com" style={link} />]} /></p>
         </div>
 
         {/* Footer */}
@@ -246,16 +177,8 @@ export default function AccountDeletionPage() {
             fontSize: 13,
           }}
         >
-          <p>
-            Questions?{" "}
-            <a href="mailto:support@notho.co.za" style={{ color: teal }}>
-              support@notho.co.za
-            </a>
-          </p>
-          <p style={{ marginTop: 8 }}>
-            &copy; {new Date().getFullYear()} The Solution Org (Pty) Ltd. All
-            rights reserved.
-          </p>
+          <p><I18nRich source={"Questions?  <a0>support@notho.co.za</a0>"} elements={[<a key="inline-0" href="mailto:support@notho.co.za" style={{ color: teal }} />]} /></p>
+          <p style={{ marginTop: 8 }}><I18nText source={"© {value0} The Solution Org (Pty) Ltd. All rights reserved."} values={[new Date().getFullYear()]} /></p>
         </div>
       </div>
     </main>

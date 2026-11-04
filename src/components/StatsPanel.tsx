@@ -1,11 +1,13 @@
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import { useState } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
 import { NothoStreak, NothoHeart, NothoLevel, NothoXP, NothoFreeze } from "@/components/icons/NothoIcons";
 import { streakExtendedToday } from "@/lib/dates";
 import { formatWithSpaces } from "@/lib/formatters";
-import { generateShareText, type UserData } from "@/app/pageViews.types";
+import { type UserData } from "@/app/pageViews.types";
+import { shareDuoCard } from "@/components/ShareCard";
 import { StreakFreezeBody } from "@/components/StreakFreezeControl";
 import type { FreezePurchase } from "@/lib/streakFreeze";
 
@@ -24,8 +26,6 @@ export function StatsPanel({
   onBuyFreeze?: () => Promise<FreezePurchase> | FreezePurchase;
   signedIn?: boolean;
 }) {
-  // Lit when the streak just moved, or last activity is already today.
-  // lessonsToday alone stays 0 on a replay that still stamps the day.
   const streakSafeToday =
     userData.lessonsToday > 0 || streakExtendedToday(userData.lastActivityDate);
   const [showFreeze, setShowFreeze] = useState(false);
@@ -37,7 +37,7 @@ export function StatsPanel({
   return (
     <aside className="stats-panel" id="statsPanel">
       <div className="stats-section">
-        <h3>My Stats</h3>
+        <h3><I18nText source={"My Stats"} /></h3>
         <div className="stat-item" style={{ position: "relative" }}>
           <div className="stat-icon" style={{ position: "relative" }}>
             <NothoStreak
@@ -53,34 +53,19 @@ export function StatsPanel({
             <div
               className="stat-label"
               style={{ color: streakSafeToday ? undefined : "var(--text-muted, #888)" }}
-            >
-              Day Streak
-            </div>
+            ><I18nText source={"Day Streak"} /></div>
             <div
               className="stat-value"
               id="streakValue"
               style={{ color: streakSafeToday ? undefined : "var(--text-muted, #888)" }}
             >
-              {userData.streak}
+              <I18nText>{userData.streak}</I18nText>
             </div>
           </div>
-          <button
+          <I18nElement as="button"
             type="button"
-            onClick={async () => {
-              const text = generateShareText("streak", { streakDays: userData.streak });
-              if (typeof navigator !== "undefined" && navigator.share) {
-                try {
-                  await navigator.share({ text });
-                  return;
-                } catch {
-                  /* ignore */
-                }
-              }
-              window.open(
-                `https://wa.me/?text=${encodeURIComponent(text)}`,
-                "_blank",
-                "noopener,noreferrer"
-              );
+            onClick={() => {
+              void shareDuoCard({ type: "streak", streakDays: userData.streak });
             }}
             className="text-orange-400 hover:text-orange-600"
             title="Share your streak"
@@ -88,7 +73,7 @@ export function StatsPanel({
             style={{ background: "none", border: "none", cursor: "pointer", padding: 4, flexShrink: 0 }}
           >
             <Share2 size={18} aria-hidden />
-          </button>
+          </I18nElement>
         </div>
 
         <div className="stat-item">
@@ -96,9 +81,9 @@ export function StatsPanel({
             <NothoXP size={28} className="text-current" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Total XP</div>
+            <div className="stat-label"><I18nText source={"Total XP"} /></div>
             <div className="stat-value" id="xpValue">
-              {formatWithSpaces(userData.xp)}
+              <I18nText>{formatWithSpaces(userData.xp)}</I18nText>
             </div>
           </div>
         </div>
@@ -108,14 +93,14 @@ export function StatsPanel({
             <NothoHeart size={28} className="text-current" style={{ color: "#E03C31" }} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Hearts</div>
+            <div className="stat-label"><I18nText source={"Hearts"} /></div>
             <div className="stat-value" id="heartsValue">
-              {hearts}/{maxHearts}
+              <I18nText>{hearts}</I18nText>/<I18nText>{maxHearts}</I18nText>
             </div>
           </div>
         </div>
 
-        <button
+        <I18nElement as="button"
           type="button"
           className="stat-item"
           onClick={() => setShowFreeze(true)}
@@ -126,24 +111,24 @@ export function StatsPanel({
             <NothoFreeze size={28} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Streak Freezes</div>
+            <div className="stat-label"><I18nText source={"Streak Freezes"} /></div>
             <div className="stat-value" style={{ color: freezeCount > 0 ? "#3B82F6" : "var(--color-text-secondary)" }}>
-              {freezeCount}/2
+              <I18nText>{freezeCount}</I18nText>/2
             </div>
           </div>
-        </button>
+        </I18nElement>
 
         <div className="stat-item">
           <div className="stat-icon">
             <NothoLevel size={28} className="text-current" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Level</div>
+            <div className="stat-label"><I18nText source={"Level"} /></div>
             <div className="stat-value" id="levelValue">
-              {userData.level}
+              <I18nText>{userData.level}</I18nText>
             </div>
             <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 4 }}>
-              {(() => {
+              <I18nText>{(() => {
                 const levels = [
                   { min: 0, max: 499 },
                   { min: 500, max: 1499 },
@@ -158,14 +143,14 @@ export function StatsPanel({
                 const nextThreshold = levels[nextLevel].min;
                 const xpNeeded = Math.max(0, nextThreshold - userData.xp);
                 return `${formatWithSpaces(xpNeeded)} XP to Level ${nextLevel + 1}`;
-              })()}
+              })()}</I18nText>
             </div>
           </div>
         </div>
       </div>
 
       <div className="stats-section">
-        <h3>Daily Goal</h3>
+        <h3><I18nText source={"Daily Goal"} /></h3>
         <div className="daily-goal-progress">
           <div className="progress-bar">
             <div
@@ -175,14 +160,13 @@ export function StatsPanel({
             />
           </div>
           <div className="progress-text" id="dailyGoalText">
-            {userData.dailyXP >= userData.dailyGoal
+            <I18nText>{userData.dailyXP >= userData.dailyGoal
               ? `Goal reached! ${userData.dailyXP} XP today (+${userData.dailyXP - userData.dailyGoal} extra)`
-              : `${userData.dailyXP} / ${userData.dailyGoal} XP`}
+              : `${userData.dailyXP} / ${userData.dailyGoal} XP`}</I18nText>
           </div>
         </div>
       </div>
 
-      {/* Legal disclaimer */}
       <div style={{
         marginTop: "auto",
         paddingTop: 20,
@@ -192,9 +176,7 @@ export function StatsPanel({
         lineHeight: 1.5,
         opacity: 0.7,
         textAlign: "center",
-      }}>
-        Educational content only - not financial advice. Consult a licensed financial advisor before making any financial decisions.
-      </div>
+      }}><I18nText source={"Educational content only - not financial advice. Consult a licensed financial advisor before making any financial decisions."} /></div>
       {showFreeze && (
         <div
           onClick={() => setShowFreeze(false)}
@@ -233,13 +215,10 @@ export function StatsPanel({
               className="btn btn-secondary"
               onClick={() => setShowFreeze(false)}
               style={{ width: "100%", marginTop: 12 }}
-            >
-              Close
-            </button>
+            ><I18nText source={"Close"} /></button>
           </div>
         </div>
       )}
     </aside>
   );
 }
-

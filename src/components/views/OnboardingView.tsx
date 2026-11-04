@@ -1,5 +1,6 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
+/* eslint-disable @next/next/no-html-link-for-pages */
 
 import React from "react";
 import {
@@ -147,10 +148,10 @@ export function OnboardingView({
 
       <div style={{ maxWidth: 360, width: "100%", textAlign: "center" }}>
         <h1 style={{ fontSize: 26, fontWeight: 900, marginBottom: 12, color: "var(--color-text-primary)" }}>
-          {current.title}
+          <I18nText>{current.title}</I18nText>
         </h1>
         <p style={{ fontSize: 15, color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: 28 }}>
-          {current.body}
+          <I18nText>{current.body}</I18nText>
         </p>
 
         {screen === 0 && (
@@ -158,7 +159,7 @@ export function OnboardingView({
             <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>
               {t("onboarding.username")}
             </label>
-            <input
+            <I18nElement as="input"
               type="text"
               autoCapitalize="none"
               autoCorrect="off"
@@ -253,7 +254,7 @@ export function OnboardingView({
             (screen === 1 && otherNeedsText)
           }
         >
-          {current.cta}
+          <I18nText>{current.cta}</I18nText>
         </button>
 
         {screen === 1 && selectedGoals.length > 0 && (

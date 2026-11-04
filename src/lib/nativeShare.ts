@@ -54,6 +54,42 @@ export async function cacheFilePreviewUrl(opts: {
   }
 }
 
+export function isShareCancel(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const name = "name" in err ? String((err as { name?: unknown }).name ?? "") : "";
+  const message = "message" in err ? String((err as { message?: unknown }).message ?? "") : "";
+  return name === "AbortError" || /cancel/i.test(message);
+}
+
+/**
+ * Hand a locally-generated file to the native share sheet.
+ * Returns cancelled when the learner dismisses the sheet, so callers do not
+ * fall through into a second share prompt on iPhone.
+ */
+export async function shareNativeFile(opts: {
+  blob: Blob;
+  fileName: string;
+  title?: string;
+  text?: string;
+  dialogTitle?: string;
+}): Promise<"shared" | "cancelled" | "unavailable"> {
+  try {
+    const { Share } = await import("@capacitor/share");
+    const uri = await writeCacheUri(opts.blob, opts.fileName);
+    if (!uri) return "unavailable";
+    await Share.share({
+      title: opts.title,
+      text: opts.text,
+      dialogTitle: opts.dialogTitle,
+      files: [uri],
+    });
+    return "shared";
+  } catch (err) {
+    if (isShareCancel(err)) return "cancelled";
+    return "unavailable";
+  }
+}
+
 /**
  * Hand a locally-generated file (e.g. the budget report PDF) to the native
  * share sheet. @capacitor/share can't share a Blob directly - it only takes
@@ -69,19 +105,8 @@ export async function shareFileBlob(opts: {
   blob: Blob;
   fileName: string;
   title?: string;
+  text?: string;
   dialogTitle?: string;
 }): Promise<boolean> {
-  try {
-    const { Share } = await import("@capacitor/share");
-    const uri = await writeCacheUri(opts.blob, opts.fileName);
-    if (!uri) return false;
-    await Share.share({
-      title: opts.title,
-      dialogTitle: opts.dialogTitle,
-      files: [uri],
-    });
-    return true;
-  } catch {
-    return false;
-  }
+  return (await shareNativeFile(opts)) === "shared";
 }

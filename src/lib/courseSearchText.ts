@@ -1,4 +1,5 @@
 import type { Course, Lesson, LessonStep, QuestionSlot } from "@/data/content";
+import { catalogString } from "@/i18n/catalog";
 import { LOCALE_PACKS } from "@/i18n/localePacks";
 
 function pushText(out: string[], value: unknown) {
@@ -48,7 +49,7 @@ function collectLessonEnglish(lesson: Lesson): string[] {
  * English course copy plus every registered translation of that course.
  * Used by search so a query in any shipped language can hit the same course.
  */
-export function courseSearchText(course: Course): string {
+export function courseSearchText(course: Course, locale = "en"): string {
   const parts: string[] = [course.title, course.description ?? ""];
 
   for (const unit of course.units ?? []) {
@@ -59,6 +60,10 @@ export function courseSearchText(course: Course): string {
   }
 
   const english = parts.slice();
+  if (locale !== "en") for (const source of english) {
+    const translated = catalogString(locale, source);
+    if (translated) parts.push(translated);
+  }
   for (const pack of LOCALE_PACKS) {
     parts.push(pack.content[`course.${course.id}`] ?? "");
     for (const unit of course.units ?? []) {

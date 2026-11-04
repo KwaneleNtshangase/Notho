@@ -4,6 +4,7 @@ import { createServiceSupabase } from "@/lib/supabaseServer";
 import { sastToday } from "@/lib/dates";
 import { resolveMonthlyBudget, type BudgetTargetRow } from "@/lib/budget/budgetResolve";
 import { buildCoachSummary } from "@/lib/coach/summary";
+import { parseLocale, LOCALE_NAMES } from '@/i18n/locales';
 import type { CoachEntry } from "@/lib/coach/insights";
 
 /**
@@ -28,7 +29,7 @@ export const maxDuration = 60;
 const MAX_PER_DAY = 10;
 const MAX_MSG_LEN = 500;
 const HISTORY_TURNS = 8;
-const GEMINI_MODEL = "gemini-3.5-flash";
+const GEMINI_MODEL = "gemini-3.8-flash";
 // Abort a single model call if it stalls, so the retry (or a clean error) kicks
 // in within seconds instead of leaving the user staring at a typing indicator.
 const GEMINI_TIMEOUT_MS = 20_000;
@@ -40,7 +41,7 @@ STRICT RULES - never break these:
 2. NEVER recommend, endorse, or name specific financial products, providers, banks, funds, shares, or cryptocurrencies. If asked "what should I buy/invest in/switch to", explain the general principles, point to a relevant lesson topic, and suggest speaking to a registered financial adviser for product decisions.
 3. NEVER perform calculations or invent numbers. Quote ONLY the figures given in the BUDGET SUMMARY below. If a figure is not in the summary, say you don't have that number.
 4. Discuss only personal-finance education and the user's budget summary. Politely decline anything else (coding, news, medical, legal, tax filing specifics, etc.).
-5. Keep answers under 120 words, warm and plain-spoken, in the same language the user writes in. Use Rand (R) amounts exactly as given.
+5. Keep answers under 120 words, warm and plain-spoken, in the selected app language supplied below unless the user explicitly requests a different language. Use Rand (R) amounts exactly as given.
 6. Where a "related lesson" is mentioned in the findings, encourage the user to open it from their coach card.
 7. If the BUDGET SUMMARY says there is no data, tell the user plainly that you don't have their numbers yet and suggest adding entries or importing a bank statement in the Budget tab. Do NOT mention, estimate, or make up ANY amounts, categories, or percentages in that case. General money-education answers are still fine.
 8. Never use em dashes in your replies. Use commas, full stops, or hyphens instead.
@@ -170,10 +171,10 @@ export async function POST(req: NextRequest) {
 
   const geminiBody = {
     systemInstruction: {
-      parts: [{ text: `${SYSTEM_PROMPT}\n\nBUDGET SUMMARY (the user's own anonymised numbers - quote these exactly):\n${summary.text}` }],
+      parts: [{ text: `${SYSTEM_PROMPT}\n\nSelected app language: ${LOCALE_NAMES[parseLocale(req.cookies.get('notho_locale')?.value)]}.\n\nBUDGET SUMMARY (the user's own anonymised numbers - quote these exactly):\n${summary.text}` }],
     },
     contents: [...history, { role: "user", parts: [{ text: message }] }],
-    // NB: Gemini 3.5 Flash "thinks" before replying and its thinking tokens
+    // NB: Gemini 3.8 Flash "thinks" before replying and its thinking tokens
     // count against maxOutputTokens. A small cap truncates replies mid-sentence
     // (~450 thinking tokens observed), so leave generous headroom; the prompt
     // keeps visible replies under 120 words.

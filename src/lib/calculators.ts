@@ -341,7 +341,7 @@ export function solveForWithdrawal(base: GrowthInputs, surviveYears?: number): n
   return bisectSolver((w) => (survives(w) ? -1 : 1), 0, cap);
 }
 
-export function assumptionLine(inputs: GrowthInputs): string {
+export function assumptionParts(inputs: GrowthInputs): string[] {
   const n = normalizeCalcInputs(inputs);
   const bits = ["End-of-month deposits", `${n.rate}% p.a. nominal, compounded monthly`];
   bits.push(n.fee > 0 ? `${n.fee}% annual fee` : "no fees");
@@ -351,7 +351,11 @@ export function assumptionLine(inputs: GrowthInputs): string {
     else bits.push(`R${Math.round(n.withdrawal).toLocaleString("en-ZA")}/mo from year ${n.withdrawFromYear}`);
   }
   if (n.wrapper !== "none") bits.push(n.wrapper === "living-annuity" ? "living annuity" : n.wrapper.toUpperCase());
-  return bits.join(" · ");
+  return bits;
+}
+
+export function assumptionLine(inputs: GrowthInputs): string {
+  return assumptionParts(inputs).join(" · ");
 }
 
 export function calculateCompoundInterest(principal: number, annualRatePercent: number, years: number, compoundsPerYear: number) {

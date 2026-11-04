@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 /**
  * GROWTH - are new people arriving, and do they turn into users?
@@ -128,10 +129,7 @@ export function GrowthPanel({ days, nonce }: { days: number; nonce: number }) {
           />
           <div style={{ marginTop: 16 }}>
             <Note>
-              <strong>How to read it:</strong> the percentage inside each bar is share of the
-              original cohort; the red figure on the right is the share lost at that step alone.
-              Fixing a step below a big leak is wasted work - the people never get there.
-            </Note>
+              <strong><I18nText source={"How to read it:"} /></strong> <I18nText source={" the percentage inside each bar is share of the original cohort; the red figure on the right is the share lost at that step alone. Fixing a step below a big leak is wasted work - the people never get there."} /></Note>
           </div>
         </Gate>
       </Panel>
@@ -176,10 +174,7 @@ export function GrowthPanel({ days, nonce }: { days: number; nonce: number }) {
             </ComposedChart>
           </Frame>
           <Note>
-            <strong>The test:</strong> if the red bar below the line is taller than the green and
-            purple above it, you are replacing users rather than adding them. Acquisition spend in
-            that state just refills a leaking bucket.
-          </Note>
+            <strong><I18nText source={"The test:"} /></strong> <I18nText source={" if the red bar below the line is taller than the green and purple above it, you are replacing users rather than adding them. Acquisition spend in that state just refills a leaking bucket."} /></Note>
         </Gate>
       </Panel>
 
@@ -216,12 +211,9 @@ export function GrowthPanel({ days, nonce }: { days: number; nonce: number }) {
 
         <Card>
           <div className="nv-card-head">
-            <h2 className="nv-card-title">Onboarding losses</h2>
+            <h2 className="nv-card-title"><I18nText source={"Onboarding losses"} /></h2>
           </div>
-          <p className="nv-card-sub">
-            The two buckets that never became users. Both are recoverable, and both need a different
-            message.
-          </p>
+          <p className="nv-card-sub"><I18nText source={"The two buckets that never became users. Both are recoverable, and both need a different message."} /></p>
           <Gate
             loading={segments.loading && !segments.data}
             error={segments.error}
@@ -238,11 +230,11 @@ export function GrowthPanel({ days, nonce }: { days: number; nonce: number }) {
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                    <span style={{ fontSize: 13.5, fontWeight: 700, color: p.ink }}>{x.label}</span>
-                    <span style={{ fontSize: 17, fontWeight: 800, color: p.ink }}>{fmt(x.users)}</span>
+                    <span style={{ fontSize: 13.5, fontWeight: 700, color: p.ink }}><I18nText>{x.label}</I18nText></span>
+                    <span style={{ fontSize: 17, fontWeight: 800, color: p.ink }}><I18nText>{fmt(x.users)}</I18nText></span>
                   </div>
                   <div style={{ fontSize: 12, color: p.muted, marginTop: 5, lineHeight: 1.55 }}>
-                    {x.action}
+                    <I18nText>{x.action}</I18nText>
                   </div>
                 </div>
               ))}

@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 
 /**
  * RETENTION - do people come back, and who is about to stop?
@@ -87,7 +88,7 @@ export function RetentionPanel({
       label: "User",
       render: (x) => (
         <div>
-          <div className="nv-strong">{displayName(x)}</div>
+          <div className="nv-strong"><I18nText>{displayName(x)}</I18nText></div>
           <div style={{ fontSize: 11.5, color: p.muted }}>{x.email}</div>
         </div>
       ),
@@ -97,7 +98,7 @@ export function RetentionPanel({
       label: "Status",
       render: (x) => (
         <Tag tone={x.risk === "Slipping" ? "warn" : x.risk === "At risk" ? "bad" : "neutral"}>
-          {x.risk}
+          <I18nText>{x.risk}</I18nText>
         </Tag>
       ),
     },
@@ -111,11 +112,11 @@ export function RetentionPanel({
       numeric: true,
       render: (x) => (
         <span style={{ fontWeight: 800, color: x.risk_score >= 40 ? p.gold : p.muted }}>
-          {Math.round(x.risk_score)}
+          <I18nText>{Math.round(x.risk_score)}</I18nText>
         </span>
       ),
     },
-    { key: "seen", label: "Last seen", render: (x) => <span style={{ color: p.muted }}>{ago(x.last_seen)}</span> },
+    { key: "seen", label: "Last seen", render: (x) => <span style={{ color: p.muted }}><I18nText>{ago(x.last_seen)}</I18nText></span> },
   ];
 
   return (
@@ -184,10 +185,7 @@ export function RetentionPanel({
             maxHeight={430}
           />
           <Note>
-            <strong>At this size, personal beats automated.</strong> A three-line email that names
-            the course they were on will out-perform any campaign. Work down from the top: the score
-            already weighs how much they invested against how likely they are to still be reachable.
-          </Note>
+            <strong><I18nText source={"At this size, personal beats automated."} /></strong> <I18nText source={" A three-line email that names the course they were on will out-perform any campaign. Work down from the top: the score already weighs how much they invested against how likely they are to still be reachable."} /></Note>
         </Gate>
       </Panel>
 
@@ -228,20 +226,16 @@ export function RetentionPanel({
           <div className="nv-legend">
             <span>
               <i style={{ background: `color-mix(in srgb, ${p.teal} 10%, transparent)` }} />
-              low
-            </span>
+              <I18nText source={"low"} /></span>
             <span>
               <i style={{ background: `color-mix(in srgb, ${p.teal} 45%, transparent)` }} />
-              medium
-            </span>
+              <I18nText source={"medium"} /></span>
             <span>
               <i style={{ background: `color-mix(in srgb, ${p.teal} 90%, transparent)` }} />
-              high
-            </span>
+              <I18nText source={"high"} /></span>
             <span>
               <i style={{ background: "transparent", boxShadow: `inset 0 0 0 1px ${p.border}` }} />
-              too early to tell
-            </span>
+              <I18nText source={"too early to tell"} /></span>
           </div>
         </Gate>
       </Panel>
@@ -289,10 +283,7 @@ export function RetentionPanel({
               </LineChart>
             </Frame>
             <Note>
-              <strong>Rough benchmarks for consumer learning apps:</strong> day 1 around 30-40%, day
-              7 around 15-25%, day 30 around 8-15%. Being under these is a signal to work on the
-              first week, not a reason to panic on a small sample.
-            </Note>
+              <strong><I18nText source={"Rough benchmarks for consumer learning apps:"} /></strong> <I18nText source={" day 1 around 30-40%, day 7 around 15-25%, day 30 around 8-15%. Being under these is a signal to work on the first week, not a reason to panic on a small sample."} /></Note>
           </Gate>
         </Panel>
 
