@@ -171,15 +171,11 @@ In the PostHog provider or after login, call:
 
 ```typescript
 posthog.identify(user.id, {
-  email:         user.email,           // for linking to email tool
-  goal:          profile.goal,
-  age_range:     profile.age_range,
-  signup_date:   user.created_at,
-  plan:          "free" | "premium",
+  platform: "web",
 });
 ```
 
-Do not pass any financial amounts or personally sensitive data to PostHog. Stick to behavioural metadata only.
+The distinct id is the Supabase user id. Do not send email, name, username, phone, statement text, or raw rand amounts. `identifyProperties` drops those keys, and sign-in also unsets them if an older build stored them.
 
 ---
 
@@ -196,6 +192,7 @@ Create these in PostHog before you need them. They are free to add and make futu
 | `d14_email_enabled` | `false` | Enable after Resend D+14 template is published. |
 | `d30_email_enabled` | `false` | Enable after Resend D+30 template is published. |
 | `content_impact_survey_enabled` | `false` | Show 30-day survey only to users with 10+ lessons. |
+| `session-replay-enabled` | on if missing | Kill switch for masked session replay. An explicit `false` stops recording. If the flag does not exist or flags fail to load, recording stays on and `POSTHOG_SESSION_REPLAY=off` is the hard stop. |
 
 ---
 

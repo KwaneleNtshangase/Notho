@@ -50,7 +50,7 @@ export default function PrivacyPage() {
               color: "#ffffff",
             }}
           ><I18nText source={"Privacy Policy"} /></h1>
-          <p style={{ color: "#a0a0a0", fontSize: "15px", margin: 0 }}><I18nText source={"Last updated: August 2026  ·  The Solution Org (Pty) Ltd"} /></p>
+          <p style={{ color: "#a0a0a0", fontSize: "15px", margin: 0 }}><I18nText source={"Last updated: November 2026  ·  The Solution Org (Pty) Ltd"} /></p>
         </div>
 
         {/* Non-FSP / "not financial advice" disclosure - surfaced at the
@@ -123,7 +123,7 @@ export default function PrivacyPage() {
             <li><I18nRich source={"<strong0>Vercel</strong0>  - our web-hosting provider, for serving the app."} elements={[<strong key="inline-0" />]} /></li>
             <li><I18nRich source={"<strong0>Apple, Google & Meta (Facebook)</strong0>  - solely for OAuth sign-in; we receive only the account profile data you authorise during the login flow. Apple may provide a private relay email address instead of your personal address."} elements={[<strong key="inline-0" />]} /></li>
             <li><I18nRich source={"<strong0>Google (Gemini API)</strong0>  - powers Cosmo, our optional AI money coach. Cosmo is switched off until you turn it on. When you do, we send Google only an  <strong1>anonymised summary</strong1>  of your budget: category totals and monthly income. We never send your name, email, merchant names, transaction descriptions, or any other identifying detail. See Section 9 for the full explanation."} elements={[<strong key="inline-0" />, <strong key="inline-1" />]} /></li>
-            <li><I18nRich source={"<strong0>PostHog</strong0>  - product analytics, so we can see which features are used and where the app breaks. Used for aggregate measurement only; we do not use it to track you across other apps or websites, and we do not run advertising."} elements={[<strong key="inline-0" />]} /></li>
+            <li><I18nRich source={"<strong0>PostHog</strong0>  - product analytics and, for signed-in learners who have not turned it off, masked session recordings. Used so we can see which features are used and where the app breaks. We do not use it to track you across other apps or websites, and we do not run advertising. See Section 6a."} elements={[<strong key="inline-0" />]} /></li>
             <li><I18nRich source={"<strong0>Resend</strong0>  - sends our transactional email (welcome messages, budget alerts, and replies to your requests). Receives your email address and the contents of that message only."} elements={[<strong key="inline-0" />]} /></li>
           </ul>
           <p><I18nText source={"These providers are contractually prohibited from using your data for their own purposes. We do not sell your personal information, we do not share it with advertisers, and we do not share it with any other third party except as required by South African law or a court order."} /></p>
@@ -152,6 +152,10 @@ export default function PrivacyPage() {
           <p><I18nRich source={"We place a few small <strong0>first-party cookies</strong0>  on your device for non-sensitive preferences only - for example dark mode, whether you have finished the first-time onboarding flow, and whether you dismissed the “add to home screen” prompt. These values are not used to identify you beyond the app experience."} elements={[<strong key="inline-0" />]} /></p>
           <p><I18nText source={"Some in-app toggles (such as sound effects) apply for your current browser session only and are not written to persistent storage on your device."} /></p>
           <p><I18nRich source={"We do <strong0>not</strong0>  store your account progress, scores, or other sensitive personal data in your browser's  <strong1>local storage</strong1>  or <strong2>session storage</strong2>  APIs. Session cookies are used where needed for authentication. We do not use advertising or tracking cookies."} elements={[<strong key="inline-0" />, <strong key="inline-1" />, <strong key="inline-2" />]} /></p>
+        </Section>
+
+        <Section title="6a. Session recordings" id="session-recording">
+          <p><I18nText source={"Signed-in sessions are recorded by default to improve Notho. You can turn session recording off anytime in Settings. Recordings are masked: text, inputs, images, and video are hidden, and we do not record network request or response bodies, headers, or console logs. Recordings are for our own product work. We never sell them, or any personal information."} /></p>
         </Section>
 
         <Section title="7. Your Rights">

@@ -6,7 +6,8 @@ import posthog from "posthog-js";
 import { startUsageTracking, setUsageRoute, resetUsageIdentity } from "@/lib/usageTracking";
 import { supabase } from "@/lib/supabaseClient";
 import { APP_TAB_EVENT } from "@/lib/appTabs";
-import { identifyProperties, isPosthogLoaded, pageviewPath, posthogKey } from "@/lib/posthogClient";
+import { identifyProperties, isPosthogLoaded, pageviewPath, PERSON_PROPERTIES_TO_UNSET, posthogKey } from "@/lib/posthogClient";
+import { stopSessionReplayNow } from "@/lib/sessionReplayControl";
 import { analytics } from "@/lib/analytics";
 
 function capturePage(path: string | null) {
@@ -25,13 +26,12 @@ function identifyUser(user: { id: string; user_metadata?: Record<string, unknown
   try {
     if (!isPosthogLoaded(posthog)) return;
     if (!user) {
+      stopSessionReplayNow();
       posthog.reset();
       return;
     }
-    const username =
-      (typeof user.user_metadata?.username === "string" ? user.user_metadata.username : null) ??
-      (typeof user.user_metadata?.notho_username === "string" ? user.user_metadata.notho_username : null);
-    posthog.identify(user.id, identifyProperties({ userId: user.id, username, platform: "web" }));
+    posthog.identify(user.id, identifyProperties({ userId: user.id, platform: "web" }));
+    posthog.unsetPersonProperties([...PERSON_PROPERTIES_TO_UNSET]);
   } catch {
     /* ignore */
   }

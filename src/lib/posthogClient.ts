@@ -27,14 +27,4 @@ export function pageviewPath(pathname: string | null | undefined): string | null
   return path;
 }
 
-export function identifyProperties(input: {
-  userId: string;
-  username?: string | null;
-  platform?: "web" | "ios" | "android" | "pwa";
-}): Record<string, string> {
-  const props: Record<string, string> = {};
-  const username = input.username?.trim();
-  if (username && username.length <= 40 && !username.includes("@")) props.username = username;
-  if (input.platform) props.platform = input.platform;
-  return props;
-}
+export { identifyProperties, PERSON_PROPERTIES_TO_UNSET, sanitizePosthogProperties } from "@/lib/sessionReplay";
