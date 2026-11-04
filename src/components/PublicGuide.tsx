@@ -1,6 +1,7 @@
 import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
+import { PublicFooter } from "@/components/PublicFooter";
 import {
   SITE_NAME,
   faqJsonLd,
@@ -134,17 +135,8 @@ export function PublicGuide({
           </div>
         ))}
 
-        <p
-          style={{
-            marginTop: 40,
-            paddingTop: 24,
-            borderTop: "1px solid #eee",
-            color: "#666",
-            fontSize: 14,
-            lineHeight: 1.7,
-          }}
-        ><I18nText source={"Notho is financial-literacy education. Lessons, calculators and budgets are illustrative. Notho is not an FSP and does not give personal financial advice. Founded by Kwanele Ntshangase."} values={[SITE_NAME]} /></p>
       </div>
+      <PublicFooter />
     </main>
   );
 }
