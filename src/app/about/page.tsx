@@ -272,7 +272,7 @@ export default function AboutPage() {
             <I18nText source={"Built by Kwanele Ntshangase"} />
           </h2>
           <p style={{ margin: 0, color: "#b0b0b0", fontSize: 16, lineHeight: 1.65 }}>
-            <I18nText source={"Notho is operated by The Solution Org (Pty) Ltd. It was previously called Fundi Finance (renamed July 2026)."} />
+            <I18nText source={"Notho was founded by Kwanele Ntshangase. Previously called Fundi Finance (renamed July 2026)."} />
           </p>
         </div>
       </section>
@@ -306,7 +306,7 @@ export default function AboutPage() {
           </Link>
         </p>
         <p style={{ color: "#606060", fontSize: 13 }}>
-          <I18nText source={"Operated by The Solution Org (Pty) Ltd. Contact hello@notho.co.za."} />
+          <I18nText source={"Founded by Kwanele Ntshangase. Contact hello@notho.co.za."} />
         </p>
       </section>
     </main>
