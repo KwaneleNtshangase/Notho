@@ -143,7 +143,7 @@ export function PublicGuide({
             fontSize: 14,
             lineHeight: 1.7,
           }}
-        ><I18nText source={"Notho is financial-literacy education from {value0}. Lessons, calculators and budgets are illustrative. Notho is not an FSP and does not give personal financial advice. Operated by The Solution Org (Pty) Ltd, Durban, South Africa."} values={[SITE_NAME]} /></p>
+        ><I18nText source={"Notho is financial-literacy education from {value0}. Lessons, calculators and budgets are illustrative. Notho is not an FSP and does not give personal financial advice. Founded by Kwanele Ntshangase."} values={[SITE_NAME]} /></p>
       </div>
     </main>
   );

@@ -178,7 +178,7 @@ export default function AccountDeletionPage() {
           }}
         >
           <p><I18nRich source={"Questions?  <a0>support@notho.co.za</a0>"} elements={[<a key="inline-0" href="mailto:support@notho.co.za" style={{ color: teal }} />]} /></p>
-          <p style={{ marginTop: 8 }}><I18nText source={"© {value0} The Solution Org (Pty) Ltd. All rights reserved."} values={[new Date().getFullYear()]} /></p>
+          <p style={{ marginTop: 8 }}><I18nText source={"© {value0} Kwanele Ntshangase. All rights reserved."} values={[new Date().getFullYear()]} /></p>
         </div>
       </div>
     </main>

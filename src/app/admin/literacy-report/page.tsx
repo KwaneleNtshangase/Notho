@@ -123,7 +123,7 @@ export default function LiteracyReportPage() {
         </header>
 
         <h1><I18nText source={"Financial education measurement record"} /></h1>
-        <p className="lede"><I18nText source={"Prepared for the illustrative seat, Notho. Cohort {value0} is every Notho account until a partner seat exists. Period: 90 days ending {value1}. Prepared by The Solution Org (Pty) Ltd, which operates Notho and is not an FSP."} values={[COHORT, periodEnd]} /></p>
+        <p className="lede"><I18nText source={"Prepared for the illustrative seat, Notho. Cohort {value0} is every Notho account until a partner seat exists. Period: 90 days ending {value1}. Prepared for Notho. Notho is not an FSP."} values={[COHORT, periodEnd]} /></p>
 
         <div className="finding">
           <p className="eyebrow"><I18nText source={"Finding"} /></p>
