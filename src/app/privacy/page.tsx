@@ -50,7 +50,7 @@ export default function PrivacyPage() {
               color: "#ffffff",
             }}
           ><I18nText source={"Privacy Policy"} /></h1>
-          <p style={{ color: "#a0a0a0", fontSize: "15px", margin: 0 }}><I18nText source={"Last updated: November 2026  ·  The Solution Org (Pty) Ltd"} /></p>
+          <p style={{ color: "#a0a0a0", fontSize: "15px", margin: 0 }}><I18nText source={"Last updated: November 2026"} /></p>
         </div>
 
         {/* Non-FSP / "not financial advice" disclosure - surfaced at the
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
         <Section title="1. Introduction">
           <p><I18nRich source={"Notho (“we”, “our”, or “us”) is a South African personal-finance learning app available at  <a0>notho.co.za</a0> . We are committed to protecting your personal information in accordance with the Protection of Personal Information Act, 2013 (POPIA) and applicable data-protection regulations."} elements={[<a key="inline-0" href="https://notho.co.za" style={{ color: "#007A85" }} />]} /></p>
           <p><I18nText source={"This Privacy Policy explains what personal information we collect, why we collect it, how we use it, and what rights you have. By using Notho you agree to the practices described here."} /></p>
-          <p><I18nRich source={"<strong0>Notho was previously called Fundi Finance.</strong0>  Only the name has changed. The app is operated by the same company, The Solution Org (Pty) Ltd, and this policy continues to apply to information collected under the former name. Nothing about how we handle your data changed with the rename."} elements={[<strong key="inline-0" />]} /></p>
+          <p><I18nRich source={"<strong0>Notho was previously called Fundi Finance.</strong0>  Only the name has changed. This policy continues to apply to information collected under the former name. Nothing about how we handle your data changed with the rename."} elements={[<strong key="inline-0" />]} /></p>
         </Section>
 
         <Section title="2. Information We Collect">
@@ -214,7 +214,7 @@ export default function PrivacyPage() {
               color: "#c0c0c0",
             }}
           >
-            <I18nText source={"The Solution Org (Pty) Ltd"} /><br />
+            <I18nText source={"Kwanele Ntshangase"} /><br />
             <I18nText source={"South Africa"} /><br />
             <a
               href="mailto:support@notho.co.za"
@@ -239,7 +239,7 @@ export default function PrivacyPage() {
             color: "#505050",
             fontSize: "13px",
           }}
-        ><I18nText source={"© {value0} The Solution Org (Pty) Ltd. All rights reserved."} values={[new Date().getFullYear()]} /></div>
+        ><I18nText source={"© {value0} Kwanele Ntshangase. All rights reserved."} values={[new Date().getFullYear()]} /></div>
       </div>
     </main>
   );
