@@ -7,6 +7,14 @@ import { CheckCircle2, X } from "@/components/icons/NothoIcons";
 
 export const SHAKE_PREF_KEY = "notho.shakeReport";
 
+/** Settings (and anything else that is not a shake) opens the report sheet. */
+export const REPORT_PROBLEM_EVENT = "notho:report";
+
+export function openReportProblem(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(REPORT_PROBLEM_EVENT));
+}
+
 export function shakeReportEnabled(): boolean {
   if (typeof localStorage === "undefined") return true;
   return localStorage.getItem(SHAKE_PREF_KEY) !== "off";
@@ -43,10 +51,12 @@ export function ReportProblemSheet({
   open,
   onClose,
   screenshot,
+  via = "shake",
 }: {
   open: boolean;
   onClose: () => void;
   screenshot: string | null;
+  via?: "shake" | "settings";
 }) {
   const [issueType, setIssueType] = useState("other");
   const [description, setDescription] = useState("");
@@ -95,7 +105,7 @@ export function ReportProblemSheet({
       const user = session?.user ?? null;
       const feedbackId = crypto.randomUUID();
       const typeLabel = TYPES.find((t) => t.value === issueType)?.label ?? "General feedback";
-      const subject = `${typeLabel} from shake`;
+      const subject = via === "settings" ? `${typeLabel} from settings` : `${typeLabel} from shake`;
       await supabase.from("feedback").insert({
         id: feedbackId,
         user_id: user?.id ?? null,
