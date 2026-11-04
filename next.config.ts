@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 const securityHeaders = [
   {
@@ -77,12 +77,36 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 };
 
+const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim();
+const sentryOrg = process.env.SENTRY_ORG?.trim();
+const sentryProject = process.env.SENTRY_PROJECT?.trim();
+// Source-map upload needs all three. Missing or rejected credentials must not
+// fail `next build` — events still arrive, traces stay minified.
+const canUploadSourceMaps = Boolean(sentryAuthToken && sentryOrg && sentryProject);
+
 export default withSentryConfig(nextConfig, {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
+  org: sentryOrg,
+  project: sentryProject,
+  authToken: sentryAuthToken,
   silent: !process.env.CI,
   widenClientFileUpload: true,
   tunnelRoute: "/monitoring",
-  disableLogger: true,
+  // Strip SDK debug logs. bundleSizeOptimizations works for Turbopack (Next 16
+  // default) and webpack. disableLogger does not, and is deprecated.
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+  },
+  telemetry: false,
+  sourcemaps: {
+    disable: !canUploadSourceMaps,
+  },
+  release: {
+    create: canUploadSourceMaps,
+  },
+  errorHandler(error) {
+    console.warn(
+      "[sentry] Source map upload failed. The Next.js build will continue.",
+      error
+    );
+  },
 });

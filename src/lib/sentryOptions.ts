@@ -1,8 +1,10 @@
 /**
  * Shared Sentry init for client, Node, and Edge.
  *
- * No DSN → Sentry is a no-op. Production can ship this branch before the
- * Sentry project exists; flip it on by setting NEXT_PUBLIC_SENTRY_DSN.
+ * No DSN → callers skip Sentry.init, so nothing is sent. Production can
+ * ship this before a Sentry project exists. Set NEXT_PUBLIC_SENTRY_DSN
+ * (browser and server) or SENTRY_DSN (server fallback). Blank values count
+ * as unset. Nothing in this file is a hardcoded DSN.
  *
  * Session Replay stays off. Budget statements, Cosmo threads and profile
  * fields are on screen, and POPIA does not want those in a third-party video.
@@ -10,8 +12,16 @@
 import type { BrowserOptions, ErrorEvent, EventHint } from "@sentry/nextjs";
 import { sentryBeforeSend } from "./sentryFilter";
 
-const dsn =
-  process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || undefined;
+/** Public browser DSN, with a server-only fallback. Blank values count as unset. */
+export function readSentryDsn(
+  env: Record<string, string | undefined> = process.env
+): string | undefined {
+  const raw = env.NEXT_PUBLIC_SENTRY_DSN || env.SENTRY_DSN || "";
+  const dsn = raw.trim();
+  return dsn.length > 0 ? dsn : undefined;
+}
+
+const dsn = readSentryDsn();
 
 const environment =
   process.env.VERCEL_ENV || process.env.NODE_ENV || "development";
@@ -26,11 +36,14 @@ function beforeSend(event: ErrorEvent, hint: EventHint): ErrorEvent | null {
   return sentryBeforeSend(event, hint) as ErrorEvent | null;
 }
 
+/** False when neither DSN env var is set. Callers must skip Sentry.init. */
+export const sentryEnabled = Boolean(dsn);
+
 export const sentryBaseOptions: BrowserOptions = {
   dsn,
   environment,
   release,
-  enabled: Boolean(dsn),
+  enabled: sentryEnabled,
   sendDefaultPii: false,
   tracesSampleRate,
   beforeSend,

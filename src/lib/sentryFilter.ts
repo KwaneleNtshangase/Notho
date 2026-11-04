@@ -5,7 +5,9 @@
 import { classifyClientError } from "./errorNoise";
 import { isAutomatedUserAgent } from "./errorReportGuards";
 
-type Primitive = string | number | boolean | null | undefined;
+// Same members as @sentry/core Primitive. A narrower union makes ErrorEvent
+// tags unassignable (Sentry tags may be bigint or symbol).
+type Primitive = string | number | boolean | bigint | symbol | null | undefined;
 
 export type SentryLikeEvent = {
   message?: string;
