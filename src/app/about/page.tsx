@@ -22,12 +22,7 @@ export const metadata: Metadata = {
 };
 
 const teal = "#007A85";
-const p: React.CSSProperties = {
-  color: "#d0d0d0",
-  fontSize: 16,
-  lineHeight: 1.75,
-  margin: "0 0 16px",
-};
+const photo = "/about/kwanele.jpg";
 
 export default function AboutPage() {
   return (
@@ -46,13 +41,54 @@ export default function AboutPage() {
           description: SITE_DESCRIPTION,
         })}
       />
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "48px 24px 80px" }}>
-        <p style={{ color: teal, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", fontSize: 12 }}><I18nText source={"About"} /></p>
-        <h1 style={{ fontSize: "clamp(30px, 5vw, 44px)", fontWeight: 800, margin: "8px 0 16px" }}><I18nText source={"Notho is how South Africans learn money."} /></h1>
-        <p style={p}><I18nText>{SITE_DESCRIPTION}</I18nText></p>
-        <p style={p}><I18nText>{DISAMBIGUATION}</I18nText></p>
 
-        <p>
+      {/* Hero */}
+      <section
+        style={{
+          maxWidth: 1080,
+          margin: "0 auto",
+          padding: "64px 24px 48px",
+          display: "grid",
+          gridTemplateColumns: "1fr auto",
+          gap: 48,
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <p
+            style={{
+              color: teal,
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              fontSize: 13,
+              margin: "0 0 12px",
+            }}
+          >
+            <I18nText source={"About"} />
+          </p>
+          <h1
+            style={{
+              fontSize: "clamp(36px, 5.5vw, 56px)",
+              fontWeight: 800,
+              lineHeight: 1.08,
+              margin: "0 0 16px",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            <I18nText source={"Notho is how South Africans learn money."} />
+          </h1>
+          <p
+            style={{
+              color: "#c8c8c8",
+              fontSize: 18,
+              lineHeight: 1.6,
+              margin: "0 0 28px",
+              maxWidth: 520,
+            }}
+          >
+            <I18nText source={"Short lessons, real calculators in rand, and a budget that uses your own numbers. Not an FSP. Not advice. Just clearer money skills."} />
+          </p>
           <Link
             href="/learn"
             style={{
@@ -61,44 +97,218 @@ export default function AboutPage() {
               color: "#fff",
               fontWeight: 700,
               textDecoration: "none",
-              padding: "12px 18px",
-              borderRadius: 10,
-              margin: "8px 12px 28px 0",
+              padding: "14px 24px",
+              borderRadius: 12,
+              fontSize: 16,
             }}
-          ><I18nText source={"Start learning"} /></Link>
+          >
+            <I18nText source={"Start learning"} />
+          </Link>
+        </div>
+        <img
+          src={photo}
+          alt="Kwanele Ntshangase"
+          style={{
+            width: 220,
+            height: 220,
+            borderRadius: "50%",
+            objectFit: "cover",
+            border: "4px solid #1a1a1a",
+            boxShadow: "0 8px 32px rgba(0,122,133,0.15)",
+          }}
+        />
+      </section>
+
+      {/* Mission */}
+      <section
+        style={{
+          maxWidth: 1080,
+          margin: "0 auto",
+          padding: "0 24px 48px",
+        }}
+      >
+        <p
+          style={{
+            color: "#a0a0a0",
+            fontSize: 16,
+            lineHeight: 1.7,
+            maxWidth: 680,
+            margin: 0,
+          }}
+        >
+          <I18nText>{SITE_DESCRIPTION}</I18nText>
         </p>
-
-        <h2 style={{ color: teal, fontSize: 22, fontWeight: 800 }}><I18nText source={"What you can do in Notho"} /></h2>
-        <ul style={{ color: "#d0d0d0", fontSize: 16, lineHeight: 1.8, paddingLeft: 20 }}>
-          <li>
-            <Link href="/financial-literacy" style={{ color: teal, fontWeight: 600 }}><I18nText source={"Learn"} /></Link> <I18nText source={" personal finance in short lessons, then review the ideas until they stick."} /></li>
-          <li>
-            <Link href="/investment-calculator" style={{ color: teal, fontWeight: 600 }}><I18nText source={"Calculate"} /></Link> <I18nText source={" savings, investments, TFSA, retirement annuity and living-annuity scenarios in rand."} /></li>
-          <li>
-            <Link href="/budgeting" style={{ color: teal, fontWeight: 600 }}><I18nText source={"Budget"} /></Link> <I18nText source={" from your own numbers, including statement import for lookback."} /></li>
-          <li><I18nText source={"Set money goals on the Goals tab when you are ready."} /></li>
-          <li>
-            <Link href="/re5" style={{ color: teal, fontWeight: 600 }}><I18nText source={"Prepare for RE5"} /></Link> <I18nText source={" if you are studying the regulatory exam."} /></li>
-        </ul>
-
-        <h2 style={{ color: teal, fontSize: 22, fontWeight: 800, marginTop: 32 }}><I18nText source={"What Notho is not"} /></h2>
-        <p style={p}><I18nText source={"Notho does not sell loans, does not log into your bank, and does not replace an FSCA-registered adviser. Cosmo answers literacy questions. It is not a human adviser and not a product salesperson."} /></p>
-
-        <h2 style={{ color: teal, fontSize: 22, fontWeight: 800 }}><I18nText source={"Guides"} /></h2>
-        <p style={p}>
-          <Link href="/personal-finance" style={{ color: teal }}><I18nText source={"Personal finance in South Africa"} /></Link>
-          <I18nText>{" \u00b7 "}</I18nText>
-          <Link href="/investment-calculator" style={{ color: teal }}><I18nText source={"Investment calculator"} /></Link>
-          <I18nText>{" \u00b7 "}</I18nText>
-          <Link href="/budgeting" style={{ color: teal }}><I18nText source={"Budgeting"} /></Link>
-          <I18nText>{" \u00b7 "}</I18nText>
-          <Link href="/financial-literacy" style={{ color: teal }}><I18nText source={"Financial literacy"} /></Link>
-          <I18nText>{" \u00b7 "}</I18nText>
-          <Link href="/re5" style={{ color: teal }}><I18nText source={"RE5 prep"} /></Link>
+        <p
+          style={{
+            color: "#808080",
+            fontSize: 14,
+            lineHeight: 1.6,
+            marginTop: 12,
+          }}
+        >
+          <I18nText>{DISAMBIGUATION}</I18nText>
         </p>
+      </section>
 
-        <p style={{ color: "#808080", fontSize: 14, marginTop: 40 }}><I18nText source={"Operated by The Solution Org (Pty) Ltd. Previously called Fundi Finance (renamed July 2026). Contact hello@notho.co.za."} /></p>
-      </div>
+      {/* Features */}
+      <section
+        style={{
+          maxWidth: 1080,
+          margin: "0 auto",
+          padding: "0 24px 64px",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: 28,
+            fontWeight: 800,
+            margin: "0 0 24px",
+          }}
+        >
+          <I18nText source={"What you can do"} />
+        </h2>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: 16,
+          }}
+        >
+          {[
+            {
+              href: "/financial-literacy",
+              title: "Learn",
+              body: "Short lessons on personal finance. Review the ideas until they stick.",
+            },
+            {
+              href: "/investment-calculator",
+              title: "Calculate",
+              body: "Savings, TFSA, retirement annuity and living-annuity scenarios in rand.",
+            },
+            {
+              href: "/budgeting",
+              title: "Budget",
+              body: "From your own numbers. Statement import is lookback only.",
+            },
+            {
+              href: "/re5",
+              title: "RE5 prep",
+              body: "If you are studying the regulatory exam.",
+            },
+          ].map((f) => (
+            <Link
+              key={f.href}
+              href={f.href}
+              style={{
+                display: "block",
+                background: "#141414",
+                border: "1px solid #222",
+                borderRadius: 16,
+                padding: 24,
+                textDecoration: "none",
+                color: "inherit",
+              }}
+            >
+              <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 700, color: teal }}>
+                <I18nText source={f.title} />
+              </h3>
+              <p style={{ margin: 0, color: "#b0b0b0", fontSize: 15, lineHeight: 1.55 }}>
+                <I18nText source={f.body} />
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* What we are not */}
+      <section
+        style={{
+          maxWidth: 1080,
+          margin: "0 auto",
+          padding: "0 24px 64px",
+        }}
+      >
+        <div
+          style={{
+            background: "#111",
+            border: "1px solid #222",
+            borderRadius: 16,
+            padding: "32px 28px",
+          }}
+        >
+          <h2 style={{ margin: "0 0 12px", fontSize: 22, fontWeight: 800 }}>
+            <I18nText source={"What Notho is not"} />
+          </h2>
+          <p style={{ margin: 0, color: "#c0c0c0", fontSize: 16, lineHeight: 1.65 }}>
+            <I18nText source={"Notho does not sell loans, does not log into your bank, and does not replace an FSCA-registered adviser. Cosmo answers literacy questions. It is not a human adviser and not a product salesperson."} />
+          </p>
+        </div>
+      </section>
+
+      {/* Founder */}
+      <section
+        style={{
+          maxWidth: 1080,
+          margin: "0 auto",
+          padding: "0 24px 64px",
+          display: "grid",
+          gridTemplateColumns: "auto 1fr",
+          gap: 32,
+          alignItems: "center",
+        }}
+      >
+        <img
+          src={photo}
+          alt="Kwanele Ntshangase"
+          style={{
+            width: 120,
+            height: 120,
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+        />
+        <div>
+          <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>
+            <I18nText source={"Built by Kwanele Ntshangase"} />
+          </h2>
+          <p style={{ margin: 0, color: "#b0b0b0", fontSize: 16, lineHeight: 1.65 }}>
+            <I18nText source={"Notho was founded by Kwanele Ntshangase. Previously called Fundi Finance (renamed July 2026)."} />
+          </p>
+        </div>
+      </section>
+
+      {/* Guides + footer */}
+      <section
+        style={{
+          maxWidth: 1080,
+          margin: "0 auto",
+          padding: "0 24px 80px",
+        }}
+      >
+        <p style={{ color: "#808080", fontSize: 14, margin: "0 0 8px" }}>
+          <I18nText source={"Guides"} />
+        </p>
+        <p style={{ margin: "0 0 32px" }}>
+          <Link href="/personal-finance" style={{ color: teal, marginRight: 16 }}>
+            <I18nText source={"Personal finance"} />
+          </Link>
+          <Link href="/investment-calculator" style={{ color: teal, marginRight: 16 }}>
+            <I18nText source={"Investment calculator"} />
+          </Link>
+          <Link href="/budgeting" style={{ color: teal, marginRight: 16 }}>
+            <I18nText source={"Budgeting"} />
+          </Link>
+          <Link href="/financial-literacy" style={{ color: teal, marginRight: 16 }}>
+            <I18nText source={"Financial literacy"} />
+          </Link>
+          <Link href="/re5" style={{ color: teal }}>
+            <I18nText source={"RE5 prep"} />
+          </Link>
+        </p>
+        <p style={{ color: "#606060", fontSize: 13 }}>
+          <I18nText source={"Founded by Kwanele Ntshangase. Contact hello@notho.co.za."} />
+        </p>
+      </section>
     </main>
   );
 }
