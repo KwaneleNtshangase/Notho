@@ -1,7 +1,8 @@
 "use client";
 import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, type ReactNode } from "react";
+import { BodyPortal } from "@/components/BodyPortal";
 import { Brain, CheckCircle2, X } from "@/components/icons/NothoIcons";
 import { CONCEPTS } from "@/data/concepts";
 import { promptForReview } from "@/lib/reviewCards";
@@ -85,9 +86,13 @@ export function ReviewSession({
 
   const isDone = currentIdx >= queue.length;
 
+  const portal = (node: ReactNode) => (
+    <BodyPortal onEscape={onClose}>{node}</BodyPortal>
+  );
+
   if (isDone) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    return portal(
+      <div className="review-session-sheet fixed inset-0 z-50 flex items-center justify-center bg-black/60">
         <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
           <Brain size={52} className="mx-auto mb-3" style={{ color: "#3B7DD8" }} />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1"><I18nText source={"Review complete!"} /></h2>
@@ -126,9 +131,9 @@ export function ReviewSession({
   const displayOptions = shuffled ? shuffled.options : card.options;
   const optionLetters = ["A", "B", "C", "D"];
 
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-gray-950">
-      <div className="flex items-center justify-between px-4 pt-safe-top pb-3 pt-4 border-b border-gray-100 dark:border-gray-800">
+  return portal(
+    <div className="review-session-screen fixed inset-0 z-50 flex flex-col bg-white dark:bg-gray-950">
+      <div className="flex items-center justify-between px-4 pb-3 pt-4 border-b border-gray-100 dark:border-gray-800">
         <I18nElement as="button"
           type="button"
           onClick={onClose}
@@ -150,7 +155,7 @@ export function ReviewSession({
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-6">
         <div className="mb-1 flex items-center gap-1.5">
           <Brain size={13} className="text-purple-500" aria-hidden />
           <span className="text-xs font-semibold uppercase tracking-widest text-purple-500">
@@ -207,10 +212,7 @@ export function ReviewSession({
       </div>
 
       {selected !== null && (
-        <div
-          className="px-4 pt-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950"
-          style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 96px)" }}
-        >
+        <div className="px-4 pb-6 pt-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
           <button
             type="button"
             onClick={handleNext}
