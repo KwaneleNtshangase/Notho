@@ -133,14 +133,14 @@ export default function SupportPage() {
           }}
         >
           <address style={{ fontStyle: "normal", lineHeight: 1.8 }}>
-            <I18nText source={"The Solution Org (Pty) Ltd"} /><br />
+            <I18nText source={"Kwanele Ntshangase"} /><br />
             <I18nText source={"South Africa"} /><br />
             <a
               href="mailto:support@notho.co.za"
               style={{ color: teal }}
             ><I18nText source={"support@notho.co.za"} /></a>
           </address>
-          <p style={{ marginTop: 16 }}><I18nText source={"© {value0} The Solution Org (Pty) Ltd. All rights reserved."} values={[new Date().getFullYear()]} /></p>
+          <p style={{ marginTop: 16 }}><I18nText source={"© {value0} Kwanele Ntshangase. All rights reserved."} values={[new Date().getFullYear()]} /></p>
         </div>
       </div>
     </main>

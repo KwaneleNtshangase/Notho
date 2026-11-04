@@ -10,8 +10,8 @@ import {
 const teal = "#007A85";
 
 const wrap: React.CSSProperties = {
-  backgroundColor: "#0a0a0a",
-  color: "#ffffff",
+  backgroundColor: "#ffffff",
+  color: "#1a1a1a",
   minHeight: "100dvh",
   fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
 };
@@ -23,7 +23,7 @@ const inner: React.CSSProperties = {
 };
 
 const p: React.CSSProperties = {
-  color: "#d0d0d0",
+  color: "#333333",
   fontSize: 16,
   lineHeight: 1.75,
   margin: "0 0 16px",
@@ -37,8 +37,8 @@ const h2: React.CSSProperties = {
 };
 
 const card: React.CSSProperties = {
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "#f7f9fa",
+  border: "1px solid #e8e8e8",
   borderRadius: 12,
   padding: "18px 20px",
   marginBottom: 12,
@@ -47,7 +47,7 @@ const card: React.CSSProperties = {
 const cta: React.CSSProperties = {
   display: "inline-block",
   background: teal,
-  color: "#fff",
+  color: "#ffffff",
   fontWeight: 700,
   textDecoration: "none",
   padding: "12px 18px",
@@ -82,8 +82,8 @@ export function PublicGuide({
           <Link href="/about" style={{ color: teal, fontWeight: 700 }}>
             <I18nText>{SITE_NAME}</I18nText>
           </Link>
-          <span style={{ color: "#666", margin: "0 8px" }}>/</span>
-          <span style={{ color: "#a0a0a0" }}><I18nText>{title}</I18nText></span>
+          <span style={{ color: "#888", margin: "0 8px" }}>/</span>
+          <span style={{ color: "#666" }}><I18nText>{title}</I18nText></span>
         </nav>
 
         <div
@@ -112,7 +112,7 @@ export function PublicGuide({
         >
           <I18nText>{title}</I18nText>
         </h1>
-        <p style={{ ...p, fontSize: 17, color: "#c8c8c8" }}><I18nText>{lede}</I18nText></p>
+        <p style={{ ...p, fontSize: 17, color: "#4a4a4a" }}><I18nText>{lede}</I18nText></p>
 
         <div style={{ margin: "8px 0 32px" }}>
           <Link href="/learn" style={cta}><I18nText source={"Open Notho"} /></Link>
@@ -127,7 +127,7 @@ export function PublicGuide({
         <h2 style={h2}><I18nText source={"Questions people ask"} /></h2>
         {faqs.map((item) => (
           <div key={item.q} style={card}>
-            <h3 style={{ margin: "0 0 8px", fontSize: 16, color: "#fff" }}>
+            <h3 style={{ margin: "0 0 8px", fontSize: 16, color: "#1a1a1a" }}>
               <I18nText>{item.q}</I18nText>
             </h3>
             <p style={{ ...p, margin: 0 }}><I18nText>{item.a}</I18nText></p>
@@ -138,12 +138,12 @@ export function PublicGuide({
           style={{
             marginTop: 40,
             paddingTop: 24,
-            borderTop: "1px solid #1e1e1e",
-            color: "#808080",
+            borderTop: "1px solid #eee",
+            color: "#666",
             fontSize: 14,
             lineHeight: 1.7,
           }}
-        ><I18nText source={"Notho is financial-literacy education from {value0}. Lessons, calculators and budgets are illustrative. Notho is not an FSP and does not give personal financial advice. Operated by The Solution Org (Pty) Ltd, Durban, South Africa."} values={[SITE_NAME]} /></p>
+        ><I18nText source={"Notho is financial-literacy education. Lessons, calculators and budgets are illustrative. Notho is not an FSP and does not give personal financial advice. Founded by Kwanele Ntshangase."} values={[SITE_NAME]} /></p>
       </div>
     </main>
   );
