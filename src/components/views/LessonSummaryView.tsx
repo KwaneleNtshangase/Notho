@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Trophy, Sparkles, Target, Flame, Wallet } from "lucide-react";
 import { BUDGET_LESSON_BRIDGE, getLessonTitle } from "@/app/pageViews.types";
 import { ShareResultButton } from "@/components/ShareCard";
-import { isIosNative } from "@/lib/capacitorPlatform";
+import { isIosNative, isIosNativeSync } from "@/lib/capacitorPlatform";
 
 export function LessonSummaryView({
   lessonSummary,
@@ -32,6 +32,10 @@ export function LessonSummaryView({
   const lessonTitle = getLessonTitle(lessonSummary.courseId, lessonSummary.lessonId) ?? "Lesson";
 
   useEffect(() => {
+    if (isIosNativeSync()) {
+      setIosShare(true);
+      return;
+    }
     let cancelled = false;
     isIosNative().then((ios) => {
       if (!cancelled) setIosShare(ios);

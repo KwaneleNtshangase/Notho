@@ -2,9 +2,8 @@
 import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 // v2 - streak freeze, hearts, share
 import { useState } from "react";
-import { Share2 } from "@/components/icons/NothoIcons";
 import { NothoStreak, NothoXP, NothoHeart } from "@/components/icons/NothoIcons";
-import { shareDuoCard } from "@/components/ShareCard";
+import { StreakShareButton } from "@/components/ShareCard";
 import { streakExtendedToday } from "@/lib/dates";
 import { formatWithSpaces } from "@/lib/formatters";
 import { StreakFreezeBody, StreakFreezeChip } from "@/components/StreakFreezeControl";
@@ -71,17 +70,10 @@ export function NothoTopBar({
             <span style={{ fontWeight: 700, fontSize: 15, color: "#EFB343", opacity: flameOpacity }}><I18nText>{streak}</I18nText></span>
           </I18nElement>
           <StreakFreezeChip count={freezeCount} onClick={() => setShowStreakModal(true)} />
-          <I18nElement as="button"
-            type="button"
-            onClick={() => {
-              void shareDuoCard({ type: "streak", streakDays: streak });
-            }}
+          <StreakShareButton
+            streakDays={streak}
             className="text-orange-400 hover:text-orange-600 p-1"
-            title="Share your streak"
-            aria-label="Share your streak"
-          >
-            <Share2 size={18} aria-hidden />
-          </I18nElement>
+          />
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>

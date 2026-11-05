@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
 import { shareFileBlob } from "@/lib/nativeShare";
+import { beginFileShare, preparedFileFollowUp } from "@/lib/shareHandoff";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
@@ -1134,10 +1135,10 @@ export function BudgetView() {
     }
   };
 
-  // Share the PDF for a specific period. Native: hands the file straight to
-  // the OS share sheet (@capacitor/share) - see nativeShare.ts. Web: falls
-  // back to the Web Share API where a browser can share files, and to the
-  // same download-link behaviour as downloadReportPdf everywhere else.
+  // Share a report that still has to be generated. Native share does not need
+  // the original tap. On the web the tap is gone once the PDF response
+  // arrives, so a missed sheet opens the ready preview: its Share and Save
+  // PDF buttons run on a new tap. Dismissing a sheet does not open that preview.
   const shareReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
     setExportLoading(true);
     try {
@@ -1146,33 +1147,22 @@ export function BudgetView() {
       const blob = await res.blob();
       const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
 
-      if (await isNativePlatform()) {
-        const shared = await shareFileBlob({
-          blob,
-          fileName,
-          title: "Notho budget report",
-          dialogTitle: "Share your budget report",
-        });
-        if (shared) return;
-        // Native share failed for some reason (e.g. cancelled) - fall through
-        // to the same web-style download rather than leaving the user stuck.
-      }
-
-      const file = new File([blob], fileName, { type: "application/pdf" });
-      const nav = navigator as Navigator & { canShare?: (data: { files?: File[] }) => boolean };
-      if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: "Notho budget report" });
-        return;
-      }
+      const outcome = beginFileShare({
+        blob,
+        fileName,
+        mimeType: "application/pdf",
+        title: "Notho budget report",
+        dialogTitle: "Share your budget report",
+      });
+      const result = outcome === "unavailable" ? "unavailable" : await outcome;
+      if (preparedFileFollowUp(result) === "done") return;
 
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      setPdfFrameReady(false);
+      setPdfPreview((prev) => {
+        if (prev?.url.startsWith("blob:")) URL.revokeObjectURL(prev.url);
+        return { url, fileName, blob };
+      });
     } catch {
       /* non-fatal: the interactive view is still open */
     } finally {
@@ -1834,7 +1824,7 @@ export function BudgetView() {
       )}
 
       {pdfPreview && (
-        <div className="fixed inset-0 z-[460] flex flex-col bg-black/70" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[560] flex flex-col bg-black/70" role="dialog" aria-modal="true">
           <div style={{ background: "var(--color-surface)", width: "100%", maxWidth: 820, margin: "0 auto", height: "100%", maxHeight: "100dvh", display: "flex", flexDirection: "column" }}>
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
@@ -1895,30 +1885,28 @@ export function BudgetView() {
                 type="button"
                 className="btn btn-secondary"
                 style={{ flex: 1, padding: 12 }}
-                onClick={async () => {
-                  const shared = await shareFileBlob({
+                onClick={() => {
+                  const save = () => {
+                    const a = document.createElement("a");
+                    a.href = pdfPreview.url;
+                    a.download = pdfPreview.fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                  };
+                  const outcome = beginFileShare({
                     blob: pdfPreview.blob,
                     fileName: pdfPreview.fileName,
+                    mimeType: "application/pdf",
                     title: "Notho budget report",
                     dialogTitle: "Share or save your budget report",
                   });
-                  if (shared) return;
-                  const file = new File([pdfPreview.blob], pdfPreview.fileName, { type: "application/pdf" });
-                  const nav = navigator as Navigator & { canShare?: (data: { files?: File[] }) => boolean };
-                  if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
-                    try {
-                      await navigator.share({ files: [file], title: "Notho budget report" });
-                    } catch {
-                      /* user cancelled the sheet */
-                    }
+                  if (outcome === "unavailable") {
+                    save();
                     return;
                   }
-                  const a = document.createElement("a");
-                  a.href = pdfPreview.url;
-                  a.download = pdfPreview.fileName;
-                  document.body.appendChild(a);
-                  a.click();
-                  a.remove();
+                  // A rejection arrives after this tap. Save PDF is the next tap.
+                  void outcome.then(() => undefined);
                 }}
               ><I18nText source={"Share"} /></button>
               <button
