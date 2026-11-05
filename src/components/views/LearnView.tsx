@@ -5,6 +5,7 @@ import { localizeContent } from "@/i18n/contentZu";
 /* eslint-disable @next/next/no-html-link-for-pages */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { BodyPortal } from "@/components/BodyPortal";
 import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
@@ -591,9 +592,13 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
 
   const isDone = !loading && hasLoaded && queue.length > 0 && currentIdx >= queue.length;
 
+  const portal = (node: ReactNode) => (
+    <BodyPortal onEscape={onClose}>{node}</BodyPortal>
+  );
+
   if (loading) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    return portal(
+      <div className="review-session-sheet fixed inset-0 z-50 flex items-center justify-center bg-black/60">
         <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
           <p className="text-sm font-semibold text-gray-600 dark:text-gray-300"><I18nText source={"Loading review..."} /></p>
         </div>
@@ -602,8 +607,8 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
   }
 
   if (hasLoaded && queue.length === 0) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    return portal(
+      <div className="review-session-sheet fixed inset-0 z-50 flex items-center justify-center bg-black/60">
         <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2"><I18nText source={"Review"} /></h2>
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-6"><I18nText source={"Nothing due for review. Come back tomorrow to keep your streak strong."} /></p>
@@ -623,8 +628,8 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
       // markConceptReviewedToday() now happens in the review-complete
       // handler above, alongside the rest of the credit.
     }
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    return portal(
+      <div className="review-session-sheet fixed inset-0 z-50 flex items-center justify-center bg-black/60">
         <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
           <Brain size={52} className="mx-auto mb-3" style={{ color: "#3B7DD8" }} />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1"><I18nText source={"Review complete!"} /></h2>
@@ -665,10 +670,10 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
   const displayOptions = shuffled ? shuffled.options : card.options;
   const optionLetters = ["A", "B", "C", "D"];
 
-  return (
-    <div className="fixed inset-0 z-[300] flex flex-col bg-white dark:bg-gray-950">
+  return portal(
+    <div className="review-session-screen fixed inset-0 z-[300] flex flex-col bg-white dark:bg-gray-950">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-safe-top pb-3 pt-4 border-b border-gray-100 dark:border-gray-800">
+      <div className="flex items-center justify-between px-4 pb-3 pt-4 border-b border-gray-100 dark:border-gray-800">
         <I18nElement as="button"
           type="button"
           onClick={onClose}
@@ -691,7 +696,7 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
       </div>
 
       {/* Card content */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-6">
         <div className="mb-1 flex items-center gap-1.5">
           <Brain size={13} className="text-purple-500" aria-hidden />
           <span className="text-xs font-semibold uppercase tracking-widest text-purple-500">
@@ -749,7 +754,7 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
 
       {/* Footer */}
       {selected !== null && (
-        <div className="px-4 pb-safe-bottom pb-6 pt-3 border-t border-gray-100 dark:border-gray-800">
+        <div className="px-4 pb-6 pt-3 border-t border-gray-100 dark:border-gray-800">
           <button
             type="button"
             onClick={handleNext}

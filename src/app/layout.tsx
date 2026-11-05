@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { PostHogProvider } from "@/components/PostHogProvider";
+import { isReplayEnvKilled } from "@/lib/sessionReplay";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ErrorReportingInit } from "@/components/ErrorReportingInit";
 import { NativeAuthDeepLink } from "@/components/NativeAuthDeepLink";
@@ -91,9 +92,9 @@ export const metadata: Metadata = {
     "RE5 prep",
     "Fundi Finance",
   ],
-  authors: [{ name: "The Solution Org (Pty) Ltd", url: SITE_URL }],
+  authors: [{ name: "Kwanele Ntshangase", url: SITE_URL }],
   creator: SITE_NAME,
-  publisher: "The Solution Org (Pty) Ltd",
+  publisher: "Kwanele Ntshangase",
   category: "education",
   manifest: "/manifest.json",
   metadataBase: new URL(SITE_URL),
@@ -155,7 +156,12 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <LocaleProvider>
-            <PostHogProvider>{children}</PostHogProvider>
+            <PostHogProvider
+              replayKilled={isReplayEnvKilled({
+                POSTHOG_SESSION_REPLAY: process.env.POSTHOG_SESSION_REPLAY,
+                NEXT_PUBLIC_POSTHOG_SESSION_REPLAY: process.env.NEXT_PUBLIC_POSTHOG_SESSION_REPLAY,
+              })}
+            >{children}</PostHogProvider>
           </LocaleProvider>
           <ServiceWorkerRegistration />
           <ErrorReportingInit />

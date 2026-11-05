@@ -313,7 +313,7 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
 
       {page === "privacy" && (
         <div style={{ fontSize: 14, lineHeight: 1.7, color: "var(--color-text-primary)" }}>
-          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 20 }}><I18nText source={"Last revised: 9 August 2026"} /></p>
+          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 20 }}><I18nText source={"Last revised: 4 November 2026"} /></p>
           {[
             { title: "1. General", body: "Notho (\"we\", \"us\") cares about your personal information. This Privacy Policy explains how we collect, use, and protect it when you use the Notho app and related services. By using the service, you agree to the practices described here." },
             { title: "2. Information We Collect", body: "We collect: (a) your email address and display name when you register; (b) your learning progress including lessons completed, XP earned, and streaks; (c) budget entries you create - these are stored securely and only accessible to you; (d) anonymised, aggregated budget data for the community benchmarking feature; (e) app usage data such as which lessons you viewed and how long you spent." },
@@ -324,6 +324,7 @@ export function LegalPage({ page, onBack, onFeedback }: { page: "privacy" | "ter
             { title: "6a. Exit Feedback", body: "If you tell us why you are leaving - when you delete your account, unsubscribe from emails, or reply to a \"what happened?\" email - we keep that answer after your account is gone, because it is the only way we can learn what to fix. It is anonymous: the reason you picked, any comment you wrote, and general context like how long you had been signed up. It is not linked to your name, email, or account, and your account identifier is replaced with a one-way code that cannot be reversed. Answering is always optional and there is always a Skip button. To have a comment you wrote removed, email privacy@notho.co.za." },
             { title: "7. Children", body: "Notho is not directed at children under the age of 13. We do not knowingly collect data from children. If we become aware that a child has provided personal information, we will delete it promptly." },
             { title: "8. Cookies & Analytics", body: "We use analytics tools (PostHog) to understand how users engage with the app. Data collected is anonymised and used only to improve the product. We do not use third-party advertising cookies." },
+            { title: "8a. Session recording", body: "Signed-in sessions are recorded by default to improve the product. You can turn this off anytime in Settings. Recordings are masked, and we never sell this data." },
             { title: "9. Contact", body: "For all privacy enquiries, contact our team at privacy@notho.co.za." },
           ].map((s) => (
             <div key={s.title} style={{ marginBottom: 20 }}>

@@ -97,6 +97,8 @@ function SettingsAccountSection() {
 }
 
 import { ensurePushSubscription, disablePush } from "@/lib/push/subscribe";
+import { stopSessionReplayNow } from "@/lib/sessionReplayControl";
+import { replayToggleStopsImmediately } from "@/lib/sessionReplay";
 
 export function SettingsView({
   userData,
@@ -172,6 +174,13 @@ export function SettingsView({
     void userSettings.setSoundEnabled(next);
   };
 
+  const replayOn = userSettings.sessionReplayEnabled;
+  const handleReplayToggle = () => {
+    const next = !replayOn;
+    if (replayToggleStopsImmediately(next)) stopSessionReplayNow();
+    void userSettings.setSessionReplayEnabled(next);
+  };
+
   const handleGoal = (g: number) => {
     setSelectedGoal(g);
     setDailyGoal(g);
@@ -206,7 +215,33 @@ export function SettingsView({
 
       <LanguageSelector />
 
-      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Learning"} /></div>
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", marginBottom: 8 }}><I18nText source={"Privacy"} /></div>
+      <Row
+        icon={<Shield size={18} />}
+        label="Session recording: help improve Notho"
+        sub="Sessions are recorded by default to improve Notho. You can turn this off anytime. Recordings are masked, and we never sell this data."
+      >
+        <button
+          type="button"
+          role="switch"
+          aria-checked={replayOn}
+          aria-label="Session recording: help improve Notho"
+          onClick={handleReplayToggle}
+          style={{
+            width: 48, height: 28, borderRadius: 14,
+            background: replayOn ? "var(--color-primary)" : "var(--color-border)",
+            border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0,
+          }}
+        >
+          <span style={{
+            position: "absolute", top: 3, left: replayOn ? 23 : 3, width: 22, height: 22,
+            borderRadius: "50%", background: "white", boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+            transition: "left 0.2s",
+          }} />
+        </button>
+      </Row>
+
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}><I18nText source={"Learning"} /></div>
 
       <VoiceSettings />
 

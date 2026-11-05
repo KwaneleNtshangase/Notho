@@ -29,7 +29,7 @@ export const maxDuration = 60;
 const MAX_PER_DAY = 10;
 const MAX_MSG_LEN = 500;
 const HISTORY_TURNS = 8;
-const GEMINI_MODEL = "gemini-3.5-flash";
+const GEMINI_MODEL = "gemini-3.8-flash";
 // Abort a single model call if it stalls, so the retry (or a clean error) kicks
 // in within seconds instead of leaving the user staring at a typing indicator.
 const GEMINI_TIMEOUT_MS = 20_000;
@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
       parts: [{ text: `${SYSTEM_PROMPT}\n\nSelected app language: ${LOCALE_NAMES[parseLocale(req.cookies.get('notho_locale')?.value)]}.\n\nBUDGET SUMMARY (the user's own anonymised numbers - quote these exactly):\n${summary.text}` }],
     },
     contents: [...history, { role: "user", parts: [{ text: message }] }],
-    // NB: Gemini 3.5 Flash "thinks" before replying and its thinking tokens
+    // NB: Gemini 3.8 Flash "thinks" before replying and its thinking tokens
     // count against maxOutputTokens. A small cap truncates replies mid-sentence
     // (~450 thinking tokens observed), so leave generous headroom; the prompt
     // keeps visible replies under 120 words.

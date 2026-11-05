@@ -1510,6 +1510,40 @@ body.modal-open .bottom-nav {
   display: none !important;
 }
 
+/* Review session is portaled to document.body. Sit above the shell
+   (sidebar, stats, top bar, bottom nav, safe-area strips at z-index 400)
+   and under the biometric lock (700) and the shake-to-report sheet (600).
+   touch-action stays pannable so the card list can scroll while the page
+   behind is locked. No transform or filter here: those would trap fixed
+   descendants again. */
+.review-session-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 520;
+  touch-action: pan-y;
+}
+.review-session-portal:focus {
+  outline: none;
+}
+html.notho-review-open body.modal-open {
+  touch-action: auto;
+}
+.review-session-screen {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  overscroll-behavior: contain;
+}
+.review-session-sheet {
+  box-sizing: border-box;
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+}
+
 /* ── Dark mode floating nav pill ────────────────────────────────────────── */
 html.dark .nav-pill {
   background: #141414;

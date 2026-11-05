@@ -306,7 +306,7 @@ export function CosmoCoachChat() {
 
           {state.kind === "consent" && (
             <div>
-              <p style={{ fontSize: 13, color: "var(--color-text-primary)", margin: "0 0 8px" }}><I18nRich source={"Cosmo is an <strong0>AI assistant</strong0>, powered by Google Gemini. Ask it questions about your month. Only anonymised category totals are shared with the AI. Your name, transactions, and account details are never shared."} elements={[<strong key="inline-0" />]} /></p>
+              <p style={{ fontSize: 13, color: "var(--color-text-primary)", margin: "0 0 8px" }}><I18nText source={"Cosmo is an AI assistant. Ask him questions about your budget."} /></p>
               <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "0 0 10px" }}><I18nRich source={"AI can get things wrong. Cosmo explains, it does not advise, and it is not a financial adviser.  <a0>How this works</a0>"} elements={[<a key="inline-0"
                   href="/privacy#ai-coach"
                   target="_blank"

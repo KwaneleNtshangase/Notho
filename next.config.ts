@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 const securityHeaders = [
   {
@@ -9,7 +10,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' data: https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://*.supabase.co https://*.googleusercontent.com https://*.fbcdn.net https://platform-lookaside.fbsbx.com https://appleid.cdn-apple.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com https://app.posthog.com https://notho.co.za https://www.notho.co.za https://wealthwithkwanele.co.za",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://us.i.posthog.com https://us-assets.i.posthog.com https://app.posthog.com https://notho.co.za https://www.notho.co.za https://wealthwithkwanele.co.za https://*.ingest.sentry.io https://*.ingest.de.sentry.io",
       "worker-src 'self' blob:",
       "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
       "frame-ancestors 'none'",
@@ -76,4 +77,36 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 };
 
-export default nextConfig;
+const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim();
+const sentryOrg = process.env.SENTRY_ORG?.trim();
+const sentryProject = process.env.SENTRY_PROJECT?.trim();
+// Source-map upload needs all three. Missing or rejected credentials must not
+// fail `next build` — events still arrive, traces stay minified.
+const canUploadSourceMaps = Boolean(sentryAuthToken && sentryOrg && sentryProject);
+
+export default withSentryConfig(nextConfig, {
+  org: sentryOrg,
+  project: sentryProject,
+  authToken: sentryAuthToken,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  // Strip SDK debug logs. bundleSizeOptimizations works for Turbopack (Next 16
+  // default) and webpack. disableLogger does not, and is deprecated.
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+  },
+  telemetry: false,
+  sourcemaps: {
+    disable: !canUploadSourceMaps,
+  },
+  release: {
+    create: canUploadSourceMaps,
+  },
+  errorHandler(error) {
+    console.warn(
+      "[sentry] Source map upload failed. The Next.js build will continue.",
+      error
+    );
+  },
+});
