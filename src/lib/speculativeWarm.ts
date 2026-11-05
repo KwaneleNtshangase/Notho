@@ -58,6 +58,7 @@ export function warmHeavyShell() {
   void import("@/components/views/LessonSummaryView");
   void import("@/components/SettingsView");
   void import("@/components/ReviewSession");
+  prefetchHref("/review");
   prefetchHref("/settings");
   prefetchHref("/re5-readiness");
 }

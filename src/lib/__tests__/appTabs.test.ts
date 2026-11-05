@@ -22,6 +22,7 @@ describe("appTabs", () => {
     expect(isAppTabPath("/lesson/investing-basics/lesson-1")).toBe(false);
     expect(isAppTabPath("/settings")).toBe(false);
     expect(isAppTabPath("/leaderboard")).toBe(false);
+    expect(isAppTabPath("/review")).toBe(false);
   });
 
   it("normalises aliases onto a tab href", () => {

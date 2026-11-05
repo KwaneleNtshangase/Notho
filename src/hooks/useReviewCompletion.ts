@@ -4,8 +4,8 @@
  * useReviewCompletion
  *
  * One entry point for "the learner finished a spaced-repetition review",
- * shared by the two review surfaces (`components/ReviewSession` and the review
- * flow inside `views/LearnView`) so the streak rule lives in exactly one place.
+ * Used by the /review page (`components/ReviewSession`) so the streak rule
+ * lives in exactly one place.
  *
  * Reads the Notho context directly rather than through `useNotho()` so a review
  * screen rendered outside the provider degrades to a no-op instead of throwing
