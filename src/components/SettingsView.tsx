@@ -20,7 +20,7 @@ import {
   Zap,
 } from "@/components/icons/NothoIcons";
 import { LegalPage, FeedbackModal } from "@/components/ProfileView";
-import { ShakeReportSetting } from "@/components/ReportProblemSheet";
+import { ShakeReportSetting, openReportProblem } from "@/components/ReportProblemSheet";
 import { VoiceSettings } from "@/components/VoiceSettings";
 import { ExitSurveyModal } from "@/components/churn/ExitSurvey";
 import { isAdminEmail } from "@/lib/admin";
@@ -343,6 +343,20 @@ export function SettingsView({
           </a>
         </>
       )}
+
+      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}><I18nText source={"Feedback"} /></div>
+      <button
+        type="button"
+        onClick={() => openReportProblem()}
+        style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", marginBottom: 8, background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 12, cursor: "pointer", textAlign: "left" }}
+      >
+        <Bug size={16} style={{ color: "var(--color-primary)", flexShrink: 0 }} />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}><I18nText source={"Report a problem"} /></div>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={"Opens the same report sheet as shaking the phone"} /></div>
+        </div>
+        <ChevronRight size={14} style={{ color: "var(--color-text-secondary)" }} />
+      </button>
 
       <ShakeReportSetting />
 
