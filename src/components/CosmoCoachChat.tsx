@@ -6,40 +6,56 @@ import { LocalizedRichText as I18nRich, LocalizedText as I18nText, LocalizedElem
  *
  * Floating chat button (bottom-right) that opens a compact chat panel.
  * Gates on explicit opt-in consent (user_settings.coach_ai_consent), then
- * chats via POST /api/coach/chat. History for today loads from coach_ai_logs
+ * chats via POST /api/coach/chat. The newest page loads from coach_ai_logs
  * (RLS: read-own only; all writes happen server-side).
  */
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { readCoachHistory, type HistoryCursor } from "@/lib/coach/history";
+import { sastToday } from "@/lib/dates";
 import { MessageSquare } from "@/components/icons/NothoIcons";
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
 type ChatState =
   | { kind: "loading" }
+  | { kind: "load-error" }
   | { kind: "consent" }
   | { kind: "chat" };
 
 const INPUT_MAX = 500;
+const HISTORY_PAGE_SIZE = 20;
 
 export function CosmoCoachChat() {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<ChatState>({ kind: "loading" });
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
-  const [remaining, setRemaining] = useState<number | null>(null);
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+  const sending = pendingMessage !== null;
+  const pendingSend = useRef<Promise<void> | null>(null);
+  const [earlierPage, setEarlierPage] = useState<{ userId: string; before: HistoryCursor } | null>(null);
+  const [loadingEarlier, setLoadingEarlier] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const historyVersion = useRef(0);
+  const scrollAnchor = useRef<{ height: number; top: number } | null>(null);
+  const [allowance, setAllowance] = useState<{ day: string; left: number } | null>(null);
+  const remaining = allowance?.day === sastToday() ? allowance.left : null;
   const [notice, setNotice] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
+    const version = historyVersion.current;
 
     async function load() {
+      // A reopened panel must read after an in-flight exchange has been saved.
+      if (pendingSend.current) await pendingSend.current;
+      if (cancelled) return;
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) throw new Error("Session unavailable");
 
       const [settingsRes, logsRes] = await Promise.all([
         supabase
@@ -47,29 +63,51 @@ export function CosmoCoachChat() {
           .select("coach_ai_consent")
           .eq("user_id", user.id)
           .maybeSingle(),
-        supabase
-          .from("coach_ai_logs")
-          .select("role, content, created_at")
-          .order("created_at", { ascending: true })
-          .limit(20),
+        readCoachHistory(supabase, user.id, HISTORY_PAGE_SIZE),
       ]);
       if (cancelled) return;
 
+      if (settingsRes.error || logsRes.error) throw new Error("History unavailable");
       const consent = Boolean(settingsRes.data?.coach_ai_consent);
-      setMessages(
-        ((logsRes.data ?? []) as { role: string; content: string }[])
-          .filter((m) => m.role === "user" || m.role === "assistant")
-          .map((m) => ({ role: m.role as ChatMsg["role"], content: m.content }))
-      );
+      setMessages(logsRes.messages);
+      setEarlierPage(logsRes.before ? { userId: user.id, before: logsRes.before } : null);
       setState({ kind: consent ? "chat" : "consent" });
     }
 
-    load();
-    return () => { cancelled = true; };
-  }, [open]);
+    load().catch(() => { if (!cancelled) setState({ kind: "load-error" }); });
+    return () => {
+      cancelled = true;
+      historyVersion.current = version + 1;
+      scrollAnchor.current = null;
+    };
+  }, [open, loadAttempt]);
+
+  async function loadEarlier() {
+    if (!earlierPage || loadingEarlier) return;
+    const version = historyVersion.current;
+    setLoadingEarlier(true);
+    setNotice(null);
+    try {
+      const page = await readCoachHistory(supabase, earlierPage.userId, HISTORY_PAGE_SIZE, { before: earlierPage.before });
+      if (version !== historyVersion.current) return;
+      if (page.error) throw page.error;
+      const list = listRef.current;
+      if (list) scrollAnchor.current = { height: list.scrollHeight, top: list.scrollTop };
+      setMessages(current => [...page.messages, ...current]);
+      setEarlierPage(page.before ? { userId: earlierPage.userId, before: page.before } : null);
+    } catch {
+      if (version === historyVersion.current) setNotice("Earlier messages could not be loaded. Please try again.");
+    } finally {
+      if (version === historyVersion.current) setLoadingEarlier(false);
+    }
+  }
 
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+    const list = listRef.current;
+    if (!list) return;
+    const anchor = scrollAnchor.current;
+    list.scrollTop = anchor ? anchor.top + list.scrollHeight - anchor.height : list.scrollHeight;
+    scrollAnchor.current = null;
   }, [messages, sending]);
 
   useEffect(() => {
@@ -100,13 +138,15 @@ export function CosmoCoachChat() {
     setState({ kind: value ? "chat" : "consent" });
   }
 
-  async function send() {
+  function send() {
     const message = input.trim();
-    if (!message || sending) return;
-    setInput("");
+    if (!message || pendingSend.current) return;
+    pendingSend.current = sendMessage(message).finally(() => { pendingSend.current = null; });
+  }
+
+  async function sendMessage(message: string) {
     setNotice(null);
-    setSending(true);
-    setMessages((m) => [...m, { role: "user", content: message }]);
+    setPendingMessage(message);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -132,7 +172,7 @@ export function CosmoCoachChat() {
 
       if (res.status === 429) {
         setNotice("You've used today's 10 coach messages. More tomorrow!");
-        setRemaining(0);
+        setAllowance({ day: sastToday(), left: 0 });
         return;
       }
       if (res.status === 403) {
@@ -144,13 +184,17 @@ export function CosmoCoachChat() {
         return;
       }
       if (!res.ok) {
-        setNotice(`Coach is unavailable right now (code ${res.status}), try again later.`);
+        const error = await res.json().catch(() => null);
+        setNotice(error?.error === "history_save_failed"
+          ? "Cosmo couldn't save this exchange. Please try sending your question again."
+          : `Coach is unavailable right now (code ${res.status}), try again later.`);
         return;
       }
 
       const data = (await res.json()) as { reply: string; remaining: number };
-      setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
-      setRemaining(data.remaining);
+      setMessages((m) => [...m, { role: "user", content: message }, { role: "assistant", content: data.reply }]);
+      setInput("");
+      setAllowance({ day: sastToday(), left: data.remaining });
     } catch (err) {
       const timedOut = err instanceof DOMException && err.name === "AbortError";
       setNotice(
@@ -159,7 +203,7 @@ export function CosmoCoachChat() {
           : "Coach is unavailable right now, try again later."
       );
     } finally {
-      setSending(false);
+      setPendingMessage(null);
     }
   }
 
@@ -243,7 +287,12 @@ export function CosmoCoachChat() {
           type="button"
           className="notho-chat-fab"
           aria-label="Ask Cosmo"
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setState({ kind: "loading" });
+            setLoadingEarlier(false);
+            if (!pendingSend.current) setNotice(null);
+            setOpen(true);
+          }}
         >
           <MessageSquare size={24} style={{ color: "#fff" }} />
         </I18nElement>
@@ -304,6 +353,15 @@ export function CosmoCoachChat() {
             <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}><I18nText source={"Loading…"} /></p>
           )}
 
+          {state.kind === "load-error" && (
+            <div role="alert">
+              <p><I18nText source={"Cosmo couldn't load your chat history."} /></p>
+              <button type="button" onClick={() => { setState({ kind: "loading" }); setLoadAttempt(n => n + 1); }}>
+                <I18nText source={"Try again"} />
+              </button>
+            </div>
+          )}
+
           {state.kind === "consent" && (
             <div>
               <p style={{ fontSize: 13, color: "var(--color-text-primary)", margin: "0 0 8px" }}><I18nText source={"Cosmo is an AI assistant. Ask him questions about your budget."} /></p>
@@ -335,10 +393,15 @@ export function CosmoCoachChat() {
                   flexDirection: "column", gap: 8, marginBottom: 10, WebkitOverflowScrolling: "touch",
                 }}
               >
+                {earlierPage && (
+                  <button type="button" onClick={loadEarlier} disabled={loadingEarlier || sending}>
+                    <I18nText source={loadingEarlier ? "Loading…" : "Load earlier messages"} />
+                  </button>
+                )}
                 {messages.length === 0 && !sending && (
                   <p style={{ fontSize: 13, color: "var(--color-text-secondary)", margin: 0 }}><I18nText source={"Ask about a category on this month's budget."} /></p>
                 )}
-                {messages.map((m, i) => (
+                {(pendingMessage ? [...messages, { role: "user", content: pendingMessage }] : messages).map((m, i) => (
                   <div
                     key={i}
                     style={{
@@ -376,7 +439,7 @@ export function CosmoCoachChat() {
                 className="notho-chat-form"
               >
                 <I18nElement as="input"
-                  value={input}
+                  value={sending ? "" : input}
                   maxLength={INPUT_MAX}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about your month"

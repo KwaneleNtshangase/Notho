@@ -4,6 +4,7 @@ import { createServiceSupabase } from "@/lib/supabaseServer";
 import { sastToday } from "@/lib/dates";
 import { resolveMonthlyBudget, type BudgetTargetRow } from "@/lib/budget/budgetResolve";
 import { buildCoachSummary } from "@/lib/coach/summary";
+import { readCoachHistory } from "@/lib/coach/history";
 import { parseLocale, LOCALE_NAMES } from '@/i18n/locales';
 import type { CoachEntry } from "@/lib/coach/insights";
 
@@ -101,12 +102,13 @@ export async function POST(req: NextRequest) {
 
   // ── Daily rate limit (SAST day) ────────────────────────────────────────────
   const sastDayStartIso = new Date(`${sastToday()}T00:00:00+02:00`).toISOString();
-  const { count: usedToday } = await admin
+  const { count: usedToday, error: countError } = await admin
     .from("coach_ai_logs")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
     .eq("role", "user")
     .gte("created_at", sastDayStartIso);
+  if (countError) return NextResponse.json({ error: "history_unavailable" }, { status: 500 });
   if ((usedToday ?? 0) >= MAX_PER_DAY) {
     return NextResponse.json({ error: "daily_limit", remaining: 0 }, { status: 429 });
   }
@@ -131,14 +133,11 @@ export async function POST(req: NextRequest) {
       .from("custom_budget_categories")
       .select("id, name")
       .eq("user_id", user.id),
-    admin
-      .from("coach_ai_logs")
-      .select("role, content")
-      .eq("user_id", user.id)
-      .gte("created_at", sastDayStartIso)
-      .order("created_at", { ascending: false })
-      .limit(HISTORY_TURNS),
+    readCoachHistory(admin, user.id, HISTORY_TURNS, { since: sastDayStartIso }),
   ]);
+  if (historyRes.error) {
+    return NextResponse.json({ error: "history_unavailable" }, { status: 500 });
+  }
 
   const targetRows = (targetsRes.data ?? []) as BudgetTargetRow[];
   const budgets: Record<string, number> = {};
@@ -162,12 +161,10 @@ export async function POST(req: NextRequest) {
   });
 
   // ── Call Gemini ────────────────────────────────────────────────────────────
-  const history = ((historyRes.data ?? []) as { role: string; content: string }[])
-    .reverse() // oldest first
-    .map((h) => ({
-      role: h.role === "assistant" ? "model" : "user",
-      parts: [{ text: h.content }],
-    }));
+  const history = historyRes.messages.map((h) => ({
+    role: h.role === "assistant" ? "model" : "user",
+    parts: [{ text: h.content }],
+  }));
 
   const geminiBody = {
     systemInstruction: {
@@ -241,10 +238,14 @@ export async function POST(req: NextRequest) {
   reply = reply.replace(/\s*[\u2014\u2013]\s*/g, " - ");
 
   // ── Log the exchange (service role - clients cannot write this table) ─────
-  await admin.from("coach_ai_logs").insert([
+  const { error: saveError } = await admin.from("coach_ai_logs").insert([
     { user_id: user.id, role: "user", content: message },
     { user_id: user.id, role: "assistant", content: reply },
   ]);
+  if (saveError) {
+    console.error("[coach/chat] history insert failed", saveError.code);
+    return NextResponse.json({ error: "history_save_failed" }, { status: 500 });
+  }
 
   const remaining = Math.max(0, MAX_PER_DAY - (usedToday ?? 0) - 1);
   return NextResponse.json({ reply, remaining });
