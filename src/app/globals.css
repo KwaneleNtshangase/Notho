@@ -3246,3 +3246,32 @@ html.dark .mock-review-heading > span {
     text-align: center !important;
   }
 }
+
+/* Public marketing pages stay light even when the system prefers dark */
+html.dark .public-page,
+html.dark .public-page [style*="background: #fff"],
+html.dark .public-page [style*="background:#fff"],
+html.dark .public-page [style*="background: #ffffff"],
+html.dark .public-page [style*="background:#ffffff"],
+html.dark .public-page [style*="background: white"],
+html.dark .public-page [style*="background:white"] {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+}
+html.dark .public-page [style*="background: #f7f9fa"],
+html.dark .public-page [style*="background:#f7f9fa"],
+html.dark .public-page [style*="background: #f4f7f8"],
+html.dark .public-page [style*="background:#f4f7f8"] {
+  background: #f7f9fa !important;
+  color: #1a1a1a !important;
+}
+html.dark .public-page h1,
+html.dark .public-page h2,
+html.dark .public-page h3,
+html.dark .public-page p,
+html.dark .public-page a,
+html.dark .public-page span,
+html.dark .public-page div,
+html.dark .public-page li {
+  color: inherit;
+}

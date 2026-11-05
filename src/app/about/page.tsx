@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import { PublicFooter } from "@/components/PublicFooter";
+import { OpenNothoButton } from "@/components/OpenNothoButton";
 import {
   SITE_DESCRIPTION,
   canonical,
@@ -29,6 +30,7 @@ const muted = "#4a4a4a";
 export default function AboutPage() {
   return (
     <div
+      className="public-page"
       style={{
         backgroundColor: "#ffffff",
         color: ink,
@@ -67,8 +69,7 @@ export default function AboutPage() {
             <Link href="/financial-literacy" style={{ color: ink, textDecoration: "none" }}>Learn</Link>
             <Link href="/investment-calculator" style={{ color: ink, textDecoration: "none" }}>Calculate</Link>
             <Link href="/budgeting" style={{ color: ink, textDecoration: "none" }}>Budget</Link>
-            <Link
-              href="/learn"
+            <OpenNothoButton
               style={{
                 background: teal,
                 color: "#fff",
@@ -77,9 +78,7 @@ export default function AboutPage() {
                 borderRadius: 6,
                 fontWeight: 700,
               }}
-            >
-              Open Notho
-            </Link>
+            />
           </nav>
         </div>
       </header>
@@ -110,10 +109,10 @@ export default function AboutPage() {
             <I18nText source={"Learn personal finance in South Africa."} />
           </h1>
           <p style={{ fontSize: 18, lineHeight: 1.6, color: muted, margin: "0 0 28px", maxWidth: 480 }}>
-            <I18nText source={"Short lessons, calculators that work in rand, and a budget that uses your own numbers."} />
+            <I18nText source={"Short lessons, calculators, and a budget that uses your own numbers."} />
           </p>
-          <Link
-            href="/learn"
+          <OpenNothoButton
+            label="Start learning"
             style={{
               display: "inline-block",
               background: teal,
@@ -124,9 +123,7 @@ export default function AboutPage() {
               borderRadius: 8,
               fontSize: 16,
             }}
-          >
-            <I18nText source={"Start learning"} />
-          </Link>
+          />
         </div>
         <div
           style={{
@@ -158,7 +155,7 @@ export default function AboutPage() {
           >
             {[
               { href: "/financial-literacy", title: "Learn", body: "Short lessons on personal finance. Review the ideas until they stick." },
-              { href: "/investment-calculator", title: "Calculate", body: "Savings, TFSA, retirement annuity and living-annuity scenarios in rand." },
+              { href: "/investment-calculator", title: "Calculate", body: "Savings, TFSA, retirement annuity and living-annuity scenarios." },
               { href: "/budgeting", title: "Budget", body: "From your own numbers. Statement import is lookback only." },
               { href: "/re5", title: "RE5 prep", body: "If you are studying the regulatory exam." },
             ].map((item) => (
