@@ -2,6 +2,7 @@ import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import { PublicFooter } from "@/components/PublicFooter";
+import { PublicHeader } from "@/components/PublicHeader";
 import {
   SITE_NAME,
   faqJsonLd,
@@ -76,6 +77,7 @@ export function PublicGuide({
 }) {
   return (
     <main style={wrap}>
+      <PublicHeader />
       <JsonLd data={webPageJsonLd({ path, title, description })} />
       <JsonLd data={faqJsonLd(faqs)} />
       <div style={inner}>

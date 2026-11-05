@@ -1,6 +1,8 @@
 import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const metadata: Metadata = {
   title: "Support | Notho",
@@ -10,12 +12,12 @@ export const metadata: Metadata = {
 
 /* ── Shared inline styles (matches privacy/terms page conventions) ─── */
 
-const bg = "#0a0a0a";
+const bg = "#ffffff";
 const teal = "#007A85";
 
 const wrap: React.CSSProperties = {
   backgroundColor: bg,
-  color: "#ffffff",
+  color: "#1a1a1a",
   minHeight: "100dvh",
   fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
   padding: 0,
@@ -29,8 +31,8 @@ const inner: React.CSSProperties = {
 };
 
 const card: React.CSSProperties = {
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: "#f7f9fa",
+  border: "1px solid #e8e8e8",
   borderRadius: 12,
   padding: "20px 22px",
   marginBottom: 16,
@@ -45,7 +47,7 @@ const h2: React.CSSProperties = {
 };
 
 const p: React.CSSProperties = {
-  color: "#d0d0d0",
+  color: "#333333",
   fontSize: 15,
   lineHeight: 1.75,
   margin: "0 0 12px",
@@ -57,6 +59,7 @@ const link: React.CSSProperties = { color: teal, fontWeight: 600 };
 
 export default function SupportPage() {
   return (
+    <PublicHeader />
     <main style={wrap}>
       <div style={inner}>
         {/* Header */}
@@ -65,7 +68,7 @@ export default function SupportPage() {
             style={{
               display: "inline-block",
               backgroundColor: teal,
-              color: "#ffffff",
+              color: "#1a1a1a",
               fontSize: 12,
               fontWeight: 700,
               letterSpacing: "0.1em",
@@ -81,10 +84,10 @@ export default function SupportPage() {
               fontWeight: 800,
               lineHeight: 1.15,
               margin: "0 0 12px",
-              color: "#ffffff",
+              color: "#1a1a1a",
             }}
           ><I18nText source={"Support"} /></h1>
-          <p style={{ color: "#a0a0a0", fontSize: 15, margin: 0 }}><I18nText source={"We're here to help. Most questions are answered in the pages below, but if not — email us and we'll get back to you."} /></p>
+          <p style={{ color: "#555555", fontSize: 15, margin: 0 }}><I18nText source={"We're here to help. Most questions are answered in the pages below, but if not — email us and we'll get back to you."} /></p>
         </div>
 
         {/* Contact card */}
@@ -102,7 +105,7 @@ export default function SupportPage() {
             style={{
               paddingLeft: 20,
               margin: 0,
-              color: "#d0d0d0",
+              color: "#333333",
               fontSize: 15,
               lineHeight: 2,
             }}
@@ -128,7 +131,7 @@ export default function SupportPage() {
             marginTop: 40,
             paddingTop: 24,
             borderTop: "1px solid #1e1e1e",
-            color: "#505050",
+            color: "#777777",
             fontSize: 13,
           }}
         >
@@ -144,5 +147,6 @@ export default function SupportPage() {
         </div>
       </div>
     </main>
+    <PublicFooter />
   );
 }

@@ -5,6 +5,8 @@ import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n
 
 import React, { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 /**
  * Public "Your data & security" page. Explains how we handle data (plain
@@ -14,6 +16,13 @@ import { supabase } from "@/lib/supabaseClient";
 export default function SecurityPage() {
   const [busy, setBusy] = useState<null | "export" | "delete">(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [signedIn, setSignedIn] = useState(false);
+
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setSignedIn(!!session));
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   const token = async () => {
     const { data } = await supabase.auth.getSession();
@@ -57,14 +66,16 @@ export default function SecurityPage() {
     }
   };
 
-  const wrap: React.CSSProperties = { maxWidth: 720, margin: "0 auto", padding: "40px 20px 80px", color: "var(--color-text-primary)", lineHeight: 1.65 };
-  const card: React.CSSProperties = { background: "var(--color-surface)", borderRadius: 16, padding: "20px 22px", marginBottom: 16 };
+  const wrap: React.CSSProperties = { maxWidth: 720, margin: "0 auto", padding: "40px 20px 80px", color: "#1a1a1a", lineHeight: 1.65 };
+  const card: React.CSSProperties = { background: "#f7f9fa", border: "1px solid #e8e8e8", borderRadius: 16, padding: "20px 22px", marginBottom: 16 };
   const h2: React.CSSProperties = { fontSize: 17, fontWeight: 800, margin: "0 0 8px" };
-  const p: React.CSSProperties = { fontSize: 14.5, color: "var(--color-text-secondary)", margin: "0 0 8px" };
+  const p: React.CSSProperties = { fontSize: 14.5, color: "#4a4a4a", margin: "0 0 8px" };
   const btn: React.CSSProperties = { padding: "12px 18px", borderRadius: 10, border: "none", fontWeight: 700, fontSize: 14.5, cursor: "pointer" };
 
   return (
-    <main style={wrap}>
+    <div style={{ background: "#ffffff", minHeight: "100dvh", color: "#1a1a1a" }}>
+      <PublicHeader />
+      <main style={wrap}>
       <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 6 }}><I18nText source={"Your data & security"} /></h1>
       <p style={{ ...p, marginBottom: 24 }}><I18nText source={"Notho is built to help you learn about money, and to keep your information safe while you do."} /></p>
 
@@ -82,21 +93,32 @@ export default function SecurityPage() {
 
       <div style={card}>
         <h2 style={h2}><I18nText source={"Your rights"} /></h2>
-        <p style={p}><I18nText source={"Under POPIA you can access the data we hold about you and ask us to delete it. You can do both right here."} /></p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 12 }}>
-          <button type="button" onClick={downloadData} disabled={busy !== null}
-            style={{ ...btn, background: "var(--color-primary)", color: "#fff", opacity: busy === "export" ? 0.6 : 1 }}>
-            <I18nText>{busy === "export" ? "Preparing…" : "Download my data"}</I18nText>
-          </button>
-          <button type="button" onClick={deleteAccount} disabled={busy !== null}
-            style={{ ...btn, background: "transparent", color: "#E03C31", boxShadow: "inset 0 0 0 1.5px #E03C31", opacity: busy === "delete" ? 0.6 : 1 }}>
-            <I18nText>{busy === "delete" ? "Deleting…" : "Delete my account"}</I18nText>
-          </button>
-        </div>
-        {msg && <p style={{ ...p, marginTop: 12, marginBottom: 0, color: "var(--color-text-primary)" }}><I18nText>{msg}</I18nText></p>}
+        <p style={p}><I18nText source={"Under POPIA you can access the data we hold about you and ask us to delete it."} /></p>
+        {signedIn ? (
+          <>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 12 }}>
+              <button type="button" onClick={downloadData} disabled={busy !== null}
+                style={{ ...btn, background: "#007A85", color: "#fff", opacity: busy === "export" ? 0.6 : 1 }}>
+                <I18nText>{busy === "export" ? "Preparing…" : "Download my data"}</I18nText>
+              </button>
+              <button type="button" onClick={deleteAccount} disabled={busy !== null}
+                style={{ ...btn, background: "transparent", color: "#E03C31", boxShadow: "inset 0 0 0 1.5px #E03C31", opacity: busy === "delete" ? 0.6 : 1 }}>
+                <I18nText>{busy === "delete" ? "Deleting…" : "Delete my account"}</I18nText>
+              </button>
+            </div>
+            {msg && <p style={{ ...p, marginTop: 12, marginBottom: 0, color: "#1a1a1a" }}><I18nText>{msg}</I18nText></p>}
+          </>
+        ) : (
+          <p style={{ ...p, marginBottom: 0 }}>
+            <I18nText source={"Sign in to Notho to download your data or delete your account."} />{" "}
+            <a href="/learn" style={{ color: "#007A85", fontWeight: 700 }}>Open Notho</a>
+          </p>
+        )}
       </div>
 
       <p style={{ ...p, textAlign: "center", marginTop: 8 }}><I18nRich source={"Questions? <a0>support@notho.co.za</a0>"} elements={[<a key="inline-0" href="mailto:support@notho.co.za" style={{ color: "var(--color-primary)", fontWeight: 700 }} />]} /></p>
-    </main>
+      </main>
+      <PublicFooter />
+    </div>
   );
 }

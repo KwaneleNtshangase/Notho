@@ -1,5 +1,7 @@
 import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
+import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const metadata: Metadata = {
   title: "Terms of Service | Notho",
@@ -8,10 +10,11 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
+    <PublicHeader />
     <main
       style={{
-        backgroundColor: "#0a0a0a",
-        color: "#ffffff",
+        backgroundColor: "#ffffff",
+        color: "#1a1a1a",
         minHeight: "100dvh",
         fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
         padding: "0",
@@ -47,10 +50,10 @@ export default function TermsPage() {
               fontWeight: 900,
               lineHeight: 1.1,
               margin: "0 0 12px",
-              color: "#ffffff",
+              color: "#1a1a1a",
             }}
           ><I18nText source={"Terms of Service"} /></h1>
-          <p style={{ color: "#a0a0a0", fontSize: "15px", margin: 0 }}><I18nText source={"Last updated: July 2026"} /></p>
+          <p style={{ color: "#555555", fontSize: "15px", margin: 0 }}><I18nText source={"Last updated: July 2026"} /></p>
         </div>
 
         {/* Important Notice */}
@@ -77,15 +80,15 @@ export default function TermsPage() {
             style={{
               fontSize: "15px",
               lineHeight: 1.7,
-              color: "#d0d0d0",
+              color: "#333333",
               margin: 0,
             }}
-          ><I18nRich source={"Notho is a  <strong0>financial-literacy education</strong0>  platform. It is  <strong1>not a licensed financial services provider (FSP)</strong1>  under the South African Financial Advisory and Intermediary Services Act (FAIS Act, 2002) and it does not render financial, investment, tax, or legal advice as defined in that Act."} elements={[<strong key="inline-0" style={{ color: "#ffffff" }} />, <strong key="inline-1" style={{ color: "#ffffff" }} />]} /></p>
+          ><I18nRich source={"Notho is a  <strong0>financial-literacy education</strong0>  platform. It is  <strong1>not a licensed financial services provider (FSP)</strong1>  under the South African Financial Advisory and Intermediary Services Act (FAIS Act, 2002) and it does not render financial, investment, tax, or legal advice as defined in that Act."} elements={[<strong key="inline-0" style={{ color: "#1a1a1a" }} />, <strong key="inline-1" style={{ color: "#1a1a1a" }} />]} /></p>
           <p
             style={{
               fontSize: "14px",
               lineHeight: 1.7,
-              color: "#a0a0a0",
+              color: "#555555",
               margin: "12px 0 0",
             }}
           ><I18nRich source={"Lessons, calculators, budgets, and projections are illustrative and generic. For advice specific to your personal circumstances, consult an FSCA-registered financial adviser. You can verify any adviser's licence at  <a0>fsca.co.za</a0> ."} elements={[<a key="inline-0"
@@ -120,12 +123,13 @@ export default function TermsPage() {
             marginTop: "48px",
             paddingTop: "24px",
             borderTop: "1px solid #1e1e1e",
-            color: "#505050",
+            color: "#777777",
             fontSize: "13px",
           }}
         ><I18nText source={"© {value0} Kwanele Ntshangase. All rights reserved."} values={[new Date().getFullYear()]} /></div>
       </div>
     </main>
+    <PublicFooter />
   );
 }
 
