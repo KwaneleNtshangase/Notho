@@ -221,7 +221,7 @@ export function SettingsView({
         label="Session recording: help improve Notho"
         sub="Sessions are recorded by default to improve Notho. You can turn this off anytime. Recordings are masked, and we never sell this data."
       >
-        <button
+        <I18nElement as="button"
           type="button"
           role="switch"
           aria-checked={replayOn}
@@ -238,7 +238,7 @@ export function SettingsView({
             borderRadius: "50%", background: "white", boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
             transition: "left 0.2s",
           }} />
-        </button>
+        </I18nElement>
       </Row>
 
       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--color-text-secondary)", margin: "20px 0 8px" }}><I18nText source={"Learning"} /></div>

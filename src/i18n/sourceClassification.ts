@@ -5,8 +5,8 @@ const names = new Set([
   'Discovery Bank', 'TymeBank', 'African Bank', 'Google', 'Apple', 'Facebook',
   'WhatsApp', 'LinkedIn', 'EasyEquities', 'Satrix', 'Sygnia', 'RSA Retail Bonds',
   'SARS', 'FSCA', 'NCR', 'JSE', 'RE5', 'TFSA', 'GEPF', 'IRP5',
-  'Thabo', 'Zanele', 'Lindiwe', 'Priya', 'Sipho', 'Durban', 'Centurion',
-  'SEDA', 'SEDFA', 'SEFA', 'UIF', 'RA', 'ZAR', 'SAST', 'SARS eFiling',
+  'Kwanele Ntshangase', 'Thabo', 'Zanele', 'Lindiwe', 'Priya', 'Sipho', 'Durban', 'Centurion',
+  'SEDA', 'SEDFA', 'SEFA', 'UIF', 'RA', 'ZAR', 'SAST', 'SARS eFiling', 'SARB MPC', 'RSA Retail Savings Bonds', 'FAIS Ombud', 'R',
   'JSE (Johannesburg Stock Exchange)', 'Notho RE5',
   'IT3(a)', 'IT3(b)', 'IT3(c)', 'XP', 'PDF', 'CSV', 'JSON',
   'English', 'Afrikaans', 'isiNdebele', 'isiXhosa', 'isiZulu', 'Sepedi',
@@ -25,7 +25,7 @@ export function preservedSourceReason(source: string): string | undefined {
   if (names.has(text)) return 'Exact brand, institution, product or language name, or standard identifier';
   if (/^(?:\{value\d+\} \| Notho|Cosmo \{value\d+\}|\(SAST\))$/.test(text)) return 'Brand or time-zone label with interpolated data';
   if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text) || /^(?:[\w-]+\.)+(?:co\.za|za|com|org|net)$/.test(text)) return 'Literal email address or domain';
-  if (text === 'balance = balance × (1 + r / 12) + PMT') return 'Formula using fixed mathematical variable names';
+  if (['balance = balance × (1 + r / 12) + PMT', '18% (R900k EBITDA ÷ R5m)', 'EBITDA = R8m × 15% = R1.2m; × 4 = R4.8m.'].includes(text)) return 'Formula using fixed mathematical variable names';
   if (text === 'Aa') return 'Font-size control sample glyphs';
   if (/^https?:\/\/\S+$/.test(text)) return 'Literal URL';
   const withoutPlaceholders = text.replace(/\{[A-Za-z_]\w*\}/g, '');

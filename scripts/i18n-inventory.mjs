@@ -103,6 +103,9 @@ for (const filename of [...files(path.join(root, 'src/components')), ...files(pa
   function visit(node) {
     if (ts.isJsxElement(node) && ['style', 'script'].includes(node.openingElement.tagName.getText(sourceFile))) return;
     if (ts.isVariableDeclaration(node) && /(?:^|_)SCRIPT$/.test(node.name.getText(sourceFile))) return;
+    // Inline scripts and styles are executed by the browser. Their bodies are not learner copy.
+    if (ts.isJsxElement(node) && ['script', 'style'].includes(node.openingElement.tagName.getText(sourceFile))) return;
+    if (ts.isJsxSelfClosingElement(node) && ['script', 'style'].includes(node.tagName.getText(sourceFile))) return;
     if (ts.isArrayLiteralExpression(node) && node.elements.length
       && node.elements.every(item => ts.isStringLiteralLike(item) && LOCALES.includes(item.text))) return;
     if (ts.isBinaryExpression(node) && /\.style\.cssText$/.test(node.left.getText(sourceFile))) return;

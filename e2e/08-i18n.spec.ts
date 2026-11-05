@@ -203,6 +203,7 @@ test('authenticated settings, navigation, course and lesson screens', async ({ p
     await expect(page.getByRole('button', { name: localizeString(locale, 'Test voice'), exact: true })).toHaveCount(0);
     await expect(page.getByRole('button', { name: localizeString(locale, 'Save Changes'), exact: true })).toBeVisible();
     await expect(page.getByText(localizeString(locale, 'Plays on correct / incorrect answers'), { exact: true })).toBeVisible();
+    await expect(page.getByRole('switch', { name: localizeString(locale, 'Session recording: help improve Notho'), exact: true })).toBeVisible();
     await noOverflow(page);
     await expect(page.getByRole('complementary', { name: localizeString(locale, 'Translation status') })).toBeVisible();
     await page.locator('.translation-notice strong').scrollIntoViewIfNeeded();
@@ -239,6 +240,10 @@ test('authenticated settings, navigation, course and lesson screens', async ({ p
   await expect(page).toHaveURL(/\/course\/money-basics/);
   await page.goto('/settings', { waitUntil: 'domcontentloaded' });
   await selector.selectOption('af');
+  await page.goto('/about', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { name: localizeString('af', 'Notho is a South African app for learning money.'), exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: localizeString('af', 'Personal finance'), exact: true })).toBeVisible();
+  await noOverflow(page);
   await page.goto('/calculator', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: localizeString('af', 'Investment Calculator'), exact: true })).toBeVisible();
   const principal = page.getByRole('spinbutton', { name: localizeString('af', 'Initial Amount (R)'), exact: true });

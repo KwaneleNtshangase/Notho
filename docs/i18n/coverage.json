@@ -1,175 +1,187 @@
 {
-  "date": "2026-11-02",
-  "scope": "26,339 distinct sources across 22 courses, 205 lessons and app UI candidates. Structural coverage is not linguistic validation.",
+  "date": "2026-11-05",
+  "scope": "22 courses and all 205 lessons. Counts include UI candidates and deliberately shared wording. Structural checks do not measure cultural or linguistic accuracy.",
   "bulk": {
-    "generatedAt": "2026-11-02T15:59:23.089Z",
+    "generatedAt": "2026-11-05T13:05:58.511Z",
     "status": "incomplete",
-    "sourceRows": 26551,
-    "uniqueSources": 26339,
+    "sourceRows": 26481,
+    "uniqueSources": 26269,
     "validation": "Structural checks only. Generated drafts have not received human or cultural validation.",
     "languages": [
       {
         "locale": "af",
-        "acceptedPublic": 25061,
+        "acceptedPublic": 24999,
         "acceptedPrivate": 1270,
-        "preservedSource": 195,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 8,
-        "unchangedRequiringClassification": 210
+        "rejected": 0,
+        "unchangedRequiringClassification": 113
       },
       {
         "locale": "nr",
-        "acceptedPublic": 25048,
+        "acceptedPublic": 24999,
         "acceptedPrivate": 1270,
-        "preservedSource": 195,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 21,
-        "unchangedRequiringClassification": 183
+        "rejected": 0,
+        "unchangedRequiringClassification": 118
       },
       {
         "locale": "xh",
-        "acceptedPublic": 25060,
+        "acceptedPublic": 24999,
         "acceptedPrivate": 1270,
-        "preservedSource": 195,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 9,
-        "unchangedRequiringClassification": 190
+        "rejected": 0,
+        "unchangedRequiringClassification": 106
       },
       {
         "locale": "zu",
-        "acceptedPublic": 25060,
+        "acceptedPublic": 24999,
         "acceptedPrivate": 1270,
-        "preservedSource": 195,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 9,
-        "unchangedRequiringClassification": 186
+        "rejected": 0,
+        "unchangedRequiringClassification": 88
       },
       {
         "locale": "nso",
-        "acceptedPublic": 25046,
+        "acceptedPublic": 24999,
         "acceptedPrivate": 1270,
-        "preservedSource": 195,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 23,
-        "unchangedRequiringClassification": 306
+        "rejected": 0,
+        "unchangedRequiringClassification": 130
       },
       {
         "locale": "st",
-        "acceptedPublic": 25059,
+        "acceptedPublic": 24999,
         "acceptedPrivate": 1270,
-        "preservedSource": 195,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 10,
-        "unchangedRequiringClassification": 264
+        "rejected": 0,
+        "unchangedRequiringClassification": 149
       },
       {
         "locale": "tn",
-        "acceptedPublic": 25049,
+        "acceptedPublic": 24999,
         "acceptedPrivate": 1270,
-        "preservedSource": 195,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 20,
-        "unchangedRequiringClassification": 306
+        "rejected": 0,
+        "unchangedRequiringClassification": 128
       },
       {
         "locale": "ss",
-        "acceptedPublic": 24960,
-        "acceptedPrivate": 1268,
-        "preservedSource": 195,
+        "acceptedPublic": 24999,
+        "acceptedPrivate": 1270,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 111,
-        "unchangedRequiringClassification": 265
+        "rejected": 0,
+        "unchangedRequiringClassification": 118
       },
       {
         "locale": "ve",
-        "acceptedPublic": 25017,
+        "acceptedPublic": 24999,
         "acceptedPrivate": 1270,
-        "preservedSource": 195,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 52,
-        "unchangedRequiringClassification": 368
+        "rejected": 0,
+        "unchangedRequiringClassification": 119
       },
       {
         "locale": "ts",
-        "acceptedPublic": 25008,
+        "acceptedPublic": 24999,
         "acceptedPrivate": 1270,
-        "preservedSource": 195,
+        "preservedSource": 226,
         "missing": 0,
-        "rejected": 61,
-        "unchangedRequiringClassification": 349
+        "rejected": 0,
+        "unchangedRequiringClassification": 136
       }
     ]
   },
-  "effectivePublic": [
+  "effectiveCoverage": [
     {
       "locale": "af",
-      "totalKeys": 25450,
-      "translated": 24981,
-      "preservedSource": 231,
-      "englishFallback": 238
+      "totalKeys": 25380,
+      "translated": 24985,
+      "preservedSource": 262,
+      "curriculumFallback": 3,
+      "englishFallback": 133
     },
     {
       "locale": "nr",
-      "totalKeys": 25450,
-      "translated": 24996,
-      "preservedSource": 231,
-      "englishFallback": 223
+      "totalKeys": 25380,
+      "translated": 24987,
+      "preservedSource": 262,
+      "curriculumFallback": 0,
+      "englishFallback": 131
     },
     {
       "locale": "xh",
-      "totalKeys": 25450,
-      "translated": 25001,
-      "preservedSource": 231,
-      "englishFallback": 218
+      "totalKeys": 25380,
+      "translated": 24993,
+      "preservedSource": 262,
+      "curriculumFallback": 0,
+      "englishFallback": 125
     },
     {
       "locale": "zu",
-      "totalKeys": 25450,
-      "translated": 25024,
-      "preservedSource": 230,
-      "englishFallback": 196
+      "totalKeys": 25380,
+      "translated": 25030,
+      "preservedSource": 261,
+      "curriculumFallback": 0,
+      "englishFallback": 89
     },
     {
       "locale": "nso",
-      "totalKeys": 25450,
-      "translated": 24869,
-      "preservedSource": 231,
-      "englishFallback": 350
+      "totalKeys": 25380,
+      "translated": 24968,
+      "preservedSource": 262,
+      "curriculumFallback": 0,
+      "englishFallback": 150
     },
     {
       "locale": "st",
-      "totalKeys": 25450,
-      "translated": 24926,
-      "preservedSource": 231,
-      "englishFallback": 293
+      "totalKeys": 25380,
+      "translated": 24950,
+      "preservedSource": 262,
+      "curriculumFallback": 0,
+      "englishFallback": 168
     },
     {
       "locale": "tn",
-      "totalKeys": 25450,
-      "translated": 24875,
-      "preservedSource": 231,
-      "englishFallback": 344
+      "totalKeys": 25380,
+      "translated": 24971,
+      "preservedSource": 262,
+      "curriculumFallback": 0,
+      "englishFallback": 147
     },
     {
       "locale": "ss",
-      "totalKeys": 25450,
-      "translated": 24830,
-      "preservedSource": 231,
-      "englishFallback": 389
+      "totalKeys": 25380,
+      "translated": 24981,
+      "preservedSource": 262,
+      "curriculumFallback": 0,
+      "englishFallback": 137
     },
     {
       "locale": "ve",
-      "totalKeys": 25450,
-      "translated": 24788,
-      "preservedSource": 231,
-      "englishFallback": 431
+      "totalKeys": 25380,
+      "translated": 24985,
+      "preservedSource": 262,
+      "curriculumFallback": 0,
+      "englishFallback": 133
     },
     {
       "locale": "ts",
-      "totalKeys": 25450,
-      "translated": 24793,
-      "preservedSource": 231,
-      "englishFallback": 426
+      "totalKeys": 25380,
+      "translated": 24971,
+      "preservedSource": 262,
+      "curriculumFallback": 1,
+      "englishFallback": 147
     }
-  ]
+  ],
+  "structuralFailures": [],
+  "privateExclusiveSources": 1270
 }

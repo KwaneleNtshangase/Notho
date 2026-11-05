@@ -116,15 +116,15 @@ export default function AboutPage() {
         </p>
 
         <p style={{ fontSize: 14, color: "#888", marginTop: 24 }}>
-          <Link href="/personal-finance" style={{ color: teal }}>Personal finance</Link>
+          <Link href="/personal-finance" style={{ color: teal }}><I18nText source="Personal finance" /></Link>
           {" · "}
-          <Link href="/investment-calculator" style={{ color: teal }}>Investment calculator</Link>
+          <Link href="/investment-calculator" style={{ color: teal }}><I18nText source="Investment calculator" /></Link>
           {" · "}
-          <Link href="/budgeting" style={{ color: teal }}>Budgeting</Link>
+          <Link href="/budgeting" style={{ color: teal }}><I18nText source="Budgeting" /></Link>
           {" · "}
-          <Link href="/financial-literacy" style={{ color: teal }}>Financial literacy</Link>
+          <Link href="/financial-literacy" style={{ color: teal }}><I18nText source="Financial literacy" /></Link>
           {" · "}
-          <Link href="/re5" style={{ color: teal }}>RE5 prep</Link>
+          <Link href="/re5" style={{ color: teal }}><I18nText source="RE5 prep" /></Link>
         </p>
 
         <p style={{ fontSize: 13, color: "#999", marginTop: 32 }}>

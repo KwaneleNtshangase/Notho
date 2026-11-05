@@ -8,7 +8,7 @@ const jiti = createJiti(import.meta.url, { alias: { '@': path.join(root, 'src') 
 const read = name => JSON.parse(fs.readFileSync(path.join(root, name), 'utf8'));
 const { LOCALES } = await jiti.import(path.join(root, 'src/i18n/locales.ts'));
 const { translate } = await jiti.import(path.join(root, 'src/i18n/messages.ts'));
-const { localizeContent } = await jiti.import(path.join(root, 'src/i18n/contentZu.ts'));
+const { contentZu, localizeContent } = await jiti.import(path.join(root, 'src/i18n/contentZu.ts'));
 const { stringZu, localizeString } = await jiti.import(path.join(root, 'src/i18n/stringZu.ts'));
 const { translationIssues } = await jiti.import(path.join(root, 'src/i18n/validation.ts'));
 const { preservedSourceReason } = await jiti.import(path.join(root, 'src/i18n/sourceClassification.ts'));
@@ -53,7 +53,7 @@ const arg = name => { const i = process.argv.indexOf(name); return i < 0 ? undef
 const command = process.argv[2] ?? 'check';
 const locale = arg('--locale');
 const holds = read('src/i18n/drafts/holds.json');
-const priority = key => /auth\.|username|debt|invest|retire|business|tax|insurance|scam|credit|estate|re5|privacy|consent|terms|password|13\+|FAIS|POPIA|\bFSP\b|advice|licen[cs]|delet|personal information/i.test(key) ? 'priority-human-review' : 'human-review';
+const priority = key => /auth\.|username|debt|invest|retire|business|tax|insurance|scam|credit|estate|re5|privacy|consent|session record|masked session|terms|password|13\+|FAIS|POPIA|\bFSP\b|advice|licen[cs]|delet|personal information/i.test(key) ? 'priority-human-review' : 'human-review';
 const resolved = (loc, key, source) => privateMode ? resolveTranslation(source, privateReviews[loc]?.[key], undefined, privatePacks[loc]?.[source]) : key.startsWith('messages:') ? translate(loc, key.slice(9)) : key.startsWith('content:') ? localizeContent(loc, key.slice(8), source) : localizeString(loc, source);
 const storePath = path.join(root, privateMode ? 'src/i18n/reviewed/private-overrides.json' : 'src/i18n/reviewed/overrides.json');
 if (command === 'import') {
@@ -74,18 +74,34 @@ if (command === 'import') {
   const approved = JSON.parse(fs.readFileSync(storePath, 'utf8'));
   const evidenceFile = 'output/i18n-generation-v3/review-metadata.json';
   const evidence = fs.existsSync(path.join(root, evidenceFile)) ? read(evidenceFile)[locale] ?? {} : {};
+  const authored = {
+    messages: read(`src/i18n/drafts/${locale}.json`),
+    content: read('src/i18n/drafts/content.json')[locale],
+    strings: read('src/i18n/drafts/strings.json')[locale],
+  };
+  const legacy = { messages: read('src/i18n/legacyZuMessages.json'), content: contentZu, strings: stringZu };
   const rows = Object.entries(sources).map(([key, source]) => {
     const translation = resolved(locale, key, source);
     const draft = evidence[source];
-    const applies = draft && (draft.translation === translation || translation === source && draft.issues?.length);
+    const knownApproval = approved[locale]?.[key];
+    const isApproved = knownApproval?.status === 'approved' && knownApproval.source === source && knownApproval.translation === translation;
+    const separator = key.indexOf(':');
+    const namespace = key.slice(0, separator), id = key.slice(separator + 1);
+    const legacyValue = legacy[namespace]?.[id] ?? (namespace === 'strings' && source === 'Money Is More Than Cash' ? stringZu['Money is More Than Cash'] : undefined);
+    const isLegacy = !privateMode && locale === 'zu' && legacyValue === translation;
+    const isAuthored = !privateMode && !holds[locale]?.[key] && authored[namespace]?.[id] === translation;
+    const applies = !isApproved && !isLegacy && !isAuthored && draft && (draft.translation === translation || translation === source && draft.issues?.length);
+    const preserved = translation === source ? preservedSourceReason(source) : undefined;
+    const reason = holds[locale]?.[key] ?? (translation === source && !preserved
+      ? (applies && draft.issues?.length ? draft.issues.join(', ') : 'English fallback or shared wording requiring classification') : '');
     return { locale, key, source, translation,
-    status: approved[locale]?.[key]?.status === 'approved' && approved[locale][key].source === source ? 'approved' : 'needs-review',
+    status: isApproved ? 'approved' : 'needs-review',
     reviewer: approved[locale]?.[key]?.reviewer ?? '', reviewedAt: approved[locale]?.[key]?.reviewedAt ?? '',
     priority: priority(`${key} ${source}`), contexts: bulkContexts.get(key) ?? [],
-    fallbackReason: holds[locale]?.[key] ?? (translation === source ? applies ? (draft.issues ?? []).join(', ') : 'English fallback or unchanged wording requiring classification' : ''),
-    draftProvider: applies ? draft.provider : '', generationNote: applies ? draft.generationNote : '',
+    fallbackReason: reason,
+    draftProvider: isApproved ? 'Approved reviewer override' : isLegacy ? 'Preserved existing wording' : isAuthored ? 'Notho generated draft' : applies ? draft.provider : '', generationNote: applies ? draft.generationNote : '',
     promptRevision: applies ? draft.promptRevision ?? '' : '', generationJob: applies ? draft.generationJob ?? '' : '',
-    sourcePreservationReason: applies && draft.status === 'preserved-source-not-a-translation' ? draft.generationNote : '',
+    sourcePreservationReason: preserved ?? '',
     note: 'Generation notes are unverified provider output, not human review. Check meaning in screen context, register, spelling and accessibility. Source references do not validate generated sentences.' };
   });
   fs.writeFileSync(output, JSON.stringify(rows, null, 2) + '\n', { flag: 'wx' });
@@ -128,7 +144,9 @@ if (command === 'import') {
       else if (preservedSourceReason(source)) preserved++;
       else englishFallbackKeys.push(key);
     }
-    return { locale: loc, totalKeys: Object.keys(sources).length, translated, preservedSource: preserved,
+    const curriculumFallback = englishFallbackKeys.filter(key => bulkContexts.get(key)?.some(context =>
+      context.startsWith('/lesson/') || context.startsWith('/course/'))).length;
+    return { locale: loc, totalKeys: Object.keys(sources).length, translated, preservedSource: preserved, curriculumFallback,
       englishFallback: englishFallbackKeys.length, englishFallbackKeys };
   });
   if (arg('--coverage-out')) fs.writeFileSync(arg('--coverage-out'), JSON.stringify(effective, null, 2) + '\n', { flag: 'wx' });
