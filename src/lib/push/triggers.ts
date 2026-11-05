@@ -3,6 +3,9 @@
  *
  * Cron feeds each subscribed user through these and sends at most ONE push
  * per user per day, in priority: save (streak at risk) > routine > coach alert.
+ *
+ * Quiet hours: 21:30–07:30 SAST. Cron slots (13:00 / 18:00 SAST) are outside
+ * that window. The helper is for any future per-user timing.
  */
 
 export type PushMessage = {
@@ -16,6 +19,15 @@ export function yesterdayOf(sastDay: string): string {
   const d = new Date(`${sastDay}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() - 1);
   return d.toISOString().slice(0, 10);
+}
+
+/** True when wall-clock SAST is inside quiet hours (21:30–07:30). */
+export function isQuietHoursSAST(now = new Date()): boolean {
+  const sast = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+  const h = sast.getUTCHours();
+  const m = sast.getUTCMinutes();
+  const mins = h * 60 + m;
+  return mins >= 21 * 60 + 30 || mins < 7 * 60 + 30;
 }
 
 const SAVE_COPY: { title: (n: number) => string; body: (n: number, lesson: string) => string }[] = [
@@ -55,15 +67,19 @@ export function streakAtRiskPush(
   streak: number,
   lastActivityDate: string | null,
   sastToday: string,
-  next?: { lessonTitle: string; url: string } | null
+  next?: { lessonTitle: string; url: string } | null,
+  name?: string | null
 ): PushMessage | null {
   if (streak < 2) return null;
   if (lastActivityDate !== yesterdayOf(sastToday)) return null;
   const lesson = next?.lessonTitle ?? "today's lesson";
   const line = pick(SAVE_COPY, `${sastToday}:${streak}`);
+  const title = name
+    ? `Save your streak, ${name}!`
+    : line.title(streak);
   return {
     key: `streak:${sastToday}`,
-    title: line.title(streak),
+    title,
     body: line.body(streak, lesson),
     url: next?.url ?? "/learn",
   };
