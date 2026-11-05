@@ -1,5 +1,5 @@
 "use client";
-import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import React, { useEffect, useState } from "react";
 import { Target } from "lucide-react";
@@ -139,7 +139,7 @@ export function GoalCard() {
               ))}
             </div>
             {pickerGoalId === "other" && (
-              <textarea
+              <I18nElement as="textarea"
                 placeholder="Describe your goal - e.g. save for my child's education"
                 value={pickerGoalDescription}
                 onChange={(e) => setPickerGoalDescription(e.target.value)}
@@ -148,7 +148,7 @@ export function GoalCard() {
               />
             )}
             {pickerGoalId && pickerGoalId !== "other" && (
-              <textarea
+              <I18nElement as="textarea"
                 placeholder="Anything more to say about this goal? (optional)"
                 value={pickerGoalDescription}
                 onChange={(e) => setPickerGoalDescription(e.target.value)}

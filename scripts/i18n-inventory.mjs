@@ -116,18 +116,27 @@ for (const filename of [...files(path.join(root, 'src/components')), ...files(pa
     if (ts.isVariableDeclaration(node) && (/(?:^|_)css$/i.test(node.name.getText(sourceFile))
       || /CSSProperties/.test(node.type?.getText(sourceFile) ?? ''))) return;
     if (ts.isPropertyAssignment(node) && node.name.getText(sourceFile) === 'style') return;
+    if (ts.isCaseClause(node)) {
+      node.statements.forEach(visit); return;
+    }
+    if (ts.isBinaryExpression(node) && [ts.SyntaxKind.EqualsEqualsEqualsToken, ts.SyntaxKind.ExclamationEqualsEqualsToken, ts.SyntaxKind.EqualsEqualsToken, ts.SyntaxKind.ExclamationEqualsToken].includes(node.operatorToken.kind)) {
+      if (!ts.isStringLiteralLike(node.left)) visit(node.left);
+      if (!ts.isStringLiteralLike(node.right)) visit(node.right);
+      return;
+    }
+    if (ts.isPropertyAssignment(node) && /^(?:boxShadow|border|borderTop|borderBottom|borderLeft|borderRight|background|backgroundColor|fontFamily|fontWeight|fontSize|display|position|alignItems|justifyContent|overflow|overflowX|overflowY|whiteSpace|wordBreak|textTransform|objectFit|pointerEvents|transition|transform|color|stroke|fill|letterSpacing|cursor|method|encoding|userAgent|@type|@context)$/.test(node.name.getText(sourceFile).replace(/['"]/g, ''))) return;
     if (ts.isCallExpression(node)) {
       const callee = node.expression.getText(sourceFile);
       if (/^(?:console\.|(?:window\.)?(?:localStorage|sessionStorage)\.)/.test(callee)) return;
       // These arguments identify browser events/elements, database fields or
       // request metadata. Their literals are not rendered copy.
-      if (/\.(?:addEventListener|removeEventListener|querySelector|querySelectorAll|getElementById|getAttribute|createElement|createElementNS|from|rpc|select|eq|neq|order|in|ilike)$/.test(callee)) {
+      if (/\.(?:addEventListener|removeEventListener|querySelector|querySelectorAll|getElementById|getAttribute|setAttribute|createElement|createElementNS|from|rpc|select|eq|neq|order|in|ilike|includes|startsWith|endsWith|normalize)$/.test(callee)) {
         for (const argument of node.arguments) if (!ts.isStringLiteralLike(argument)) visit(argument);
         return;
       }
     }
     let source, candidate = false;
-    if (filename.endsWith('/report/pdf.tsx') && ts.isJsxElement(node)
+    if ((filename.endsWith('/report/pdf.tsx') || ts.isJsxElement(node) && node.openingElement.attributes.properties.some(attr => ts.isJsxAttribute(attr) && attr.name.getText(sourceFile) === 'as' && attr.initializer?.text === 'option')) && ts.isJsxElement(node)
       && node.children.every(c => ts.isJsxText(c) || ts.isJsxExpression(c))) {
       let index = 0;
       const phrase = node.children.map(c => ts.isJsxText(c) ? jsxText(c.text) : c.expression ? `{value${index++}}` : '').join('');

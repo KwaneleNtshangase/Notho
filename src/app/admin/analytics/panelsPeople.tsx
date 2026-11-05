@@ -143,7 +143,7 @@ export function PeoplePanel({
         subtitle="Click any row for the full profile. Search by email, username or name; sort by any column with arrows."
         action={
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <input
+            <I18nElement as="input"
               className="nv-input"
               value={search}
               onChange={(e) => setSearch(e.target.value)}

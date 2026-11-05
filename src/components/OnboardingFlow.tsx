@@ -245,7 +245,7 @@ export function OnboardingFlow({
               ))}
             </div>
             {selectedGoal === "other" && (
-              <textarea
+              <I18nElement as="textarea"
                 placeholder="Describe your goal - e.g. save for my child's education"
                 value={goalDescription}
                 onChange={(e) => setGoalDescription(e.target.value)}
@@ -266,7 +266,7 @@ export function OnboardingFlow({
               />
             )}
             {selectedGoal && selectedGoal !== "other" && (
-              <textarea
+              <I18nElement as="textarea"
                 placeholder="Anything more to say about this goal? (optional)"
                 value={goalDescription}
                 onChange={(e) => setGoalDescription(e.target.value)}

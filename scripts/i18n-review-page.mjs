@@ -1,0 +1,39 @@
+/** Build an offline review worksheet from the existing JSON export. No app writes. */
+import fs from 'node:fs';
+const arg = name => { const i = process.argv.indexOf(name); return i < 0 ? undefined : process.argv[i + 1]; };
+const input = arg('--file'), output = arg('--out');
+if (!input || !output) throw new Error('Use --file exported-review.json --out review.html [--all]. Output must not already exist.');
+const source = JSON.parse(fs.readFileSync(input, 'utf8'));
+const rows = source.filter(row => process.argv.includes('--all') || !row.sourcePreservationReason && (
+  row.fallbackReason || row.key.startsWith('messages:') && row.priority === 'priority-human-review'
+  || /Download My Data|Delete My Data|Push notifications|Plays on correct|Money is more than cash/.test(row.source)
+  || /content:course\.(credit-debt|taxes|insurance|retirement|estate-planning|re5)/.test(row.key)
+));
+const payload = JSON.stringify(rows).replaceAll('<', '\\u003c');
+const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notho language review</title><style>
+body{font:16px/1.5 system-ui,sans-serif;max-width:1000px;margin:auto;padding:24px;color:#172338;background:#f7f8fc}h1{margin-bottom:0}label{display:block;margin:12px 0}input,textarea,button,select{font:inherit;padding:10px;border:1px solid #64748b;border-radius:6px}textarea{width:100%;box-sizing:border-box;min-height:90px}article{background:white;padding:20px;margin:16px 0;border:1px solid #ccd4df;border-radius:10px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}small{display:block;overflow-wrap:anywhere}button{cursor:pointer;background:#183a6b;color:white}header{border-bottom:2px solid #ccd4df;padding-bottom:20px}.controls{display:flex;gap:12px;flex-wrap:wrap}#status{font-weight:600}.reason{color:#7a3309}input[type=checkbox]{margin-right:10px}a{color:#174a96}
+</style><header><h1>Notho language review</h1><p id="scope"></p>
+<p>These are unreviewed drafts. Check the whole phrase against the English source and its screen or lesson context. Use everyday language that adults would naturally use. Check negation, money, numbers, privacy and legal meaning carefully. A structural check is not language approval.</p>
+<p>This file runs offline. It sends nothing. Edits stay only in this open page until you download them. Download before closing or reloading. The full JSON export contains the rest of the catalog.</p>
+<div class="controls"><label>Reviewer name <input id="reviewer" autocomplete="name"></label><label>Review date <input id="date" type="date"></label></div>
+<label>Find a phrase, key or screen <input id="query" type="search" style="width:90%"></label>
+<div class="controls"><button id="download">Download checked approvals</button><button id="draft">Save all worksheet edits</button></div><p id="status" role="status" aria-live="polite"></p>
+</header><main id="rows"></main><button id="more">Show next 50</button>
+<script type="application/json" id="data">${payload}</script><script>
+const rows=JSON.parse(document.getElementById('data').textContent), edits=new Map(), checked=new Set();
+const $=id=>document.getElementById(id); let shown=50;
+$('scope').textContent=(rows[0]?.locale||'')+': '+rows.length+' phrases in this worksheet. English fallback entries come first; some unchanged terms still need contextual classification.';
+$('date').value=new Date().toISOString().slice(0,10);
+const order=rows.map((r,i)=>i).sort((a,b)=>Number(Boolean(rows[b].fallbackReason))-Number(Boolean(rows[a].fallbackReason)));
+function node(tag,text,parent){const n=document.createElement(tag);n.textContent=text;parent.append(n);return n;}
+function render(){const query=$('query').value.toLowerCase();const matches=order.filter(i=>[rows[i].source,rows[i].translation,rows[i].key,...rows[i].contexts].join(' ').toLowerCase().includes(query));$('rows').replaceChildren();
+for(const i of matches.slice(0,shown)){const r=rows[i],a=node('article','',$('rows'));node('small',r.locale+' | '+r.key,a);node('small',r.contexts.join(' | '),a);node('h2','English source',a);node('pre',r.source,a);if(r.fallbackReason)node('p','Review reason: '+r.fallbackReason,a).className='reason';if(r.generationNote)node('small','Unverified draft note: '+r.generationNote,a);const label=node('label','Translation',a),t=document.createElement('textarea');t.value=edits.get(i)??r.translation;t.setAttribute('aria-label','Translation for '+r.key);t.oninput=()=>edits.set(i,t.value);label.append(t);const approve=node('label','',a),c=document.createElement('input');c.type='checkbox';c.checked=checked.has(i);c.onchange=()=>{c.checked?checked.add(i):checked.delete(i);$('status').textContent=checked.size+' phrases checked for approval.';};approve.append(c,document.createTextNode('I reviewed this phrase in context and approve this wording.'));}
+$('more').hidden=shown>=matches.length;}
+function download(data,name){const blob=new Blob([JSON.stringify(data,null,2)+'\\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+$('query').oninput=()=>{shown=50;render();};$('more').onclick=()=>{shown+=50;render();};
+$('draft').onclick=()=>download(rows.map((r,i)=>({...r,translation:edits.get(i)??r.translation,status:'needs-review',reviewer:'',reviewedAt:''})),'notho-'+(rows[0]?.locale||'')+'-worksheet-edits.json');
+$('download').onclick=()=>{const reviewer=$('reviewer').value.trim(),reviewedAt=$('date').value;if(!reviewer||!reviewedAt||!checked.size){$('status').textContent='Enter your name and date, then check only phrases you have actually reviewed.';return;}const approved=[...checked].map(i=>({...rows[i],translation:edits.get(i)??rows[i].translation,status:'approved',reviewer,reviewedAt}));download(approved,'notho-'+rows[0].locale+'-approved.json');$('status').textContent='Downloaded '+approved.length+' approvals. Import validation still checks numbers, markup, placeholders and source changes.';};render();
+</script></html>`;
+fs.writeFileSync(output, html, { flag: 'wx' });
+console.log(`Created offline worksheet with ${rows.length} rows: ${output}`);

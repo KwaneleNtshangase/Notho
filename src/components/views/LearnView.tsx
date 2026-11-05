@@ -1266,7 +1266,7 @@ export function LearnView({
               ))}
             </div>
             {pickerGoalId === "other" && (
-              <textarea
+              <I18nElement as="textarea"
                 placeholder="Describe your goal - e.g. save for my child's education"
                 value={pickerGoalDescription}
                 onChange={(e) => setPickerGoalDescription(e.target.value)}
@@ -1275,7 +1275,7 @@ export function LearnView({
               />
             )}
             {pickerGoalId && pickerGoalId !== "other" && (
-              <textarea
+              <I18nElement as="textarea"
                 placeholder="Anything more to say about this goal? (optional)"
                 value={pickerGoalDescription}
                 onChange={(e) => setPickerGoalDescription(e.target.value)}

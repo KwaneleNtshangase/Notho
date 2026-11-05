@@ -189,7 +189,7 @@ export function ReportProblemSheet({
               </select>
             </label>
 
-            <textarea
+            <I18nElement as="textarea"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Please describe your issue..."

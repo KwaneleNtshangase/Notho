@@ -46,9 +46,13 @@ export function LocalizedElement<T extends keyof React.JSX.IntrinsicElements>({ 
   for (const name of ['title', 'alt', 'placeholder', 'aria-label', 'aria-description', 'aria-valuetext']) {
     if (typeof translated[name] === 'string') translated[name] = localizeString(locale, translated[name] as string);
   }
-  if (as === 'option' && typeof translated.children === 'string') {
-    if (translated.value === undefined) translated.value = translated.children;
-    translated.children = localizeString(locale, translated.children);
+  if (as === 'option') {
+    const pieces = React.Children.toArray(translated.children as ReactNode);
+    if (pieces.every(piece => typeof piece === 'string' || typeof piece === 'number')) {
+      const source = pieces.join('');
+      if (translated.value === undefined) translated.value = source;
+      translated.children = localizeString(locale, source);
+    }
   }
   return createElement(as, translated);
 }

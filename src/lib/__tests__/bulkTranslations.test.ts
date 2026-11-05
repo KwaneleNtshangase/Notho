@@ -63,6 +63,11 @@ describe('bulk draft presentation', () => {
       expect(renderToStaticMarkup(React.createElement(LocalizedText, { source: '{value0} days', one: '{value0} day', count, values: [count] }))).toBe(expected);
     }
   });
+  it('translates mixed numeric option labels without changing submitted values', () => {
+    installCatalog('af', { '{value0} XP / day': '{value0} XP / dag' });
+    const result = renderToStaticMarkup(React.createElement(LocalizedElement, { as: 'option', value: 25 }, 25, ' XP / day'));
+    expect(result).toBe('<option value="25">25 XP / dag</option>');
+  });
   it('translates accessibility labels while preserving form values and option IDs', () => {
     installCatalog('af', { 'Monthly income': 'Maandelikse inkomste', 'Savings': 'Spaargeld' });
     const input = renderToStaticMarkup(React.createElement(LocalizedElement, { as: 'input', 'aria-label': 'Monthly income', defaultValue: 'Savings' }));

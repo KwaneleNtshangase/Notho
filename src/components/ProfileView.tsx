@@ -222,7 +222,7 @@ export function FeedbackModal({ open, onClose }: { open: boolean; onClose: () =>
             </div>
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", display: "block", marginBottom: 6 }}><I18nText source={"Description *"} /></label>
-              <textarea
+              <I18nElement as="textarea"
                 required value={description} onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe your issue or suggestion in detail..."
                 rows={4}
