@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { OpenNothoButton } from "@/components/OpenNothoButton";
 
 const teal = "#007A85";
 const ink = "#1a1a1a";
@@ -31,10 +32,7 @@ export function PublicHeader() {
           <Link href="/financial-literacy" style={{ color: ink, textDecoration: "none" }}>Learn</Link>
           <Link href="/investment-calculator" style={{ color: ink, textDecoration: "none" }}>Calculate</Link>
           <Link href="/budgeting" style={{ color: ink, textDecoration: "none" }}>Budget</Link>
-          <Link
-            href="/learn"
-            target="_blank"
-            rel="noreferrer"
+          <OpenNothoButton
             style={{
               background: teal,
               color: "#fff",
@@ -43,9 +41,7 @@ export function PublicHeader() {
               borderRadius: 6,
               fontWeight: 700,
             }}
-          >
-            Open Notho
-          </Link>
+          />
         </nav>
       </div>
     </header>
