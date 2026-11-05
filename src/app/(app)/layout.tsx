@@ -35,7 +35,7 @@ import { ShakeToReport } from "@/components/ShakeToReport";
 import { NavProfileMark, ProfilePhotoBoot, warmProfileAvatar } from "@/components/navProfilePhoto";
 import { useLocale } from "@/i18n/LocaleProvider";
 
-function AppNavigation() {
+function AppNavigation({ hidden = false }: { hidden?: boolean }) {
   const { setRoute } = useNotho();
   const { t } = useLocale();
   const pathname = usePathname() || "/";
@@ -63,6 +63,7 @@ function AppNavigation() {
 
   return (
     <MobileBottomNav
+      hidden={hidden}
       items={[
         {
           key: "learn",
@@ -115,7 +116,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     pathname
   );
   const pathIsTab = isAppTabPath(pathname);
+  const isReview = pathname === "/review" || pathname.startsWith("/review/");
   const [showTabs, setShowTabs] = useState(pathIsTab);
+  const tabsVisible = !isReview && showTabs;
 
   useEffect(() => {
     setShowTabs(isAppTabPath(pathname));
@@ -139,20 +142,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="app-container">
             {!isMockExam && <DesktopSidebar />}
             <div
-              className={`main-content ${isMockExam ? "mock-main-content" : ""} ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
+              className={`main-content ${isMockExam ? "mock-main-content" : ""} ${isReview ? "review-main-content" : ""} ${(pathname === "/learn" || pathname === "/") ? "main-with-stats" : ""}`}
               style={{ display: 'flex', flexDirection: 'column' }}
             >
               {!isMockExam && <MobileTopBarWrapper />}
-              <div style={{ paddingBottom: isMockExam ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {!isMockExam && <PersistentAppTabs visible={showTabs} />}
-                <I18nText>{!showTabs && children}</I18nText>
+              <div
+                className={isReview ? "review-stage" : undefined}
+                style={{ paddingBottom: isMockExam || isReview ? 0 : "70px", flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+              >
+                {!isMockExam && <PersistentAppTabs visible={tabsVisible} />}
+                <I18nText>{!tabsVisible && children}</I18nText>
               </div>
             </div>
             {(pathname === "/learn" || pathname === "/") && (
               <StatsPanelWrapper />
             )}
           </div>
-          {!isMockExam && <AppNavigation />}
+          {!isMockExam && <AppNavigation hidden={isReview} />}
           {!isMockExam && <NotificationOptIn />}
           {!isMockExam && <StreakRepairBanner />}
           <UsageTracker />

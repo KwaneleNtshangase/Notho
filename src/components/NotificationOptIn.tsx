@@ -24,6 +24,7 @@ export function NotificationOptIn() {
   const onQuietPath =
     pathname.startsWith("/settings") ||
     pathname.startsWith("/lesson") ||
+    pathname.startsWith("/review") ||
     pathname.startsWith("/onboarding") ||
     pathname.startsWith("/admin");
 

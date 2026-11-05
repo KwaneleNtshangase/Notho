@@ -4,8 +4,8 @@ import { useLocale } from "@/i18n/LocaleProvider";
 import { localizeContent } from "@/i18n/contentZu";
 /* eslint-disable @next/next/no-html-link-for-pages */
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { BodyPortal } from "@/components/BodyPortal";
+import React, { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
@@ -20,14 +20,7 @@ import {
   INVESTOR_QUIZ_QUESTIONS,
 } from "@/data/gamificationExtras";
 import { CONCEPTS, getConceptIdsForCourse } from "@/data/concepts";
-import { hashSeed, seededPermutation } from "@/lib/lessonShuffle";
-import {
-  applyReview,
-  getDueCards,
-  saveMastery,
-  scheduleConceptsForCourse,
-} from "@/lib/spaced-repetition";
-import type { MasteryRecord } from "@/lib/spaced-repetition";
+import { getDueCards } from "@/lib/spaced-repetition";
 import { useProgress } from "@/hooks/useProgress";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { usePinnedCourses } from "@/hooks/usePinnedCourses";
@@ -115,7 +108,6 @@ import {
   User as UserIcon,
   Wallet,
   WifiOff,
-  X,
   Zap,
 } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -151,7 +143,6 @@ import {
   GOAL_OPTIONS,
   GOAL_COURSE_MAP,
   BUDGET_LESSON_BRIDGE,
-  playSound,
   persistUserGoalToStorageAndSupabase,
   COURSE_LEVEL_REQUIREMENTS, COURSE_COLOURS, type SavedLessonProgress,
 } from "@/app/pageViews.types";
@@ -162,7 +153,6 @@ import {
   resetCorrectAnswerStreakToday,
 } from "@/lib/dailyChallengeFlags";
 import { useNothoState } from "@/hooks/useNothoState";
-import { useReviewCompletion, NOT_COUNTED, type ReviewOutcome } from "@/hooks/useReviewCompletion";
 import { SettingsView } from "@/components/SettingsView";
 
 function getDailyFact(): string {
@@ -473,301 +463,6 @@ export function DailyChallenges({ streak = 0, onXpClaimed }: { streak?: number; 
   );
 }
 
-// ── Spaced Repetition Review Session ─────────────────────────────────────────
-
-export function ReviewSession({ onClose }: { onClose: () => void }) {
-  const [queue, setQueue] = useState<MasteryRecord[]>([]);
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [hasLoaded, setHasLoaded] = useState(false);
-  const [outcome, setOutcome] = useState<ReviewOutcome>(NOT_COUNTED);
-  const completedRef = useRef(false);
-  const completeReview = useReviewCompletion();
-  const REVIEW_SESSION_KEY = "notho-review-session";
-
-  useEffect(() => {
-    void (async () => {
-      setLoading(true);
-      if (typeof window !== "undefined") {
-        const raw = localStorage.getItem(REVIEW_SESSION_KEY);
-        if (raw) {
-          try {
-            const parsed = JSON.parse(raw) as {
-              queue: MasteryRecord[];
-              currentIdx: number;
-              selected: number | null;
-              showExplanation: boolean;
-              correctCount: number;
-            };
-            if (parsed.queue?.length > 0 && parsed.currentIdx < parsed.queue.length) {
-              setQueue(parsed.queue);
-              setCurrentIdx(parsed.currentIdx);
-              setSelected(parsed.selected);
-              setShowExplanation(parsed.showExplanation);
-              setCorrectCount(parsed.correctCount);
-              setHasLoaded(true);
-              setLoading(false);
-              return;
-            }
-          } catch {
-            // Ignore corrupted local state and continue with fresh due cards.
-          }
-        }
-      }
-      const dueCards = await getDueCards();
-      setQueue(dueCards);
-      setHasLoaded(true);
-      setLoading(false);
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!hasLoaded || queue.length === 0 || currentIdx >= queue.length) return;
-    localStorage.setItem(
-      REVIEW_SESSION_KEY,
-      JSON.stringify({ queue, currentIdx, selected, showExplanation, correctCount })
-    );
-  }, [queue, currentIdx, selected, showExplanation, correctCount, hasLoaded]);
-
-  const current = queue[currentIdx];
-  const concept = current ? CONCEPTS.find((c) => c.id === current.concept_id) : null;
-
-  // Shuffle the four review-card options per concept (seeded, so it's stable
-  // across a resumed session) and remap the correct index — review cards don't
-  // go through the lesson option-shuffle, so without this the correct answer
-  // would always sit in its authored position.
-  const shuffled = useMemo(() => {
-    if (!concept) return null;
-    const perm = seededPermutation(
-      concept.reviewCard.options.length,
-      hashSeed(`review:${concept.id}`)
-    );
-    return {
-      options: perm.map((oldIdx) => concept.reviewCard.options[oldIdx]),
-      correct: perm.indexOf(concept.reviewCard.correct),
-    };
-  }, [concept]);
-  const correctIdx = shuffled ? shuffled.correct : -1;
-
-  const handleAnswer = (idx: number) => {
-    if (selected !== null) return;
-    setSelected(idx);
-    setShowExplanation(true);
-    const isCorrect = idx === correctIdx;
-    if (isCorrect) {
-      setCorrectCount((n) => n + 1);
-      playSound("correct");
-    } else {
-      playSound("incorrect");
-    }
-  };
-
-  const handleNext = () => {
-    if (!current || !concept) return;
-    const isCorrect = selected === correctIdx;
-    const updated = applyReview(current, isCorrect ? 4 : 1);
-    saveMastery(updated);
-    if (currentIdx + 1 >= queue.length) {
-      // ── Review-complete handler ────────────────────────────────────────
-      // Reviews used to end here having awarded nothing. A finished session
-      // now takes the same path a lesson does — /api/progress/sync-streak for
-      // the streak, plus lessonsToday and the daily-challenge counters — when
-      // it is long enough to count. Ref-guarded so credit applies once.
-      if (!completedRef.current) {
-        completedRef.current = true;
-        setOutcome(completeReview({ cards: queue.length, correct: correctCount }));
-      }
-      // All done - go to summary by setting currentIdx beyond queue
-      setCurrentIdx(queue.length);
-    } else {
-      setSelected(null);
-      setShowExplanation(false);
-      setCurrentIdx((i) => i + 1);
-    }
-  };
-
-  const isDone = !loading && hasLoaded && queue.length > 0 && currentIdx >= queue.length;
-
-  const portal = (node: ReactNode) => (
-    <BodyPortal onEscape={onClose}>{node}</BodyPortal>
-  );
-
-  if (loading) {
-    return portal(
-      <div className="review-session-sheet fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
-          <p className="text-sm font-semibold text-gray-600 dark:text-gray-300"><I18nText source={"Loading review..."} /></p>
-        </div>
-      </div>
-    );
-  }
-
-  if (hasLoaded && queue.length === 0) {
-    return portal(
-      <div className="review-session-sheet fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2"><I18nText source={"Review"} /></h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-6"><I18nText source={"Nothing due for review. Come back tomorrow to keep your streak strong."} /></p>
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full rounded-xl bg-green-600 py-3 text-sm font-bold text-white"
-          ><I18nText source={"Back to Learn"} /></button>
-        </div>
-      </div>
-    );
-  }
-
-  if (isDone) {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(REVIEW_SESSION_KEY);
-      // markConceptReviewedToday() now happens in the review-complete
-      // handler above, alongside the rest of the credit.
-    }
-    return portal(
-      <div className="review-session-sheet fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 text-center shadow-2xl">
-          <Brain size={52} className="mx-auto mb-3" style={{ color: "#3B7DD8" }} />
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1"><I18nText source={"Review complete!"} /></h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2"><I18nText source={"{value0} of {value1} correct"} values={[correctCount, queue.length]} /></p>
-          {outcome.counted && outcome.xpAwarded > 0 && (
-            <p className="text-sm font-bold text-green-600 dark:text-green-400 mb-4"><I18nText source={"+{value0} XP · Streak kept"} values={[outcome.xpAwarded]} /></p>
-          )}
-          {outcome.counted && outcome.alreadyCountedToday && (
-            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-4"><I18nText source={"Streak kept · today's review was already counted"} /></p>
-          )}
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">
-            <div
-              className="h-2 rounded-full bg-green-500"
-              style={{ width: `${Math.round((correctCount / queue.length) * 100)}%` }}
-            />
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
-            <I18nText>{outcome.counted
-              ? "Cards are rescheduled. Keep it up daily to master your finances!"
-              : `Cards are rescheduled. ${outcome.cardsRequired} cards in one session keep your streak going — this one was ${queue.length}.`}</I18nText>
-          </p>
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full rounded-xl bg-green-600 py-3 text-sm font-bold text-white"
-          ><I18nText source={"Done"} /></button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!concept) {
-    onClose();
-    return null;
-  }
-
-  const card = concept.reviewCard;
-  const displayOptions = shuffled ? shuffled.options : card.options;
-  const optionLetters = ["A", "B", "C", "D"];
-
-  return portal(
-    <div className="review-session-screen fixed inset-0 z-[300] flex flex-col bg-white dark:bg-gray-950">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 pb-3 pt-4 border-b border-gray-100 dark:border-gray-800">
-        <I18nElement as="button"
-          type="button"
-          onClick={onClose}
-          className="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-          aria-label="Close review"
-        >
-          <X size={20} />
-        </I18nElement>
-        <div className="flex-1 mx-4">
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-            <div
-              className="h-1.5 rounded-full bg-purple-500 transition-all"
-              style={{ width: `${Math.round(((currentIdx) / queue.length) * 100)}%` }}
-            />
-          </div>
-        </div>
-        <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
-          <I18nText>{currentIdx + 1}</I18nText> / <I18nText>{queue.length}</I18nText>
-        </span>
-      </div>
-
-      {/* Card content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-6">
-        <div className="mb-1 flex items-center gap-1.5">
-          <Brain size={13} className="text-purple-500" aria-hidden />
-          <span className="text-xs font-semibold uppercase tracking-widest text-purple-500">
-            <I18nText>{concept.category}</I18nText>
-          </span>
-        </div>
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 leading-snug">
-          <I18nText>{card.question}</I18nText>
-        </h2>
-
-        <div className="space-y-3">
-          {displayOptions.map((opt, i) => {
-            const isSelected = selected === i;
-            const isCorrect = i === correctIdx;
-            let bg = "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white";
-            if (selected !== null) {
-              if (isCorrect) bg = "bg-green-50 dark:bg-green-900/30 border-green-400 text-green-900 dark:text-green-200";
-              else if (isSelected) bg = "bg-red-50 dark:bg-red-900/30 border-red-400 text-red-900 dark:text-red-200";
-              else bg = "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500";
-            }
-            return (
-              <button
-                key={i}
-                type="button"
-                disabled={selected !== null}
-                onClick={() => handleAnswer(i)}
-                className={`w-full flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition-all ${bg}`}
-              >
-                <span className="shrink-0 w-7 h-7 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-xs font-bold text-gray-500">
-                  <I18nText>{optionLetters[i]}</I18nText>
-                </span>
-                <span className="text-sm font-medium"><I18nText>{opt}</I18nText></span>
-                {selected !== null && isCorrect && (
-                  <CheckCircle2 size={16} className="ml-auto text-green-500 shrink-0" aria-hidden />
-                )}
-                {isSelected && !isCorrect && (
-                  <X size={16} className="ml-auto text-red-500 shrink-0" aria-hidden />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {showExplanation && (
-          <div className={`mt-5 rounded-xl p-4 ${selected === correctIdx ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" : "bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"}`}>
-            <p className={`text-xs font-bold mb-1 ${selected === correctIdx ? "text-green-700 dark:text-green-400" : "text-orange-700 dark:text-orange-400"}`}>
-              <I18nText>{selected === correctIdx ? "✓ Correct!" : "Not quite"}</I18nText>
-            </p>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-              <I18nText>{card.explanation}</I18nText>
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      {selected !== null && (
-        <div className="px-4 pb-6 pt-3 border-t border-gray-100 dark:border-gray-800">
-          <button
-            type="button"
-            onClick={handleNext}
-            className="w-full rounded-xl bg-purple-600 py-3.5 text-sm font-bold text-white"
-          >
-            <I18nText>{currentIdx + 1 >= queue.length ? "See Results" : "Next →"}</I18nText>
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function LearnView({
   courses,
   isLessonCompleted,
@@ -789,6 +484,8 @@ export function LearnView({
   /** Current total XP. Used to show how much XP is still needed to unlock gated courses. */
   userXP?: number;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { locale, t, catalogRevision } = useLocale();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -797,7 +494,6 @@ export function LearnView({
   const [showGoalPicker, setShowGoalPicker] = useState(false);
   const [pickerGoalId, setPickerGoalId] = useState<string>("");
   const [pickerGoalDescription, setPickerGoalDescription] = useState<string>("");
-  const [showReview, setShowReview] = useState(false);
   const [dueCount, setDueCount] = useState(0);
   const { pinned, isPinned, togglePin } = usePinnedCourses();
   // Finished courses live in a collapsed section at the bottom — they're the
@@ -819,10 +515,16 @@ export function LearnView({
     [courses, locale, catalogRevision]
   );
 
-  // Refresh due count on mount and when returning from a review
+  // Learn stays mounted in the tab shell, so refresh when this route is shown
+  // again — including after a /review sitting reschedules cards.
   useEffect(() => {
+    if (pathname !== "/learn" && pathname !== "/") return;
     void getDueCards().then((cards) => setDueCount(cards.length));
-  }, [showReview]);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (dueCount > 0) router.prefetch("/review");
+  }, [dueCount, router]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -910,7 +612,7 @@ export function LearnView({
       {dueCount > 0 && (
         <button
           type="button"
-          onClick={() => setShowReview(true)}
+          onClick={() => router.push("/review")}
           className="w-full flex items-center gap-3 rounded-xl border-2 border-purple-200 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20 px-4 py-3 mb-4 text-left"
         >
           <div className="shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-800 flex items-center justify-center">
@@ -922,15 +624,6 @@ export function LearnView({
           </div>
           <span className="shrink-0 text-xs font-bold text-white bg-purple-600 rounded-full px-2.5 py-1"><I18nText source={"Start"} /></span>
         </button>
-      )}
-
-      {showReview && (
-        <ReviewSession
-          onClose={() => {
-            setShowReview(false);
-            void getDueCards().then((cards) => setDueCount(cards.length));
-          }}
-        />
       )}
 
       {userGoal && (
