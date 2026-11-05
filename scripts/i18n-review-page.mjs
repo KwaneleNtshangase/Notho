@@ -5,7 +5,9 @@ const input = arg('--file'), output = arg('--out');
 if (!input || !output) throw new Error('Use --file exported-review.json --out review.html [--all]. Output must not already exist.');
 const source = JSON.parse(fs.readFileSync(input, 'utf8'));
 const rows = source.filter(row => process.argv.includes('--all') || !row.sourcePreservationReason && (
-  row.fallbackReason || row.key.startsWith('messages:') && row.priority === 'priority-human-review'
+  row.fallbackReason || row.generationJob === 'consequential-phrases-20261105'
+  || row.locale === 'zu' && row.contexts.some(context => context.startsWith('/lesson/money-basics/lesson-1:steps[0]'))
+  || row.key.startsWith('messages:') && row.priority === 'priority-human-review'
   || /Download My Data|Delete My Data|Push notifications|Plays on correct|Money is more than cash|Session recording|Sessions are recorded|Signed-in sessions are recorded|ZBB allocates|Zero-based budgeting (?:gives|means)/.test(row.source)
   || /content:course\.(credit-debt|taxes|insurance|retirement|estate-planning|re5)/.test(row.key)
 ));

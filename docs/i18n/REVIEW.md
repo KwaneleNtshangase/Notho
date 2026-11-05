@@ -1,6 +1,6 @@
 # South African text-language beta and review workflow
 
-English is the default, without a beta label. Afrikaans (`af`), Southern isiNdebele (`nr`), isiXhosa (`xh`), isiZulu (`zu`), Sepedi (`nso`), Sesotho (`st`), Setswana (`tn`), siSwati (`ss`), Tshivenda (`ve`) and Xitsonga (`ts`) are selectable with **(under review)** after the language name. The current release provides partial language support, not a fully translated curriculum.
+English is the default, without a beta label. Afrikaans (`af`), Southern isiNdebele (`nr`), isiXhosa (`xh`), isiZulu (`zu`), Sepedi (`nso`), Sesotho (`st`), Setswana (`tn`), siSwati (`ss`), Tshivenda (`ve`) and Xitsonga (`ts`) are selectable with **(under review)** after the language name. The release covers all 205 lessons. The Xitsonga credit and debt title remains in English pending review. See [the 5 November coverage report](RELEASE-20261105.md) for public UI fallbacks and shared wording.
 
 ## Provenance and precedence
 
@@ -15,11 +15,11 @@ All generated entries are **needs human review**. Neither structural tests nor t
 
 ## Coverage and known gaps
 
-Run `npm run i18n:check` for current counts and structural failures. The initial catalog has 113 shared messages, 274 course/unit/lesson title keys and 20,016 unique strings discovered in course content (including descriptions, questions, answer options and feedback). This inventory is not a count of screens. The expanded source inventory also includes interface, rich-text, PDF and secured exam wording. See FULL-COVERAGE-20261026.md for the current release status.
+Run `npm run i18n:check` for current counts and structural failures. The initial catalog has 113 shared messages, 274 course/unit/lesson title keys and 20,016 unique strings discovered in course content (including descriptions, questions, answer options and feedback). This inventory is not a count of screens. The expanded source inventory also includes interface, rich-text, PDF and secured exam wording. See [RELEASE-20261105.md](RELEASE-20261105.md) for the current release status.
 
 - All 113 shared message keys have draft entries in each language. Two proper-language labels intentionally match English. The shared catalog covers navigation, settings language controls, authentication/recovery, onboarding, goals, lesson actions and read-aloud accessibility labels.
 - All 22 course titles have generated drafts. Xitsonga `course.credit-debt` is held in English because the draft does not clearly distinguish credit access from outstanding debt; an approved correction can release it. Other titles resolve through preserved or approved wording before generated bulk drafts. Missing or invalid entries use English.
-- Lesson presentation fields now resolve across all 205 lessons, including questions, answer options and explanations. Bulk drafting is still incomplete, so some passages use English. IDs, scoring, answer indices and numeric answer values are not translated.
+- Lesson presentation fields now resolve across all 205 lessons, including questions, answer options and explanations. Every inventoried source has a structurally usable record in all ten languages. Some short strings legitimately match English and some UI labels still require classification. IDs, scoring, answer indices and numeric answer values are not translated.
 - Budget tools, calculators, reports, profile/settings, legal pages and RE5 use the translation resolver. Coverage is measured separately from integration. User-provided text is preserved; unresolved app wording uses English. Secured exam drafts and overrides remain server-only.
 - Read-aloud buttons and voice settings appear only when the device supplies a voice for the selected language. Voice choices are saved per language; old preferences are honoured only when the language matches. English is never silently substituted as a voice for another language. Voice availability varies by device. Mixed English fallback/translated passages still need a per-passage audio review.
 - The brand owner requested the approximate pronunciation “Notto” for English speech. Updated by the brand owner on 26 October 2026. Speech input uses that hint for non-Nguni voices; native Nguni voices retain “Notho”. Displayed brand spelling is unchanged. Exact output depends on the device voice and has not received linguistic audio validation.
