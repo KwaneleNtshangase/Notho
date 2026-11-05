@@ -1528,9 +1528,10 @@ body.modal-open .bottom-nav {
 html.notho-review-open body.modal-open {
   touch-action: auto;
 }
-/* /review is a real page, in normal flow under the app shell. The top bar
-   already clears the status-bar inset. Bottom padding keeps the next button
-   above the home indicator once the tab bar is hidden. */
+/* /review is a real page in normal flow under the app shell. It uses the
+   lesson player (sticky progress, step card, option buttons), not a fixed
+   overlay. The top bar already clears the status-bar inset. Bottom padding
+   only needs the home indicator once the tab bar is hidden. */
 .main-content.review-main-content {
   min-height: 100dvh;
 }
@@ -1542,22 +1543,8 @@ html.notho-review-open body.modal-open {
 }
 .review-session-screen {
   box-sizing: border-box;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  height: calc(100dvh - 7.5rem);
-  max-height: calc(100dvh - 7.5rem);
-  min-height: 0;
-  background: var(--color-bg);
   color: var(--color-text-primary);
-  overscroll-behavior: contain;
-}
-@media (min-width: 1200px) {
-  .review-session-screen {
-    height: calc(100dvh - 4.5rem);
-    max-height: calc(100dvh - 4.5rem);
-  }
 }
 @media (max-width: 768px) {
   .main-content.review-main-content {
@@ -1567,140 +1554,9 @@ html.notho-review-open body.modal-open {
 body:has(.review-session-screen) .bottom-nav {
   display: none !important;
 }
-.review-session-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  padding: 8px 0 12px;
-  background: var(--color-bg);
-}
-.review-icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  padding: 4px;
-  border: none;
-  background: none;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-}
-.review-count {
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-text-secondary);
-}
-.review-session-body {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.review-card {
-  background: var(--color-surface);
-  border-radius: 12px;
-  padding: 20px 16px 8px;
-}
-@media (min-width: 769px) {
-  .review-card {
-    padding: 36px 36px 12px;
-  }
-}
-.review-kicker {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-}
-.review-question {
-  margin: 0 0 20px;
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1.35;
-  color: var(--color-text-primary);
-}
-.review-options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.review-option-letter {
-  width: 28px;
-  height: 28px;
-  margin-right: 12px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 800;
-  background: var(--color-bg);
-  color: var(--color-text-secondary);
-  border: 2px solid var(--color-option-border) !important;
-}
-.option-button.correct .review-option-letter,
-.option-button.incorrect .review-option-letter {
-  background: transparent;
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.75) !important;
-}
-.review-session-footer {
-  padding: 12px 0 calc(16px + env(safe-area-inset-bottom, 0px));
-  background: var(--color-bg);
-}
-.review-session-footer .btn,
-.review-session-result .btn {
-  width: 100%;
-}
-.review-session-result {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: min(100%, 420px);
-  margin: 0 auto;
-  padding: 32px 8px calc(24px + env(safe-area-inset-bottom, 0px));
-}
-.review-session-result h2 {
-  margin: 12px 0 4px;
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--color-text-primary);
-}
-.review-session-result p {
-  margin: 0 0 8px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--color-text-secondary);
-}
 .review-xp {
   color: var(--color-success) !important;
   font-weight: 800 !important;
-}
-.review-score-track {
-  width: 100%;
-  margin: 12px 0 16px;
-}
-.review-session-sheet {
-  box-sizing: border-box;
-  padding-top: max(1rem, env(safe-area-inset-top, 0px));
-  padding-right: max(1rem, env(safe-area-inset-right, 0px));
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-  padding-left: max(1rem, env(safe-area-inset-left, 0px));
 }
 
 /* ── Dark mode floating nav pill ────────────────────────────────────────── */
