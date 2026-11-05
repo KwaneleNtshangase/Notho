@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
+    <>
     <PublicHeader />
     <main className="public-page"
       style={{
@@ -246,6 +247,7 @@ export default function PrivacyPage() {
       </div>
     </main>
     <PublicFooter />
+    </>
   );
 }
 

@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
+    <>
     <PublicHeader />
     <main className="public-page"
       style={{
@@ -130,6 +131,7 @@ export default function TermsPage() {
       </div>
     </main>
     <PublicFooter />
+    </>
   );
 }
 

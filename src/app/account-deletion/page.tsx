@@ -59,6 +59,7 @@ const link: React.CSSProperties = { color: teal, fontWeight: 600 };
 
 export default function AccountDeletionPage() {
   return (
+    <>
     <PublicHeader />
     <main className="public-page" style={wrap}>
       <div style={inner}>
@@ -186,5 +187,6 @@ export default function AccountDeletionPage() {
       </div>
     </main>
     <PublicFooter />
+    </>
   );
 }

@@ -59,6 +59,7 @@ const link: React.CSSProperties = { color: teal, fontWeight: 600 };
 
 export default function SupportPage() {
   return (
+    <>
     <PublicHeader />
     <main className="public-page" style={wrap}>
       <div style={inner}>
@@ -148,5 +149,6 @@ export default function SupportPage() {
       </div>
     </main>
     <PublicFooter />
+    </>
   );
 }
