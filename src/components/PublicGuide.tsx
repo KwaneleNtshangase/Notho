@@ -75,7 +75,7 @@ export function PublicGuide({
   faqs: { q: string; a: string }[];
 }) {
   return (
-    <main style={wrap}>
+    <main className="public-page" style={wrap}>
       <JsonLd data={webPageJsonLd({ path, title, description })} />
       <JsonLd data={faqJsonLd(faqs)} />
       <div style={inner}>

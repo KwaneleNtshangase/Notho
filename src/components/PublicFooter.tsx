@@ -75,6 +75,24 @@ export function PublicFooter() {
       </div>
       <div
         style={{
+          maxWidth: 1080,
+          margin: "0 auto",
+          padding: "0 24px 24px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 16,
+          fontSize: 14,
+        }}
+      >
+        <a href="https://youtube.com/@nothoapp" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">YouTube</a>
+        <a href="https://www.instagram.com/notho.app" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">Instagram</a>
+        <a href="https://www.tiktok.com/@notho.app" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">TikTok</a>
+        <a href="https://www.facebook.com/share/1MPnpmmwgk/" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">Facebook</a>
+        <a href="https://www.threads.com/@notho.app" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">Threads</a>
+        <a href="https://www.linkedin.com/company/notho-za" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">LinkedIn</a>
+      </div>
+      <div
+        style={{
           borderTop: "1px solid #222",
           padding: "16px 24px",
           display: "flex",
