@@ -1,6 +1,8 @@
 import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const metadata: Metadata = {
   title: "Support | Notho",
@@ -10,12 +12,12 @@ export const metadata: Metadata = {
 
 /* ── Shared inline styles (matches privacy/terms page conventions) ─── */
 
-const bg = "#0a0a0a";
+const bg = "#ffffff";
 const teal = "#007A85";
 
 const wrap: React.CSSProperties = {
   backgroundColor: bg,
-  color: "#ffffff",
+  color: "#1a1a1a",
   minHeight: "100dvh",
   fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
   padding: 0,
@@ -57,7 +59,8 @@ const link: React.CSSProperties = { color: teal, fontWeight: 600 };
 
 export default function SupportPage() {
   return (
-    <main style={wrap}>
+    <PublicHeader />
+    <main className="public-page" style={wrap}>
       <div style={inner}>
         {/* Header */}
         <div style={{ marginBottom: 40 }}>
@@ -65,7 +68,7 @@ export default function SupportPage() {
             style={{
               display: "inline-block",
               backgroundColor: teal,
-              color: "#ffffff",
+              color: "#1a1a1a",
               fontSize: 12,
               fontWeight: 700,
               letterSpacing: "0.1em",
@@ -81,7 +84,7 @@ export default function SupportPage() {
               fontWeight: 800,
               lineHeight: 1.15,
               margin: "0 0 12px",
-              color: "#ffffff",
+              color: "#1a1a1a",
             }}
           ><I18nText source={"Support"} /></h1>
           <p style={{ color: "#a0a0a0", fontSize: 15, margin: 0 }}><I18nText source={"We're here to help. Most questions are answered in the pages below, but if not — email us and we'll get back to you."} /></p>
@@ -144,5 +147,6 @@ export default function SupportPage() {
         </div>
       </div>
     </main>
+    <PublicFooter />
   );
 }

@@ -1,5 +1,7 @@
 import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
+import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Notho",
@@ -8,10 +10,11 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main
+    <PublicHeader />
+    <main className="public-page"
       style={{
-        backgroundColor: "#0a0a0a",
-        color: "#ffffff",
+        backgroundColor: "#ffffff",
+        color: "#1a1a1a",
         minHeight: "100dvh",
         fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
         padding: "0",
@@ -47,7 +50,7 @@ export default function PrivacyPage() {
               fontWeight: 800,
               lineHeight: 1.15,
               margin: "0 0 12px",
-              color: "#ffffff",
+              color: "#1a1a1a",
             }}
           ><I18nText source={"Privacy Policy"} /></h1>
           <p style={{ color: "#a0a0a0", fontSize: "15px", margin: 0 }}><I18nText source={"Last updated: November 2026"} /></p>
@@ -242,6 +245,7 @@ export default function PrivacyPage() {
         ><I18nText source={"© {value0} Kwanele Ntshangase. All rights reserved."} values={[new Date().getFullYear()]} /></div>
       </div>
     </main>
+    <PublicFooter />
   );
 }
 

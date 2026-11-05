@@ -1,6 +1,8 @@
 import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n/LocalizedText";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const metadata: Metadata = {
   title: "Delete Your Account | Notho",
@@ -10,12 +12,12 @@ export const metadata: Metadata = {
 
 /* ── Shared inline styles (matches privacy/terms/support conventions) ─ */
 
-const bg = "#0a0a0a";
+const bg = "#ffffff";
 const teal = "#007A85";
 
 const wrap: React.CSSProperties = {
   backgroundColor: bg,
-  color: "#ffffff",
+  color: "#1a1a1a",
   minHeight: "100dvh",
   fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
   padding: 0,
@@ -57,7 +59,8 @@ const link: React.CSSProperties = { color: teal, fontWeight: 600 };
 
 export default function AccountDeletionPage() {
   return (
-    <main style={wrap}>
+    <PublicHeader />
+    <main className="public-page" style={wrap}>
       <div style={inner}>
         {/* Header */}
         <div style={{ marginBottom: 40 }}>
@@ -65,7 +68,7 @@ export default function AccountDeletionPage() {
             style={{
               display: "inline-block",
               backgroundColor: teal,
-              color: "#ffffff",
+              color: "#1a1a1a",
               fontSize: 12,
               fontWeight: 700,
               letterSpacing: "0.1em",
@@ -81,7 +84,7 @@ export default function AccountDeletionPage() {
               fontWeight: 800,
               lineHeight: 1.15,
               margin: "0 0 12px",
-              color: "#ffffff",
+              color: "#1a1a1a",
             }}
           ><I18nText source={"Delete Your Account"} /></h1>
           <p style={{ color: "#a0a0a0", fontSize: 15, margin: 0 }}><I18nText source={"You can delete your Notho account and all associated data at any time. Here's how."} /></p>
@@ -182,5 +185,6 @@ export default function AccountDeletionPage() {
         </div>
       </div>
     </main>
+    <PublicFooter />
   );
 }

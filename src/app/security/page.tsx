@@ -64,7 +64,8 @@ export default function SecurityPage() {
   const btn: React.CSSProperties = { padding: "12px 18px", borderRadius: 10, border: "none", fontWeight: 700, fontSize: 14.5, cursor: "pointer" };
 
   return (
-    <main style={wrap}>
+    <PublicHeader />
+    <main className="public-page" style={wrap}>
       <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 6 }}><I18nText source={"Your data & security"} /></h1>
       <p style={{ ...p, marginBottom: 24 }}><I18nText source={"Notho is built to help you learn about money, and to keep your information safe while you do."} /></p>
 
@@ -98,5 +99,6 @@ export default function SecurityPage() {
 
       <p style={{ ...p, textAlign: "center", marginTop: 8 }}><I18nRich source={"Questions? <a0>support@notho.co.za</a0>"} elements={[<a key="inline-0" href="mailto:support@notho.co.za" style={{ color: "var(--color-primary)", fontWeight: 700 }} />]} /></p>
     </main>
+    <PublicFooter />
   );
 }
