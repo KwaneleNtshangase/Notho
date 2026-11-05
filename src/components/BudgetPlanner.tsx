@@ -11,7 +11,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
 import { isNativePlatform } from "@/lib/capacitorPlatform";
 import { shareFileBlob } from "@/lib/nativeShare";
-import { beginFileShare } from "@/lib/shareHandoff";
+import { beginFileShare, preparedFileFollowUp } from "@/lib/shareHandoff";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
@@ -1135,9 +1135,10 @@ export function BudgetView() {
     }
   };
 
-  // Share the PDF for a specific period. Native: the OS share sheet.
-  // Web: the file share sheet when the browser can take a file, otherwise
-  // the same download as Save PDF. Dismissing the sheet does not download.
+  // Share a report that still has to be generated. Native share does not need
+  // the original tap. On the web the tap is gone once the PDF response
+  // arrives, so a missed sheet opens the ready preview: its Share and Save
+  // PDF buttons run on a new tap. Dismissing a sheet does not open that preview.
   const shareReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
     setExportLoading(true);
     try {
@@ -1154,16 +1155,14 @@ export function BudgetView() {
         dialogTitle: "Share your budget report",
       });
       const result = outcome === "unavailable" ? "unavailable" : await outcome;
-      if (result === "shared" || result === "cancelled") return;
+      if (preparedFileFollowUp(result) === "done") return;
 
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      setPdfFrameReady(false);
+      setPdfPreview((prev) => {
+        if (prev?.url.startsWith("blob:")) URL.revokeObjectURL(prev.url);
+        return { url, fileName, blob };
+      });
     } catch {
       /* non-fatal: the interactive view is still open */
     } finally {
@@ -1825,7 +1824,7 @@ export function BudgetView() {
       )}
 
       {pdfPreview && (
-        <div className="fixed inset-0 z-[460] flex flex-col bg-black/70" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[560] flex flex-col bg-black/70" role="dialog" aria-modal="true">
           <div style={{ background: "var(--color-surface)", width: "100%", maxWidth: 820, margin: "0 auto", height: "100%", maxHeight: "100dvh", display: "flex", flexDirection: "column" }}>
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
@@ -1906,9 +1905,8 @@ export function BudgetView() {
                     save();
                     return;
                   }
-                  void outcome.then((result) => {
-                    if (result === "unavailable") save();
-                  });
+                  // A rejection arrives after this tap. Save PDF is the next tap.
+                  void outcome.then(() => undefined);
                 }}
               ><I18nText source={"Share"} /></button>
               <button

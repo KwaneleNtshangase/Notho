@@ -3,7 +3,7 @@ import { isIosNativeSync, nativePlatformSync } from "@/lib/capacitorPlatform";
 import { markSharedToday } from "@/lib/dailyChallengeFlags";
 import { isShareCancel, shareNativeFile, shareNativeText } from "@/lib/nativeShare";
 
-export type ShareHandoffResult = "shared" | "cancelled" | "failed";
+export type ShareHandoffResult = "shared" | "cancelled" | "failed" | "needs-whatsapp";
 
 export type TextShareTarget = {
   text: string;
@@ -25,27 +25,20 @@ function record(shareType: ShareKind | undefined, method: "native" | "whatsapp")
 }
 
 /**
- * Open WhatsApp in this turn. A null return means the browser blocked the
- * window. `noopener` is applied on the opened window so a blocked popup
- * (which returns null) is not confused with a successful one (browsers
- * return null whenever `noopener` is passed in the feature string).
+ * Open WhatsApp from a live click. `noopener` is in the feature string so the
+ * new page never receives `window.opener`. With that flag the return value is
+ * null even when the window opens, so this does not try to tell a blocked
+ * popup from a successful one.
  */
-function openWhatsApp(text: string, shareType: ShareKind | undefined): ShareHandoffResult {
-  if (typeof window === "undefined" || typeof window.open !== "function") return "failed";
-  let opened: Window | null = null;
+export function openWhatsAppNow(text: string, shareType?: ShareKind): boolean {
+  if (typeof window === "undefined" || typeof window.open !== "function") return false;
   try {
-    opened = window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
   } catch {
-    return "failed";
-  }
-  if (!opened || opened.closed) return "failed";
-  try {
-    opened.opener = null;
-  } catch {
-    /* The page opened. Losing the opener reference is best-effort. */
+    return false;
   }
   record(shareType, "whatsapp");
-  return "shared";
+  return true;
 }
 
 /**
@@ -65,7 +58,8 @@ export function shareTextNow(target: TextShareTarget): Promise<ShareHandoffResul
       pending = nav.share(payload);
     } catch (err) {
       if (isShareCancel(err)) return Promise.resolve("cancelled");
-      return Promise.resolve(openWhatsApp(target.text, target.shareType));
+      // The throw is still inside the click, so WhatsApp can open now.
+      return Promise.resolve(openWhatsAppNow(target.text, target.shareType) ? "shared" : "failed");
     }
     return pending.then(
       () => {
@@ -74,7 +68,9 @@ export function shareTextNow(target: TextShareTarget): Promise<ShareHandoffResul
       },
       (err: unknown) => {
         if (isShareCancel(err)) return "cancelled" as const;
-        return openWhatsApp(target.text, target.shareType);
+        // The rejection runs after the gesture is gone. Opening WhatsApp
+        // here is blocked, and retrying the same share call fails again.
+        return "needs-whatsapp" as const;
       },
     );
   }
@@ -93,10 +89,10 @@ export function shareTextNow(target: TextShareTarget): Promise<ShareHandoffResul
         return "shared" as const;
       }
       if (result === "cancelled") return "cancelled" as const;
-      return openWhatsApp(target.text, target.shareType);
+      return "needs-whatsapp" as const;
     });
   }
-  return Promise.resolve(openWhatsApp(target.text, target.shareType));
+  return Promise.resolve(openWhatsAppNow(target.text, target.shareType) ? "shared" : "failed");
 }
 
 export async function shareIosCard(opts: {
@@ -153,6 +149,16 @@ export function startDuoShare(opts: {
     title: "Notho",
     url: "https://www.notho.co.za",
   });
+}
+
+/**
+ * What to do after a PDF has already been fetched. The original tap does not
+ * survive that wait on the web, so a failed share must not pretend a
+ * programmatic download worked. `preview` means show the ready file and let
+ * Share / Save PDF run on a new tap. Cancellation stays `done`.
+ */
+export function preparedFileFollowUp(result: "shared" | "cancelled" | "unavailable"): "done" | "preview" {
+  return result === "shared" || result === "cancelled" ? "done" : "preview";
 }
 
 export type FileShareStart = "unavailable" | Promise<"shared" | "cancelled" | "unavailable">;

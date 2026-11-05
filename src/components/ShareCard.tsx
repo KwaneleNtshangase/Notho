@@ -5,7 +5,7 @@ import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i1
 import { useState, type CSSProperties } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
 import { duoCardCopy } from "@/lib/duoShareCard";
-import { shareTextNow, startDuoShare } from "@/lib/shareHandoff";
+import { openWhatsAppNow, shareTextNow, startDuoShare } from "@/lib/shareHandoff";
 import { generateShareText } from "@/app/pageViews.types";
 
 export type ShareCardData =
@@ -184,7 +184,7 @@ async function blobFromCard(data: ShareCardData): Promise<Blob> {
  * or WhatsApp window has to open inside this call, before the first await.
  * The image card stays iPhone-app only.
  */
-export function shareDuoCard(data: ShareCardData): Promise<"shared" | "cancelled" | "downloaded" | "failed"> {
+export function shareDuoCard(data: ShareCardData): Promise<"shared" | "cancelled" | "downloaded" | "failed" | "needs-whatsapp"> {
   const text = shareCaption(data);
   const shareType = data.type === "calculator" ? "badge" : data.type;
   return startDuoShare({
@@ -195,16 +195,33 @@ export function shareDuoCard(data: ShareCardData): Promise<"shared" | "cancelled
   });
 }
 
+function shareKind(data: ShareCardData): "lesson" | "badge" | "streak" {
+  if (data.type === "calculator") return "badge";
+  return data.type;
+}
+
 export function ShareResultButton({ data, label = "Share" }: { data: ShareCardData; label?: string }) {
   const [sharing, setSharing] = useState(false);
   const [status, setStatus] = useState<"idle" | "done" | "error">("idle");
+  const [whatsapp, setWhatsapp] = useState(false);
 
   const handleShare = () => {
+    if (whatsapp) {
+      openWhatsAppNow(shareCaption(data), shareKind(data));
+      setWhatsapp(false);
+      setStatus("done");
+      window.setTimeout(() => setStatus("idle"), 2500);
+      return;
+    }
     setSharing(true);
     setStatus("idle");
     void shareDuoCard(data).then((result) => {
       setSharing(false);
       if (result === "cancelled") return;
+      if (result === "needs-whatsapp") {
+        setWhatsapp(true);
+        return;
+      }
       setStatus(result === "failed" ? "error" : "done");
       window.setTimeout(() => setStatus("idle"), 2500);
     });
@@ -226,7 +243,7 @@ export function ShareResultButton({ data, label = "Share" }: { data: ShareCardDa
         }}
       >
         <Share2 size={16} />
-        <I18nText>{sharing ? "Preparing…" : status === "done" ? "Shared" : status === "error" ? "Try again" : label}</I18nText>
+        <I18nText>{sharing ? "Preparing…" : whatsapp ? "WhatsApp" : status === "done" ? "Shared" : status === "error" ? "Try again" : label}</I18nText>
       </button>
     </div>
   );
@@ -243,20 +260,32 @@ export function ShareButton({
 }) {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<"idle" | "done" | "error">("idle");
+  const [whatsapp, setWhatsapp] = useState(false);
 
   const handleShare = () => {
     if (busy) return;
+    if (whatsapp) {
+      openWhatsAppNow(text, shareType);
+      setWhatsapp(false);
+      setStatus("done");
+      window.setTimeout(() => setStatus("idle"), 2500);
+      return;
+    }
     setBusy(true);
     setStatus("idle");
     void shareTextNow({ text, shareType }).then((result) => {
       setBusy(false);
       if (result === "cancelled") return;
+      if (result === "needs-whatsapp") {
+        setWhatsapp(true);
+        return;
+      }
       setStatus(result === "failed" ? "error" : "done");
       window.setTimeout(() => setStatus("idle"), 2500);
     });
   };
 
-  const shown = status === "done" ? "Shared" : status === "error" ? "Try again" : label;
+  const shown = whatsapp ? "WhatsApp" : status === "done" ? "Shared" : status === "error" ? "Try again" : label;
 
   return (
     <button
@@ -283,14 +312,24 @@ export function StreakShareButton({
   style?: CSSProperties;
 }) {
   const [failed, setFailed] = useState(false);
+  const [whatsapp, setWhatsapp] = useState(false);
 
   return (
     <I18nElement
       as="button"
       type="button"
       onClick={() => {
+        if (whatsapp) {
+          openWhatsAppNow(shareCaption({ type: "streak", streakDays }), "streak");
+          setWhatsapp(false);
+          return;
+        }
         setFailed(false);
         void shareDuoCard({ type: "streak", streakDays }).then((result) => {
+          if (result === "needs-whatsapp") {
+            setWhatsapp(true);
+            return;
+          }
           if (result !== "failed") return;
           setFailed(true);
           window.setTimeout(() => setFailed(false), 2500);
@@ -298,10 +337,11 @@ export function StreakShareButton({
       }}
       className={className}
       style={failed ? { ...style, color: "#E03C31" } : style}
-      title={failed ? "Couldn't share. Try again." : "Share your streak"}
-      aria-label={failed ? "Couldn't share. Try again." : "Share your streak"}
+      title={whatsapp ? "Share on WhatsApp" : failed ? "Couldn't share. Try again." : "Share your streak"}
+      aria-label={whatsapp ? "Share on WhatsApp" : failed ? "Couldn't share. Try again." : "Share your streak"}
     >
       <Share2 size={18} aria-hidden />
+      {whatsapp ? <span style={{ fontSize: 11, fontWeight: 700, marginLeft: 4 }}><I18nText>WhatsApp</I18nText></span> : null}
       {failed ? <span style={{ fontSize: 11, fontWeight: 700, marginLeft: 4 }}><I18nText>Try again</I18nText></span> : null}
     </I18nElement>
   );

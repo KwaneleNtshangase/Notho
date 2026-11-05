@@ -4,7 +4,7 @@ import { analytics } from "@/lib/analytics";
 import { isIosNativeSync, nativePlatformSync } from "@/lib/capacitorPlatform";
 import { markSharedToday } from "@/lib/dailyChallengeFlags";
 import { shareNativeFile, shareNativeText } from "@/lib/nativeShare";
-import { beginFileShare, startDuoShare } from "@/lib/shareHandoff";
+import { beginFileShare, openWhatsAppNow, preparedFileFollowUp, shareTextNow, startDuoShare } from "@/lib/shareHandoff";
 
 vi.mock("@/lib/analytics", () => ({
   analytics: { shareTriggered: vi.fn() },
@@ -33,7 +33,7 @@ function install(opts: {
   open?: () => Window | null;
   bridge?: "ios" | "android";
 }) {
-  const open = vi.fn<(url?: string) => Window | null>(opts.open ?? (() => ({ closed: false, opener: null }) as Window));
+  const open = vi.fn<(url?: string, target?: string, features?: string) => Window | null>(opts.open ?? (() => ({ closed: false, opener: null }) as Window));
   const win: Record<string, unknown> = { open };
   if (opts.bridge === "ios") win.webkit = { messageHandlers: { bridge: {} } };
   if (opts.bridge === "android") win.androidBridge = {};
@@ -120,19 +120,20 @@ describe("share buttons that were waiting on the Capacitor import", () => {
     });
     const pending = shareDuoCard({ type: "calculator", headline: "R10 000", sub: "in 10 years" });
     expect(open).toHaveBeenCalledTimes(1);
-    expect(String(open.mock.calls[0]?.[0])).toMatch(/^https:\/\/wa\.me\/\?text=/);
+    expect(open.mock.calls[0]?.[0]).toMatch(/^https:\/\/wa\.me\/\?text=/);
+    expect(open.mock.calls[0]?.[1]).toBe("_blank");
+    expect(open.mock.calls[0]?.[2]).toBe("noopener,noreferrer");
     expect(nativeFile).not.toHaveBeenCalled();
     return expect(pending).resolves.toBe("shared");
   });
 
-  it("reports a blocked WhatsApp window as a failure", async () => {
+  it("does not treat a null WhatsApp window as failure when opener is severed", async () => {
     install({
       userAgent: "Mozilla/5.0 (Linux; Android 10; HarmonyOS) HuaweiBrowser/13.0",
       open: () => null,
     });
-    await expect(shareDuoCard({ type: "streak", streakDays: 2 })).resolves.toBe("failed");
-    expect(markSharedToday).not.toHaveBeenCalled();
-    expect(analytics.shareTriggered).not.toHaveBeenCalled();
+    await expect(shareDuoCard({ type: "streak", streakDays: 2 })).resolves.toBe("shared");
+    expect(markSharedToday).toHaveBeenCalled();
   });
 
   it("does not open WhatsApp when the learner dismisses the text sheet", async () => {
@@ -143,13 +144,39 @@ describe("share buttons that were waiting on the Capacitor import", () => {
     expect(markSharedToday).not.toHaveBeenCalled();
   });
 
-  it("falls back to WhatsApp only when Web Share rejects for a reason other than cancel", async () => {
+  it("does not open WhatsApp after Web Share rejects asynchronously", async () => {
     const share = vi.fn(() => Promise.reject(Object.assign(new Error("no"), { name: "NotAllowedError" })));
     const { open } = install({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)", share });
-    await expect(startDuoShare(streakCard)).resolves.toBe("shared");
+    await expect(startDuoShare(streakCard)).resolves.toBe("needs-whatsapp");
     expect(share).toHaveBeenCalledTimes(1);
-    expect(open).toHaveBeenCalledTimes(1);
-    expect(analytics.shareTriggered).toHaveBeenCalledWith("streak", "whatsapp");
+    expect(open).not.toHaveBeenCalled();
+    expect(markSharedToday).not.toHaveBeenCalled();
+  });
+
+  it("opens WhatsApp in the click turn when Web Share throws before yielding", () => {
+    const share = vi.fn(() => {
+      throw Object.assign(new Error("no"), { name: "NotAllowedError" });
+    });
+    const { open } = install({ userAgent: "Mozilla/5.0 (Macintosh)", share });
+    const pending = shareTextNow({ text: "hello", shareType: "lesson" });
+    expect(open).toHaveBeenCalledWith(expect.stringMatching(/^https:\/\/wa\.me\/\?text=/), "_blank", "noopener,noreferrer");
+    return expect(pending).resolves.toBe("shared");
+  });
+
+  it("asks for a fresh WhatsApp tap when the Android text sheet is unavailable", async () => {
+    const { open } = install({ userAgent: "Mozilla/5.0 NothoApp/Android", bridge: "android" });
+    nativeText.mockResolvedValue("unavailable");
+    await expect(startDuoShare(streakCard)).resolves.toBe("needs-whatsapp");
+    expect(open).not.toHaveBeenCalled();
+  });
+
+  it("opens WhatsApp with noopener on the follow-up tap", () => {
+    const open = vi.fn(() => null);
+    vi.stubGlobal("window", { open });
+    vi.stubGlobal("navigator", { userAgent: "Mozilla/5.0" });
+    expect(openWhatsAppNow("See you there", "lesson")).toBe(true);
+    expect(open).toHaveBeenCalledWith(expect.stringMatching(/^https:\/\/wa\.me\/\?text=/), "_blank", "noopener,noreferrer");
+    expect(markSharedToday).toHaveBeenCalled();
   });
 });
 
@@ -211,6 +238,15 @@ describe("iPhone app image share", () => {
 });
 
 describe("budget file share", () => {
+  it("keeps a cancelled report share from opening the preview", () => {
+    expect(preparedFileFollowUp("cancelled")).toBe("done");
+    expect(preparedFileFollowUp("shared")).toBe("done");
+  });
+
+  it("shows the ready preview when the post-fetch share cannot run", () => {
+    expect(preparedFileFollowUp("unavailable")).toBe("preview");
+  });
+
   it("returns unavailable in the click turn when the browser cannot share files", () => {
     install({ userAgent: "Mozilla/5.0 (X11; Linux x86_64) Firefox" });
     const outcome = beginFileShare({
