@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/JsonLd";
 import { PublicFooter } from "@/components/PublicFooter";
+import { PublicHeader } from "@/components/PublicHeader";
 import {
   SITE_DESCRIPTION,
   canonical,
@@ -44,45 +45,7 @@ export default function AboutPage() {
         })}
       />
 
-      {/* Header */}
-      <header
-        style={{
-          borderBottom: "1px solid #eee",
-          padding: "16px 24px",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1080,
-            margin: "0 auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Link href="/about">
-            <img src="/notho-logo.png" alt="Notho" style={{ height: 40, width: "auto" }} />
-          </Link>
-          <nav style={{ display: "flex", gap: 24, alignItems: "center", fontSize: 14 }}>
-            <Link href="/financial-literacy" style={{ color: ink, textDecoration: "none" }}>Learn</Link>
-            <Link href="/investment-calculator" style={{ color: ink, textDecoration: "none" }}>Calculate</Link>
-            <Link href="/budgeting" style={{ color: ink, textDecoration: "none" }}>Budget</Link>
-            <Link
-              href="/learn"
-              style={{
-                background: teal,
-                color: "#fff",
-                textDecoration: "none",
-                padding: "8px 16px",
-                borderRadius: 6,
-                fontWeight: 700,
-              }}
-            >
-              Open Notho
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Hero */}
       <section
