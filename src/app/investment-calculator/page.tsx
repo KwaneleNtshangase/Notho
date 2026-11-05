@@ -4,7 +4,7 @@ import Link from "next/link";
 import { PublicGuide, guideStyles } from "@/components/PublicGuide";
 import { canonical } from "@/lib/seo";
 
-const title = "Investment calculator in rand";
+const title = "Investment calculator";
 const description =
   "Use Notho's South African investment calculator to project contributions, withdrawals, fees and inflation, including TFSA, retirement annuity and living-annuity wrappers. Educational estimates only.";
 
@@ -45,7 +45,7 @@ export default function InvestmentCalculatorPage() {
       title={title}
       path="/investment-calculator"
       description={description}
-      lede="If you want an investment calculator that speaks rand and South African wrappers, use Notho Calculate. It is a planning sketch, not a product quote."
+      lede="If you want an investment calculator for South African wrappers, use Notho Calculate. It is a planning sketch, not a product quote."
       faqs={faqs}
     >
       <h2 style={h2}><I18nText source={"What the calculator does"} /></h2>

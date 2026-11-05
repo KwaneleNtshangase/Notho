@@ -80,16 +80,24 @@ export function PublicFooter() {
           padding: "0 24px 24px",
           display: "flex",
           flexWrap: "wrap",
-          gap: 16,
-          fontSize: 14,
+          gap: 14,
+          alignItems: "center",
         }}
       >
-        <a href="https://youtube.com/@nothoapp" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">YouTube</a>
-        <a href="https://www.instagram.com/notho.app" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">Instagram</a>
-        <a href="https://www.tiktok.com/@notho.app" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">TikTok</a>
-        <a href="https://www.facebook.com/share/1MPnpmmwgk/" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">Facebook</a>
-        <a href="https://www.threads.com/@notho.app" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">Threads</a>
-        <a href="https://www.linkedin.com/company/notho-za" style={{ color: "#888", textDecoration: "none" }} target="_blank" rel="noreferrer">LinkedIn</a>
+        {[
+          { href: "https://youtube.com/@nothoapp", label: "YouTube", path: "M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.8 15.5v-7l6.2 3.5-6.2 3.5z" },
+          { href: "https://www.instagram.com/notho.app", label: "Instagram", path: "M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.3 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .3-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.3-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.3 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1 .1-1.6.2-1.9.3-.5.2-.8.4-1.1.7-.3.3-.5.6-.7 1.1-.1.3-.2.9-.3 1.9-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c.1 1 .2 1.6.3 1.9.2.5.4.8.7 1.1.3.3.6.5 1.1.7.3.1.9.2 1.9.3 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1-.1 1.6-.2 1.9-.3.5-.2.8-.4 1.1-.7.3-.3.5-.6.7-1.1.1-.3.2-.9.3-1.9.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1-.2-1.6-.3-1.9-.2-.5-.4-.8-.7-1.1-.3-.3-.6-.5-1.1-.7-.3-.1-.9-.2-1.9-.3-1.2-.1-1.6-.1-4.7-.1zm0 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8zm0 1.8a3.1 3.1 0 1 0 0 6.2 3.1 3.1 0 0 0 0-6.2zm6.4-2.3a1.1 1.1 0 1 1-2.3 0 1.1 1.1 0 0 1 2.3 0z" },
+          { href: "https://www.tiktok.com/@notho.app", label: "TikTok", path: "M19.6 6.3a6.5 6.5 0 0 1-3.8-1.2v8.4a5.5 5.5 0 1 1-4.7-5.4v2.7a2.8 2.8 0 1 0 1.9 2.7V2h2.8a6.5 6.5 0 0 0 3.8 3.3v1z" },
+          { href: "https://www.facebook.com/share/1MPnpmmwgk/", label: "Facebook", path: "M14 8h3V4h-3c-2.8 0-5 2.2-5 5v2H6v4h3v9h4v-9h3l1-4h-4V9c0-.6.4-1 1-1z" },
+          { href: "https://www.threads.com/@notho.app", label: "Threads", path: "M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm3.2 11.2c-.3 2.4-1.8 3.9-4.1 4.1-1.5.1-2.9-.3-3.9-1.2l1.2-1.3c.7.6 1.6.9 2.6.8 1.4-.1 2.3-1 2.5-2.4-.4.2-.9.3-1.4.3-2.2 0-3.7-1.6-3.7-3.6 0-2.1 1.5-3.6 3.6-3.6 1.1 0 2 .4 2.6 1.1.5-.3 1.1-.5 1.7-.5h.6l-.4 1.5h-.5c-.4 0-.7.1-1 .3.2.5.3 1 .3 1.5 0 .2 0 .4-.1.6 1.1.1 1.9.6 2.1 1.4z" },
+          { href: "https://www.linkedin.com/company/notho-za", label: "LinkedIn", path: "M6.5 9H3.7v11.5h2.8V9zM5.1 3.5A1.6 1.6 0 1 0 5.1 6.7 1.6 1.6 0 0 0 5.1 3.5zM20.3 13.3c0-3.1-1.7-4.6-3.9-4.6-1.8 0-2.6 1-3.1 1.7V9H10.5c0 1.5 0 11.5 0 11.5h2.8v-6.4c0-.3 0-.7.1-1 .3-.7.9-1.4 2-1.4 1.4 0 2 1.1 2 2.6v6.2H20.3v-6.2z" },
+        ].map((s) => (
+          <a key={s.label} href={s.href} aria-label={s.label} title={s.label} target="_blank" rel="noreferrer" style={{ color: "#888", display: "inline-flex" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d={s.path} />
+            </svg>
+          </a>
+        ))}
       </div>
       <div
         style={{
