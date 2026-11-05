@@ -1,8 +1,8 @@
 "use client";
 import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Brain, CheckCircle2, X } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Brain, X } from "lucide-react";
 import { playSound as defaultPlaySound } from "@/app/pageViews.types";
 import { CONCEPTS, type Concept, type ReviewCard } from "@/data/concepts";
 import { promptForReview, reviewPromptsFor } from "@/lib/reviewCards";
@@ -16,7 +16,90 @@ import {
 import { useReviewCompletion, NOT_COUNTED, type ReviewOutcome } from "@/hooks/useReviewCompletion";
 
 const REVIEW_SESSION_KEY = "notho-review-session";
-const OPTION_LETTERS = ["A", "B", "C", "D"];
+
+/** Same sticky chrome as the lesson player header. */
+const reviewHeaderStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  marginBottom: 8,
+  position: "sticky",
+  top: 0,
+  zIndex: 50,
+  background: "var(--color-bg)",
+  paddingTop: 8,
+  paddingBottom: 8,
+  marginTop: -8,
+};
+
+const reviewCloseStyle: CSSProperties = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  padding: "4px 2px",
+  color: "var(--color-text-secondary)",
+  flexShrink: 0,
+  display: "flex",
+  alignItems: "center",
+};
+
+function ReviewShell({
+  onClose,
+  progress,
+  countLabel,
+  children,
+}: {
+  onClose: () => void;
+  progress: number;
+  countLabel?: ReactNode;
+  children: ReactNode;
+}) {
+  const clamped = Math.max(0, Math.min(100, progress));
+  return (
+    <main className="review-session-screen">
+      <div className="lesson-player">
+        <div style={reviewHeaderStyle}>
+          <I18nElement
+            as="button"
+            type="button"
+            onClick={onClose}
+            style={reviewCloseStyle}
+            aria-label="Close review"
+          >
+            <X size={22} />
+          </I18nElement>
+          <I18nElement
+            as="div"
+            className="lesson-progress-bar"
+            style={{ flex: 1, margin: 0 }}
+            role="progressbar"
+            aria-valuenow={Math.round(clamped)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Review progress"
+          >
+            <div className="lesson-progress-fill" style={{ width: `${clamped}%` }} />
+          </I18nElement>
+          {countLabel}
+        </div>
+        <div className="lesson-step">{children}</div>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "8px 16px 12px",
+            color: "var(--color-text-secondary)",
+            fontSize: 11,
+            opacity: 0.75,
+            borderTop: "1px solid var(--color-border)",
+            marginTop: 4,
+          }}
+        >
+          <I18nText source={"Education only. Not financial advice."} />
+        </div>
+      </div>
+    </main>
+  );
+}
 
 type SavedReview = {
   queue: MasteryRecord[];
@@ -225,46 +308,57 @@ export function ReviewSession({
 
   if (loading || !hasLoaded) {
     return (
-      <main className="review-session-screen">
-        <div className="review-session-result">
-          <p><I18nText source={"Loading review..."} /></p>
-        </div>
-      </main>
+      <ReviewShell onClose={onClose} progress={0}>
+        <p className="step-content" style={{ marginBottom: 0 }}>
+          <I18nText source={"Loading review..."} />
+        </p>
+      </ReviewShell>
     );
   }
 
   if (queue.length === 0) {
     return (
-      <main className="review-session-screen">
-        <div className="review-session-result">
-          <Brain size={48} aria-hidden style={{ color: "var(--color-primary)" }} />
-          <h2><I18nText source={"Review"} /></h2>
-          <p><I18nText source={"Nothing due for review. Come back tomorrow to keep your streak strong."} /></p>
-          <button type="button" className="btn btn-primary" onClick={onClose}>
-            <I18nText source={"Back to Learn"} />
-          </button>
+      <ReviewShell onClose={onClose} progress={0}>
+        <div style={{ textAlign: "center" }}>
+          <Brain size={48} aria-hidden style={{ color: "var(--color-primary)", display: "block", margin: "0 auto 12px" }} />
+          <h2 className="step-title"><I18nText source={"Review"} /></h2>
+          <p className="step-content">
+            <I18nText source={"Nothing due for review. Come back tomorrow to keep your streak strong."} />
+          </p>
+          <div className="lesson-actions">
+            <button type="button" className="btn btn-primary" onClick={onClose}>
+              <I18nText source={"Back to Learn"} />
+            </button>
+          </div>
         </div>
-      </main>
+      </ReviewShell>
     );
   }
 
   if (isDone) {
     const score = Math.round((correctCount / queue.length) * 100);
     return (
-      <main className="review-session-screen">
-        <div className="review-session-result">
-          <Brain size={52} aria-hidden style={{ color: "var(--color-primary)" }} />
-          <h2><I18nText source={"Review complete!"} /></h2>
-          <p><I18nText source={"{value0} of {value1} correct"} values={[correctCount, queue.length]} /></p>
+      <ReviewShell onClose={onClose} progress={100}>
+        <div style={{ textAlign: "center" }}>
+          <Brain size={52} aria-hidden style={{ color: "var(--color-primary)", display: "block", margin: "0 auto 12px" }} />
+          <h2 className="step-title"><I18nText source={"Review complete!"} /></h2>
+          <p className="step-content" style={{ marginBottom: 8 }}>
+            <I18nText source={"{value0} of {value1} correct"} values={[correctCount, queue.length]} />
+          </p>
           {outcome.counted && outcome.xpAwarded > 0 && (
-            <p className="review-xp"><I18nText source={"+{value0} XP · Streak kept"} values={[outcome.xpAwarded]} /></p>
+            <p className="review-xp step-content" style={{ marginBottom: 8 }}>
+              <I18nText source={"+{value0} XP · Streak kept"} values={[outcome.xpAwarded]} />
+            </p>
           )}
           {outcome.counted && outcome.alreadyCountedToday && (
-            <p><I18nText source={"Streak kept · today's review was already counted"} /></p>
+            <p className="step-content" style={{ marginBottom: 8 }}>
+              <I18nText source={"Streak kept · today's review was already counted"} />
+            </p>
           )}
           <I18nElement
             as="div"
-            className="lesson-progress-bar review-score-track"
+            className="lesson-progress-bar"
+            style={{ margin: "8px 0 16px" }}
             role="progressbar"
             aria-valuenow={score}
             aria-valuemin={0}
@@ -273,115 +367,93 @@ export function ReviewSession({
           >
             <div className="lesson-progress-fill" style={{ width: `${score}%`, background: "var(--color-success)" }} />
           </I18nElement>
-          <p>
+          <p className="step-content">
             <I18nText>
               {outcome.counted
                 ? "Cards are rescheduled. Keep it up daily to master your finances!"
                 : `Cards are rescheduled. ${outcome.cardsRequired} cards in one session keep your streak going — this one was ${queue.length}.`}
             </I18nText>
           </p>
-          <button type="button" className="btn btn-primary" onClick={onClose}>
-            <I18nText source={"Done"} />
-          </button>
+          <div className="lesson-actions">
+            <button type="button" className="btn btn-primary" onClick={onClose}>
+              <I18nText source={"Done"} />
+            </button>
+          </div>
         </div>
-      </main>
+      </ReviewShell>
     );
   }
 
   if (!concept || !card || !shuffled) return null;
 
-  const progress = Math.round((currentIdx / queue.length) * 100);
+  const progress = ((currentIdx + 1) / queue.length) * 100;
+  const answeredCorrectly = selected === correctIdx;
 
   return (
-    <main className="review-session-screen">
-      <div className="review-session-header">
-        <I18nElement
-          as="button"
-          type="button"
-          onClick={onClose}
-          className="review-icon-btn"
-          aria-label="Close review"
+    <ReviewShell
+      onClose={onClose}
+      progress={progress}
+      countLabel={
+        <span
+          style={{
+            flexShrink: 0,
+            fontWeight: 800,
+            fontSize: 14,
+            color: "var(--color-text-secondary)",
+            fontVariantNumeric: "tabular-nums",
+          }}
         >
-          <X size={22} />
-        </I18nElement>
-        <I18nElement
-          as="div"
-          className="lesson-progress-bar"
-          style={{ flex: 1, margin: 0 }}
-          role="progressbar"
-          aria-valuenow={progress}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label="Review progress"
-        >
-          <div className="lesson-progress-fill" style={{ width: `${progress}%` }} />
-        </I18nElement>
-        <span className="review-count">
           <I18nText>{currentIdx + 1}</I18nText>
           {" / "}
           <I18nText>{queue.length}</I18nText>
         </span>
+      }
+    >
+      <h2 className="step-title">
+        <I18nText>{card.question}</I18nText>
+      </h2>
+      <div className="flex flex-col gap-3 my-4">
+        {shuffled.options.map((opt, index) => {
+          const isSelected = selected === index;
+          const isCorrect = index === correctIdx;
+          return (
+            <button
+              key={`${card.question}:${index}`}
+              type="button"
+              disabled={selected !== null}
+              onClick={() => handleAnswer(index)}
+              className={`option-button w-full text-left p-5 mb-3 rounded-2xl border-2 transition-all ${
+                selected !== null
+                  ? isCorrect
+                    ? "correct font-bold"
+                    : isSelected
+                      ? "incorrect font-bold"
+                      : "not-chosen"
+                  : "font-medium"
+              }`}
+            >
+              <I18nText>{opt}</I18nText>
+            </button>
+          );
+        })}
       </div>
-
-      <div className="review-session-body">
-        <div className="review-card">
-          <div className="review-kicker">
-            <Brain size={14} aria-hidden />
-            <span><I18nText>{concept.category}</I18nText></span>
-          </div>
-          <h2 className="review-question"><I18nText>{card.question}</I18nText></h2>
-          <div className="review-options">
-            {shuffled.options.map((opt, index) => {
-              const isSelected = selected === index;
-              const isCorrect = index === correctIdx;
-              let state = "";
-              if (selected !== null) {
-                if (isCorrect) state = "correct";
-                else if (isSelected) state = "incorrect";
-                else state = "not-chosen";
-              }
-              return (
-                <button
-                  key={`${card.question}:${index}`}
-                  type="button"
-                  disabled={selected !== null}
-                  onClick={() => handleAnswer(index)}
-                  className={state ? `option-button ${state}` : "option-button"}
-                >
-                  <span className="review-option-letter" aria-hidden>
-                    <I18nText>{OPTION_LETTERS[index] ?? String(index + 1)}</I18nText>
-                  </span>
-                  <span style={{ flex: 1 }}><I18nText>{opt}</I18nText></span>
-                  {selected !== null && isCorrect && (
-                    <CheckCircle2 size={18} aria-hidden style={{ flexShrink: 0 }} />
-                  )}
-                  {isSelected && !isCorrect && (
-                    <X size={18} aria-hidden style={{ flexShrink: 0 }} />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          {showExplanation && (
-            <div className={`feedback ${selected === correctIdx ? "correct" : "incorrect"}`}>
-              <p style={{ margin: "0 0 6px" }}>
-                <I18nText>{selected === correctIdx ? "✓ Correct!" : "Not quite"}</I18nText>
-              </p>
-              <p style={{ margin: 0, fontWeight: 500 }}>
+      {showExplanation && (
+        <>
+          <div className={`feedback ${answeredCorrectly ? "correct" : "incorrect"}`}>
+            <I18nText>{answeredCorrectly ? "✓ Correct!" : "Not quite"}</I18nText>
+            {card.explanation ? (
+              <div style={{ marginTop: 8, fontWeight: 500 }}>
                 <I18nText>{card.explanation}</I18nText>
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {selected !== null && (
-        <div className="review-session-footer">
-          <button type="button" className="btn btn-primary" onClick={handleNext}>
-            <I18nText>{currentIdx + 1 >= queue.length ? "See Results" : "Next →"}</I18nText>
-          </button>
-        </div>
+              </div>
+            ) : null}
+          </div>
+          <div className="lesson-actions">
+            <button type="button" className="btn btn-primary" onClick={handleNext}>
+              <I18nText>{currentIdx + 1 >= queue.length ? "See Results" : "Continue"}</I18nText>
+            </button>
+          </div>
+        </>
       )}
-    </main>
+    </ReviewShell>
   );
 }
