@@ -1,14 +1,11 @@
 "use client";
 import { localizeClientString } from "@/i18n/clientString";
-import { LocalizedText as I18nText } from "@/i18n/LocalizedText";
+import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
-import { analytics } from "@/lib/analytics";
-import { markSharedToday } from "@/lib/dailyChallengeFlags";
 import { duoCardCopy } from "@/lib/duoShareCard";
-import { isIosNative } from "@/lib/capacitorPlatform";
-import { isShareCancel, shareNativeFile } from "@/lib/nativeShare";
+import { shareTextNow, startDuoShare } from "@/lib/shareHandoff";
 import { generateShareText } from "@/app/pageViews.types";
 
 export type ShareCardData =
@@ -182,67 +179,35 @@ async function blobFromCard(data: ShareCardData): Promise<Blob> {
   return (await fetch(dataUrl)).blob();
 }
 
-async function shareTextFallback(data: ShareCardData, text: string): Promise<"shared" | "cancelled" | "failed"> {
-  const shareType = data.type === "calculator" ? "badge" : data.type;
-  if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-    try {
-      await navigator.share({ title: "Notho", text, url: "https://www.notho.co.za" });
-      analytics.shareTriggered(shareType, "native");
-      markSharedToday();
-      return "shared";
-    } catch (err) {
-      if (isShareCancel(err)) return "cancelled";
-    }
-  }
-  if (typeof window !== "undefined") {
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
-    analytics.shareTriggered(shareType, "whatsapp");
-    markSharedToday();
-    return "shared";
-  }
-  return "failed";
-}
-
-export async function shareDuoCard(data: ShareCardData): Promise<"shared" | "cancelled" | "downloaded" | "failed"> {
+/**
+ * Not async on purpose. On Android, Huawei, web, and desktop the text sheet
+ * or WhatsApp window has to open inside this call, before the first await.
+ * The image card stays iPhone-app only.
+ */
+export function shareDuoCard(data: ShareCardData): Promise<"shared" | "cancelled" | "downloaded" | "failed"> {
   const text = shareCaption(data);
   const shareType = data.type === "calculator" ? "badge" : data.type;
-  try {
-    // Image sheet is iPhone-only. Android, Huawei, web, and desktop keep text share.
-    if (await isIosNative()) {
-      const blob = await blobFromCard(data);
-      const fileName = data.type === "streak" ? "notho-streak.png" : "notho-lesson.png";
-      const native = await shareNativeFile({
-        blob,
-        fileName,
-        title: "Notho",
-        text,
-        dialogTitle: "Share",
-      });
-      if (native === "shared") {
-        analytics.shareTriggered(shareType, "native");
-        markSharedToday();
-        return "shared";
-      }
-      if (native === "cancelled") return "cancelled";
-    }
-    return shareTextFallback(data, text);
-  } catch {
-    return "failed";
-  }
+  return startDuoShare({
+    text,
+    shareType,
+    fileName: data.type === "streak" ? "notho-streak.png" : "notho-lesson.png",
+    createBlob: () => blobFromCard(data),
+  });
 }
 
 export function ShareResultButton({ data, label = "Share" }: { data: ShareCardData; label?: string }) {
   const [sharing, setSharing] = useState(false);
   const [status, setStatus] = useState<"idle" | "done" | "error">("idle");
 
-  const handleShare = async () => {
+  const handleShare = () => {
     setSharing(true);
     setStatus("idle");
-    const result = await shareDuoCard(data);
-    setSharing(false);
-    if (result === "cancelled") return;
-    setStatus(result === "failed" ? "error" : "done");
-    window.setTimeout(() => setStatus("idle"), 2500);
+    void shareDuoCard(data).then((result) => {
+      setSharing(false);
+      if (result === "cancelled") return;
+      setStatus(result === "failed" ? "error" : "done");
+      window.setTimeout(() => setStatus("idle"), 2500);
+    });
   };
 
   return (
@@ -276,35 +241,69 @@ export function ShareButton({
   label?: string;
   shareType?: "lesson" | "badge" | "streak";
 }) {
-  const handleShare = async () => {
-    const method =
-      typeof navigator !== "undefined" && typeof navigator.share === "function"
-        ? "native"
-        : "whatsapp";
-    if (shareType) analytics.shareTriggered(shareType, method);
-    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-      try {
-        await navigator.share({ text });
-        markSharedToday();
-        return;
-      } catch {
-        /* dismissed or unavailable */
-      }
-    }
-    const encoded = encodeURIComponent(text);
-    window.open(`https://wa.me/?text=${encoded}`, "_blank", "noopener,noreferrer");
-    markSharedToday();
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState<"idle" | "done" | "error">("idle");
+
+  const handleShare = () => {
+    if (busy) return;
+    setBusy(true);
+    setStatus("idle");
+    void shareTextNow({ text, shareType }).then((result) => {
+      setBusy(false);
+      if (result === "cancelled") return;
+      setStatus(result === "failed" ? "error" : "done");
+      window.setTimeout(() => setStatus("idle"), 2500);
+    });
   };
+
+  const shown = status === "done" ? "Shared" : status === "error" ? "Try again" : label;
 
   return (
     <button
       type="button"
       onClick={handleShare}
-      className="flex w-full items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 py-3 text-sm font-semibold text-green-700 transition-colors hover:bg-green-100 dark:border-green-700 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
+      disabled={busy}
+      aria-live="polite"
+      className="flex w-full items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 py-3 text-sm font-semibold text-green-700 transition-colors hover:bg-green-100 disabled:cursor-default dark:border-green-700 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
+      style={status === "error" ? { borderColor: "rgba(224,60,49,0.45)", color: "#E03C31" } : undefined}
     >
       <Share2 size={16} className="shrink-0" aria-hidden />
-      <span><I18nText>{label}</I18nText></span>
+      <span><I18nText>{shown}</I18nText></span>
     </button>
+  );
+}
+
+export function StreakShareButton({
+  streakDays,
+  className,
+  style,
+}: {
+  streakDays: number;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <I18nElement
+      as="button"
+      type="button"
+      onClick={() => {
+        setFailed(false);
+        void shareDuoCard({ type: "streak", streakDays }).then((result) => {
+          if (result !== "failed") return;
+          setFailed(true);
+          window.setTimeout(() => setFailed(false), 2500);
+        });
+      }}
+      className={className}
+      style={failed ? { ...style, color: "#E03C31" } : style}
+      title={failed ? "Couldn't share. Try again." : "Share your streak"}
+      aria-label={failed ? "Couldn't share. Try again." : "Share your streak"}
+    >
+      <Share2 size={18} aria-hidden />
+      {failed ? <span style={{ fontSize: 11, fontWeight: 700, marginLeft: 4 }}><I18nText>Try again</I18nText></span> : null}
+    </I18nElement>
   );
 }
 

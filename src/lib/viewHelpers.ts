@@ -4,10 +4,8 @@
 import { localizeClientString } from "@/i18n/clientString";
 import React from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { analytics } from "@/lib/analytics";
 import { CONTENT_DATA } from "@/data/content";
 import {
-  Share2,
   CreditCard,
   Shield,
   TrendingUp,
@@ -179,45 +177,6 @@ export function generateShareText(
   return "";
 }
 
-export function ShareButton({
-  text,
-  label = "Share",
-  shareType,
-}: {
-  text: string;
-  label?: string;
-  shareType?: "lesson" | "badge" | "streak";
-}) {
-  const handleShare = async () => {
-    const method =
-      typeof navigator !== "undefined" && typeof navigator.share === "function"
-        ? "native"
-        : "whatsapp";
-    if (shareType) analytics.shareTriggered(shareType, method);
-    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-      try {
-        await navigator.share({ text });
-        return;
-      } catch {
-        /* dismissed or unavailable */
-      }
-    }
-    const encoded = encodeURIComponent(text);
-    window.open(`https://wa.me/?text=${encoded}`, "_blank", "noopener,noreferrer");
-  };
-
-  return (
-    React.createElement("button", {
-      type: "button",
-      onClick: handleShare,
-      className: "flex w-full items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 py-3 text-sm font-semibold text-green-700 transition-colors hover:bg-green-100 dark:border-green-700 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40",
-    },
-      React.createElement(Share2, { size: 16, className: "shrink-0", "aria-hidden": true }),
-      React.createElement("span", null, label)
-    )
-  );
-}
-
 export async function persistUserGoalToStorageAndSupabase(goalId: string, goalDescription?: string) {
   if (typeof window === "undefined") return;
   localStorage.setItem("notho-user-goal", goalId);
@@ -274,7 +233,7 @@ export type Route =
 
 export type { CalcInputs } from "@/lib/calculators";
 export { calcGrowth } from "@/lib/calculators";
-export { ShareResultButton, generateShareCard } from "@/components/ShareCard";
+export { ShareButton, ShareResultButton, generateShareCard } from "@/components/ShareCard";
 
 export function formatWithSpaces(value: number) {
   if (!isFinite(value) || isNaN(value)) return "0";

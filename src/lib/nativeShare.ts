@@ -90,6 +90,28 @@ export async function shareNativeFile(opts: {
   }
 }
 
+/** Text-only native sheet. Used when the iOS image file could not be written. */
+export async function shareNativeText(opts: {
+  title?: string;
+  text?: string;
+  url?: string;
+  dialogTitle?: string;
+}): Promise<"shared" | "cancelled" | "unavailable"> {
+  try {
+    const { Share } = await import("@capacitor/share");
+    await Share.share({
+      title: opts.title,
+      text: opts.text,
+      url: opts.url,
+      dialogTitle: opts.dialogTitle,
+    });
+    return "shared";
+  } catch (err) {
+    if (isShareCancel(err)) return "cancelled";
+    return "unavailable";
+  }
+}
+
 /**
  * Hand a locally-generated file (e.g. the budget report PDF) to the native
  * share sheet. @capacitor/share can't share a Blob directly - it only takes

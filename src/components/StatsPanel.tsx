@@ -2,12 +2,11 @@
 import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
 import { useState } from "react";
-import { Share2 } from "@/components/icons/NothoIcons";
 import { NothoStreak, NothoHeart, NothoLevel, NothoXP, NothoFreeze } from "@/components/icons/NothoIcons";
 import { streakExtendedToday } from "@/lib/dates";
 import { formatWithSpaces } from "@/lib/formatters";
 import { type UserData } from "@/app/pageViews.types";
-import { shareDuoCard } from "@/components/ShareCard";
+import { StreakShareButton } from "@/components/ShareCard";
 import { StreakFreezeBody } from "@/components/StreakFreezeControl";
 import type { FreezePurchase } from "@/lib/streakFreeze";
 
@@ -62,18 +61,11 @@ export function StatsPanel({
               <I18nText>{userData.streak}</I18nText>
             </div>
           </div>
-          <I18nElement as="button"
-            type="button"
-            onClick={() => {
-              void shareDuoCard({ type: "streak", streakDays: userData.streak });
-            }}
+          <StreakShareButton
+            streakDays={userData.streak}
             className="text-orange-400 hover:text-orange-600"
-            title="Share your streak"
-            aria-label="Share your streak"
             style={{ background: "none", border: "none", cursor: "pointer", padding: 4, flexShrink: 0 }}
-          >
-            <Share2 size={18} aria-hidden />
-          </I18nElement>
+          />
         </div>
 
         <div className="stat-item">
