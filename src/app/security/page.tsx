@@ -5,6 +5,8 @@ import { LocalizedRichText as I18nRich, LocalizedText as I18nText } from "@/i18n
 
 import React, { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 /**
  * Public "Your data & security" page. Explains how we handle data (plain
