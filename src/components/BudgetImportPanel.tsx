@@ -1,7 +1,7 @@
 "use client";
 import { LocalizedRichText as I18nRich, LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i18n/LocalizedText";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, ArrowLeftRight, CheckCircle2, FileUp, Plus, Shield, Upload, X } from "@/components/icons/NothoIcons";
 import { supabase } from "@/lib/supabaseClient";
 import { formatRand } from "@/lib/viewHelpers";
@@ -116,14 +116,26 @@ function validateIncomingFiles(incoming: File[]): { files: File[] } | { error: s
   return { files: incoming };
 }
 
-export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
-  const [open, setOpen] = useState(false);
+/** Opens the preview directly. Used by regression tests with synthetic statements. */
+export type BudgetImportPreviewSeed = {
+  metas: FileMeta[];
+  rows: PreviewRow[];
+};
+
+export function BudgetImportPanel({
+  onImported,
+  previewSeed,
+}: {
+  onImported: () => void;
+  previewSeed?: BudgetImportPreviewSeed;
+}) {
+  const [open, setOpen] = useState(Boolean(previewSeed));
   const [consent, setConsent] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
-  const [fileMetas, setFileMetas] = useState<FileMeta[]>([]);
+  const [fileMetas, setFileMetas] = useState<FileMeta[]>(previewSeed?.metas ?? []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [rows, setRows] = useState<PreviewRow[]>([]);
+  const [rows, setRows] = useState<PreviewRow[]>(previewSeed?.rows ?? []);
   const [committing, setCommitting] = useState(false);
   const [pdfPassword, setPdfPassword] = useState("");
   const [needsPasswordFile, setNeedsPasswordFile] = useState<string | null>(null);
@@ -134,6 +146,8 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
   const [narrow, setNarrow] = useState(true);
+  const busyRef = useRef(false);
+  busyRef.current = loading || committing;
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 720px)");
@@ -143,11 +157,14 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
     return () => mq.removeEventListener("change", apply);
   }, []);
 
-  // Escape closes the import dialog (unless a parse/import is mid-flight)
+  // Lock the page behind the sheet for as long as it is open. Parse/commit
+  // must not re-run this effect: saving and restoring overflow mid-flight
+  // drops the lock, and a second lock then restores "hidden" after close.
+  // Escape still waits until a parse or import finishes.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !loading && !committing) setOpen(false);
+      if (e.key === "Escape" && !busyRef.current) setOpen(false);
     };
     window.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
@@ -159,7 +176,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
       document.body.style.overflow = prevOverflow;
       document.body.style.touchAction = prevTouch;
     };
-  }, [open, loading, committing]);
+  }, [open]);
 
   const loadCustomCategories = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -786,7 +803,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
         <div style={{ flexShrink: 0, padding: rows.length > 0 ? "20px 20px 0" : "24px 20px 0" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: rows.length > 0 ? 12 : 16 }}>
             <h3 style={{ fontWeight: 900, fontSize: 18 }}><I18nText source={"Import bank statement(s)"} /></h3>
-            <button type="button" onClick={() => { setOpen(false); reset(); }} style={{ background: "none", border: "none", cursor: "pointer" }}>
+            <button type="button" aria-label="Close import" onClick={() => { setOpen(false); reset(); }} style={{ background: "none", border: "none", cursor: "pointer" }}>
               <X size={20} />
             </button>
           </div>
@@ -942,7 +959,23 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
           </div>
         ) : (
           <>
-            <div style={{ flexShrink: 0, padding: "0 20px 12px" }}>
+            {/* Banners, transfer pairs and account rows share one scrollport.
+                Transfer confirmation only appears for 2+ accounts. Pinning it
+                (and the per-file banners) above the list let that block grow
+                past 92vh, collapsed the list to 0 height, and hid Back/Import
+                because the sheet itself is overflow:hidden. */}
+            <div
+              data-import-scroll=""
+              style={{
+                flex: 1,
+                minHeight: 0,
+                overflow: "auto",
+                WebkitOverflowScrolling: "touch",
+                touchAction: "pan-y",
+                overscrollBehavior: "contain",
+              }}
+            >
+            <div style={{ padding: "0 20px 12px" }}>
               {fileMetas.map((meta) => (
                 meta.reconciliation?.ok ? (
                   <div key={`${meta.fileName}-ok`} style={{ background: "rgba(0,122,133,0.08)", border: "1px solid rgba(0,122,133,0.25)", borderRadius: 10, padding: 12, marginBottom: 8, fontSize: 13 }}>
@@ -972,7 +1005,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
               <p style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 0, lineHeight: 1.5 }}><I18nRich source={"Edit a category below and tick <strong0>Remember</strong0>  to apply it to matching rows in this import and teach future imports."} elements={[<strong key="inline-0" />]} /></p>
             </div>
 
-            <div style={{ flexShrink: 0, padding: "8px 20px 0" }}>
+            <div style={{ padding: "8px 20px 0" }}>
 
             {transferPairs.length > 0 && (
               <div style={{ background: "rgba(0,122,133,0.06)", border: "1px solid rgba(0,122,133,0.25)", borderRadius: 10, padding: 14, marginBottom: 16 }}>
@@ -1009,7 +1042,9 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
             {!narrow && (
             <div
               style={{
-                flexShrink: 0,
+                position: "sticky",
+                top: 0,
+                zIndex: 2,
                 display: "grid",
                 gridTemplateColumns: "88px minmax(0,1fr) 96px 168px 72px",
                 gap: 0,
@@ -1029,7 +1064,7 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
             </div>
             )}
 
-            <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "0 20px 8px", WebkitOverflowScrolling: "touch" }}>
+            <div style={{ padding: "0 20px 8px" }}>
 
             {[...groupedByFile.entries()].map(([fileName, fileRows]) => {
               const meta = fileMetas.find((m) => m.fileName === fileName);
@@ -1198,8 +1233,9 @@ export function BudgetImportPanel({ onImported }: { onImported: () => void }) {
 
             {error && <p style={{ color: "#E03C31", fontSize: 13, marginBottom: 12 }}><I18nText>{error}</I18nText></p>}
             </div>
+            </div>
 
-            <div style={{
+            <div data-import-actions="" style={{
               flexShrink: 0,
               background: "var(--color-surface)",
               borderTop: "1px solid var(--color-border)",
