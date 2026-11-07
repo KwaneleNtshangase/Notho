@@ -25,8 +25,9 @@ export function speechText(text: string, locale: Locale): string {
 
   // Normalise South African Rand amounts for speech so TTS reads them as
   // "900000 rands" instead of "R 900000" (especially with space/NBSP grouping).
-  // Matches R followed by digits, spaces, NBSP, commas or periods (decimals).
-  out = out.replace(/\bR\s*([\d\s\u00A0,.]+)/gi, (_, digits) => {
+  // Digit group stops at the last number character so following text keeps its space
+  // ("R900 000 per year" → "900000 rands per year").
+  out = out.replace(/\bR\s*([\d\u00A0,.]+(?:\s[\d\u00A0,.]+)*)/gi, (_, digits) => {
     const cleaned = digits.replace(/[\s\u00A0,]/g, '').replace(/\.+$/, '');
     if (!cleaned || !/^\d+(\.\d+)?$/.test(cleaned)) return `R${digits}`;
     const num = cleaned.includes('.') ? cleaned : cleaned.replace(/^0+/, '') || '0';
