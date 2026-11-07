@@ -21,5 +21,17 @@ export function preferredVoice(voices: readonly SpeechSynthesisVoice[], locale: 
 // Speech-only pronunciation hint requested by the brand owner. Native Nguni
 // voices retain the original spelling; other voices use the approximate “Notto”.
 export function speechText(text: string, locale: Locale): string {
-  return ['nr', 'xh', 'zu', 'ss'].includes(locale) ? text : text.replace(/\bNotho\b/gi, 'Notto');
+  let out = ['nr', 'xh', 'zu', 'ss'].includes(locale) ? text : text.replace(/\bNotho\b/gi, 'Notto');
+
+  // Normalise South African Rand amounts for speech so TTS reads them as
+  // "900000 rands" instead of "R 900000" (especially with space/NBSP grouping).
+  // Matches R followed by digits, spaces, NBSP, commas or periods (decimals).
+  out = out.replace(/\bR\s*([\d\s\u00A0,.]+)/gi, (_, digits) => {
+    const cleaned = digits.replace(/[\s\u00A0,]/g, '').replace(/\.+$/, '');
+    if (!cleaned || !/^\d+(\.\d+)?$/.test(cleaned)) return `R${digits}`;
+    const num = cleaned.includes('.') ? cleaned : cleaned.replace(/^0+/, '') || '0';
+    return `${num} rands`;
+  });
+
+  return out;
 }
