@@ -17,6 +17,14 @@ import { useReviewCompletion, NOT_COUNTED, type ReviewOutcome } from "@/hooks/us
 
 const REVIEW_SESSION_KEY = "notho-review-session";
 
+/** Strip leading "Right." / "Yes." / "Correct." etc. so the feedback header is not repeated. */
+function cleanExplanation(text: string): string {
+  return text
+    .replace(/^(Right|Yes|Correct|That's right|Exactly|Correct,|That's correct)\b[.,:]?\s*/i, "")
+    .trim();
+}
+
+
 /** Same sticky chrome as the lesson player header. */
 const reviewHeaderStyle: CSSProperties = {
   display: "flex",
@@ -347,12 +355,12 @@ export function ReviewSession({
           </p>
           {outcome.counted && outcome.xpAwarded > 0 && (
             <p className="review-xp step-content" style={{ marginBottom: 8 }}>
-              <I18nText source={"+{value0} XP · Streak kept"} values={[outcome.xpAwarded]} />
+              <I18nText source={"+{value0} XP \u00b7 Streak kept"} values={[outcome.xpAwarded]} />
             </p>
           )}
           {outcome.counted && outcome.alreadyCountedToday && (
             <p className="step-content" style={{ marginBottom: 8 }}>
-              <I18nText source={"Streak kept · today's review was already counted"} />
+              <I18nText source={"Streak kept \u00b7 today's review was already counted"} />
             </p>
           )}
           <I18nElement
@@ -371,7 +379,7 @@ export function ReviewSession({
             <I18nText>
               {outcome.counted
                 ? "Cards are rescheduled. Keep it up daily to master your finances!"
-                : `Cards are rescheduled. ${outcome.cardsRequired} cards in one session keep your streak going — this one was ${queue.length}.`}
+                : `Cards are rescheduled. ${outcome.cardsRequired} cards in one session keep your streak going \u2014 this one was ${queue.length}.`}
             </I18nText>
           </p>
           <div className="lesson-actions">
@@ -440,10 +448,10 @@ export function ReviewSession({
       {showExplanation && (
         <>
           <div className={`feedback ${answeredCorrectly ? "correct" : "incorrect"}`}>
-            <I18nText>{answeredCorrectly ? "✓ Correct!" : "Not quite"}</I18nText>
+            <I18nText>{answeredCorrectly ? "\u2713 Correct!" : "Not quite"}</I18nText>
             {card.explanation ? (
               <div style={{ marginTop: 8, fontWeight: 500 }}>
-                <I18nText>{card.explanation}</I18nText>
+                <I18nText>{cleanExplanation(card.explanation)}</I18nText>
               </div>
             ) : null}
           </div>
