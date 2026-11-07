@@ -1,3 +1,4 @@
+import AVFoundation
 import UIKit
 import Capacitor
 
@@ -7,8 +8,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Lesson read-aloud is WKWebView speechSynthesis, which inherits the
+        // process-wide session. The default soloAmbient category follows the
+        // hardware silent switch. Playback does not. This is the only
+        // activation: the session is shared, this runs once before the scene
+        // and web view exist, and SceneDelegate must not activate it again.
+        configureLessonPlaybackSession()
         return true
+    }
+
+    /// Makes lesson voiceover ignore the Ring/Silent switch. A failure (for
+    /// example while a phone call owns the session) must not abort launch;
+    /// speech then keeps the system default session.
+    private func configureLessonPlaybackSession() {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.playback, mode: .default, options: [])
+            try session.setActive(true)
+        } catch {
+            // The description is the log argument, not the format string.
+            NSLog("%@", "Notho audio session setup failed: \(error.localizedDescription)")
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
