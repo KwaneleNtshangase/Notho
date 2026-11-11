@@ -38,9 +38,9 @@ export async function startStreakLiveActivity(input: StreakLiveInput): Promise<b
   if (!isNativeIos()) return false;
   if (input.streak < 1) return false;
   try {
-    const { LiveActivities } = await import("@capgo/capacitor-live-activities");
+    const { CapgoLiveActivities } = await import("@capgo/capacitor-live-activities");
     const title = input.name ? `Save your streak, ${input.name}!` : "Save your streak!";
-    await LiveActivities.startActivity({
+    await CapgoLiveActivities.startActivity({
       id: STREAK_ACTIVITY_ID,
       layout: {
         type: "container",
@@ -116,8 +116,8 @@ export async function startStreakLiveActivity(input: StreakLiveInput): Promise<b
 export async function endStreakLiveActivity(): Promise<void> {
   if (!isNativeIos()) return;
   try {
-    const { LiveActivities } = await import("@capgo/capacitor-live-activities");
-    await LiveActivities.endActivity({ id: STREAK_ACTIVITY_ID });
+    const { CapgoLiveActivities } = await import("@capgo/capacitor-live-activities");
+    await CapgoLiveActivities.endActivity({ id: STREAK_ACTIVITY_ID });
   } catch {
     /* no activity or plugin missing */
   }
