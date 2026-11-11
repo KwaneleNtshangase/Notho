@@ -4,8 +4,8 @@
  * Cron feeds each subscribed user through these and sends at most ONE push
  * per user per day, in priority: save (streak at risk) > routine > coach alert.
  *
- * Quiet hours: 21:30–07:30 SAST. Cron slots (13:00 / 18:00 SAST) are outside
- * that window. The helper is for any future per-user timing.
+ * Timing: reminders fire ~23 hours after the previous lesson (habit-aligned),
+ * never during quiet hours 21:30–07:30 SAST.
  */
 
 export type PushMessage = {
@@ -28,6 +28,29 @@ export function isQuietHoursSAST(now = new Date()): boolean {
   const m = sast.getUTCMinutes();
   const mins = h * 60 + m;
   return mins >= 21 * 60 + 30 || mins < 7 * 60 + 30;
+}
+
+/**
+ * True when ~23 hours have passed since the last lesson and the user has
+ * not yet done a lesson today. Window is 22.5–24.5 h so an hourly cron
+ * still catches it. Quiet hours are checked by the caller.
+ */
+export function is23hAfterLastLesson(
+  lastActivityAt: Date | string | null | undefined,
+  lastActivityDate: string | null | undefined,
+  sastToday: string,
+  now = new Date()
+): boolean {
+  if (lastActivityDate === sastToday) return false;
+  if (!lastActivityAt) {
+    // Fallback when only the civil date exists: treat as eligible once the
+    // day has rolled (caller still enforces quiet hours).
+    return lastActivityDate === yesterdayOf(sastToday);
+  }
+  const t = typeof lastActivityAt === "string" ? Date.parse(lastActivityAt) : lastActivityAt.getTime();
+  if (!Number.isFinite(t)) return false;
+  const hours = (now.getTime() - t) / 3_600_000;
+  return hours >= 22.5 && hours < 24.5;
 }
 
 const SAVE_COPY: { title: (n: number) => string; body: (n: number, lesson: string) => string }[] = [
@@ -68,9 +91,13 @@ export function streakAtRiskPush(
   lastActivityDate: string | null,
   sastToday: string,
   next?: { lessonTitle: string; url: string } | null,
-  name?: string | null
+  name?: string | null,
+  lastActivityAt?: Date | string | null,
+  now = new Date()
 ): PushMessage | null {
   if (streak < 2) return null;
+  if (!is23hAfterLastLesson(lastActivityAt, lastActivityDate, sastToday, now)) return null;
+  // Still require the civil date to be yesterday so a multi-day gap doesn't fire as a "save".
   if (lastActivityDate !== yesterdayOf(sastToday)) return null;
   const lesson = next?.lessonTitle ?? "today's lesson";
   const line = pick(SAVE_COPY, `${sastToday}:${streak}`);
@@ -88,9 +115,13 @@ export function streakAtRiskPush(
 export function routinePush(
   lastActivityDate: string | null,
   sastToday: string,
-  next?: { lessonTitle: string; courseTitle: string; url: string } | null
+  next?: { lessonTitle: string; courseTitle: string; url: string } | null,
+  lastActivityAt?: Date | string | null,
+  now = new Date()
 ): PushMessage | null {
   if (lastActivityDate === sastToday) return null;
+  if (!is23hAfterLastLesson(lastActivityAt, lastActivityDate, sastToday, now)) return null;
+
   const yesterday = yesterdayOf(sastToday);
   const daysOff =
     lastActivityDate && lastActivityDate < yesterday
