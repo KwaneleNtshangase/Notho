@@ -29,7 +29,6 @@ export function midnightSastIso(now = new Date()): string {
   const y = sast.getUTCFullYear();
   const m = sast.getUTCMonth();
   const d = sast.getUTCDate();
-  // Midnight SAST = 22:00 previous UTC day
   const midnightUtc = Date.UTC(y, m, d + 1) - 2 * 60 * 60 * 1000;
   return new Date(midnightUtc).toISOString();
 }
@@ -40,47 +39,41 @@ export async function startStreakLiveActivity(input: StreakLiveInput): Promise<b
   try {
     const { CapgoLiveActivities } = await import("@capgo/capacitor-live-activities");
     const title = input.name ? `Save your streak, ${input.name}!` : "Save your streak!";
-    await CapgoLiveActivities.startActivity({
-      id: STREAK_ACTIVITY_ID,
+    const { activityId } = await CapgoLiveActivities.startActivity({
       layout: {
         type: "container",
-        properties: [
-          { direction: "horizontal" },
-          { spacing: 12 },
-          { padding: 16 },
-          { backgroundColor: "#6B4CFF" },
-          { cornerRadius: 16 },
-        ],
+        direction: "horizontal",
+        spacing: 12,
+        properties: {
+          padding: 16,
+          backgroundColor: "#6B4CFF",
+          cornerRadius: 16,
+        },
         children: [
           {
             type: "text",
-            properties: [
-              { text: String(input.streak) },
-              { fontSize: 28 },
-              { fontWeight: "bold" },
-              { color: "#FFFFFF" },
-            ],
+            content: String(input.streak),
+            fontSize: 28,
+            fontWeight: "bold",
+            color: "#FFFFFF",
           },
           {
             type: "container",
-            properties: [{ direction: "vertical" }, { spacing: 4 }],
+            direction: "vertical",
+            spacing: 4,
             children: [
               {
                 type: "text",
-                properties: [
-                  { text: title },
-                  { fontSize: 16 },
-                  { fontWeight: "bold" },
-                  { color: "#FFFFFF" },
-                ],
+                content: title,
+                fontSize: 16,
+                fontWeight: "bold",
+                color: "#FFFFFF",
               },
               {
                 type: "text",
-                properties: [
-                  { text: "Midnight is the line" },
-                  { fontSize: 13 },
-                  { color: "#EDE7FF" },
-                ],
+                content: "Midnight is the line",
+                fontSize: 13,
+                color: "#EDE7FF",
               },
             ],
           },
@@ -88,25 +81,25 @@ export async function startStreakLiveActivity(input: StreakLiveInput): Promise<b
       },
       dynamicIslandLayout: {
         expanded: {
-          leading: { type: "text", properties: [{ text: String(input.streak) }, { fontSize: 20 }, { color: "#FFFFFF" }] },
-          trailing: { type: "text", properties: [{ text: "streak" }, { fontSize: 12 }, { color: "#EDE7FF" }] },
-          center: { type: "text", properties: [{ text: title }, { fontSize: 14 }, { color: "#FFFFFF" }] },
-          bottom: { type: "text", properties: [{ text: "Tap to keep it" }, { fontSize: 12 }, { color: "#EDE7FF" }] },
+          leading: { type: "text", content: String(input.streak), fontSize: 20, color: "#FFFFFF" },
+          trailing: { type: "text", content: "streak", fontSize: 12, color: "#EDE7FF" },
+          center: { type: "text", content: title, fontSize: 14, color: "#FFFFFF" },
+          bottom: { type: "text", content: "Tap to keep it", fontSize: 12, color: "#EDE7FF" },
         },
-        compact: {
-          leading: { type: "text", properties: [{ text: String(input.streak) }] },
-          trailing: { type: "text", properties: [{ text: "\ud83d\udd25" }] },
-        },
-        minimal: {
-          leading: { type: "text", properties: [{ text: String(input.streak) }] },
-        },
+        compactLeading: { type: "text", content: String(input.streak) },
+        compactTrailing: { type: "text", content: "fire" },
+        minimal: { type: "text", content: String(input.streak) },
       },
       data: {
         streak: input.streak,
         title,
         endsAt: input.endsAt,
+        localId: STREAK_ACTIVITY_ID,
       },
     });
+    if (typeof window !== "undefined" && activityId) {
+      try { sessionStorage.setItem(STREAK_ACTIVITY_ID, activityId); } catch { /* ignore */ }
+    }
     return true;
   } catch {
     return false;
@@ -117,7 +110,14 @@ export async function endStreakLiveActivity(): Promise<void> {
   if (!isNativeIos()) return;
   try {
     const { CapgoLiveActivities } = await import("@capgo/capacitor-live-activities");
-    await CapgoLiveActivities.endActivity({ id: STREAK_ACTIVITY_ID });
+    let activityId = STREAK_ACTIVITY_ID;
+    if (typeof window !== "undefined") {
+      try { activityId = sessionStorage.getItem(STREAK_ACTIVITY_ID) || activityId; } catch { /* ignore */ }
+    }
+    await CapgoLiveActivities.endActivity({ activityId });
+    if (typeof window !== "undefined") {
+      try { sessionStorage.removeItem(STREAK_ACTIVITY_ID); } catch { /* ignore */ }
+    }
   } catch {
     /* no activity or plugin missing */
   }
