@@ -35,14 +35,20 @@ const outcomes = [
 
 const steps = [
   { n: "1", title: "Learn a short lesson", body: "One idea at a time. Review until it sticks." },
-  { n: "2", title: "Try it in the calculator", body: "See the same idea with South African wrappers." },
-  { n: "3", title: "See it in your budget", body: "Your numbers. Statement import is lookback only." },
+  { n: "2", title: "Try it in the calculator", body: "See what saving and investing looks like with TFSA, retirement annuity and living annuity." },
+  { n: "3", title: "See it in your budget", body: "Put your own numbers next to what you just learned." },
+];
+
+const examples = [
+  { title: "Payday", body: "You want to know what is a need and what is a want before the money is gone." },
+  { title: "Saving for something", body: "You want to see what a monthly amount does over 5 or 10 years." },
+  { title: "Studying for RE5", body: "You want practice for the regulatory exam, not another textbook." },
 ];
 
 const features = [
   { href: "/financial-literacy", title: "Learn", body: "Short lessons, then review until it sticks." },
   { href: "/investment-calculator", title: "Calculate", body: "TFSA, retirement annuity, living annuity and savings." },
-  { href: "/budgeting", title: "Budget", body: "Your numbers. Statement import is lookback only." },
+  { href: "/budgeting", title: "Budget", body: "A budget from your own numbers." },
   { href: "/re5", title: "RE5 prep", body: "For the regulatory exam." },
 ];
 
@@ -63,6 +69,15 @@ export default function AboutPage() {
         fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
       }}
     >
+      <style>{`
+        .about-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 48px; align-items: center; }
+        .about-founder { display: grid; grid-template-columns: 120px 1fr; gap: 24px; align-items: start; }
+        @media (max-width: 800px) {
+          .about-hero { grid-template-columns: 1fr; gap: 28px; }
+          .about-founder { grid-template-columns: 1fr; }
+        }
+      `}</style>
+
       <JsonLd
         data={webPageJsonLd({
           path: "/about",
@@ -110,15 +125,8 @@ export default function AboutPage() {
       </header>
 
       <section
-        style={{
-          maxWidth: 1080,
-          margin: "0 auto",
-          padding: "72px 24px 56px",
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1.1fr) minmax(0, 0.9fr)",
-          gap: 48,
-          alignItems: "center",
-        }}
+        className="about-hero"
+        style={{ maxWidth: 1080, margin: "0 auto", padding: "72px 24px 48px" }}
       >
         <div>
           <h1
@@ -186,6 +194,18 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section style={{ maxWidth: 720, margin: "0 auto", padding: "16px 24px 56px" }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: navy, margin: "0 0 12px" }}>
+          <I18nText source={"Why Notho exists"} />
+        </h2>
+        <p style={{ fontSize: 16, lineHeight: 1.7, color: muted, margin: "0 0 12px" }}>
+          <I18nText source={"Most money advice online is written for somewhere else. The limits, products and rules are different here."} />
+        </p>
+        <p style={{ fontSize: 16, lineHeight: 1.7, color: muted, margin: 0 }}>
+          <I18nText source={"Notho is for people in South Africa who want to learn how money works, then try it with their own numbers. No loans. No bank login. Just lessons and tools."} />
+        </p>
+      </section>
+
       <section style={{ background: "#f7f9fa", padding: "56px 24px" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto" }}>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: navy, margin: "0 0 24px" }}>
@@ -200,9 +220,7 @@ export default function AboutPage() {
           >
             {steps.map((step) => (
               <div key={step.n}>
-                <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 700, color: teal }}>
-                  {step.n}
-                </p>
+                <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 700, color: teal }}>{step.n}</p>
                 <h3 style={{ margin: "0 0 6px", fontSize: 17, fontWeight: 700, color: ink }}>
                   <I18nText source={step.title} />
                 </h3>
@@ -216,6 +234,38 @@ export default function AboutPage() {
       </section>
 
       <section style={{ maxWidth: 1080, margin: "0 auto", padding: "56px 24px" }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: navy, margin: "0 0 20px" }}>
+          <I18nText source={"Who it is for"} />
+        </h2>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 16,
+          }}
+        >
+          {examples.map((item) => (
+            <div
+              key={item.title}
+              style={{
+                background: "#ffffff",
+                border: "1px solid #e8e8e8",
+                borderRadius: 12,
+                padding: 20,
+              }}
+            >
+              <h3 style={{ margin: "0 0 6px", fontSize: 17, fontWeight: 700, color: navy }}>
+                <I18nText source={item.title} />
+              </h3>
+              <p style={{ margin: 0, color: muted, fontSize: 15, lineHeight: 1.55 }}>
+                <I18nText source={item.body} />
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ maxWidth: 1080, margin: "0 auto", padding: "8px 24px 48px" }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: navy, margin: "0 0 20px" }}>
           <I18nText source={"What you can do"} />
         </h2>
@@ -251,15 +301,33 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section style={{ maxWidth: 1080, margin: "0 auto", padding: "8px 24px 64px" }}>
+      <section style={{ background: "#f7f9fa", padding: "56px 24px" }}>
+        <div className="about-founder" style={{ maxWidth: 720, margin: "0 auto" }}>
+          <img
+            src="/about/kwanele.jpg"
+            alt="Kwanele Ntshangase"
+            style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 12 }}
+          />
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: navy, margin: "0 0 10px" }}>
+              <I18nText source={"Founded by Kwanele Ntshangase"} />
+            </h2>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: muted, margin: "0 0 12px" }}>
+              <I18nText source={"I built Notho because the tools I wanted were not in one place. Lessons short enough to finish. Calculators that know TFSA and retirement annuity. A budget that uses your numbers."} />
+            </p>
+            <p style={{ fontSize: 15, color: "#666", margin: 0 }}>
+              <I18nText source={"Previously called Fundi Finance. Renamed July 2026."} />
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ maxWidth: 1080, margin: "0 auto", padding: "48px 24px 64px" }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: navy, margin: "0 0 12px" }}>
           <I18nText source={"What Notho is not"} />
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.65, color: muted, maxWidth: 640, margin: 0 }}>
           <I18nText source={"Notho does not sell loans, does not log into your bank, and does not replace an FSCA-registered adviser. Cosmo answers questions about the lessons. It is not a human adviser."} />
-        </p>
-        <p style={{ fontSize: 15, color: "#666", marginTop: 28 }}>
-          <I18nText source={"Founded by Kwanele Ntshangase. Previously called Fundi Finance (renamed July 2026)."} />
         </p>
       </section>
 
