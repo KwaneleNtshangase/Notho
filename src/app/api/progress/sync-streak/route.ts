@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
   }
 
   const nextLongest = Math.max(next.streak, prevLongest);
+  const nowIso = new Date().toISOString();
 
   const { error: upsertError } = await admin.from("user_progress").upsert({
     user_id: userId,
@@ -57,6 +58,8 @@ export async function POST(req: NextRequest) {
     streak_freeze_count: next.freezeCount,
     longest_streak: nextLongest,
     last_activity_date: today,
+    // Exact instant so the cron can fire the reminder ~23 hours later.
+    last_activity_at: nowIso,
   }, { onConflict: "user_id" });
 
   if (upsertError) {
@@ -69,6 +72,7 @@ export async function POST(req: NextRequest) {
     streak: next.streak,
     longestStreak: nextLongest,
     lastActivityDate: today,
+    lastActivityAt: nowIso,
     freezeCount: next.freezeCount,
     extended: next.extended,
   });
