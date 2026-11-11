@@ -8,6 +8,7 @@ import {
   coachAlertPush,
   routinePush,
   pickPush,
+  isQuietHoursSAST,
   type PushMessage,
 } from "@/lib/push/triggers";
 import { resolveNextLesson } from "@/lib/push/nextLesson";
@@ -50,8 +51,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (isQuietHoursSAST()) {
+    return NextResponse.json({ skipped: "quiet-hours", evaluated: 0 });
+  }
+
   const admin = createServiceSupabase();
   const today = sastToday();
+  const now = new Date();
   const monthKey = today.slice(0, 7);
   const prevMonthKey = prevMonthKeyOf(monthKey);
   const catalog = CONTENT_DATA.courses.map((c) => ({
@@ -79,13 +85,24 @@ export async function GET(req: NextRequest) {
 
   const { data: progressRows } = await admin
     .from("user_progress")
-    .select("user_id, streak, last_activity_date, completed_lessons, pinned_courses, lesson_resume")
+    .select("user_id, streak, last_activity_date, last_activity_at, completed_lessons, pinned_courses, lesson_resume")
     .in("user_id", userIds);
   const progress = new Map(
     (progressRows ?? []).map((r: Record<string, unknown>) => [r.user_id as string, r])
   );
 
-  const summary = { evaluated: userIds.length, sent: 0, skippedDuplicate: 0, failed: 0 };
+  const { data: nameRows } = await admin
+    .from("profiles")
+    .select("user_id, username")
+    .in("user_id", userIds);
+  const names = new Map(
+    (nameRows ?? []).map((r: { user_id: string; username?: string | null }) => [
+      r.user_id,
+      r.username?.trim() || null,
+    ])
+  );
+
+  const summary = { evaluated: userIds.length, sent: 0, skippedDuplicate: 0, failed: 0, errors: [] as string[] };
 
   for (const userId of userIds) {
     try {
@@ -98,16 +115,24 @@ export async function GET(req: NextRequest) {
         resume: resumeFrom(p?.lesson_resume),
       });
 
+      const lastAt = (p?.last_activity_at as string | null) ?? null;
+      const lastDate = (p?.last_activity_date as string | null) ?? null;
+
       const streakMsg = streakAtRiskPush(
         Number(p?.streak ?? 0),
-        (p?.last_activity_date as string | null) ?? null,
+        lastDate,
         today,
-        next
+        next,
+        names.get(userId) ?? null,
+        lastAt,
+        now
       );
       const habitMsg = routinePush(
-        (p?.last_activity_date as string | null) ?? null,
+        lastDate,
         today,
-        next
+        next,
+        lastAt,
+        now
       );
 
       let coachMsg: PushMessage | null = null;
@@ -173,7 +198,9 @@ export async function GET(req: NextRequest) {
       if (delivered > 0) summary.sent++;
       else summary.failed++;
     } catch (err) {
-      console.error("[push-triggers]", userId, err);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[push-triggers]", userId, msg);
+      summary.errors.push(`${userId.slice(0, 8)}: ${msg.slice(0, 120)}`);
       summary.failed++;
     }
   }

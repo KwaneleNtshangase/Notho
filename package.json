@@ -38,6 +38,7 @@
     "@capacitor/push-notifications": "^8.1.2",
     "@capacitor/share": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.2",
+    "@capgo/capacitor-live-activities": "^1.2.5",
     "@capgo/capacitor-native-biometric": "^8.6.2",
     "@capgo/capacitor-shake": "^8.0.46",
     "@react-pdf/renderer": "^4.5.1",

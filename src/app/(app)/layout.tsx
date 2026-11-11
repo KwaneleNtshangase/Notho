@@ -27,6 +27,7 @@ import "../nav-glass.css";
 import { AuthGate } from "@/components/AuthGate";
 import { OnboardingGate } from "@/components/OnboardingGate";
 import { NotificationOptIn } from "@/components/NotificationOptIn";
+import { StreakLiveActivity } from "@/components/StreakLiveActivity";
 import { StreakRepairBanner } from "@/components/StreakRepairBanner";
 import { UsageTracker } from "@/components/UsageTracker";
 import { SessionReplayGate } from "@/components/SessionReplayGate";
@@ -160,6 +161,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
           {!isMockExam && <AppNavigation hidden={isReview} />}
           {!isMockExam && <NotificationOptIn />}
+          {!isMockExam && <StreakLiveActivity />}
           {!isMockExam && <StreakRepairBanner />}
           <UsageTracker />
           <SessionReplayGate />

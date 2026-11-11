@@ -29,11 +29,6 @@
 			<string>za.co.notho.app</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<!-- OAuth deep-link return target. Must match capacitor.config.ts
-				     appId and the redirect URI registered in both Supabase
-				     (Authentication > URL Configuration) and Google Cloud
-				     Console (Credentials > Authorised redirect URIs):
-				     za.co.notho.app://auth/callback -->
 				<string>za.co.notho.app</string>
 			</array>
 		</dict>
@@ -42,6 +37,8 @@
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSMotionUsageDescription</key>
 	<string>Notho uses motion to open Send Feedback when you shake the phone.</string>
 	<key>NSFaceIDUsageDescription</key>
