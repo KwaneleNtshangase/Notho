@@ -7,6 +7,7 @@ import {
   routinePush,
   pickPush,
   isQuietHoursSAST,
+  is23hAfterLastLesson,
 } from "../triggers";
 
 const next = { lessonTitle: "Needs vs Wants", courseTitle: "Money Basics", url: "/lesson/money-basics/lesson-2" };
@@ -30,9 +31,32 @@ describe("isQuietHoursSAST", () => {
   });
 });
 
+describe("is23hAfterLastLesson", () => {
+  const now = new Date("2026-07-12T14:00:00Z"); // 16:00 SAST
+  const twentyThreeAgo = new Date(now.getTime() - 23 * 3_600_000).toISOString();
+  const tenAgo = new Date(now.getTime() - 10 * 3_600_000).toISOString();
+  const thirtyAgo = new Date(now.getTime() - 30 * 3_600_000).toISOString();
+
+  it("is true inside the 22.5–24.5 h window", () => {
+    expect(is23hAfterLastLesson(twentyThreeAgo, "2026-07-11", "2026-07-12", now)).toBe(true);
+  });
+  it("is false too early, too late, or already done today", () => {
+    expect(is23hAfterLastLesson(tenAgo, "2026-07-11", "2026-07-12", now)).toBe(false);
+    expect(is23hAfterLastLesson(thirtyAgo, "2026-07-11", "2026-07-12", now)).toBe(false);
+    expect(is23hAfterLastLesson(twentyThreeAgo, "2026-07-12", "2026-07-12", now)).toBe(false);
+  });
+  it("falls back to yesterday when only a civil date exists", () => {
+    expect(is23hAfterLastLesson(null, "2026-07-11", "2026-07-12", now)).toBe(true);
+    expect(is23hAfterLastLesson(null, "2026-07-12", "2026-07-12", now)).toBe(false);
+  });
+});
+
 describe("streakAtRiskPush", () => {
-  it("fires for a 2+ streak last active yesterday", () => {
-    const p = streakAtRiskPush(7, "2026-07-11", "2026-07-12", next);
+  const now = new Date("2026-07-12T14:00:00Z");
+  const lastAt = new Date(now.getTime() - 23 * 3_600_000).toISOString();
+
+  it("fires for a 2+ streak ~23h after yesterday's lesson", () => {
+    const p = streakAtRiskPush(7, "2026-07-11", "2026-07-12", next, null, lastAt, now);
     expect(p).not.toBeNull();
     expect(p!.key).toBe("streak:2026-07-12");
     expect(p!.url).toBe(next.url);
@@ -40,39 +64,42 @@ describe("streakAtRiskPush", () => {
   });
 
   it("personalizes the title when a name is given", () => {
-    const p = streakAtRiskPush(7, "2026-07-11", "2026-07-12", next, "Kwanele");
+    const p = streakAtRiskPush(7, "2026-07-11", "2026-07-12", next, "Kwanele", lastAt, now);
     expect(p).not.toBeNull();
     expect(p!.title).toBe("Save your streak, Kwanele!");
   });
 
   it("skips a one-day streak", () => {
-    expect(streakAtRiskPush(1, "2026-07-11", "2026-07-12", next)).toBeNull();
+    expect(streakAtRiskPush(1, "2026-07-11", "2026-07-12", next, null, lastAt, now)).toBeNull();
   });
 
   it("skips users already active today", () => {
-    expect(streakAtRiskPush(7, "2026-07-12", "2026-07-12", next)).toBeNull();
+    expect(streakAtRiskPush(7, "2026-07-12", "2026-07-12", next, null, lastAt, now)).toBeNull();
   });
 
   it("skips already-broken streaks", () => {
-    expect(streakAtRiskPush(7, "2026-07-09", "2026-07-12", next)).toBeNull();
-    expect(streakAtRiskPush(7, null, "2026-07-12", next)).toBeNull();
+    expect(streakAtRiskPush(7, "2026-07-09", "2026-07-12", next, null, lastAt, now)).toBeNull();
+    expect(streakAtRiskPush(7, null, "2026-07-12", next, null, null, now)).toBeNull();
   });
 });
 
 describe("routinePush", () => {
-  it("fires when they have not learned today", () => {
-    const p = routinePush("2026-07-11", "2026-07-12", next);
+  const now = new Date("2026-07-12T14:00:00Z");
+  const lastAt = new Date(now.getTime() - 23 * 3_600_000).toISOString();
+
+  it("fires when ~23h after yesterday and no lesson today", () => {
+    const p = routinePush("2026-07-11", "2026-07-12", next, lastAt, now);
     expect(p).not.toBeNull();
     expect(p!.key).toBe("routine:2026-07-12");
     expect(p!.url).toBe(next.url);
   });
 
   it("stays quiet after today's lesson", () => {
-    expect(routinePush("2026-07-12", "2026-07-12", next)).toBeNull();
+    expect(routinePush("2026-07-12", "2026-07-12", next, lastAt, now)).toBeNull();
   });
 
   it("stops after a quiet week", () => {
-    expect(routinePush("2026-07-01", "2026-07-12", next)).toBeNull();
+    expect(routinePush("2026-07-01", "2026-07-12", next, lastAt, now)).toBeNull();
   });
 });
 
@@ -102,8 +129,10 @@ describe("leaderboardDefencePush", () => {
 
 describe("pickPush", () => {
   it("returns the first non-null candidate (priority order)", () => {
-    const streak = streakAtRiskPush(5, "2026-07-11", "2026-07-12", next);
-    const routine = routinePush("2026-07-11", "2026-07-12", next);
+    const now = new Date("2026-07-12T14:00:00Z");
+    const lastAt = new Date(now.getTime() - 23 * 3_600_000).toISOString();
+    const streak = streakAtRiskPush(5, "2026-07-11", "2026-07-12", next, null, lastAt, now);
+    const routine = routinePush("2026-07-11", "2026-07-12", next, lastAt, now);
     expect(pickPush([streak, routine])!.key).toBe("streak:2026-07-12");
     expect(pickPush([null, routine])!.key).toBe("routine:2026-07-12");
     expect(pickPush([null, null, null])).toBeNull();

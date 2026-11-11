@@ -57,6 +57,7 @@ export async function GET(req: NextRequest) {
 
   const admin = createServiceSupabase();
   const today = sastToday();
+  const now = new Date();
   const monthKey = today.slice(0, 7);
   const prevMonthKey = prevMonthKeyOf(monthKey);
   const catalog = CONTENT_DATA.courses.map((c) => ({
@@ -84,7 +85,7 @@ export async function GET(req: NextRequest) {
 
   const { data: progressRows } = await admin
     .from("user_progress")
-    .select("user_id, streak, last_activity_date, completed_lessons, pinned_courses, lesson_resume")
+    .select("user_id, streak, last_activity_date, last_activity_at, completed_lessons, pinned_courses, lesson_resume")
     .in("user_id", userIds);
   const progress = new Map(
     (progressRows ?? []).map((r: Record<string, unknown>) => [r.user_id as string, r])
@@ -114,17 +115,24 @@ export async function GET(req: NextRequest) {
         resume: resumeFrom(p?.lesson_resume),
       });
 
+      const lastAt = (p?.last_activity_at as string | null) ?? null;
+      const lastDate = (p?.last_activity_date as string | null) ?? null;
+
       const streakMsg = streakAtRiskPush(
         Number(p?.streak ?? 0),
-        (p?.last_activity_date as string | null) ?? null,
+        lastDate,
         today,
         next,
-        names.get(userId) ?? null
+        names.get(userId) ?? null,
+        lastAt,
+        now
       );
       const habitMsg = routinePush(
-        (p?.last_activity_date as string | null) ?? null,
+        lastDate,
         today,
-        next
+        next,
+        lastAt,
+        now
       );
 
       let coachMsg: PushMessage | null = null;
