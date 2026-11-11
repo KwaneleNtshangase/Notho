@@ -37,12 +37,12 @@ describe("is23hAfterLastLesson", () => {
   const tenAgo = new Date(now.getTime() - 10 * 3_600_000).toISOString();
   const thirtyAgo = new Date(now.getTime() - 30 * 3_600_000).toISOString();
 
-  it("is true inside the 22.5–24.5 h window", () => {
+  it("is true once 23 hours have passed", () => {
     expect(is23hAfterLastLesson(twentyThreeAgo, "2026-07-11", "2026-07-12", now)).toBe(true);
+    expect(is23hAfterLastLesson(thirtyAgo, "2026-07-11", "2026-07-12", now)).toBe(true);
   });
-  it("is false too early, too late, or already done today", () => {
+  it("is false too early or already done today", () => {
     expect(is23hAfterLastLesson(tenAgo, "2026-07-11", "2026-07-12", now)).toBe(false);
-    expect(is23hAfterLastLesson(thirtyAgo, "2026-07-11", "2026-07-12", now)).toBe(false);
     expect(is23hAfterLastLesson(twentyThreeAgo, "2026-07-12", "2026-07-12", now)).toBe(false);
   });
   it("falls back to yesterday when only a civil date exists", () => {
