@@ -108,6 +108,7 @@ export function SettingsView({
   onSignOut,
   onDeleteAccount,
   onDownloadData,
+  downloadReady = false,
 }: {
   userData: UserData;
   setDailyGoal: (goal: number) => void;
@@ -116,6 +117,8 @@ export function SettingsView({
   onSignOut?: () => void;
   onDeleteAccount?: (exitId?: string | null) => Promise<void>;
   onDownloadData?: () => void;
+  /** The export is in memory. The next tap must share or save it. */
+  downloadReady?: boolean;
 }) {
   const { t } = useLocale();
   const [showLegalPage, setShowLegalPage] = useState<"faq" | "privacy" | "terms" | null>(null);
@@ -372,8 +375,8 @@ export function SettingsView({
                 style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "none", border: "none", borderBottom: "1px solid var(--color-border)", cursor: "pointer", textAlign: "left" }}>
                 <FileText size={16} style={{ color: "var(--color-primary)", flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}><I18nText source={"Download My Data"} /></div>
-                  <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={"Export your progress as a JSON file (POPIA right to access)"} /></div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}><I18nText source={downloadReady ? "Save file" : "Download My Data"} /></div>
+                  <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}><I18nText source={downloadReady ? "Your export is ready. Tap save to keep it on this device." : "Export your progress as a JSON file (POPIA right to access)"} /></div>
                 </div>
               </button>
             )}

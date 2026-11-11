@@ -120,7 +120,7 @@ import { CalculatorView, CalcInputs, calcGrowth } from "@/components/CalculatorV
 import { LeaderboardView, getLeaderboardWeekKey } from "@/components/LeaderboardView";
 import { StatsPanel } from "@/components/StatsPanel";
 import { AuthGate } from "@/components/AuthGate";
-import { ShareButton, ShareResultButton } from "@/components/ShareCard";
+import { ShareResultButton } from "@/components/ShareCard";
 import { CosmoCharacter } from "@/components/CosmoCharacter";
 import { SpeakButton } from "@/components/SpeakButton";
 import { NothoTopBar } from "@/components/NothoTopBar";
@@ -140,7 +140,6 @@ import {
   validateUsername,
   isUsernameAvailable,
   getLessonTitle,
-  generateShareText,
   ONBOARDING_GOAL_OPTIONS,
   ONBOARDING_AGE_RANGES,
   GOAL_OPTIONS,
@@ -495,6 +494,12 @@ export function LessonView({
                   <button className="btn btn-secondary" style={{ width: "100%", background: "var(--color-bg)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }} onClick={() => finalizeLesson("course")}>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CheckCircle2 size={18} /> <I18nText source={" Done - "} />{t("lesson.backToCourse")}</span>
                   </button>
+                  {lessonTitle ? (
+                    <ShareResultButton
+                      data={{ type: "lesson", lessonTitle, xpEarned: 50 + correctCount * 10, isPerfect: false, courseName: "Notho" }}
+                      label="Share your result"
+                    />
+                  ) : null}
                 </div>
               ) : (
                 <button className="btn btn-primary" onClick={nextStep}><I18nText source={"Finish"} /></button>
@@ -781,10 +786,9 @@ export function LessonView({
                           </span>
                         </button>
                         {lessonTitle ? (
-                          <ShareButton
-                            text={generateShareText("lesson", { lessonTitle })}
-                            label="Share your progress"
-                            shareType="lesson"
+                          <ShareResultButton
+                            data={{ type: "lesson", lessonTitle, xpEarned: 50 + correctCount * 10, isPerfect: false, courseName: "Notho" }}
+                            label="Share your result"
                           />
                         ) : null}
                       </div>
@@ -903,10 +907,9 @@ export function LessonView({
                           </span>
                         </button>
                         {lessonTitle ? (
-                          <ShareButton
-                            text={generateShareText("lesson", { lessonTitle })}
-                            label="Share your progress"
-                            shareType="lesson"
+                          <ShareResultButton
+                            data={{ type: "lesson", lessonTitle, xpEarned: 50 + correctCount * 10, isPerfect: false, courseName: "Notho" }}
+                            label="Share your result"
                           />
                         ) : null}
                       </div>

@@ -1,10 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { Browser } from "@capacitor/browser";
 import { shareDuoCard } from "@/components/ShareCard";
 import { analytics } from "@/lib/analytics";
 import { isIosNativeSync, nativePlatformSync } from "@/lib/capacitorPlatform";
 import { markSharedToday } from "@/lib/dailyChallengeFlags";
 import { shareNativeFile, shareNativeText } from "@/lib/nativeShare";
-import { beginFileShare, openWhatsAppNow, preparedFileFollowUp, shareTextNow, startDuoShare } from "@/lib/shareHandoff";
+import { beginFileShare, beginTextShare, deliverReadyFile, downloadBlobNow, openWhatsAppNow, preparedFileFollowUp, saveReadyFile, shareFileAfterWait, shareOrDeferFile, shareTextNow, startDuoShare } from "@/lib/shareHandoff";
+
+vi.mock("@capacitor/browser", () => ({
+  Browser: { open: vi.fn(async () => undefined) },
+}));
 
 vi.mock("@/lib/analytics", () => ({
   analytics: { shareTriggered: vi.fn() },
@@ -25,6 +31,7 @@ vi.mock("@/lib/nativeShare", async () => {
 
 const nativeFile = vi.mocked(shareNativeFile);
 const nativeText = vi.mocked(shareNativeText);
+const browserOpen = vi.mocked(Browser.open);
 
 function install(opts: {
   userAgent: string;
@@ -78,16 +85,19 @@ describe("share buttons that were waiting on the Capacitor import", () => {
     return expect(pending).resolves.toBe("shared");
   });
 
-  it("keeps Android and the Huawei shell on text share", () => {
+  it("keeps Android and the Huawei shell on the native text sheet even when Web Share exists", () => {
     const share = vi.fn(() => Promise.resolve());
     install({
       userAgent: "Mozilla/5.0 (Linux; Android 12; ELS-NX9; HarmonyOS) NothoApp/Android",
       share,
     });
+    nativeText.mockResolvedValue("shared");
     const pending = startDuoShare({ ...streakCard, createBlob: streakCard.createBlob });
-    expect(share).toHaveBeenCalledTimes(1);
+    expect(share).not.toHaveBeenCalled();
+    expect(nativeText).toHaveBeenCalledWith(expect.objectContaining({ text: streakCard.text, dialogTitle: "Share" }));
     expect(streakCard.createBlob).not.toHaveBeenCalled();
     expect(nativeFile).not.toHaveBeenCalled();
+    expect(browserOpen).not.toHaveBeenCalled();
     expect(isIosNativeSync()).toBe(false);
     expect(nativePlatformSync()).toBe("android");
     return expect(pending).resolves.toBe("shared");
@@ -112,6 +122,19 @@ describe("share buttons that were waiting on the Capacitor import", () => {
     await expect(startDuoShare(streakCard)).resolves.toBe("cancelled");
     expect(open).not.toHaveBeenCalled();
     expect(markSharedToday).not.toHaveBeenCalled();
+  });
+
+  it("keeps Huawei Browser on Web Share when the page is not in the app shell", () => {
+    const share = vi.fn(() => Promise.resolve());
+    install({
+      userAgent: "Mozilla/5.0 (Linux; Android 10; HarmonyOS) HuaweiBrowser/13.0",
+      share,
+    });
+    const pending = shareTextNow({ text: "hello", shareType: "lesson", title: "Notho" });
+    expect(share).toHaveBeenCalledTimes(1);
+    expect(nativeText).not.toHaveBeenCalled();
+    expect(nativePlatformSync()).toBe("web");
+    return expect(pending).resolves.toBe("shared");
   });
 
   it("opens WhatsApp in the click turn when the browser has no share sheet", () => {
@@ -170,13 +193,40 @@ describe("share buttons that were waiting on the Capacitor import", () => {
     expect(open).not.toHaveBeenCalled();
   });
 
-  it("opens WhatsApp with noopener on the follow-up tap", () => {
+  it("opens WhatsApp with noopener on the follow-up tap", async () => {
     const open = vi.fn(() => null);
     vi.stubGlobal("window", { open });
     vi.stubGlobal("navigator", { userAgent: "Mozilla/5.0" });
-    expect(openWhatsAppNow("See you there", "lesson")).toBe(true);
+    await expect(openWhatsAppNow("See you there", "lesson")).resolves.toBe(true);
     expect(open).toHaveBeenCalledWith(expect.stringMatching(/^https:\/\/wa\.me\/\?text=/), "_blank", "noopener,noreferrer");
+    expect(browserOpen).not.toHaveBeenCalled();
     expect(markSharedToday).toHaveBeenCalled();
+  });
+
+  it("opens WhatsApp through the system browser inside the Android shell", async () => {
+    const { open } = install({ userAgent: "Mozilla/5.0 NothoApp/Android", bridge: "android" });
+    await expect(openWhatsAppNow("See you there", "streak")).resolves.toBe(true);
+    expect(open).not.toHaveBeenCalled();
+    expect(browserOpen).toHaveBeenCalledWith({ url: expect.stringMatching(/^https:\/\/wa\.me\/\?text=/) });
+    expect(markSharedToday).toHaveBeenCalled();
+  });
+
+  it("does not report a shared WhatsApp when the system browser fails", async () => {
+    install({ userAgent: "Mozilla/5.0 NothoApp/Android", bridge: "android" });
+    browserOpen.mockRejectedValueOnce(new Error("no activity"));
+    await expect(openWhatsAppNow("See you there", "lesson")).resolves.toBe(false);
+    expect(markSharedToday).not.toHaveBeenCalled();
+  });
+
+  it("does not text-share or open WhatsApp from a bare text call on the iPhone app", async () => {
+    const share = vi.fn(() => Promise.resolve());
+    const { open } = install({ userAgent: "Mozilla/5.0 NothoApp/iOS", share, bridge: "ios" });
+    await expect(shareTextNow({ text: "hello", shareType: "lesson" })).resolves.toBe("failed");
+    expect(share).not.toHaveBeenCalled();
+    expect(open).not.toHaveBeenCalled();
+    expect(browserOpen).not.toHaveBeenCalled();
+    expect(nativeText).not.toHaveBeenCalled();
+    expect(markSharedToday).not.toHaveBeenCalled();
   });
 });
 
@@ -313,5 +363,148 @@ describe("budget file share", () => {
     expect(outcome).toBeInstanceOf(Promise);
     await expect(outcome).resolves.toBe("cancelled");
     expect(nativeFile).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("every share entry point", () => {
+  const lessonCard = { type: "lesson" as const, lessonTitle: "What is Money?", xpEarned: 40, isPerfect: false, courseName: "Notho" };
+  const calculatorCard = { type: "calculator" as const, headline: "R10 000", sub: "in 10 years" };
+  const pdf = {
+    blob: new Blob(["%PDF"]),
+    fileName: "notho-budget-report.pdf",
+    mimeType: "application/pdf",
+    title: "Notho budget report",
+    dialogTitle: "Share your budget report",
+  };
+
+  it("lesson, streak, and calculator cards share text on the web during the click", () => {
+    const share = vi.fn(() => Promise.resolve());
+    install({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)", share });
+    const lesson = shareDuoCard(lessonCard);
+    const streak = shareDuoCard({ type: "streak", streakDays: 6 });
+    const calculator = shareDuoCard(calculatorCard);
+    expect(share).toHaveBeenCalledTimes(3);
+    expect(nativeFile).not.toHaveBeenCalled();
+    return Promise.all([
+      expect(lesson).resolves.toBe("shared"),
+      expect(streak).resolves.toBe("shared"),
+      expect(calculator).resolves.toBe("shared"),
+    ]);
+  });
+
+  it("lesson, streak, and calculator cards stay on the image sheet in the iPhone app", async () => {
+    const share = vi.fn(() => Promise.resolve());
+    const { open } = install({ userAgent: "Mozilla/5.0 NothoApp/iOS", share, bridge: "ios" });
+    nativeFile.mockResolvedValue("shared");
+    await expect(startDuoShare({ ...streakCard, shareType: "lesson" })).resolves.toBe("shared");
+    await expect(startDuoShare(streakCard)).resolves.toBe("shared");
+    await expect(startDuoShare({ ...streakCard, shareType: "badge", fileName: "notho-lesson.png" })).resolves.toBe("shared");
+    expect(share).not.toHaveBeenCalled();
+    expect(open).not.toHaveBeenCalled();
+    expect(browserOpen).not.toHaveBeenCalled();
+    expect(nativeFile).toHaveBeenCalledTimes(3);
+  });
+
+  it("plain lesson text uses an image on iPhone and text everywhere else", async () => {
+    const createBlob = vi.fn(async () => new Blob(["png"]));
+    const share = vi.fn(() => Promise.resolve());
+    install({ userAgent: "Mozilla/5.0 (Linux; Android 14) Chrome/120.0 Mobile", share });
+    const web = beginTextShare({ text: "lesson done", shareType: "lesson", createBlob });
+    expect(share).toHaveBeenCalledTimes(1);
+    expect(createBlob).not.toHaveBeenCalled();
+    await expect(web).resolves.toBe("shared");
+
+    share.mockClear();
+    install({ userAgent: "Mozilla/5.0 NothoApp/Android", bridge: "android" });
+    nativeText.mockResolvedValue("shared");
+    await expect(beginTextShare({ text: "lesson done", shareType: "lesson", createBlob })).resolves.toBe("shared");
+    expect(share).not.toHaveBeenCalled();
+    expect(createBlob).not.toHaveBeenCalled();
+
+    install({ userAgent: "Mozilla/5.0 NothoApp/iOS", bridge: "ios" });
+    nativeFile.mockResolvedValue("shared");
+    await expect(beginTextShare({ text: "lesson done", shareType: "lesson", createBlob, fileName: "notho-share.png" })).resolves.toBe("shared");
+    expect(createBlob).toHaveBeenCalledTimes(1);
+    expect(nativeFile).toHaveBeenCalledWith(expect.objectContaining({ fileName: "notho-share.png" }));
+  });
+
+  it("defers a fetched budget or export file on the web and shares it on Android", async () => {
+    install({ userAgent: "Mozilla/5.0 (Macintosh)" });
+    await expect(shareFileAfterWait(pdf)).resolves.toBe("preview");
+    await expect(shareOrDeferFile({ ...pdf, fileName: "notho-data-export.json", mimeType: "application/json", title: "Notho data export" })).resolves.toBe("needs-tap");
+    expect(nativeFile).not.toHaveBeenCalled();
+
+    install({ userAgent: "Mozilla/5.0 NothoApp/Android", bridge: "android" });
+    nativeFile.mockResolvedValue("cancelled");
+    await expect(shareFileAfterWait(pdf)).resolves.toBe("done");
+    expect(nativeFile).toHaveBeenCalledTimes(1);
+  });
+
+  it("downloads a ready file in the click turn when the browser cannot share it", () => {
+    let clicked = false;
+    install({ userAgent: "Mozilla/5.0 (X11; Linux x86_64) Firefox" });
+    vi.stubGlobal("URL", { createObjectURL: () => "blob:ready", revokeObjectURL: () => undefined });
+    vi.stubGlobal("document", {
+      createElement: () => ({ click: () => { clicked = true; }, remove: () => undefined }),
+      body: { appendChild: () => undefined },
+    });
+    const pending = deliverReadyFile(pdf);
+    expect(clicked).toBe(true);
+    expect(nativeFile).not.toHaveBeenCalled();
+    return expect(pending).resolves.toBe("downloaded");
+  });
+
+  it("does not download when the native save sheet is dismissed", async () => {
+    install({ userAgent: "Mozilla/5.0 NothoApp/iOS", bridge: "ios" });
+    nativeFile.mockResolvedValue("cancelled");
+    await expect(saveReadyFile(pdf)).resolves.toBe("cancelled");
+    expect(nativeFile).toHaveBeenCalledTimes(1);
+  });
+
+  it("saves on the web without opening a share sheet", () => {
+    install({ userAgent: "Mozilla/5.0 (Windows NT 10.0)", share: vi.fn(() => Promise.resolve()) });
+    vi.stubGlobal("URL", { createObjectURL: () => "blob:save", revokeObjectURL: () => undefined });
+    vi.stubGlobal("document", {
+      createElement: () => ({ click: () => undefined, remove: () => undefined }),
+      body: { appendChild: () => undefined },
+    });
+    expect(downloadBlobNow(pdf.blob, pdf.fileName)).toBe(true);
+    return expect(saveReadyFile(pdf)).resolves.toBe("downloaded");
+  });
+
+  it("wires each screen to the shared handoff", () => {
+    const source = (path: string) => readFileSync(new URL(`../../../${path}`, import.meta.url), "utf8");
+    const lesson = source("src/components/views/LessonView.tsx");
+    expect(lesson).not.toContain("<ShareButton");
+    expect(lesson.match(/<ShareResultButton/g)?.length).toBe(5);
+    expect(source("src/components/views/LessonSummaryView.tsx")).toContain("isIosNativeSync");
+    expect(source("src/components/views/LessonSummaryView.tsx")).toContain("<ShareResultButton");
+    expect(source("src/components/NothoTopBar.tsx")).toContain("<StreakShareButton");
+    expect(source("src/components/StatsPanel.tsx")).toContain("<StreakShareButton");
+    expect(source("src/components/CalculatorView.tsx")).toContain("<ShareResultButton");
+    expect(source("src/components/Calculators.tsx")).toContain("<ShareResultButton");
+    expect(source("src/components/ShareCard.tsx")).toContain("beginTextShare");
+    expect(source("src/components/ShareCard.tsx")).toContain("startDuoShare");
+    expect(source("src/components/ShareCard.tsx")).not.toContain("navigator.share");
+    const budget = source("src/components/BudgetPlanner.tsx");
+    expect(budget).toContain("shareFileAfterWait");
+    expect(budget).toContain("deliverReadyFile");
+    expect(budget).toContain("saveReadyFile");
+    expect(budget).not.toContain("isNativePlatform");
+    expect(source("src/components/InteractiveReportModal.tsx")).toContain("onSharePdf");
+    expect(source("src/hooks/useProfileHandlers.ts")).toContain("shareOrDeferFile");
+    expect(source("src/hooks/useProfileHandlers.ts")).toContain("deliverReadyFile");
+    expect(source("src/app/security/page.tsx")).toContain("shareOrDeferFile");
+    expect(source("src/app/(app)/settings/page.tsx")).toContain("saveExportFile");
+    for (const quiet of [
+      "src/components/GoalCard.tsx",
+      "src/components/ReviewSession.tsx",
+      "src/components/ProfileView.tsx",
+    ]) {
+      const text = source(quiet);
+      expect(text).not.toContain("navigator.share");
+      expect(text).not.toContain("shareTextNow");
+      expect(text).not.toContain("startDuoShare");
+    }
   });
 });

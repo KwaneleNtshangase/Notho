@@ -1,42 +1,18 @@
+import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { reportClientError } from "@/lib/errorReporting";
-import { isNativePlatform } from "@/lib/capacitorPlatform";
-import { shareFileBlob } from "@/lib/nativeShare";
+import { deliverReadyFile, shareOrDeferFile } from "@/lib/shareHandoff";
 
-async function saveOrShareJson(blob: Blob, fileName: string): Promise<boolean> {
-  if (await isNativePlatform()) {
-    const shared = await shareFileBlob({
-      blob,
-      fileName,
-      title: "Notho data export",
-      dialogTitle: "Save or share your Notho data",
-    });
-    if (shared) return true;
-  }
-
-  const file = new File([blob], fileName, { type: "application/json" });
-  const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
-  if (typeof navigator.share === "function" && typeof nav.canShare === "function" && nav.canShare({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], title: "Notho data export" });
-      return true;
-    } catch (e) {
-      if (e instanceof Error && e.name === "AbortError") return true;
-    }
-  }
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-  return !(await isNativePlatform());
-}
+const EXPORT_FILE = {
+  fileName: "notho-data-export.json",
+  mimeType: "application/json",
+  title: "Notho data export",
+  dialogTitle: "Save or share your Notho data",
+} as const;
 
 export function useProfileHandlers() {
+  const [exportFile, setExportFile] = useState<Blob | null>(null);
+
   const handleProfileSignOut = async () => {
     await supabase.auth.signOut();
     if (typeof window !== "undefined") {
@@ -79,10 +55,10 @@ export function useProfileHandlers() {
         localStorageSnapshot: lsData,
       };
       const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json" });
-      const ok = await saveOrShareJson(blob, "notho-data-export.json");
-      if (!ok) {
-        alert("Couldn't save the file on this device. Email privacy@notho.co.za and we'll send your export.");
-      }
+      // The account fetch already used up the tap. Native sheets still open.
+      // On the web, keep the file and let the next tap share or download it.
+      const outcome = await shareOrDeferFile({ blob, ...EXPORT_FILE });
+      setExportFile(outcome === "needs-tap" ? blob : null);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Data export failed";
       void reportClientError("account-export-failed", new Error(msg));
@@ -147,9 +123,24 @@ export function useProfileHandlers() {
     }
   };
 
+  const saveExportFile = () => {
+    if (!exportFile) return;
+    void deliverReadyFile({ blob: exportFile, ...EXPORT_FILE }).then((result) => {
+      if (result === "shared" || result === "downloaded") {
+        setExportFile(null);
+        return;
+      }
+      if (result === "failed") {
+        alert("Couldn't save the file on this device. Email privacy@notho.co.za and we'll send your export.");
+      }
+    });
+  };
+
   return {
     handleProfileSignOut,
     handleDownloadData,
     handleDeleteAccount,
+    exportReady: exportFile !== null,
+    saveExportFile,
   };
 }

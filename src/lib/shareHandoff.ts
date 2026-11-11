@@ -24,21 +24,44 @@ function record(shareType: ShareKind | undefined, method: "native" | "whatsapp")
   }
 }
 
+function whatsAppUrl(text: string): string {
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+
 /**
- * Open WhatsApp from a live click. `noopener` is in the feature string so the
- * new page never receives `window.opener`. With that flag the return value is
- * null even when the window opens, so this does not try to tell a blocked
- * popup from a successful one.
+ * Open WhatsApp from a live click.
+ * On the web, `window.open` runs before this returns. `noopener` is in the
+ * feature string so the new page never receives `window.opener`. With that
+ * flag the return value is null even when the window opens, so a blocked
+ * popup cannot be told apart from a successful one.
+ * Inside the iOS and Android shells, `window.open` of wa.me stays in the
+ * WebView and does nothing. The Browser plugin opens the system handler and
+ * does not need the original tap, so a failed native sheet can still fall
+ * through on the next tap.
  */
-export function openWhatsAppNow(text: string, shareType?: ShareKind): boolean {
-  if (typeof window === "undefined" || typeof window.open !== "function") return false;
+export function openWhatsAppNow(text: string, shareType?: ShareKind): Promise<boolean> {
+  const url = whatsAppUrl(text);
+  if (nativePlatformSync() !== "web") {
+    return import("@capacitor/browser")
+      .then(({ Browser }) => Browser.open({ url }))
+      .then(() => {
+        record(shareType, "whatsapp");
+        return true;
+      })
+      .catch(() => false);
+  }
+  if (typeof window === "undefined" || typeof window.open !== "function") return Promise.resolve(false);
   try {
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+    window.open(url, "_blank", "noopener,noreferrer");
   } catch {
-    return false;
+    return Promise.resolve(false);
   }
   record(shareType, "whatsapp");
-  return true;
+  return Promise.resolve(true);
+}
+
+function whatsAppResult(target: TextShareTarget): Promise<ShareHandoffResult> {
+  return openWhatsAppNow(target.text, target.shareType).then((ok) => (ok ? "shared" : "failed"));
 }
 
 /**
@@ -48,35 +71,10 @@ export function openWhatsAppNow(text: string, shareType?: ShareKind): boolean {
  * both calls no-op.
  */
 export function shareTextNow(target: TextShareTarget): Promise<ShareHandoffResult> {
-  const nav = typeof navigator !== "undefined" ? navigator : undefined;
-  if (nav && typeof nav.share === "function") {
-    const payload: ShareData = { text: target.text };
-    if (target.title) payload.title = target.title;
-    if (target.url) payload.url = target.url;
-    let pending: Promise<void>;
-    try {
-      pending = nav.share(payload);
-    } catch (err) {
-      if (isShareCancel(err)) return Promise.resolve("cancelled");
-      // The throw is still inside the click, so WhatsApp can open now.
-      return Promise.resolve(openWhatsAppNow(target.text, target.shareType) ? "shared" : "failed");
-    }
-    return pending.then(
-      () => {
-        record(target.shareType, "native");
-        return "shared" as const;
-      },
-      (err: unknown) => {
-        if (isShareCancel(err)) return "cancelled" as const;
-        // The rejection runs after the gesture is gone. Opening WhatsApp
-        // here is blocked, and retrying the same share call fails again.
-        return "needs-whatsapp" as const;
-      },
-    );
-  }
-  // Android and Huawei shells often have no Web Share API, and window.open
-  // inside that WebView does not reliably leave the app. The native text
-  // sheet does not need the original click gesture.
+  // The Android and Huawei shells expose navigator.share, but the WebView
+  // share call no-ops or rejects after the tap is gone. The Capacitor text
+  // sheet does not need that tap. Do this before Web Share so the stub
+  // cannot swallow the click.
   if (nativePlatformSync() === "android") {
     return shareNativeText({
       title: target.title ?? "Notho",
@@ -92,7 +90,59 @@ export function shareTextNow(target: TextShareTarget): Promise<ShareHandoffResul
       return "needs-whatsapp" as const;
     });
   }
-  return Promise.resolve(openWhatsAppNow(target.text, target.shareType) ? "shared" : "failed");
+  // iPhone app shares are image sheets. A text call must not open WhatsApp
+  // or the web sheet. Callers with a card use beginTextShare / startDuoShare.
+  if (isIosNativeSync()) return Promise.resolve("failed");
+
+  const nav = typeof navigator !== "undefined" ? navigator : undefined;
+  if (nav && typeof nav.share === "function") {
+    const payload: ShareData = { text: target.text };
+    if (target.title) payload.title = target.title;
+    if (target.url) payload.url = target.url;
+    let pending: Promise<void>;
+    try {
+      pending = nav.share(payload);
+    } catch (err) {
+      if (isShareCancel(err)) return Promise.resolve("cancelled");
+      // The throw is still inside the click, so WhatsApp can open now.
+      return whatsAppResult(target);
+    }
+    return pending.then(
+      () => {
+        record(target.shareType, "native");
+        return "shared" as const;
+      },
+      (err: unknown) => {
+        if (isShareCancel(err)) return "cancelled" as const;
+        // The rejection runs after the gesture is gone. Opening WhatsApp
+        // here is blocked, and retrying the same share call fails again.
+        return "needs-whatsapp" as const;
+      },
+    );
+  }
+  return whatsAppResult(target);
+}
+
+/**
+ * Text share for every non-card button.
+ * iPhone app: image sheet, and only when the caller can paint one.
+ * Android, Huawei, web, and desktop: shareTextNow, which must reach the
+ * sheet or WhatsApp before this returns.
+ */
+export function beginTextShare(target: TextShareTarget & {
+  fileName?: string;
+  createBlob?: () => Promise<Blob>;
+}): Promise<ShareHandoffResult> {
+  if (isIosNativeSync()) {
+    if (!target.createBlob) return Promise.resolve("failed");
+    return shareIosCard({
+      text: target.text,
+      fileName: target.fileName ?? "notho-share.png",
+      shareType: target.shareType,
+      createBlob: target.createBlob,
+    });
+  }
+  return shareTextNow(target);
 }
 
 export async function shareIosCard(opts: {
@@ -208,4 +258,74 @@ export function beginFileShare(opts: {
   } catch (err) {
     return isShareCancel(err) ? Promise.resolve("cancelled") : "unavailable";
   }
+}
+
+export type ReadyFile = {
+  blob: Blob;
+  fileName: string;
+  mimeType: string;
+  title: string;
+  dialogTitle?: string;
+};
+
+/** Anchor download. Must run in the click turn on the web. */
+export function downloadBlobNow(blob: Blob, fileName: string): boolean {
+  if (typeof document === "undefined") return false;
+  try {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    if (typeof window !== "undefined" && typeof window.setTimeout === "function") {
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A file that was built after an await (PDF fetch, account export).
+ * Native sheets still open. The web must not call navigator.share here.
+ */
+export async function shareOrDeferFile(opts: ReadyFile): Promise<"shared" | "cancelled" | "needs-tap"> {
+  if (nativePlatformSync() === "web") return "needs-tap";
+  const outcome = beginFileShare(opts);
+  if (outcome === "unavailable") return "needs-tap";
+  const result = await outcome;
+  return result === "shared" || result === "cancelled" ? result : "needs-tap";
+}
+
+/** Same wait as shareOrDeferFile, in the budget preview's done/preview words. */
+export async function shareFileAfterWait(opts: ReadyFile): Promise<"done" | "preview"> {
+  const result = await shareOrDeferFile(opts);
+  return result === "needs-tap" ? "preview" : "done";
+}
+
+/**
+ * Share a file that is already in memory, from a fresh tap.
+ * Downloads in that same turn when the browser cannot share files.
+ * A later rejection does not download: the tap is already gone.
+ */
+export function deliverReadyFile(opts: ReadyFile): Promise<"shared" | "cancelled" | "downloaded" | "failed"> {
+  const outcome = beginFileShare(opts);
+  if (outcome === "unavailable") {
+    return Promise.resolve(downloadBlobNow(opts.blob, opts.fileName) ? "downloaded" : "failed");
+  }
+  return outcome.then((result) => (result === "shared" || result === "cancelled" ? result : "failed"));
+}
+
+/**
+ * Save PDF. Web downloads in the click turn. Native opens the file sheet
+ * and does not download when the learner dismisses it.
+ */
+export function saveReadyFile(opts: ReadyFile): Promise<"shared" | "cancelled" | "downloaded" | "failed"> {
+  if (nativePlatformSync() === "web") {
+    return Promise.resolve(downloadBlobNow(opts.blob, opts.fileName) ? "downloaded" : "failed");
+  }
+  return deliverReadyFile(opts);
 }
