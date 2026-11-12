@@ -64,7 +64,7 @@ export function PublicFooter() {
           </Link>
         </div>
         <div style={{ gridColumn: "span 1" }}>
-          <img src="/notho-logo-on-dark.png" alt="Notho" style={{ height: 32, width: "auto", marginBottom: 12 }} />
+          <img src="/notho-logo-on-dark.png" alt="Notho" style={{ height: 48, width: "auto", marginBottom: 12 }} />
           <p style={{ fontSize: 14, lineHeight: 1.55, color: "#b0b0b0", margin: 0 }}>
             Short lessons and tools for learning personal finance in South Africa.
           </p>
