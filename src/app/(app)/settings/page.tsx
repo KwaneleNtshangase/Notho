@@ -8,7 +8,7 @@ import { useProfileHandlers } from "@/hooks/useProfileHandlers";
 
 export default function SettingsPage() {
   const { userData, setDailyGoal, resetProgress, userSettings } = useNotho();
-  const { handleProfileSignOut, handleDownloadData, handleDeleteAccount } = useProfileHandlers();
+  const { handleProfileSignOut, handleDownloadData, handleDeleteAccount, exportReady, saveExportFile } = useProfileHandlers();
 
   return (
     <SettingsView
@@ -21,7 +21,8 @@ export default function SettingsPage() {
       userSettings={userSettings}
       onSignOut={handleProfileSignOut}
       onDeleteAccount={handleDeleteAccount}
-      onDownloadData={handleDownloadData}
+      onDownloadData={exportReady ? saveExportFile : handleDownloadData}
+      downloadReady={exportReady}
     />
   );
 }

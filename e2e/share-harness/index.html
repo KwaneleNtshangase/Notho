@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Notho share harness</title>
+    <script>
+      window.process = {
+        env: {
+          NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co",
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-anon-key",
+          NODE_ENV: "test",
+        },
+      };
+    </script>
+  </head>
+  <body>
+    <button id="now" type="button">Share now</button>
+    <button id="ios" type="button">Share card</button>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

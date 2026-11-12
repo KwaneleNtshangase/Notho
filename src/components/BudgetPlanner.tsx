@@ -9,9 +9,8 @@ import { localizedDate } from "@/i18n/date";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { analytics } from "@/lib/analytics";
-import { isNativePlatform } from "@/lib/capacitorPlatform";
-import { shareFileBlob } from "@/lib/nativeShare";
-import { beginFileShare, preparedFileFollowUp } from "@/lib/shareHandoff";
+import { nativePlatformSync } from "@/lib/capacitorPlatform";
+import { deliverReadyFile, downloadBlobNow, saveReadyFile, shareFileAfterWait } from "@/lib/shareHandoff";
 import { sastToday } from "@/lib/dates";
 import { bumpWeeklyStats } from "@/lib/weeklyStats";
 import { monthAlignedDefaults, resolvePeriod, type PeriodPreset } from "@/lib/budget/report/period";
@@ -1113,21 +1112,38 @@ export function BudgetView() {
     }
   };
 
+  const openPdfPreview = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob);
+    setPdfFrameReady(false);
+    setPdfPreview((prev) => {
+      if (prev?.url.startsWith("blob:")) URL.revokeObjectURL(prev.url);
+      return { url, fileName, blob };
+    });
+  };
+
   // Download the PDF for a specific period (used by the interactive report).
+  // The fetch consumes the tap. On the web a direct download still works in
+  // desktop browsers. In the native shells the file sheet does not need the
+  // tap; if it cannot open, the preview's Save button is a fresh one.
   const downloadReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
     setExportLoading(true);
     try {
       const res = await postBudgetReport({ periodStart, periodEnd, redactNames });
       if (!res.ok) return;
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
+      if (nativePlatformSync() !== "web") {
+        const where = await shareFileAfterWait({
+          blob,
+          fileName,
+          mimeType: "application/pdf",
+          title: "Notho budget report",
+          dialogTitle: "Save your budget report",
+        });
+        if (where === "preview") openPdfPreview(blob, fileName);
+        return;
+      }
+      downloadBlobNow(blob, fileName);
     } catch {
       /* non-fatal: the interactive view is still open */
     } finally {
@@ -1137,8 +1153,9 @@ export function BudgetView() {
 
   // Share a report that still has to be generated. Native share does not need
   // the original tap. On the web the tap is gone once the PDF response
-  // arrives, so a missed sheet opens the ready preview: its Share and Save
-  // PDF buttons run on a new tap. Dismissing a sheet does not open that preview.
+  // arrives, so the ready preview opens instead of calling Web Share with a
+  // dead gesture. Its Share and Save PDF buttons run on a new tap.
+  // Dismissing a sheet does not open that preview.
   const shareReportPdf = async (periodStart: string, periodEnd: string, redactNames = true) => {
     setExportLoading(true);
     try {
@@ -1146,23 +1163,14 @@ export function BudgetView() {
       if (!res.ok) return;
       const blob = await res.blob();
       const fileName = `notho-budget-report-${periodStart}_${periodEnd}.pdf`;
-
-      const outcome = beginFileShare({
+      const where = await shareFileAfterWait({
         blob,
         fileName,
         mimeType: "application/pdf",
         title: "Notho budget report",
         dialogTitle: "Share your budget report",
       });
-      const result = outcome === "unavailable" ? "unavailable" : await outcome;
-      if (preparedFileFollowUp(result) === "done") return;
-
-      const url = URL.createObjectURL(blob);
-      setPdfFrameReady(false);
-      setPdfPreview((prev) => {
-        if (prev?.url.startsWith("blob:")) URL.revokeObjectURL(prev.url);
-        return { url, fileName, blob };
-      });
+      if (where === "preview") openPdfPreview(blob, fileName);
     } catch {
       /* non-fatal: the interactive view is still open */
     } finally {
@@ -1886,49 +1894,27 @@ export function BudgetView() {
                 className="btn btn-secondary"
                 style={{ flex: 1, padding: 12 }}
                 onClick={() => {
-                  const save = () => {
-                    const a = document.createElement("a");
-                    a.href = pdfPreview.url;
-                    a.download = pdfPreview.fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                  };
-                  const outcome = beginFileShare({
+                  void deliverReadyFile({
                     blob: pdfPreview.blob,
                     fileName: pdfPreview.fileName,
                     mimeType: "application/pdf",
                     title: "Notho budget report",
                     dialogTitle: "Share or save your budget report",
                   });
-                  if (outcome === "unavailable") {
-                    save();
-                    return;
-                  }
-                  // A rejection arrives after this tap. Save PDF is the next tap.
-                  void outcome.then(() => undefined);
                 }}
               ><I18nText source={"Share"} /></button>
               <button
                 type="button"
                 className="btn btn-primary"
                 style={{ flex: 1, padding: 12 }}
-                onClick={async () => {
-                  if (await isNativePlatform()) {
-                    const shared = await shareFileBlob({
-                      blob: pdfPreview.blob,
-                      fileName: pdfPreview.fileName,
-                      title: "Notho budget report",
-                      dialogTitle: "Save your budget report",
-                    });
-                    if (shared) return;
-                  }
-                  const a = document.createElement("a");
-                  a.href = pdfPreview.url;
-                  a.download = pdfPreview.fileName;
-                  document.body.appendChild(a);
-                  a.click();
-                  a.remove();
+                onClick={() => {
+                  void saveReadyFile({
+                    blob: pdfPreview.blob,
+                    fileName: pdfPreview.fileName,
+                    mimeType: "application/pdf",
+                    title: "Notho budget report",
+                    dialogTitle: "Save your budget report",
+                  });
                 }}
               ><I18nText source={"Save PDF"} /></button>
             </div>

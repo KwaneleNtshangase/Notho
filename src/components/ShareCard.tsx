@@ -5,7 +5,7 @@ import { LocalizedText as I18nText, LocalizedElement as I18nElement } from "@/i1
 import { useState, type CSSProperties } from "react";
 import { Share2 } from "@/components/icons/NothoIcons";
 import { duoCardCopy } from "@/lib/duoShareCard";
-import { openWhatsAppNow, shareTextNow, startDuoShare } from "@/lib/shareHandoff";
+import { beginTextShare, openWhatsAppNow, startDuoShare } from "@/lib/shareHandoff";
 import { generateShareText } from "@/app/pageViews.types";
 
 export type ShareCardData =
@@ -47,7 +47,7 @@ function loadImage(src: string): Promise<HTMLImageElement | null> {
   });
 }
 
-function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines = 3): string[] {
   const words = text.split(/\s+/).filter(Boolean);
   const lines: string[] = [];
   let line = "";
@@ -61,7 +61,7 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
     }
   }
   if (line) lines.push(line);
-  return lines.slice(0, 3);
+  return lines.slice(0, maxLines);
 }
 
 function drawFlame(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number) {
@@ -99,7 +99,7 @@ export function shareCaption(data: ShareCardData): string {
   return generateShareText("lesson", { lessonTitle: data.lessonTitle, xp: data.xpEarned });
 }
 
-export function generateShareCard(data: ShareCardData): Promise<string> {
+function renderShareCanvas(data: ShareCardData): Promise<HTMLCanvasElement> {
   return (async () => {
     const canvas = document.createElement("canvas");
     canvas.width = W;
@@ -170,13 +170,50 @@ export function generateShareCard(data: ShareCardData): Promise<string> {
     }
 
     drawWordmark(ctx, mark);
-    return canvas.toDataURL("image/png");
+    return canvas;
   })();
 }
 
+function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    if (typeof canvas.toBlob !== "function") {
+      reject(new Error("Canvas unavailable"));
+      return;
+    }
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Canvas unavailable"));
+    }, "image/png");
+  });
+}
+
+export function generateShareCard(data: ShareCardData): Promise<string> {
+  return renderShareCanvas(data).then((canvas) => canvas.toDataURL("image/png"));
+}
+
 async function blobFromCard(data: ShareCardData): Promise<Blob> {
-  const dataUrl = await generateShareCard(data);
-  return (await fetch(dataUrl)).blob();
+  return canvasToPngBlob(await renderShareCanvas(data));
+}
+
+/** Image sheet for a text-only button on the iPhone app. */
+export function plainTextCardBlob(text: string): Promise<Blob> {
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return Promise.reject(new Error("Canvas unavailable"));
+  polyfillRoundRect(ctx);
+  ctx.fillStyle = PAPER;
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = INK;
+  ctx.font = "600 54px -apple-system, BlinkMacSystemFont, sans-serif";
+  ctx.textAlign = "center";
+  const lines = wrapLines(ctx, text.replace(/\s+/g, " ").trim(), W - 160, 8);
+  lines.forEach((line, i) => ctx.fillText(line, W / 2, 820 + i * 72));
+  ctx.fillStyle = MUTED;
+  ctx.font = "500 36px -apple-system, BlinkMacSystemFont, sans-serif";
+  ctx.fillText("notho", W / 2, H - 140);
+  return canvasToPngBlob(canvas);
 }
 
 /**
@@ -207,10 +244,11 @@ export function ShareResultButton({ data, label = "Share" }: { data: ShareCardDa
 
   const handleShare = () => {
     if (whatsapp) {
-      openWhatsAppNow(shareCaption(data), shareKind(data));
-      setWhatsapp(false);
-      setStatus("done");
-      window.setTimeout(() => setStatus("idle"), 2500);
+      void openWhatsAppNow(shareCaption(data), shareKind(data)).then((ok) => {
+        setWhatsapp(false);
+        setStatus(ok ? "done" : "error");
+        if (ok) window.setTimeout(() => setStatus("idle"), 2500);
+      });
       return;
     }
     setSharing(true);
@@ -265,15 +303,21 @@ export function ShareButton({
   const handleShare = () => {
     if (busy) return;
     if (whatsapp) {
-      openWhatsAppNow(text, shareType);
-      setWhatsapp(false);
-      setStatus("done");
-      window.setTimeout(() => setStatus("idle"), 2500);
+      void openWhatsAppNow(text, shareType).then((ok) => {
+        setWhatsapp(false);
+        setStatus(ok ? "done" : "error");
+        if (ok) window.setTimeout(() => setStatus("idle"), 2500);
+      });
       return;
     }
     setBusy(true);
     setStatus("idle");
-    void shareTextNow({ text, shareType }).then((result) => {
+    void beginTextShare({
+      text,
+      shareType,
+      fileName: "notho-share.png",
+      createBlob: () => plainTextCardBlob(text),
+    }).then((result) => {
       setBusy(false);
       if (result === "cancelled") return;
       if (result === "needs-whatsapp") {
@@ -320,8 +364,12 @@ export function StreakShareButton({
       type="button"
       onClick={() => {
         if (whatsapp) {
-          openWhatsAppNow(shareCaption({ type: "streak", streakDays }), "streak");
-          setWhatsapp(false);
+          void openWhatsAppNow(shareCaption({ type: "streak", streakDays }), "streak").then((ok) => {
+            setWhatsapp(false);
+            if (ok) return;
+            setFailed(true);
+            window.setTimeout(() => setFailed(false), 2500);
+          });
           return;
         }
         setFailed(false);

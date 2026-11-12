@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { PublicHeader } from "@/components/PublicHeader";
 import { PublicFooter } from "@/components/PublicFooter";
+import { deliverReadyFile, shareOrDeferFile } from "@/lib/shareHandoff";
 
 /**
  * Public "Your data & security" page. Explains how we handle data (plain
@@ -16,6 +17,7 @@ import { PublicFooter } from "@/components/PublicFooter";
 export default function SecurityPage() {
   const [busy, setBusy] = useState<null | "export" | "delete">(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [exportFile, setExportFile] = useState<Blob | null>(null);
 
   const token = async () => {
     const { data } = await supabase.auth.getSession();
@@ -31,15 +33,40 @@ export default function SecurityPage() {
       const res = await fetch("/api/account/export", { headers: { Authorization: `Bearer ${t}` } });
       if (!res.ok) { setMsg("Something went wrong. Please try again."); return; }
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "notho-my-data.json";
-      a.click();
-      URL.revokeObjectURL(url);
+      const outcome = await shareOrDeferFile({
+        blob,
+        fileName: "notho-my-data.json",
+        mimeType: "application/json",
+        title: "Notho data export",
+        dialogTitle: "Save or share your Notho data",
+      });
+      if (outcome === "needs-tap") {
+        setExportFile(blob);
+        setMsg("Your file is ready. Tap Save my data.");
+      } else {
+        setExportFile(null);
+      }
     } finally {
       setBusy(null);
     }
+  };
+
+  const saveExport = () => {
+    if (!exportFile) return;
+    void deliverReadyFile({
+      blob: exportFile,
+      fileName: "notho-my-data.json",
+      mimeType: "application/json",
+      title: "Notho data export",
+      dialogTitle: "Save or share your Notho data",
+    }).then((result) => {
+      if (result === "shared" || result === "downloaded") {
+        setExportFile(null);
+        setMsg(null);
+        return;
+      }
+      if (result === "failed") setMsg("Couldn't save the file on this device. Email privacy@notho.co.za and we'll send your export.");
+    });
   };
 
   const deleteAccount = async () => {
@@ -88,9 +115,9 @@ export default function SecurityPage() {
         <h2 style={h2}><I18nText source={"Your rights"} /></h2>
         <p style={p}><I18nText source={"Under POPIA you can access the data we hold about you and ask us to delete it. You can do both right here."} /></p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 12 }}>
-          <button type="button" onClick={downloadData} disabled={busy !== null}
+          <button type="button" onClick={exportFile ? saveExport : downloadData} disabled={busy !== null}
             style={{ ...btn, background: "var(--color-primary)", color: "#fff", opacity: busy === "export" ? 0.6 : 1 }}>
-            <I18nText>{busy === "export" ? "Preparing…" : "Download my data"}</I18nText>
+            <I18nText>{busy === "export" ? "Preparing…" : exportFile ? "Save my data" : "Download my data"}</I18nText>
           </button>
           <button type="button" onClick={deleteAccount} disabled={busy !== null}
             style={{ ...btn, background: "transparent", color: "#E03C31", boxShadow: "inset 0 0 0 1.5px #E03C31", opacity: busy === "delete" ? 0.6 : 1 }}>
