@@ -40,7 +40,7 @@
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>NSMotionUsageDescription</key>
-	<string>Notho uses motion to open Send Feedback when you shake the phone.</string>
+	<string>Notho uses motion to open Report a Problem when you shake the phone.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Notho uses Face ID to protect access to your budget and imported transactions.</string>
 	<key>UIApplicationSceneManifest</key>
